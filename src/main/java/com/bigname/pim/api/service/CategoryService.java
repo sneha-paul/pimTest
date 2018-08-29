@@ -1,0 +1,16 @@
+package com.bigname.pim.api.service;
+
+import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.persistence.dao.CategoryDAO;
+import com.bigname.pim.util.FindBy;
+
+import java.util.List;
+
+/**
+ * Created by sruthi on 29-08-2018.
+ */
+public interface CategoryService extends  BaseService<Category, CategoryDAO> {
+    List<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy);
+
+}
+
