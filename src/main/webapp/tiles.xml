@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+    <definition name="mainLayout" template="/template1.jsp">
+        <put-attribute name="title" value="" />
+        <put-attribute name="header" value="/includes/header.jsp" />
+        <put-attribute name="leftNav" value="/includes/leftNav.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/includes/footer.jsp" />
+    </definition>
+
+    <definition name="mainPopupLayout" template="/popupTemplate1.jsp">
+        <put-attribute name="body" value="" />
+    </definition>
+
+    <!--<definition name="gridPopup" extends="mainPopupLayout">
+        <put-attribute name="title" value="PIM - Products" />
+        <put-attribute name="body" value="/product/products.jsp" />
+    </definition>-->
+
+    <!--<definition name="products" extends="mainLayout">
+        <put-attribute name="title" value="PIM - Products" />
+        <put-attribute name="body" value="/product/products.jsp" />
+    </definition>-->
+
+</tiles-definitions>
