@@ -124,6 +124,7 @@
 <script src="/assets/js/pages/ui/dialogs.js"></script>
 <script src="/assets/vendor/table-dragger/table-dragger.min.js"></script>
 <script src="/assets/vendor/emodal/eModal.js"></script>
+<script src="/assets/js/pages/ui/website/website.js"></script>
 <!-- PAGE LEVEL JS -->
 <c:forEach var="customJS" items="${pageBottomScripts}">
     <script src="<c:out value='${customJS}'/>"></script>

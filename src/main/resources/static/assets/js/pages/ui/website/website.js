@@ -3,7 +3,7 @@ $(function(){
         var eventA = function(){};
         var eventB = function(){};
         var options = {
-            url: "http://localhost:8081/pim/websites/ENVELOPES/availableCatalogs",
+            url: $.getURL('/pim/websites/{websiteId}/availableCatalogs'),
             loadingHtml: '<span class="fa fa-circle-o-notch fa-spin fa-3x text-primary"></span><span class="h4">Loading</span>',
             title:'Available Catalogs',
             size: eModal.size.lg,

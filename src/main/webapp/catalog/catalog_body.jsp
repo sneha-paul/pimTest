@@ -14,7 +14,7 @@
                         <div class="tab-content">
                             <div class="tab-pane show active" id="Home-new2">
                                 <div class="row clearfix m-t-20">
-                                    <div class="col-md-6">
+                                    <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
                                                 <form id="update-form" method="post" action="/pim/catalogs/${catalog.catalogId}" novalidate>

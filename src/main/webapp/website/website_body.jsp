@@ -91,58 +91,12 @@
                 </div>
             </div>
         </div>
-
-        <!-- Large Size -->
-        <div class="modal fade" id="largeModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="title" id="largeModalLabel">Available Catalogs</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="card">
-                            <div class="body">
-                                <div class="table-responsive">
-                                <table class="table table-hover dataTable table-custom">
-                                    <thead class="thead-dark">
-                                    <tr>
-                                        <th>Catalog Name</th>
-                                        <th>Catalog ID</th>
-                                        <th>Select</th>
-                                    </tr>
-                                    </thead>
-                                    <tr>
-                                        <td>Star Wars</td>
-                                        <td>1977</td>
-                                        <td>
-                                            <label class="fancy-checkbox">
-                                                <input type="checkbox" name="active" value="Y">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Howard The Duck</td>
-                                        <td>1986</td>
-                                        <td>$16,295,774</td>
-                                    </tr>
-                                    <tr>
-                                        <td>American Graffiti</td>
-                                        <td>1973</td>
-                                        <td>$115,000,000</td>
-                                    </tr>
-                                </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">SAVE CHANGES</button>
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">CLOSE</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <script>
+            $.initPage({
+                'websiteId' : '${website.websiteId}'
+            });
+        </script>
+        <script src="/assets/js/pages/ui/website/website.js"></script>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">
@@ -182,3 +136,4 @@
         </div>
     </c:otherwise>
 </c:choose>
+

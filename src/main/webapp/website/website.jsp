@@ -3,10 +3,10 @@
 <tiles:insertDefinition name="mainLayout">
     <tiles:putAttribute name="title" value="PIM - Websites"/>
     <tiles:putAttribute name="body" value="/website/website_body.jsp"/>
-    <tiles:putListAttribute name="pageBottomScripts">
+    <%--<tiles:putListAttribute name="pageBottomScripts">
         <tiles:addAttribute>/assets/js/pages/ui/website/website.js</tiles:addAttribute>
-    </tiles:putListAttribute>
-    <tiles:putAttribute name="script">
+    </tiles:putListAttribute>--%>
+    <%--<tiles:putAttribute name="script">
         <script>
             $(function() {
                 // validation needs name of the element
@@ -18,5 +18,5 @@
                 tableDragger(document.querySelector("#only-bodytable"), { mode: "row", onlyBody: true });
             });
         </script>
-    </tiles:putAttribute>
+    </tiles:putAttribute>--%>
 </tiles:insertDefinition>

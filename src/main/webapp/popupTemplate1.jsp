@@ -35,6 +35,11 @@
         <link type="text/css" rel="stylesheet" media="all" href='<c:out value="${pageCss}"/>'>
     </c:forEach>
 
+    <script src="/assets/vendor/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/assets/vendor/bootstrap/js/popper.min.js"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="/assets/js/pages/ui/page.js"></script>
+
     <!-- PAGE LEVEL JS -->
     <c:forEach var="pageJS" items="${pageTopScripts}">
         <script type="text/javascript" src='<c:out value="${pageJS}"/>'></script>
@@ -48,12 +53,11 @@
     </style>
 
     </head>
-<body>
+<body class="theme-orange">
 
 <tiles:insertAttribute ignore="true" name="body"/>
 
 <!-- Javascript -->
-<script src="/assets/bundles/libscripts.bundle.js"></script>
 <script src="/assets/bundles/vendorscripts.bundle.js"></script>
 
 <script src="/assets/bundles/datatablescripts.bundle.js"></script>
