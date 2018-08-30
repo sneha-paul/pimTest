@@ -10,11 +10,11 @@
                     </div>
                     <div class="body">
                         <ul class="nav nav-tabs-new2">
-                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#Home-new2">Attributes</a></li>
-                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Profile-new2">Catalogs</a></li>
+                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#Attributes">Attributes</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Catalogs">Catalogs</a></li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane show active" id="Home-new2">
+                            <div class="tab-pane show active" id="Attributes">
                                 <div class="row clearfix m-t-20">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
@@ -54,7 +54,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="Profile-new2">
+                            <div class="tab-pane" id="Catalogs">
                                 <div class="row clearfix">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">

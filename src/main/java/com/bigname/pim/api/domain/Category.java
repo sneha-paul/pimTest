@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,6 +24,9 @@ public class Category extends Entity<Category> {
 
     private String description;
 
+    @Transient
+    private Page<Category> categories;
+
     public Category() {
         super();
     }
@@ -33,7 +37,7 @@ public class Category extends Entity<Category> {
     }
 
     public String getCategoryId() {
-        return categoryId;
+        return getExternalId();
     }
 
     public void setCategoryId(String categoryId) {
@@ -55,6 +59,14 @@ public class Category extends Entity<Category> {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Page<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Page<Category> categories) {
+        this.categories = categories;
     }
 
     void setExternalId() {

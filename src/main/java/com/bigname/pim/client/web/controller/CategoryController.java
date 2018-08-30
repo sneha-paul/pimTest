@@ -39,7 +39,7 @@ public class CategoryController {
     }
 
     @RequestMapping("/available")
-    public ModelAndView availableCatalogs() {
+    public ModelAndView availableCategories() {
         Map<String, Object> model = new HashMap<>();
         return new ModelAndView("category/availableCategories", model);
     }
@@ -74,6 +74,7 @@ public class CategoryController {
         } else {
             Optional<Category> category = categoryService.get(id, FindBy.findBy(true), false);
             if(category.isPresent()) {
+                category.get().setCategories(categoryService.getRelatedCategory(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
                 model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories", category.get().getCategoryName(), ""));
@@ -82,5 +83,12 @@ public class CategoryController {
             }
         }
         return new ModelAndView("category/category", model);
+    }
+
+    @RequestMapping(value = "/{id}/availableCategories")
+    public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("categories", categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID));
+        return new ModelAndView("category/availableCategories", model);
     }
 }
