@@ -14,6 +14,5 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
     List<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy);
     List<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy);
     Page<Category> getRelatedCategory(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired);
-
 }
 

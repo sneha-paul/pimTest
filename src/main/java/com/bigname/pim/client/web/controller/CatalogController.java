@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.exception.GenericPlatformException;
 import com.bigname.pim.api.service.CatalogService;
+import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.client.model.Breadcrumbs;
 import org.springframework.stereotype.Controller;
@@ -30,9 +31,11 @@ import java.util.Optional;
 public class CatalogController {
 
     private CatalogService catalogService;
+    private CategoryService categoryService;
 
-    public CatalogController(CatalogService catalogService) {
+    public CatalogController(CatalogService catalogService, CategoryService categoryService) {
         this.catalogService = catalogService;
+        this.categoryService = categoryService;
     }
 
     @RequestMapping()
@@ -80,6 +83,7 @@ public class CatalogController {
         } else {
             Optional<Catalog> catalog = catalogService.get(id, FindBy.findBy(true), false);
             if(catalog.isPresent()) {
+                catalog.get().setCategories(catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("catalog", catalog.get());
                 model.put("breadcrumbs", new Breadcrumbs("Catalogs", "Catalogs", "/pim/catalogs", catalog.get().getCatalogName(), ""));
@@ -88,5 +92,12 @@ public class CatalogController {
             }
         }
         return new ModelAndView("catalog/catalog", model);
+    }
+
+    @RequestMapping(value = "/{id}/availableCategories")
+    public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("categories", catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID));
+        return new ModelAndView("category/availableCategories", model);
     }
 }

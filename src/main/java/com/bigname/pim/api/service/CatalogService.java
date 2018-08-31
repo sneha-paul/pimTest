@@ -1,6 +1,7 @@
 package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.Catalog;
+import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
@@ -15,4 +16,7 @@ import java.util.Optional;
  */
 public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
     List<Catalog> getAllWithExclusions(String[] excludedIds, FindBy findBy);
+    Page<Category> getRootCategories(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired);
+    List<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy);
+
 }
