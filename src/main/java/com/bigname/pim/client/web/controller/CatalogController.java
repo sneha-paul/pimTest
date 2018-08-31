@@ -10,10 +10,7 @@ import com.bigname.pim.client.model.Breadcrumbs;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,7 +80,7 @@ public class CatalogController {
         } else {
             Optional<Catalog> catalog = catalogService.get(id, FindBy.findBy(true), false);
             if(catalog.isPresent()) {
-                catalog.get().setCategories(catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
+                catalog.get().setRootCategories(catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("catalog", catalog.get());
                 model.put("breadcrumbs", new Breadcrumbs("Catalogs", "Catalogs", "/pim/catalogs", catalog.get().getCatalogName(), ""));
@@ -94,10 +91,19 @@ public class CatalogController {
         return new ModelAndView("catalog/catalog", model);
     }
 
-    @RequestMapping(value = "/{id}/availableCategories")
+    @RequestMapping(value = "/{id}/availableRootCategories")
     public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
         model.put("categories", catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID));
-        return new ModelAndView("category/availableCategories", model);
+        return new ModelAndView("category/availableRootCategories", model);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/{id}/category/{categoryId}", method = RequestMethod.POST)
+    public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "categoryId") String categoryId) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = catalogService.addCategory(id, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID) != null;
+        model.put("success", success);
+        return model;
     }
 }

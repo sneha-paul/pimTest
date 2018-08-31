@@ -61,7 +61,7 @@
                                         <div class="card">
                                             <div class="body">
                                                 <div class="row p-b-25">
-                                                    <div class="col-lg-12 col-md-12"><div class="pull-right"><button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add RootCategories</span></button></div></div>
+                                                    <div class="col-lg-12 col-md-12"><div class="pull-right"><button type="button" class="btn btn-success js-add-category"><i class="fa fa-plus"></i> <span class="p-l-5">Add RootCategories</span></button></div></div>
                                                 </div>
                                                 <table id="only-bodytable" class="table table-hover dataTable table-custom">
                                                     <thead class="thead-dark">
@@ -71,7 +71,7 @@
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
-                                                    <c:forEach items="${categories.category.content}" var="category">
+                                                    <c:forEach items="${catalog.rootCategories.content}" var="category">
                                                         <tr>
                                                             <td>${category.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
                                                             <td>${category.categoryId}</td>
@@ -92,12 +92,17 @@
                 </div>
             </div>
         </div>
-
-        <div class="modal fade" id="largeModal" tabindex="-1" role="dialog">
+        <script>
+            $.initPage({
+                'catalogId' : '${catalog.catalogId}'
+            });
+        </script>
+        <script src="/assets/js/pages/ui/catalog/catalog.js"></script>
+        <%--<div class="modal fade" id="largeModal" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="title" id="largeModalLabel">Available Subcategories</h4>
+                        <h4 class="title" id="largeModalLabel">Available RootCategories</h4>
                     </div>
                     <div class="modal-body">
                         <div class="card">
@@ -111,7 +116,7 @@
                                             <th>Select</th>
                                         </tr>
                                         </thead>
-                                        &lt;%&ndash;<%--<tr>
+                                        &lt;%&ndash;&lt;%&ndash;<tr>
                                         <td>Star Wars</td>
                                         <td>1977</td>
                                         <td>
@@ -130,7 +135,7 @@
                                             <td>American Graffiti</td>
                                             <td>1973</td>
                                             <td>$115,000,000</td>
-                                        </tr>--%>&ndash;%&gt;
+                                        </tr>&ndash;%&gt;&ndash;%&gt;
                                     </table>
                                 </div>
                             </div>
@@ -142,7 +147,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>--%>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">

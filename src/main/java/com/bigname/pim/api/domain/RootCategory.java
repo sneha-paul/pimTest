@@ -25,6 +25,7 @@ public class RootCategory extends  EntityAssociation {
         super();
         this.catalogId = catalogId;
         this.categoryId = categoryId;
+        setActive("Y");
     }
 
     public String getCatalogId() {

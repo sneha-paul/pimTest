@@ -25,6 +25,7 @@ public class RelatedCategory extends EntityAssociation {
         super();
         this.categoryId = categoryId;
         this.parentCategoryId = parentCategoryId;
+        setActive("Y");
     }
 
     public String getCategoryId() {

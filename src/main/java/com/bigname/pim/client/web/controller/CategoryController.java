@@ -8,10 +8,7 @@ import com.bigname.pim.util.FindBy;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -74,7 +71,7 @@ public class CategoryController {
         } else {
             Optional<Category> category = categoryService.get(id, FindBy.findBy(true), false);
             if(category.isPresent()) {
-                category.get().setCategories(categoryService.getRelatedCategory(id, FindBy.EXTERNAL_ID, 0, 25, false));
+                category.get().setSubCategories(categoryService.getRelatedCategory(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
                 model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories", category.get().getCategoryName(), ""));
@@ -85,10 +82,19 @@ public class CategoryController {
         return new ModelAndView("category/category", model);
     }
 
-    @RequestMapping(value = "/{id}/availableCategories")
+    @RequestMapping(value = "/{id}/availableSubCategories")
     public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
         model.put("categories", categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID));
-        return new ModelAndView("category/availableCategories", model);
+        return new ModelAndView("category/availableSubCategories", model);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/{id}/category/{subCategoryId}", method = RequestMethod.POST)
+    public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "subCategoryId") String subCategoryId) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = categoryService.addCategory(id, FindBy.EXTERNAL_ID, subCategoryId, FindBy.EXTERNAL_ID) != null;
+        model.put("success", success);
+        return model;
     }
 }

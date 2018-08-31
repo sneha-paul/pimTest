@@ -42,7 +42,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public List<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy) {
 
-        Optional<Category> category = get(id, findBy, false);
+        Optional<Category> category = get(id, findBy, false); 
 
         Set<String> categoryIds = new HashSet<>();
 
@@ -72,4 +72,16 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return new PageImpl<>(categories, pageable, totalCategories);
     }
 
+    @Override
+    public RelatedCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2) {
+        Optional<Category> category = get(id, findBy1, false);
+        if(category.isPresent()) {
+            Optional<Category> categories = get(categoryId, findBy2);
+            if(category.isPresent()) {
+                return relatedCategoryDAO.save(new RelatedCategory(category.get().getId(), categories.get().getId()));
+            }
+        }
+
+        return null;
+    }
 }

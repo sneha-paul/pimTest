@@ -19,7 +19,7 @@
                                 <td>${category.categoryId}</td>
                                 <td>
                                     <label class="fancy-checkbox">
-                                        <input type="checkbox" name="active" value="Y">
+                                        <input class="js-add" data-category-id="${category.categoryId}" type="checkbox" name="active" value="Y">
                                         <span></span>
                                     </label>
                                 </td>
@@ -35,6 +35,25 @@
             $(function() {
                 $('.availabel-categories').DataTable({
                     conditionalPaging: true
+                });
+                $('.js-add').on('click', function(){
+                    var childId = $(this).data('category-id');
+
+                    $.ajax({
+                        url: $.getURL('/pim/categories/{categoryId}/category/{subCategoryId}', {'subCategoryId': childId}),
+                        data: {},
+                        method: 'POST',
+                        dataType: 'json'
+                    }).done(function(data) {
+                        if(data.success == true) {
+                            window.location.reload();
+                        } else {
+                            alert('Failed');
+                        }
+
+                    }).fail(function(jqXHR, status) {
+                        alert("Failed:" + status);
+                    });
                 });
             });
         </script>

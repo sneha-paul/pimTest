@@ -75,4 +75,17 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
         }
         return new PageImpl<>(categories, pageable, totalCategories);
     }
+
+    @Override
+    public RootCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2) {
+        Optional<Catalog> catalog = get(id, findBy1, false);
+        if(catalog.isPresent()) {
+            Optional<Category> category = categoryService.get(categoryId, findBy2);
+            if(catalog.isPresent()) {
+                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), category.get().getId()));
+            }
+        }
+
+        return null;
+    }
 }
