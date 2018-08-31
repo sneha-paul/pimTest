@@ -25,10 +25,11 @@ public class WebsiteCatalog extends EntityAssociation {
         super();
     }
 
-    public WebsiteCatalog(String websiteId, String catalogId) {
+    public WebsiteCatalog(String websiteId, String catalogId, int subSequenceNum) {
         super();
         this.websiteId = websiteId;
         this.catalogId = catalogId;
+        setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
 

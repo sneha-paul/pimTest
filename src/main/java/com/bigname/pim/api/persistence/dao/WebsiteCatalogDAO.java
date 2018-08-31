@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by manu on 8/19/18.
@@ -16,4 +17,6 @@ public interface WebsiteCatalogDAO extends MongoRepository<WebsiteCatalog, Strin
     Page<WebsiteCatalog> findByWebsiteIdAndActiveIn(String websiteId, String active[], Pageable pageable);
     long countByWebsiteId(String websiteId);
     List<WebsiteCatalog> findByWebsiteId(String websiteId);
+    Optional<WebsiteCatalog> findTopBySequenceNumOrderBySubSequenceNumDesc(int sequenceNum);
+
 }

@@ -1,5 +1,9 @@
 package com.bigname.pim.util;
 
+import com.bigname.pim.api.domain.Entity;
+
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -36,5 +40,10 @@ public class PimUtil {
         } else {
             return booleanVarArg[0];
         }
+    }
+
+    public static Collection<? extends Entity> sort(List<? extends Entity> source, List<String> sortedIds) {
+        source.sort((e1, e2) -> sortedIds.indexOf(e1.getId()) > sortedIds.indexOf(e2.getId()) ? 1 : -1);
+        return source;
     }
 }

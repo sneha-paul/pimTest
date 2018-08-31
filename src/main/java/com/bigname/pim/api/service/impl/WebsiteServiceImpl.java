@@ -40,7 +40,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
 
     @Override
     public Page<Catalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC, "sequenceNum", "subSequenceNum");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
         List<Catalog> catalogs = new ArrayList<>();
         long totalCatalogs = 0;
         Optional<Website> _website = get(websiteId, findBy, activeRequired);
@@ -51,6 +51,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
             websiteCatalogs.forEach(wc -> catalogIds.add(wc.getCatalogId()));
             if(catalogIds.size() > 0) {
                 catalogs = catalogService.getAll(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired);
+                PimUtil.sort(catalogs, catalogIds);
                 totalCatalogs = websiteCatalogDAO.countByWebsiteId(website.getId());
             }
         }
@@ -77,7 +78,8 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
         if(website.isPresent()) {
             Optional<Catalog> catalog = catalogService.get(catalogId, findBy2);
             if(catalog.isPresent()) {
-                return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId()));
+                Optional<WebsiteCatalog> top = websiteCatalogDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
             }
         }
 
