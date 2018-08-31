@@ -19,7 +19,7 @@
                             <td>${catalog.catalogId}</td>
                             <td>
                                 <label class="fancy-checkbox">
-                                    <input type="checkbox" name="active" value="Y">
+                                    <input class="js-add" data-catalog-id="${catalog.catalogId}" type="checkbox" name="active" value="Y">
                                     <span></span>
                                 </label>
                             </td>
@@ -35,6 +35,25 @@
             $(function() {
                 $('.availabel-catalogs').DataTable({
                     conditionalPaging: true
+                });
+                $('.js-add').on('click', function(){
+                    var catalogId = $(this).data('catalog-id');
+
+                    $.ajax({
+                        url: $.getURL('/pim/websites/{websiteId}/catalogs/{catalogId}', {'catalogId': catalogId}),
+                        data: {},
+                        method: 'POST',
+                        dataType: 'json'
+                    }).done(function(data) {
+                        if(data.success == true) {
+                            window.location.reload();
+                        } else {
+                            alert('Failed');
+                        }
+
+                    }).fail(function(jqXHR, status) {
+                        alert("Failed:" + status);
+                    });
                 });
             });
         </script>

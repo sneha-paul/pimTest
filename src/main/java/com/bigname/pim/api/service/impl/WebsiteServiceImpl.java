@@ -70,4 +70,17 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
 
         return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID);
     }
+
+    @Override
+    public WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2) {
+        Optional<Website> website = get(id, findBy1, false);
+        if(website.isPresent()) {
+            Optional<Catalog> catalog = catalogService.get(catalogId, findBy2);
+            if(catalog.isPresent()) {
+                return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId()));
+            }
+        }
+
+        return null;
+    }
 }

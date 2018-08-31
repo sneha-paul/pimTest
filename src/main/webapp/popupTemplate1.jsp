@@ -51,6 +51,9 @@
         .popup-content {height: 100%}
 
     </style>
+    <script>
+        $.initPage(parent.$.getPageAttributes());
+    </script>
 
     </head>
 <body class="theme-orange">

@@ -75,7 +75,6 @@
                                                         <td>${catalog.catalogName}<i class="table-dragger-handle sindu_handle"></i></td>
                                                         <td>${catalog.catalogId}</td>
                                                         <td>
-                                                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a>
                                                             <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
                                                         </td>
                                                     </tr>

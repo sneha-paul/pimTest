@@ -10,10 +10,7 @@ import com.bigname.pim.client.model.Breadcrumbs;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -92,5 +89,14 @@ public class WebsiteController {
         Map<String, Object> model = new HashMap<>();
         model.put("catalogs", websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID));
         return new ModelAndView("catalog/availableCatalogs", model);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/{id}/catalogs/{catalogId}", method = RequestMethod.POST)
+    public Map<String, Object> addCatalogs(@PathVariable(value = "id") String id, @PathVariable(value = "catalogId") String catalogId) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = websiteService.addCatalog(id, FindBy.EXTERNAL_ID, catalogId, FindBy.EXTERNAL_ID) != null;
+        model.put("success", success);
+        return model;
     }
 }

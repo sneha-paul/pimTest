@@ -29,6 +29,7 @@ public class WebsiteCatalog extends EntityAssociation {
         super();
         this.websiteId = websiteId;
         this.catalogId = catalogId;
+        setActive("Y");
     }
 
     public String getWebsiteId() {
