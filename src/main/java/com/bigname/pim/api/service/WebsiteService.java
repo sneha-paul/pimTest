@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
-    Page<Catalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired);
+    Page<WebsiteCatalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired);
     List<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy);
     WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2);
 

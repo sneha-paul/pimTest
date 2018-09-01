@@ -24,7 +24,7 @@ public class Website extends Entity<Website> {
     private String url;
 
     @Transient
-    private Page<Catalog> catalogs;
+    private Page<WebsiteCatalog> catalogs;
 
     public Website() {
         super();
@@ -61,11 +61,11 @@ public class Website extends Entity<Website> {
         this.url = url;
     }
 
-    public Page<Catalog> getCatalogs() {
+    public Page<WebsiteCatalog> getCatalogs() {
         return catalogs;
     }
 
-    public void setCatalogs(Page<Catalog> catalogs) {
+    public void setCatalogs(Page<WebsiteCatalog> catalogs) {
         this.catalogs = catalogs;
     }
 

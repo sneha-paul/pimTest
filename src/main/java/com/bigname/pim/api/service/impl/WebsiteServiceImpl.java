@@ -49,10 +49,8 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
     }
 
     @Override
-    public Page<Catalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired) {
+    public Page<WebsiteCatalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
-        List<Catalog> catalogs = new ArrayList<>();
-        long totalCatalogs = 0;
         Optional<Website> _website = get(websiteId, findBy, activeRequired);
         if(_website.isPresent()) {
             Website website = _website.get();
@@ -60,12 +58,12 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
             List<String> catalogIds = new ArrayList<>();
             websiteCatalogs.forEach(wc -> catalogIds.add(wc.getCatalogId()));
             if(catalogIds.size() > 0) {
-                catalogs = catalogService.getAll(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired);
-                PimUtil.sort(catalogs, catalogIds);
-                totalCatalogs = websiteCatalogDAO.countByWebsiteId(website.getId());
+                Map<String, Catalog> catalogsMap = PimUtil.getIdedMap(catalogService.getAll(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                websiteCatalogs.forEach(wc -> wc.init(website, catalogsMap.get(wc.getCatalogId())));
             }
+            return websiteCatalogs;
         }
-        return new PageImpl<>(catalogs, pageable, totalCatalogs);
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 
     @Override

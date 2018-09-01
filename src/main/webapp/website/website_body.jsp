@@ -67,13 +67,16 @@
                                                     <tr>
                                                         <th>Catalog Name</th>
                                                         <th>Catalog ID</th>
+                                                        <th>Status</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
-                                                    <c:forEach items="${website.catalogs.content}" var="catalog">
+                                                    <c:forEach items="${website.catalogs.content}" var="websiteCatalog">
+                                                        <c:set var="catalog" value="${websiteCatalog.child}" />
                                                     <tr>
                                                         <td>${catalog.catalogName}<i class="table-dragger-handle sindu_handle"></i></td>
                                                         <td>${catalog.catalogId}</td>
+                                                        <td><c:choose><c:when test="${websiteCatalog.active eq 'Y'}"><span class="badge badge-success">Active</span><</c:when><c:otherwise><span class="badge badge-danger">Inactive</span><</c:otherwise></c:choose>/td>
                                                         <td>
                                                             <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
                                                         </td>

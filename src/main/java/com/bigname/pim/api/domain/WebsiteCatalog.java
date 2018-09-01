@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
  * Created by manu on 8/19/18.
  */
 
-public class WebsiteCatalog extends EntityAssociation {
+public class WebsiteCatalog extends EntityAssociation<Website, Catalog> {
 
 
     /**
@@ -31,6 +31,11 @@ public class WebsiteCatalog extends EntityAssociation {
         this.catalogId = catalogId;
         setSubSequenceNum(subSequenceNum);
         setActive("Y");
+    }
+
+    public WebsiteCatalog init(Website website, Catalog catalog) {
+        super.init(website, catalog);
+        return this;
     }
 
     public String getWebsiteId() {

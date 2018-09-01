@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 /**
  * Created by sruthi on 31-08-2018.
  */
-public class RootCategory extends  EntityAssociation {
+public class RootCategory extends  EntityAssociation<Catalog, Category> {
 
     /**
      * Internal id of the Catalog document, not the externalId (catalogId) attribute
@@ -17,16 +17,21 @@ public class RootCategory extends  EntityAssociation {
      * Internal id of the Category document, not the externalId (categoryId) attribute
      */
     @Indexed
-    private String categoryId;
+    private String rootCategoryId;
 
     public RootCategory() { super(); }
 
     public RootCategory(String catalogId, String categoryId, int subSequenceNum) {
         super();
         this.catalogId = catalogId;
-        this.categoryId = categoryId;
+        this.rootCategoryId = categoryId;
         setSubSequenceNum(subSequenceNum);
         setActive("Y");
+    }
+
+    public RootCategory init(Catalog catalog, Category rootCategory) {
+        super.init(catalog, rootCategory);
+        return this;
     }
 
     public String getCatalogId() {
@@ -37,12 +42,12 @@ public class RootCategory extends  EntityAssociation {
         this.catalogId = catalogId;
     }
 
-    public String getCategoryId() {
-        return categoryId;
+    public String getRootCategoryId() {
+        return rootCategoryId;
     }
 
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
+    public void setRootCategoryId(String rootCategoryId) {
+        this.rootCategoryId = rootCategoryId;
     }
 
     @Override
@@ -53,13 +58,13 @@ public class RootCategory extends  EntityAssociation {
         RootCategory that = (RootCategory) o;
 
         if (catalogId != null ? !catalogId.equals(that.catalogId) : that.catalogId != null) return false;
-        return categoryId != null ? categoryId.equals(that.categoryId) : that.categoryId == null;
+        return rootCategoryId != null ? rootCategoryId.equals(that.rootCategoryId) : that.rootCategoryId == null;
     }
 
     @Override
     public int hashCode() {
         int result = catalogId != null ? catalogId.hashCode() : 0;
-        result = 31 * result + (categoryId != null ? categoryId.hashCode() : 0);
+        result = 31 * result + (rootCategoryId != null ? rootCategoryId.hashCode() : 0);
         return result;
     }
 }

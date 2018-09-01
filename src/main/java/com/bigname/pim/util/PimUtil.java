@@ -2,9 +2,7 @@ package com.bigname.pim.util;
 
 import com.bigname.pim.api.domain.Entity;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by Manu on 8/6/2018.
@@ -45,5 +43,11 @@ public class PimUtil {
     public static Collection<? extends Entity> sort(List<? extends Entity> source, List<String> sortedIds) {
         source.sort((e1, e2) -> sortedIds.indexOf(e1.getId()) > sortedIds.indexOf(e2.getId()) ? 1 : -1);
         return source;
+    }
+
+    public static <T extends Entity> Map<String, T> getIdedMap(List<T> entityList, FindBy findBy) {
+        Map<String, T> idedMap = new HashMap<>();
+        entityList.forEach(e -> idedMap.put(findBy == FindBy.INTERNAL_ID ? e.getId() : e.getExternalId(), e));
+        return idedMap;
     }
 }

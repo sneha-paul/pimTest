@@ -72,12 +72,12 @@
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
-                                                    <c:forEach items="${category.subCategories.content}" var="subCategory">
-                                                        <c:set var="category" value="${subCategory.subCategory}" />
+                                                    <c:forEach items="${category.subCategories.content}" var="relatedCategory">
+                                                        <c:set var="subCategory" value="${relatedCategory.child}" />
                                                         <tr>
-                                                            <td>${category.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
-                                                            <td>${category.categoryId}</td>
-                                                            <td><c:choose><c:when test="${subCategory.active eq 'Y'}"><span class="badge badge-success">Active</span><</c:when><c:otherwise><span class="badge badge-danger">Inactive</span><</c:otherwise></c:choose>/td>
+                                                            <td>${subCategory.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
+                                                            <td>${subCategory.categoryId}</td>
+                                                            <td><c:choose><c:when test="${relatedCategory.active eq 'Y'}"><span class="badge badge-success">Active</span><</c:when><c:otherwise><span class="badge badge-danger">Inactive</span><</c:otherwise></c:choose>/td>
                                                             <td>
                                                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
                                                             </td>

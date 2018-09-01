@@ -28,7 +28,7 @@ public class Catalog extends Entity<Catalog> {
     private String description;
 
     @Transient
-    private Page<Category> rootCategories;
+    private Page<RootCategory> rootCategories;
 
     public Catalog() {
         super();
@@ -64,11 +64,11 @@ public class Catalog extends Entity<Catalog> {
         this.description = description;
     }
 
-    public Page<Category> getRootCategories() {
+    public Page<RootCategory> getRootCategories() {
         return rootCategories;
     }
 
-    public void setRootCategories(Page<Category> rootCategories) {
+    public void setRootCategories(Page<RootCategory> rootCategories) {
         this.rootCategories = rootCategories;
     }
 

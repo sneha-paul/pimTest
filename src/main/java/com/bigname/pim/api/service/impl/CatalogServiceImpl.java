@@ -48,29 +48,27 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
         Optional<Catalog> catalog = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
         if(catalog.isPresent()) {
-            rootCategoryDAO.findByCatalogId(catalog.get().getId()).forEach(rc -> categoryIds.add(rc.getCategoryId()));
+            rootCategoryDAO.findByCatalogId(catalog.get().getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
         }
         return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID);
     }
 
     @Override
-    public Page<Category> getRootCategories(String catalogId, FindBy findBy, int page, int size, boolean... activeRequired) {
+    public Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size, boolean... activeRequired) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
-        List<Category> categories = new ArrayList<>();
-        long totalCategories = 0;
         Optional<Catalog> _catalog = get(catalogId, findBy, activeRequired);
         if(_catalog.isPresent()) {
             Catalog catalog = _catalog.get();
             Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
             List<String> categoryIds = new ArrayList<>();
-            rootCategories.forEach(rc -> categoryIds.add(rc.getCategoryId()));
+            rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
             if(categoryIds.size() > 0) {
-                categories = categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired);
-                PimUtil.sort(categories, categoryIds);
-                totalCategories = rootCategoryDAO.countByCatalogId(catalog.getId());
+                Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                rootCategories.forEach(rc -> rc.init(catalog, categoriesMap.get(rc.getRootCategoryId())));
             }
+            return rootCategories;
         }
-        return new PageImpl<>(categories, pageable, totalCategories);
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 
     @Override

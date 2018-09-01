@@ -68,15 +68,17 @@
                                                     <tr>
                                                         <th>Category Name</th>
                                                         <th>Category ID</th>
+                                                        <th>Status</th>
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
-                                                    <c:forEach items="${catalog.rootCategories.content}" var="category">
+                                                    <c:forEach items="${catalog.rootCategories.content}" var="rootCategory">
+                                                        <c:set var="category" value="${rootCategory.child}"/>
                                                         <tr>
                                                             <td>${category.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
                                                             <td>${category.categoryId}</td>
+                                                            <td><c:choose><c:when test="${rootCategory.active eq 'Y'}"><span class="badge badge-success">Active</span><</c:when><c:otherwise><span class="badge badge-danger">Inactive</span><</c:otherwise></c:choose>/td>
                                                             <td>
-                                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a>
                                                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
                                                             </td>
                                                         </tr>
@@ -98,56 +100,6 @@
             });
         </script>
         <script src="/assets/js/pages/ui/catalog/catalog.js"></script>
-        <%--<div class="modal fade" id="largeModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="title" id="largeModalLabel">Available RootCategories</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="card">
-                            <div class="body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover dataTable table-custom">
-                                        <thead class="thead-dark">
-                                        <tr>
-                                            <th>Category Name</th>
-                                            <th>Category ID</th>
-                                            <th>Select</th>
-                                        </tr>
-                                        </thead>
-                                        &lt;%&ndash;&lt;%&ndash;<tr>
-                                        <td>Star Wars</td>
-                                        <td>1977</td>
-                                        <td>
-                                            <label class="fancy-checkbox">
-                                                <input type="checkbox" name="active" value="Y">
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                        <tr>
-                                            <td>Howard The Duck</td>
-                                            <td>1986</td>
-                                            <td>$16,295,774</td>
-                                        </tr>
-                                        <tr>
-                                            <td>American Graffiti</td>
-                                            <td>1973</td>
-                                            <td>$115,000,000</td>
-                                        </tr>&ndash;%&gt;&ndash;%&gt;
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">SAVE CHANGES</button>
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">CLOSE</button>
-                    </div>
-                </div>
-            </div>
-        </div>--%>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">
