@@ -38,9 +38,8 @@
                 });
                 $('.js-add').on('click', function(){
                     var childId = $(this).data('category-id');
-
                     $.ajax({
-                        url: $.getURL('/pim/catalogs/{catalogId}/category/{categoryId}', {'categoryId': childId}),
+                        url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/{categoryId}', {'categoryId': childId}),
                         data: {},
                         method: 'POST',
                         dataType: 'json'

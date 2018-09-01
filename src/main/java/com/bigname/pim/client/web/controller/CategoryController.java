@@ -71,7 +71,7 @@ public class CategoryController {
         } else {
             Optional<Category> category = categoryService.get(id, FindBy.findBy(true), false);
             if(category.isPresent()) {
-                category.get().setSubCategories(categoryService.getRelatedCategory(id, FindBy.EXTERNAL_ID, 0, 25, false));
+                category.get().setSubCategories(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
                 model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories", category.get().getCategoryName(), ""));
@@ -90,10 +90,10 @@ public class CategoryController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/{id}/category/{subCategoryId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/subCategories/{subCategoryId}", method = RequestMethod.POST)
     public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "subCategoryId") String subCategoryId) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = categoryService.addCategory(id, FindBy.EXTERNAL_ID, subCategoryId, FindBy.EXTERNAL_ID) != null;
+        boolean success = categoryService.addSubCategory(id, FindBy.EXTERNAL_ID, subCategoryId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);
         return model;
     }

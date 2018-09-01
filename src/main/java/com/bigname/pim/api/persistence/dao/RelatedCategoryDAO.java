@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by sruthi on 30-08-2018.
  */
-public interface RelatedCategoryDAO extends MongoRepository<RelatedCategory, String> {
+public interface RelatedCategoryDAO extends BaseAssociationDAO<RelatedCategory>, MongoRepository<RelatedCategory, String> {
 
     Page<RelatedCategory> findByCategoryIdAndActiveIn(String categoryId, String active[], Pageable pageable);
     long countByCategoryId(String categoryId);

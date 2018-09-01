@@ -19,5 +19,5 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
     List<Catalog> getAllWithExclusions(String[] excludedIds, FindBy findBy);
     Page<Category> getRootCategories(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired);
     List<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy);
-    RootCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
+    RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2);
 }

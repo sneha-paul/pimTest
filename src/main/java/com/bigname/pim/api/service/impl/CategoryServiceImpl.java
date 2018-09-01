@@ -41,47 +41,45 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
     @Override
     public List<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy) {
-
-        Optional<Category> category = get(id, findBy, false); 
-
+        Optional<Category> category = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
-
         if(category.isPresent()) {
-            relatedCategoryDAO.findByCategoryId(category.get().getId()).forEach(rc -> categoryIds.add(rc.getCategoryId()));
+            categoryIds.add(category.get().getId());
+            relatedCategoryDAO.findByCategoryId(category.get().getId()).forEach(rc -> categoryIds.add(rc.getSubCategoryId()));
         }
-
         return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID);
     }
 
     @Override
-    public Page<Category> getRelatedCategory(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC, "sequenceNum", "subSequenceNum");
-        List<Category> categories = new ArrayList<>();
-        long totalCategories = 0;
+    public Page<Category> getSubCategories(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
+        List<Category> subCategories = new ArrayList<>();
+        long totalSubCategories = 0;
         Optional<Category> _category = get(categoryId, findBy, activeRequired);
         if(_category.isPresent()) {
             Category category = _category.get();
             Page<RelatedCategory> relatedCategory = relatedCategoryDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
-            List<String> categoryIds = new ArrayList<>();
-            relatedCategory.forEach(rc -> categoryIds.add(rc.getCategoryId()));
-            if(categoryIds.size() > 0) {
-                categories = getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired);
-                totalCategories = relatedCategoryDAO.countByCategoryId(category.getId());
+            List<String> subCategoryIds = new ArrayList<>();
+            relatedCategory.forEach(rc -> subCategoryIds.add(rc.getSubCategoryId()));
+            if(subCategoryIds.size() > 0) {
+                subCategories = getAll(subCategoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired);
+                PimUtil.sort(subCategories, subCategoryIds);
+                totalSubCategories = relatedCategoryDAO.countByCategoryId(category.getId());
             }
         }
-        return new PageImpl<>(categories, pageable, totalCategories);
+        return new PageImpl<>(subCategories, pageable, totalSubCategories);
     }
 
     @Override
-    public RelatedCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2) {
+    public RelatedCategory addSubCategory(String id, FindBy findBy1, String subCategoryId, FindBy findBy2) {
         Optional<Category> category = get(id, findBy1, false);
         if(category.isPresent()) {
-            Optional<Category> categories = get(categoryId, findBy2);
-            if(category.isPresent()) {
-                return relatedCategoryDAO.save(new RelatedCategory(category.get().getId(), categories.get().getId()));
+            Optional<Category> subCategory = get(subCategoryId, findBy2);
+            if(subCategory.isPresent()) {
+                Optional<RelatedCategory> top = relatedCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return relatedCategoryDAO.save(new RelatedCategory(category.get().getId(), subCategory.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() : 0));
             }
         }
-
         return null;
     }
 }

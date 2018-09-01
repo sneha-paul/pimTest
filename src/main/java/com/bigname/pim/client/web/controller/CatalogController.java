@@ -99,10 +99,10 @@ public class CatalogController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/{id}/category/{categoryId}", method = RequestMethod.POST)
-    public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "categoryId") String categoryId) {
+    @RequestMapping(value = "/{id}/rootCategories/{rootCategoryId}", method = RequestMethod.POST)
+    public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "rootCategoryId") String rootCategoryId) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = catalogService.addCategory(id, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID) != null;
+        boolean success = catalogService.addRootCategory(id, FindBy.EXTERNAL_ID, rootCategoryId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);
         return model;
     }

@@ -39,6 +39,16 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
     }
 
     @Override
+    public List<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy) {
+        Optional<Website> website = get(id, findBy, false);
+        Set<String> catalogIds = new HashSet<>();
+        if(website.isPresent()) {
+            websiteCatalogDAO.findByWebsiteId(website.get().getId()).forEach(wc -> catalogIds.add(wc.getCatalogId()));
+        }
+        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID);
+    }
+
+    @Override
     public Page<Catalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
         List<Catalog> catalogs = new ArrayList<>();
@@ -59,20 +69,6 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
     }
 
     @Override
-    public List<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy) {
-
-        Optional<Website> website = get(id, findBy, false);
-
-        Set<String> catalogIds = new HashSet<>();
-
-        if(website.isPresent()) {
-            websiteCatalogDAO.findByWebsiteId(website.get().getId()).forEach(wc -> catalogIds.add(wc.getCatalogId()));
-        }
-
-        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID);
-    }
-
-    @Override
     public WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2) {
         Optional<Website> website = get(id, findBy1, false);
         if(website.isPresent()) {
@@ -82,7 +78,6 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
                 return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
             }
         }
-
         return null;
     }
 }

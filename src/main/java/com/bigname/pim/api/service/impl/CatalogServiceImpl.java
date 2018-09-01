@@ -45,31 +45,28 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
 
     @Override
     public List<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy) {
-
         Optional<Catalog> catalog = get(id, findBy, false);
-
         Set<String> categoryIds = new HashSet<>();
-
         if(catalog.isPresent()) {
             rootCategoryDAO.findByCatalogId(catalog.get().getId()).forEach(rc -> categoryIds.add(rc.getCategoryId()));
         }
-
         return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID);
     }
 
     @Override
     public Page<Category> getRootCategories(String catalogId, FindBy findBy, int page, int size, boolean... activeRequired) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC, "sequenceNum", "subSequenceNum");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
         List<Category> categories = new ArrayList<>();
         long totalCategories = 0;
         Optional<Catalog> _catalog = get(catalogId, findBy, activeRequired);
         if(_catalog.isPresent()) {
             Catalog catalog = _catalog.get();
-            Page<RootCategory> rootCategory = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
             List<String> categoryIds = new ArrayList<>();
-            rootCategory.forEach(rc -> categoryIds.add(rc.getCategoryId()));
+            rootCategories.forEach(rc -> categoryIds.add(rc.getCategoryId()));
             if(categoryIds.size() > 0) {
                 categories = categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired);
+                PimUtil.sort(categories, categoryIds);
                 totalCategories = rootCategoryDAO.countByCatalogId(catalog.getId());
             }
         }
@@ -77,15 +74,15 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
     }
 
     @Override
-    public RootCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2) {
+    public RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2) {
         Optional<Catalog> catalog = get(id, findBy1, false);
         if(catalog.isPresent()) {
-            Optional<Category> category = categoryService.get(categoryId, findBy2);
-            if(catalog.isPresent()) {
-                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), category.get().getId()));
+            Optional<Category> rootCategory = categoryService.get(rootCategoryId, findBy2);
+            if(rootCategory.isPresent()) {
+                Optional<RootCategory> top = rootCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
             }
         }
-
         return null;
     }
 }

@@ -21,10 +21,11 @@ public class RootCategory extends  EntityAssociation {
 
     public RootCategory() { super(); }
 
-    public RootCategory(String catalogId, String categoryId) {
+    public RootCategory(String catalogId, String categoryId, int subSequenceNum) {
         super();
         this.catalogId = catalogId;
         this.categoryId = categoryId;
+        setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
 

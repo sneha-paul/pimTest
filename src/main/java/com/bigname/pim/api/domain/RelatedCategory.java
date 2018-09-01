@@ -17,14 +17,15 @@ public class RelatedCategory extends EntityAssociation {
      * Internal id of the Category document, not the externalId (categoryId) attribute
      */
     @Indexed
-    private String parentCategoryId;
+    private String subCategoryId;
 
     public RelatedCategory() { super(); }
 
-    public RelatedCategory(String categoryId, String parentCategoryId) {
+    public RelatedCategory(String categoryId, String subCategoryId, int subSequenceNum) {
         super();
         this.categoryId = categoryId;
-        this.parentCategoryId = parentCategoryId;
+        this.subCategoryId = subCategoryId;
+        setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
 
@@ -36,12 +37,12 @@ public class RelatedCategory extends EntityAssociation {
         this.categoryId = categoryId;
     }
 
-    public String getParentCategoryId() {
-        return parentCategoryId;
+    public String getSubCategoryId() {
+        return subCategoryId;
     }
 
-    public void setParentCategoryId(String parentCategoryId) {
-        this.parentCategoryId = parentCategoryId;
+    public void setSubCategoryId(String subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
     @Override
@@ -52,13 +53,13 @@ public class RelatedCategory extends EntityAssociation {
         RelatedCategory that = (RelatedCategory) o;
 
         if (categoryId != null ? !categoryId.equals(that.categoryId) : that.categoryId != null) return false;
-        return parentCategoryId != null ? parentCategoryId.equals(that.parentCategoryId) : that.parentCategoryId == null;
+        return subCategoryId != null ? subCategoryId.equals(that.subCategoryId) : that.subCategoryId == null;
     }
 
     @Override
     public int hashCode() {
         int result = categoryId != null ? categoryId.hashCode() : 0;
-        result = 31 * result + (parentCategoryId != null ? parentCategoryId.hashCode() : 0);
+        result = 31 * result + (subCategoryId != null ? subCategoryId.hashCode() : 0);
         return result;
     }
 }

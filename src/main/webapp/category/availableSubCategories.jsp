@@ -40,7 +40,7 @@
                     var childId = $(this).data('category-id');
 
                     $.ajax({
-                        url: $.getURL('/pim/categories/{categoryId}/category/{subCategoryId}', {'subCategoryId': childId}),
+                        url: $.getURL('/pim/categories/{categoryId}/subCategories/{subCategoryId}', {'subCategoryId': childId}),
                         data: {},
                         method: 'POST',
                         dataType: 'json'

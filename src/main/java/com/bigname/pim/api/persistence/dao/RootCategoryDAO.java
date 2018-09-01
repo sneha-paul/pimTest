@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by sruthi on 31-08-2018.
  */
-public interface RootCategoryDAO extends MongoRepository<RootCategory, String> {
+public interface RootCategoryDAO extends BaseAssociationDAO<RootCategory>, MongoRepository<RootCategory, String> {
 
     Page<RootCategory> findByCatalogIdAndActiveIn(String catalogId, String active[], Pageable pageable);
     long countByCatalogId(String catalogId);

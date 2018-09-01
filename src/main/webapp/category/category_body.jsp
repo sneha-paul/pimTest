@@ -15,7 +15,7 @@
                         <div class="tab-content">
                             <div class="tab-pane show active" id="Attributes">
                                 <div class="row clearfix m-t-20">
-                                    <div class="col-md-6">
+                                    <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
                                                 <form id="update-form" method="post" action="/pim/categories/${category.categoryId}" novalidate>
@@ -71,12 +71,11 @@
                                                         <th>Actions</th>
                                                     </tr>
                                                     </thead>
-                                                    <c:forEach items="${categories.subCategories.content}" var="category">
+                                                    <c:forEach items="${category.subCategories.content}" var="category">
                                                         <tr>
                                                             <td>${category.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
                                                             <td>${category.categoryId}</td>
                                                             <td>
-                                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a>
                                                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
                                                             </td>
                                                         </tr>
@@ -98,56 +97,6 @@
             });
         </script>
         <script src="/assets/js/pages/ui/category/category.js"></script>
-       <%--<div class="modal fade" id="largeModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="title" id="largeModalLabel">Available Subcategories</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="card">
-                            <div class="body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover dataTable table-custom">
-                                        <thead class="thead-dark">
-                                        <tr>
-                                            <th>Category Name</th>
-                                            <th>Category ID</th>
-                                            <th>Select</th>
-                                        </tr>
-                                        </thead>
-                                        &lt;%&ndash;<tr>
-                                            <td>Star Wars</td>
-                                            <td>1977</td>
-                                            <td>
-                                                <label class="fancy-checkbox">
-                                                    <input type="checkbox" name="active" value="Y">
-                                                    <span></span>
-                                                </label>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Howard The Duck</td>
-                                            <td>1986</td>
-                                            <td>$16,295,774</td>
-                                        </tr>
-                                        <tr>
-                                            <td>American Graffiti</td>
-                                            <td>1973</td>
-                                            <td>$115,000,000</td>
-                                        </tr>&ndash;%&gt;
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">SAVE CHANGES</button>
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">CLOSE</button>
-                    </div>
-                </div>
-            </div>
-        </div>--%>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">
