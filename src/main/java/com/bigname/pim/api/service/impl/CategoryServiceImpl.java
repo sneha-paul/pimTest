@@ -51,23 +51,25 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public Page<Category> getSubCategories(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired) {
+    public Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
         List<Category> subCategories = new ArrayList<>();
         long totalSubCategories = 0;
         Optional<Category> _category = get(categoryId, findBy, activeRequired);
         if(_category.isPresent()) {
             Category category = _category.get();
-            Page<RelatedCategory> relatedCategory = relatedCategoryDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            Page<RelatedCategory> relatedCategories = relatedCategoryDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
             List<String> subCategoryIds = new ArrayList<>();
-            relatedCategory.forEach(rc -> subCategoryIds.add(rc.getSubCategoryId()));
+            relatedCategories.forEach(rc -> subCategoryIds.add(rc.getSubCategoryId()));
             if(subCategoryIds.size() > 0) {
                 subCategories = getAll(subCategoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired);
-                PimUtil.sort(subCategories, subCategoryIds);
-                totalSubCategories = relatedCategoryDAO.countByCategoryId(category.getId());
+                Map<String, Category> subCategoriesMap = new HashMap<>();
+                subCategories.forEach(sc -> subCategoriesMap.put(sc.getId(), sc));
+                relatedCategories.forEach(rc -> rc.init(category, subCategoriesMap.get(rc.getSubCategoryId())));
             }
+            return relatedCategories;
         }
-        return new PageImpl<>(subCategories, pageable, totalSubCategories);
+        return new PageImpl<RelatedCategory>(new ArrayList<>(), pageable, 0);
     }
 
     @Override

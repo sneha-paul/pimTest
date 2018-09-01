@@ -25,7 +25,7 @@ public class Category extends Entity<Category> {
     private String description;
 
     @Transient
-    private Page<Category> subCategories;
+    private Page<RelatedCategory> subCategories;
 
     public Category() {
         super();
@@ -61,11 +61,11 @@ public class Category extends Entity<Category> {
         this.description = description;
     }
 
-    public Page<Category> getSubCategories() {
+    public Page<RelatedCategory> getSubCategories() {
         return subCategories;
     }
 
-    public void setSubCategories(Page<Category> subCategories) {
+    public void setSubCategories(Page<RelatedCategory> subCategories) {
         this.subCategories = subCategories;
     }
 

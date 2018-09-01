@@ -14,7 +14,7 @@ import java.util.List;
 public interface CategoryService extends  BaseService<Category, CategoryDAO> {
     List<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy);
     List<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy);
-    Page<Category> getSubCategories(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired);
+    Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired);
     RelatedCategory addSubCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
 }
 
