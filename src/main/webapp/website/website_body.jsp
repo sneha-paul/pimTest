@@ -60,29 +60,20 @@
                                         <div class="card">
                                             <div class="body">
                                                 <div class="row p-b-25">
-                                                    <div class="col-lg-12 col-md-12"><div class="pull-right"><button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add Catalog</span></button></div></div>
+                                                    <div class="col-lg-12 col-md-12">
+                                                        <div class="pull-right">
+                                                            <button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add Catalog</span></button>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <table id="only-bodytable" class="table table-hover dataTable table-custom">
-                                                    <thead class="thead-dark">
-                                                    <tr>
-                                                        <th>Catalog Name</th>
-                                                        <th>Catalog ID</th>
-                                                        <th>Status</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <c:forEach items="${website.catalogs.content}" var="websiteCatalog">
-                                                        <c:set var="catalog" value="${websiteCatalog.child}" />
-                                                    <tr>
-                                                        <td>${catalog.catalogName}<i class="table-dragger-handle sindu_handle"></i></td>
-                                                        <td>${catalog.catalogId}</td>
-                                                        <td><c:choose><c:when test="${websiteCatalog.active eq 'Y'}"><span class="badge badge-success">Active</span><</c:when><c:otherwise><span class="badge badge-danger">Inactive</span><</c:otherwise></c:choose>/td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
-                                                        </td>
-                                                    </tr>
-                                                    </c:forEach>
-                                                </table>
+                                                <div class="table-responsive">
+                                                    <table id="paginatedTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark">
+
+                                                        </thead>
+
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -96,6 +87,21 @@
         <script>
             $.initPage({
                 'websiteId' : '${website.websiteId}'
+            });
+            $( document ).ready(function() {
+                $.initDataTable({
+                    selector: '#paginatedTable',
+                    name: 'catalogs',
+                    type: 'TYPE_2',
+                    url: $.getURL('/pim/websites/{websiteId}/'),
+                    columns: [
+                        { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
+                        { data: 'catalogId', name : 'catalogId', title : 'Catalog ID' },
+                        { data: 'active', name : 'active' , title : 'Status', orderable: false},
+                        { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                    ]
+                });
+//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
             });
         </script>
         <script src="/assets/js/pages/ui/website/website.js"></script>

@@ -25,8 +25,8 @@ public class Website extends Entity<Website> {
     @NotEmpty(message = "Website URL cannot be empty")
     private String url;
 
-    @Transient
-    private Page<WebsiteCatalog> catalogs;
+    /*@Transient
+    private Page<WebsiteCatalog> catalogs;*/
 
     public Website() {
         super();
@@ -63,13 +63,13 @@ public class Website extends Entity<Website> {
         this.url = url;
     }
 
-    public Page<WebsiteCatalog> getCatalogs() {
+    /*public Page<WebsiteCatalog> getCatalogs() {
         return catalogs;
     }
 
     public void setCatalogs(Page<WebsiteCatalog> catalogs) {
         this.catalogs = catalogs;
-    }
+    }*/
 
     void setExternalId() {
         this.websiteId = getExternalId();

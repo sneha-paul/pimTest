@@ -4,13 +4,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * Created by manu on 8/19/18.
  */
 @Document
-public class EntityAssociation<P extends Entity, C extends Entity> {
+abstract public class EntityAssociation<P extends Entity, C extends Entity> {
     @Id
     private String id;
 
@@ -81,4 +82,6 @@ public class EntityAssociation<P extends Entity, C extends Entity> {
     public void setActive(String active) {
         this.active = active;
     }
+
+    abstract public Map<String, String> toMap();
 }

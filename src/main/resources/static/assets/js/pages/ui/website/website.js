@@ -9,10 +9,10 @@ $(function(){
             title:'Available Catalogs',
             size: eModal.size.lg,
             buttons: [
-                {text: 'OK', style: 'info',   close: true, click: eventA },
-                {text: 'CANCEL', style: 'danger', close: true, click: eventB }
+                // {text: 'OK', style: 'info',   close: true, click: eventA },
+                {text: 'CLOSE', style: 'danger', close: true, click: eventB }
             ]
         };
-        eModal.iframe(options);
+        eModal.ajax(options);
     });
 });

@@ -2,10 +2,10 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <tiles:insertDefinition name="mainPopupLayout">
     <tiles:putAttribute name="body">
-        <div class="card popup-content">
+        <div class="popup-content" style="padding:20px">
             <div class="body">
                 <div class="table-responsive">
-                <table class="table table-hover available-catalogs dataTable table-custom">
+                <table class="table table-hover available-catalogs js-datatable dataTable table-custom">
                     <thead class="thead-dark">
                     <tr>
                         <th>Catalog Name</th>

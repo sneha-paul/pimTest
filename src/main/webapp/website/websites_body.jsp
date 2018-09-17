@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table id="paginatedTable" class="table table-hover dataTable table-custom m-b-0">
+                    <table id="paginatedTable" class="table table-hover dataTable table-custom">
                         <thead class="thead-dark">
 
                         </thead>
@@ -29,10 +29,11 @@
         $.initDataTable({
             selector: '#paginatedTable',
             name: 'websites',
+            type: 'TYPE_1',
             url: '/pim/websites/',
             columns: [
+                { data: 'websiteName', name : 'websiteName' , title : 'Website Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.url + '<small>'}},
                 { data: 'externalId', name : 'externalId', title : 'Website ID' },
-                { data: 'websiteName', name : 'websiteName' , title : 'Website Name'},
                 { data: 'active', name : 'active' , title : 'Status', orderable: false},
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]

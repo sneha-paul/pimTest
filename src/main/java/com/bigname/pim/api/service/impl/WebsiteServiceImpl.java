@@ -49,8 +49,11 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
     }
 
     @Override
-    public Page<WebsiteCatalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, boolean... activeRequired) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
+    public Page<WebsiteCatalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
         Optional<Website> _website = get(websiteId, findBy, activeRequired);
         if(_website.isPresent()) {
             Website website = _website.get();

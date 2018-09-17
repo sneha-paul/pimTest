@@ -1,7 +1,7 @@
 $(function () {
-    /*$('.dataTable').DataTable({
+    $('.js-dataTable').DataTable({
         conditionalPaging: true
-    });*/
+    });
 
     //Exportable table
     $('.js-exportable').DataTable({

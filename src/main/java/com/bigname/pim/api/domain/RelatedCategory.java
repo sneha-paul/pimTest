@@ -2,6 +2,9 @@ package com.bigname.pim.api.domain;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Created by sruthi on 30-08-2018.
  */
@@ -48,6 +51,17 @@ public class RelatedCategory extends EntityAssociation<Category, Category> {
 
     public void setSubCategoryId(String subCategoryId) {
         this.subCategoryId = subCategoryId;
+    }
+
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("subCategoryId", getChild().getCategoryId());
+        map.put("subCategoryName", getChild().getCategoryName());
+        map.put("active", getActive());
+        map.put("sequenceNum", Long.toString(getSequenceNum()));
+        map.put("subSequenceNum", Integer.toString(getSubSequenceNum()));
+        return map;
     }
 
     @Override

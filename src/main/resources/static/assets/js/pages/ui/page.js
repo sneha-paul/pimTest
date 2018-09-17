@@ -19,7 +19,7 @@
             page.setAttributes(attributes);
         },
         initDataTable: function(options) {
-            $.setPageAttribute(options.name, $(options.selector).DataTable( {
+            $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
                 serverSide: true,
                 pageLength: 5,
@@ -32,15 +32,23 @@
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
-                            if(value.active === 'Y') {
-                                value.active = '<span class="badge badge-success">Active</span>';
-                            } else {
-                                value.active = '<span class="badge badge-danger">Inactive</span>';
+                            if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {
+                                if (value.active === 'Y') {
+                                    value.active = '<span class="badge badge-success">Active</span>';
+                                } else {
+                                    value.active = '<span class="badge badge-danger">Inactive</span>';
+                                }
                             }
 
-                            value.actions = '<a href="'+options.url + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
-                                '<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a> ' +
-                                '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>';
+                            if(options.type === 'TYPE_1') {
+                                value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
+                                    '<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a> ' +
+                                    '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>';
+                            } else if(options.type === 'TYPE_2') {
+                                value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
+                                    '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
+                            }
+
                         });
                         return json.data;
                     }
@@ -48,8 +56,22 @@
                 columns: options.columns
             }));
         },
+        refreshDataTable: function(name) {
+            $.getDataTable(name).ajax.reload();
+        },
         reloadDataTable: function(name) {
-            $.getPageAttribute(name).ajax.reload();
+            $.getDataTable(name).destroy();
+            $.initDataTable($.getDataTableOptions(name));
+        },
+        bindDataTable: function(options, dataTable) {
+            $.setPageAttribute(options.name + '_datatable', dataTable);
+            $.setPageAttribute(options.name + '_datatable_options', options);
+        },
+        getDataTable: function(name) {
+            return $.getPageAttribute(name + '_datatable');
+        },
+        getDataTableOptions: function(name) {
+            return $.getPageAttribute(name + '_datatable_options');
         },
         setPageAttributes: function(attributes) {
             page.setAttributes(attributes);
