@@ -1,5 +1,5 @@
 $(function(){
-    $('.js-add-catalog').on('click', function(){
+    $('.js-add-catalog').off().on('click', function(){
         var eventA = function(){};
         var eventB = function(){};
         var options = {
@@ -9,17 +9,7 @@ $(function(){
             title:'Available Catalogs',
             size: eModal.size.lg,
             successCallback: function() {
-                $.initDataTable({
-                    selector: '#paginatedAvailableCatalogsTable',
-                    name: 'availableCatalogs',
-                    type: 'TYPE_3',
-                    url: $.getURL('/pim/websites/{websiteId}/catalogs/available/list'),
-                    columns: [
-                        { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-                        { data: 'externalId', name : 'externalId', title : 'Catalog ID' },
-                        { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-                    ]
-                });
+
             },
             buttons: [
                 // {text: 'OK', style: 'info',   close: true, click: eventA },
@@ -28,4 +18,6 @@ $(function(){
         };
         eModal.ajax(options);
     });
+
+
 });

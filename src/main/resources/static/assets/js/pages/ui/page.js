@@ -66,6 +66,11 @@
             $.getDataTable(name).destroy();
             $.initDataTable($.getDataTableOptions(name));
         },
+        initPopup: function(handle) {
+            if(typeof state420 === 'undefined') {
+                $(handle).trigger('click');
+            }
+        },
         bindDataTable: function(options, dataTable) {
             $.setPageAttribute(options.name + '_datatable', dataTable);
             $.setPageAttribute(options.name + '_datatable_options', options);
