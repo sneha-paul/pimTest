@@ -4,7 +4,9 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by manu on 9/1/18.
@@ -73,5 +75,14 @@ public class ProductFamily extends Entity<ProductFamily> {
     @Override
     public ProductFamily merge(ProductFamily productFamily) {
         return null;
+    }
+
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("externalId", getExternalId());
+        map.put("productFamilyName", getProductFamilyName());
+        map.put("active", getActive());
+        return map;
     }
 }

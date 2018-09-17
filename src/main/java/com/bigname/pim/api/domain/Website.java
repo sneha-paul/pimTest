@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -79,6 +81,16 @@ public class Website extends Entity<Website> {
         this.setUrl(website.getUrl());
         this.setActive(website.getActive());
         return this;
+    }
+
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("externalId", getExternalId());
+        map.put("websiteName", getWebsiteName());
+        map.put("url", getUrl());
+        map.put("active", getActive());
+        return map;
     }
 
 }

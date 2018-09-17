@@ -25,12 +25,13 @@ import java.util.Optional;
  */
 @Controller
 @RequestMapping("pim/websites")
-public class WebsiteController {
+public class WebsiteController extends BaseController<Website, WebsiteService>{
 
     private WebsiteService websiteService;
     private CatalogService catalogService;
 
     public WebsiteController(WebsiteService websiteService, CatalogService catalogService) {
+        super(websiteService);
         this.websiteService = websiteService;
         this.catalogService = catalogService;
     }
@@ -39,7 +40,7 @@ public class WebsiteController {
     public ModelAndView all() {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "WEBSITES");
-        model.put("websites", websiteService.getAll(0, 25, null, false).getContent());
+//        model.put("websites", websiteService.getAll(0, 25, null, false).getContent());
         return new ModelAndView("website/websites", model);
     }
 

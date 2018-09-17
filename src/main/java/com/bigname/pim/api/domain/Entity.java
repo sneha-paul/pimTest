@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -81,4 +82,6 @@ abstract public class Entity<T> implements Serializable {
     abstract void setExternalId();
 
     abstract public T merge(T t);
+
+    abstract public Map<String, String> toMap();
 }

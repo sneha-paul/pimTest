@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -84,4 +86,12 @@ public class Catalog extends Entity<Catalog> {
         return this;
     }
 
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("externalId", getExternalId());
+        map.put("catalogName", getCatalogName());
+        map.put("active", getActive());
+        return map;
+    }
 }

@@ -3,10 +3,12 @@ package com.bigname.pim.api.service.impl;
 import com.bigname.pim.api.domain.ProductFamily;
 import com.bigname.pim.api.persistence.dao.ProductFamilyDAO;
 import com.bigname.pim.api.service.ProductFamilyService;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by manu on 9/4/18.
  */
+@Service
 public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, ProductFamilyDAO> implements ProductFamilyService {
 
     private ProductFamilyDAO productFamilyDAO;

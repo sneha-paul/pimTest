@@ -18,6 +18,39 @@
         initPage: function(attributes) {
             page.setAttributes(attributes);
         },
+        initDataTable: function(options) {
+            $.setPageAttribute(options.name, $(options.selector).DataTable( {
+                processing: true,
+                serverSide: true,
+                pageLength: 5,
+                conditionalPaging: true,
+                searching: false,
+                ajax: {
+                    url: options.url,
+                    data: function ( data ) {
+                        //process data before sent to server.
+                    },
+                    dataSrc: function(json) {
+                        $.each(json.data, function(index, value) {
+                            if(value.active === 'Y') {
+                                value.active = '<span class="badge badge-success">Active</span>';
+                            } else {
+                                value.active = '<span class="badge badge-danger">Inactive</span>';
+                            }
+
+                            value.actions = '<a href="/pim/websites/' + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
+                                '<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a> ' +
+                                '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>';
+                        });
+                        return json.data;
+                    }
+                },
+                columns: options.columns
+            }));
+        },
+        reloadDataTable: function(name) {
+            $.getPageAttribute(name).ajax.reload();
+        },
         setPageAttributes: function(attributes) {
             page.setAttributes(attributes);
         },

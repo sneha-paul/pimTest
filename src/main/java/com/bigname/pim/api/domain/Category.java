@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -80,5 +82,14 @@ public class Category extends Entity<Category> {
         this.setDescription(category.getDescription());
         this.setActive(category.getActive());
         return this;
+    }
+
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("externalId", getExternalId());
+        map.put("categoryName", getCategoryName());
+        map.put("active", getActive());
+        return map;
     }
 }
