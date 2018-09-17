@@ -29,7 +29,7 @@
         $.initDataTable({
             selector: '#paginatedTable',
             name: 'websites',
-            url: '/pim/websites/list',
+            url: '/pim/websites/',
             columns: [
                 { data: 'externalId', name : 'externalId', title : 'Website ID' },
                 { data: 'websiteName', name : 'websiteName' , title : 'Website Name'},

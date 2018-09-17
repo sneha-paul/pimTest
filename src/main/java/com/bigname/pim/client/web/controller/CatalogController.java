@@ -25,12 +25,13 @@ import java.util.Optional;
  */
 @Controller
 @RequestMapping("pim/catalogs")
-public class CatalogController {
+public class CatalogController extends BaseController<Catalog, CatalogService>{
 
     private CatalogService catalogService;
     private CategoryService categoryService;
 
     public CatalogController(CatalogService catalogService, CategoryService categoryService) {
+        super(catalogService);
         this.catalogService = catalogService;
         this.categoryService = categoryService;
     }
@@ -39,7 +40,7 @@ public class CatalogController {
     public ModelAndView all() {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATALOGS");
-        model.put("catalogs", catalogService.getAll(0, 25, null, false).getContent());
+        //model.put("catalogs", catalogService.getAll(0, 25, null, false).getContent());
         return new ModelAndView("catalog/catalogs", model);
     }
 

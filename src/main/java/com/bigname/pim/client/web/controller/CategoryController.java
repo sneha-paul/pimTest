@@ -5,6 +5,7 @@ import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,17 +22,20 @@ import java.util.Optional;
  */
 @Controller
 @RequestMapping("pim/categories")
-public class CategoryController {
+public class CategoryController extends BaseController<Category, CategoryService>{
 
     private CategoryService categoryService;
 
-    public CategoryController( CategoryService categoryService){ this.categoryService = categoryService; }
+    public CategoryController( CategoryService categoryService){
+        super(categoryService);
+        this.categoryService = categoryService;
+    }
 
     @RequestMapping()
     public ModelAndView all(){
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATEGORIES");
-        model.put("categories", categoryService.getAll(0, 25, null, false).getContent());
+       // model.put("categories", categoryService.getAll(0, 25, null, false).getContent());
         return new ModelAndView("category/categories", model);
     }
 

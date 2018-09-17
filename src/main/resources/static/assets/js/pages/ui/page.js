@@ -26,7 +26,7 @@
                 conditionalPaging: true,
                 searching: false,
                 ajax: {
-                    url: options.url,
+                    url: options.url + 'list',
                     data: function ( data ) {
                         //process data before sent to server.
                     },
@@ -38,7 +38,7 @@
                                 value.active = '<span class="badge badge-danger">Inactive</span>';
                             }
 
-                            value.actions = '<a href="/pim/websites/' + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
+                            value.actions = '<a href="'+options.url + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
                                 '<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a> ' +
                                 '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>';
                         });
