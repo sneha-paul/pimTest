@@ -26,19 +26,12 @@
                 conditionalPaging: true,
                 searching: false,
                 ajax: {
-                    url: options.url + 'list',
+                    url: options.url + (options.type !== 'TYPE_1' ? '' : 'list'),
                     data: function ( data ) {
                         //process data before sent to server.
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
-                            if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {
-                                if (value.active === 'Y') {
-                                    value.active = '<span class="badge badge-success">Active</span>';
-                                } else {
-                                    value.active = '<span class="badge badge-danger">Inactive</span>';
-                                }
-                            }
 
                             if(options.type === 'TYPE_1') {
                                 value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
@@ -47,6 +40,16 @@
                             } else if(options.type === 'TYPE_2') {
                                 value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
+                            } else if(options.type === 'TYPE_3') {
+                                value.actions = '<button type="button" class="btn btn-success" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
+                            }
+
+                            if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {
+                                if (value.active === 'Y') {
+                                    value.active = '<span class="badge badge-success">Active</span>';
+                                } else {
+                                    value.active = '<span class="badge badge-danger">Inactive</span>';
+                                }
                             }
 
                         });

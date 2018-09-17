@@ -39,13 +39,11 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
     }
 
     @Override
-    public List<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy) {
+    public Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Website> website = get(id, findBy, false);
         Set<String> catalogIds = new HashSet<>();
-        if(website.isPresent()) {
-            websiteCatalogDAO.findByWebsiteId(website.get().getId()).forEach(wc -> catalogIds.add(wc.getCatalogId()));
-        }
-        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID);
+        website.ifPresent(website1 -> websiteCatalogDAO.findByWebsiteId(website1.getId()).forEach(wc -> catalogIds.add(wc.getCatalogId())));
+        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
     }
 
     @Override

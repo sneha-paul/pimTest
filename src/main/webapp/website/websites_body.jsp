@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table id="paginatedTable" class="table table-hover dataTable table-custom">
+                    <table id="paginatedWebsitesTable" class="table table-hover dataTable table-custom">
                         <thead class="thead-dark">
 
                         </thead>
@@ -27,7 +27,7 @@
 <script>
     $( document ).ready(function() {
         $.initDataTable({
-            selector: '#paginatedTable',
+            selector: '#paginatedWebsitesTable',
             name: 'websites',
             type: 'TYPE_1',
             url: '/pim/websites/',

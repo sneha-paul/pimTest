@@ -67,7 +67,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="table-responsive">
-                                                    <table id="paginatedTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                    <table id="paginatedCatalogsTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                         <thead class="thead-dark">
 
                                                         </thead>
@@ -90,10 +90,10 @@
             });
             $( document ).ready(function() {
                 $.initDataTable({
-                    selector: '#paginatedTable',
+                    selector: '#paginatedCatalogsTable',
                     name: 'catalogs',
                     type: 'TYPE_2',
-                    url: $.getURL('/pim/websites/{websiteId}/'),
+                    url: $.getURL('/pim/websites/{websiteId}/catalogs'),
                     columns: [
                         { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
                         { data: 'catalogId', name : 'catalogId', title : 'Catalog ID' },

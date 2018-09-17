@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -90,7 +91,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         return new ModelAndView("website/website", model);
     }
 
-    @RequestMapping("/{id}/list")
+    @RequestMapping("/{id}/catalogs")
     @ResponseBody
     public Result<Map<String, String>> getWebsiteCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
         Request dataTableRequest = new Request(request);
@@ -110,11 +111,33 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         return result;
     }
 
-    @RequestMapping(value = "/{id}/availableCatalogs")
+    @RequestMapping(value = "/{id}/catalogs/available")
     public ModelAndView availableCatalogs(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
-        model.put("catalogs", websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID));
+//        model.put("catalogs", websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID));
         return new ModelAndView("catalog/availableCatalogs", model);
+    }
+
+    @RequestMapping("/{id}/catalogs/available/list")
+    @ResponseBody
+    public Result<Map<String, String>> getAvailableCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        } else {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<Catalog> paginatedResult = websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
     }
 
     @ResponseBody

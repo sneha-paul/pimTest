@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
     Page<WebsiteCatalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
-    List<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy);
+    Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort);
     WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2);
 
 

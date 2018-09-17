@@ -353,6 +353,7 @@
                 $modal
                     .find('.' + MODAL_BODY)
                     .html(data.success ? data.success(html) : html);
+                if(data.successCallback) data.successCallback();
                 return dfd.resolve($modal);
             }
 
