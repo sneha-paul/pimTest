@@ -1,6 +1,5 @@
 $(function(){
     $('.js-add-catalog').off().on('click', function(){
-        var eventA = function(){};
         var eventB = function(){};
         var options = {
             url: $.getURL('/pim/websites/{websiteId}/catalogs/available'),
@@ -12,12 +11,9 @@ $(function(){
 
             },
             buttons: [
-                // {text: 'OK', style: 'info',   close: true, click: eventA },
                 {text: 'CLOSE', style: 'danger', close: true, click: eventB }
             ]
         };
         eModal.ajax(options);
     });
-
-
 });

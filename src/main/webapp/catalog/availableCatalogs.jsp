@@ -13,5 +13,5 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPopup('.js-add-catalog')"/>
+<img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
 <script src="/assets/js/pages/ui/catalog/availableCatalogs.js"></script>

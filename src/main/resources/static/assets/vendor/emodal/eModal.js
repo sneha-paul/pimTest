@@ -272,7 +272,7 @@
                 .off(EVENT_SHOW)
                 .find('.modal-content > div:not(:first-child)')
                 .remove();
-
+            $content.remove();
             if (!defaultSettings.allowContentRecycle || lastParams.clone) {
                 $content.remove();
             }
@@ -350,9 +350,12 @@
             return alert(params, title);
 
             function ok(html) {
+
+                html = html.replace(/<\/?script/g, '<script1');
                 $modal
                     .find('.' + MODAL_BODY)
                     .html(data.success ? data.success(html) : html);
+                $.initAHAH();
                 if(data.successCallback) data.successCallback();
                 return dfd.resolve($modal);
             }

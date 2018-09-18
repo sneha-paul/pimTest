@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,9 @@ public class ProductFamily extends Entity<ProductFamily> {
     @NotEmpty(message = "Product Family Name cannot be empty")
     private String productFamilyName;
 
-    private List<Attribute> productFamilyAttributes;
+    private List<Attribute> productFamilyAttributes = new ArrayList<>();
 
-    private List<Attribute> productVariantFamilyAttributes;
+    private List<Attribute> productVariantFamilyAttributes = new ArrayList<>();
 
     public ProductFamily() {
         super();
@@ -74,6 +75,11 @@ public class ProductFamily extends Entity<ProductFamily> {
 
     @Override
     public ProductFamily merge(ProductFamily productFamily) {
+        this.setExternalId(productFamily.getExternalId());
+        this.setProductFamilyName(productFamily.getProductFamilyName());
+        this.setActive(productFamily.getActive());
+        this.setProductFamilyAttributes(productFamily.getProductFamilyAttributes());
+        this.setProductVariantFamilyAttributes(productFamily.getProductVariantFamilyAttributes());
         return null;
     }
 

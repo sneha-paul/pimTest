@@ -66,10 +66,16 @@
             $.getDataTable(name).destroy();
             $.initDataTable($.getDataTableOptions(name));
         },
-        initPopup: function(handle) {
-            if(typeof state420 === 'undefined') {
-                $(handle).trigger('click');
-            }
+        addModal: function(options) {
+            var defaultOptions = {
+                loadingHtml: '<span class="fa fa-circle-o-notch fa-spin fa-3x text-primary"></span><span class="h4">Loading</span>',
+                size: eModal.size.lg,
+                name:'Modal',
+                title: 'Modal'
+            };
+            $(options.selector).off().on('click', function() {
+                eModal.ajax($.extend(true, defaultOptions, options));
+            });
         },
         bindDataTable: function(options, dataTable) {
             $.setPageAttribute(options.name + '_datatable', dataTable);
@@ -109,6 +115,60 @@
                 }
             }
             return $.getPageAttribute("urlRoot") + url;
+        },
+        bindFormSubmit: function(submitEl, formEl) {
+
+            $(submitEl).on('click', function(e) {
+                e.preventDefault();
+                //Clear validation errors - TODO
+                if(typeof formEl === 'undefined') {
+                    formEl = $(this).closest('form');
+                }
+                $.submitForm(formEl);
+            });
+        },
+        submitForm: function(formEl, successCallback) {
+            $.post({
+                url: $(formEl).attr('action'),
+                data: $(formEl).serialize(),
+                success: function(data) {
+                    if(successCallback) {
+                        successCallback();
+                    }
+                }
+            });
+        },
+        loadJavaScript: function loadScript(url, el, callback){
+
+            var script = document.createElement("script")
+            script.type = "text/javascript";
+
+            if (script.readyState){  //IE
+                script.onreadystatechange = function(){
+                    if (script.readyState === "loaded" ||
+                        script.readyState === "complete"){
+                        script.onreadystatechange = null;
+                        if(callback) callback();
+                    }
+                };
+            } else {  //Others
+                script.onload = function(){
+                    if(callback) callback();
+                };
+            }
+
+            script.src = url;
+            el.parentNode.appendChild(script);
+            el.parentNode.removeChild(el);
+        },
+        initAHAH: function(el) {
+            $.each($(el).siblings('script1'), function(i, v) {
+                if($(v).attr('src')) {
+                    $.loadJavaScript($(v).attr('src'), v);
+                } else {
+                    eval($(v).innerHTML);
+                }
+            });
         }
     });
     var page = new Page();

@@ -1,7 +1,7 @@
 <div class="card popup-content">
     <div class="body">
         <div class="table-responsive">
-            <table id="paginatedAvailableSubCategoriesTable" class="table table-hover dataTable table-custom">
+            <table id="paginatedAvailableSubCategoriesTable" class="table table-hover dataTable table-custom" style="width:100%">
                 <thead class="thead-dark">
                 <tr>
                     <th>Category Name</th>
@@ -13,5 +13,5 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPopup('.js-add-subCategory')"/>
+<img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
 <script src="/assets/js/pages/ui/category/availableSubCategories.js"></script>

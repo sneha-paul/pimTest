@@ -9,9 +9,11 @@ import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import com.google.common.base.Preconditions;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -98,5 +100,17 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
             return Optional.empty();
         }
         return findBy == INTERNAL_ID ? dao.findByIdAndActiveIn(id, PimUtil.getActiveOptions(activeRequired)) :  dao.findByExternalIdAndActiveIn(id, PimUtil.getActiveOptions(activeRequired));
+    }
+
+    protected static <E> Page<E> paginate(List<E> list, int page, int size) {
+        List<E> sublist = new ArrayList<>();
+        int from = page * size, to = from + size;
+        if(from < list.size() && to >= from) {
+            if(to > list.size()) {
+                to = list.size();
+            }
+            sublist = list.subList(from, to);
+        }
+        return new PageImpl<E>(sublist, PageRequest.of(page, size), sublist.size());
     }
 }

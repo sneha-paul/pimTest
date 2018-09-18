@@ -1,14 +1,19 @@
 package com.bigname.pim.api.domain;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Created by manu on 9/4/18.
  */
 public class Attribute {
-    String type;
-    String name;
-    boolean required;
+    private String type;
+    private String name;
+    private String required;
 
-    public Attribute(String type, String name, boolean required) {
+    public Attribute() {}
+
+    public Attribute(String type, String name, String required) {
         this.type = type;
         this.name = name;
         this.required = required;
@@ -30,11 +35,19 @@ public class Attribute {
         this.name = name;
     }
 
-    public boolean isRequired() {
+    public String getRequired() {
         return required;
     }
 
-    public void setRequired(boolean required) {
+    public void setRequired(String required) {
         this.required = required;
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("name", getName());
+        map.put("type", getType());
+        map.put("required", getRequired());
+        return map;
     }
 }
