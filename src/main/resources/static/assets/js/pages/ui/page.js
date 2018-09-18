@@ -41,7 +41,7 @@
                                 value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
                             } else if(options.type === 'TYPE_3') {
-                                value.actions = '<button type="button" class="btn btn-success" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
+                                value.actions = '<button type="button" class="btn btn-success js-add" data-external-id="' + value.externalId + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
                             }
 
                             if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {

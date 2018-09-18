@@ -16,19 +16,4 @@
             </div>
         </div>
         <img src="/assets/img/tiny.png" onload="$.initPopup('.js-add-catalog')"/>
-        <script>
-            $( document ).ready(function() {
-                $.initDataTable({
-                    selector: '#paginatedAvailableCatalogsTable',
-                    name: 'availableCatalogs',
-                    type: 'TYPE_3',
-                    url: $.getURL('/pim/websites/{websiteId}/catalogs/available/list'),
-                    columns: [
-                        { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-                        { data: 'externalId', name : 'externalId', title : 'Catalog ID' },
-                        { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-                    ]
-                });
-            });
-            var state420 = '';
-        </script>
+        <script src="/assets/js/pages/ui/catalog/availableCatalogs.js"></script>
