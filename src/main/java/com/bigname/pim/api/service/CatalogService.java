@@ -18,6 +18,6 @@ import java.util.Optional;
 public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
     Page<Catalog> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired);
-    List<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy);
+    Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort);
     RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2);
 }

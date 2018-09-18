@@ -5,6 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Catalog;
+import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -120,11 +121,33 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     }
 
 
-    @RequestMapping(value = "/{id}/availableRootCategories")
+    @RequestMapping(value = "/{id}/rootCategories/available")
     public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
-        model.put("categories", catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID));
+        //model.put("categories", catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID));
         return new ModelAndView("category/availableRootCategories", model);
+    }
+
+    @RequestMapping("/{id}/rootCategories/available/list")
+    @ResponseBody
+    public Result<Map<String, String>> getAvailableRootCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        } else {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<Category> paginatedResult = catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
     }
 
     @ResponseBody

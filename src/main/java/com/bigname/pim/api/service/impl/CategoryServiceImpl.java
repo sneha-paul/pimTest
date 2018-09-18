@@ -35,12 +35,17 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
 
     @Override
-    public List<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy) {
-        return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(true)) : categoryDAO.findByCategoryIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(true));
+    public Page<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+       // return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(true)) : categoryDAO.findByCategoryIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(true));
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "categoryId"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : categoryDAO.findByCategoryIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
     }
 
-    @Override
-    public List<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy) {
+ /*   @Override
+    public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy) {
         Optional<Category> category = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
         if(category.isPresent()) {
@@ -48,6 +53,15 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             relatedCategoryDAO.findByCategoryId(category.get().getId()).forEach(rc -> categoryIds.add(rc.getSubCategoryId()));
         }
         return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID);
+    }
+*/
+
+    @Override
+    public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort) {
+        Optional<Category> category = get(id, findBy, false);
+        Set<String> categoryIds = new HashSet<>();
+        category.ifPresent(category1 -> relatedCategoryDAO.findByCategoryId(category1.getId()).forEach(rc -> categoryIds.add(rc.getCategoryId())));
+        return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
     }
 
     @Override

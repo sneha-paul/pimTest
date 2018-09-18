@@ -10,8 +10,8 @@ $( document ).ready(function() {
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]
     });
-    console.log('b4');
-    $('#paginatedAvailableCatalogsTable').on('click', '.js-add', function(){console.log('inside');
+
+    $('#paginatedAvailableCatalogsTable').on('click', '.js-add', function(){
         var catalogId = $(this).data('external-id');
 
         $.ajax({
