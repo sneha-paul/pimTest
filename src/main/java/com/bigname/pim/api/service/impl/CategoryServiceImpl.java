@@ -60,7 +60,8 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Category> category = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
-        category.ifPresent(category1 -> relatedCategoryDAO.findByCategoryId(category1.getId()).forEach(rc -> categoryIds.add(rc.getCategoryId())));
+        category.ifPresent(category1 -> relatedCategoryDAO.findByCategoryId(category1.getId()).forEach(rc -> categoryIds.add(rc.getSubCategoryId())));
+        categoryIds.add(category.get().getId());
         return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
     }
 
