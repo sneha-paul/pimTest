@@ -45,6 +45,7 @@
         $.initDataTable({
             selector: '#paginatedTable',
             name: 'categories',
+            type: 'TYPE_1',
             url: '/pim/categories/',
             columns: [
                 { data: 'externalId', name : 'externalId', title : 'Category ID' },

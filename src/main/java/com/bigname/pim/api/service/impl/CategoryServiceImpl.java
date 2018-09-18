@@ -51,8 +51,8 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, boolean... activeRequired) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
+    public Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+       /* Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
         Optional<Category> _category = get(categoryId, findBy, activeRequired);
         if(_category.isPresent()) {
             Category category = _category.get();
@@ -62,6 +62,23 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             if(subCategoryIds.size() > 0) {
                 Map<String, Category> subCategoriesMap = PimUtil.getIdedMap(getAll(subCategoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
                 relatedCategories.forEach(rc -> rc.init(category, subCategoriesMap.get(rc.getSubCategoryId())));
+            }
+            return relatedCategories;
+        }
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);*/
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Optional<Category> _category = get(categoryId, findBy, activeRequired);
+        if(_category.isPresent()) {
+            Category category = _category.get();
+            Page<RelatedCategory> relatedCategories = relatedCategoryDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            List<String> subCategoryIds = new ArrayList<>();
+            relatedCategories.forEach(rc -> subCategoryIds.add(rc.getSubCategoryId()));
+            if(subCategoryIds.size() > 0) {
+                Map<String, Category> categoriesMap = PimUtil.getIdedMap(getAll(subCategoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                relatedCategories.forEach(rc -> rc.init(category, categoriesMap.get(rc.getSubCategoryId())));
             }
             return relatedCategories;
         }

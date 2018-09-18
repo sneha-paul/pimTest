@@ -58,8 +58,25 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
     }
 
     @Override
-    public Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size, boolean... activeRequired) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
+    public Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
+      /*  Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
+        Optional<Catalog> _catalog = get(catalogId, findBy, activeRequired);
+        if(_catalog.isPresent()) {
+            Catalog catalog = _catalog.get();
+            Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            List<String> categoryIds = new ArrayList<>();
+            rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
+            if(categoryIds.size() > 0) {
+                Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                rootCategories.forEach(rc -> rc.init(catalog, categoriesMap.get(rc.getRootCategoryId())));
+            }
+            return rootCategories;
+        }
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);*/
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
         Optional<Catalog> _catalog = get(catalogId, findBy, activeRequired);
         if(_catalog.isPresent()) {
             Catalog catalog = _catalog.get();
@@ -73,6 +90,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
             return rootCategories;
         }
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
+
     }
 
     @Override

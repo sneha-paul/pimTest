@@ -61,18 +61,23 @@
                                         <div class="card">
                                             <div class="body">
                                                 <div class="row p-b-25">
-                                                    <div class="col-lg-12 col-md-12"><div class="pull-right"><button type="button" class="btn btn-success js-add-category"><i class="fa fa-plus"></i> <span class="p-l-5">Add RootCategories</span></button></div></div>
+                                                    <div class="col-lg-12 col-md-12">
+                                                        <div class="pull-right">
+                                                            <button type="button" class="btn btn-success js-add-category"><i class="fa fa-plus"></i> <span class="p-l-5">Add RootCategories</span></button>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <table id="only-bodytable" class="table table-hover dataTable table-custom">
-                                                    <thead class="thead-dark">
-                                                    <tr>
+                                                <div class="table-responsive">
+                                                    <table id="paginatedRootCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark">
+                                                   <%-- <tr>
                                                         <th>Category Name</th>
                                                         <th>Category ID</th>
                                                         <th>Status</th>
                                                         <th>Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <c:forEach items="${catalog.rootCategories.content}" var="rootCategory">
+                                                    </tr>--%>
+                                                        </thead>
+                                                    <%--<c:forEach items="${catalog.rootCategories.content}" var="rootCategory">
                                                         <c:set var="category" value="${rootCategory.child}"/>
                                                         <tr>
                                                             <td>${category.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
@@ -82,8 +87,9 @@
                                                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
                                                             </td>
                                                         </tr>
-                                                    </c:forEach>
-                                                </table>
+                                                    </c:forEach>--%>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -97,6 +103,21 @@
         <script>
             $.initPage({
                 'catalogId' : '${catalog.catalogId}'
+            });
+            $( document ).ready(function() {
+                $.initDataTable({
+                    selector: '#paginatedRootCategoriesTable',
+                    name: 'rootCategories',
+                    type: 'TYPE_2',
+                    url: $.getURL('/pim/catalogs/{catalogId}/rootCategories'),
+                    columns: [
+                        { data: 'rootCategoryName', name : 'rootCategoryName' , title : 'Category Name'},
+                        { data: 'rootCategoryId', name : 'rootCategoryId', title : 'Category ID' },
+                        { data: 'active', name : 'active' , title : 'Status', orderable: false},
+                        { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                    ]
+                });
+//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
             });
         </script>
         <script src="/assets/js/pages/ui/catalog/catalog.js"></script>

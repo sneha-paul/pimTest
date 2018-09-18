@@ -1,21 +1,29 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.common.datatable.model.Pagination;
+import com.bigname.common.datatable.model.Request;
+import com.bigname.common.datatable.model.Result;
+import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.RelatedCategory;
+import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.fasterxml.jackson.databind.ser.Serializers;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -75,7 +83,7 @@ public class CategoryController extends BaseController<Category, CategoryService
         } else {
             Optional<Category> category = categoryService.get(id, FindBy.findBy(true), false);
             if(category.isPresent()) {
-                category.get().setSubCategories(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
+             //   category.get().setSubCategories(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
                 model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories", category.get().getCategoryName(), ""));
@@ -84,6 +92,26 @@ public class CategoryController extends BaseController<Category, CategoryService
             }
         }
         return new ModelAndView("category/category", model);
+    }
+
+    @RequestMapping("/{id}/subCategories")
+    @ResponseBody
+    public Result<Map<String, String>> getSubCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<RelatedCategory> paginatedResult = categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
     }
 
     @RequestMapping(value = "/{id}/availableSubCategories")

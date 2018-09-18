@@ -61,18 +61,23 @@
                                         <div class="card">
                                             <div class="body">
                                                 <div class="row p-b-25">
-                                                    <div class="col-lg-12 col-md-12"><div class="pull-right"><button type="button" class="btn btn-success js-add-subCategory"><i class="fa fa-plus"></i> <span class="p-l-5">Add SubCategories</span></button></div></div>
+                                                    <div class="col-lg-12 col-md-12">
+                                                        <div class="pull-right">
+                                                            <button type="button" class="btn btn-success js-add-subCategory"><i class="fa fa-plus"></i> <span class="p-l-5">Add SubCategories</span></button>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <table id="only-bodytable" class="table table-hover dataTable table-custom">
-                                                    <thead class="thead-dark">
-                                                    <tr>
+                                                <div class="table-responsive">
+                                                    <table id="paginatedSubCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark">
+                                                    <%--<tr>
                                                         <th>Category Name</th>
                                                         <th>Category ID</th>
                                                         <th>Status</th>
                                                         <th>Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <c:forEach items="${category.subCategories.content}" var="relatedCategory">
+                                                    </tr>--%>
+                                                        </thead>
+                                                   <%-- <c:forEach items="${category.subCategories.content}" var="relatedCategory">
                                                         <c:set var="subCategory" value="${relatedCategory.child}" />
                                                         <tr>
                                                             <td>${subCategory.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
@@ -82,8 +87,9 @@
                                                                 <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
                                                             </td>
                                                         </tr>
-                                                    </c:forEach>
-                                                </table>
+                                                    </c:forEach>--%>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -97,6 +103,21 @@
         <script>
             $.initPage({
                 'categoryId' : '${category.categoryId}'
+            });
+            $( document ).ready(function() {
+                $.initDataTable({
+                    selector: '#paginatedSubCategoriesTable',
+                    name: 'subCategories',
+                    type: 'TYPE_2',
+                    url: $.getURL('/pim/categories/{categoryId}/subCategories'),
+                    columns: [
+                        { data: 'subCategoryName', name : 'subCategoryName' , title : 'Category Name'},
+                        { data: 'subCategoryId', name : 'rootCategoryId', title : 'Category ID' },
+                        { data: 'active', name : 'active' , title : 'Status', orderable: false},
+                        { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                    ]
+                });
+//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
             });
         </script>
         <script src="/assets/js/pages/ui/category/category.js"></script>
