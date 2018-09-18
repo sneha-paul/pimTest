@@ -51,9 +51,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
     public Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Catalog> catalog = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
-        if(catalog.isPresent()) {
-            rootCategoryDAO.findByCatalogId(catalog.get().getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
-        }
+        catalog.ifPresent(catalog1 -> rootCategoryDAO.findByCatalogId(catalog1.getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId())));
         return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
     }
 
