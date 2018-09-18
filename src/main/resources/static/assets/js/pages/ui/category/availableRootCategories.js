@@ -1,4 +1,4 @@
-$( document ).ready(function() {console.log('inside');
+$( document ).ready(function() {
     $.initDataTable({
         selector: '#paginatedAvailableRootCategoriesTable',
         name: 'availableRootCategories',

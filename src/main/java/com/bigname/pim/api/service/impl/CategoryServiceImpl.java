@@ -84,7 +84,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Category> _category = get(categoryId, findBy, activeRequired);
+        Optional<Category> _category = get(categoryId, findBy, false);
         if(_category.isPresent()) {
             Category category = _category.get();
             Page<RelatedCategory> relatedCategories = relatedCategoryDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);

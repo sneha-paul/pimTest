@@ -77,7 +77,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Catalog> _catalog = get(catalogId, findBy, activeRequired);
+        Optional<Catalog> _catalog = get(catalogId, findBy, false);
         if(_catalog.isPresent()) {
             Catalog catalog = _catalog.get();
             Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
