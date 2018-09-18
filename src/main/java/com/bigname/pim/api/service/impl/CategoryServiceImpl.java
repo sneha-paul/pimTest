@@ -41,7 +41,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "categoryId"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
-        return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : categoryDAO.findByCategoryIdNotInAndActiveInOrderByCategoryNameAsc(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
+        return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : categoryDAO.findByCategoryIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
     }
 
  /*   @Override
