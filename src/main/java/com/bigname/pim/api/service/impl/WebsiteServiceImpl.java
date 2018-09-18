@@ -52,7 +52,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Website> _website = get(websiteId, findBy, activeRequired);
+        Optional<Website> _website = get(websiteId, findBy, false);
         if(_website.isPresent()) {
             Website website = _website.get();
             Page<WebsiteCatalog> websiteCatalogs = websiteCatalogDAO.findByWebsiteIdAndActiveIn(website.getId(), PimUtil.getActiveOptions(activeRequired), pageable);

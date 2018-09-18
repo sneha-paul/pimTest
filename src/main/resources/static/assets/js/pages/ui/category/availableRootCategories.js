@@ -1,11 +1,11 @@
-$( document ).ready(function() {
+$( document ).ready(function() {console.log('inside');
     $.initDataTable({
         selector: '#paginatedAvailableRootCategoriesTable',
         name: 'availableRootCategories',
         type: 'TYPE_3',
         url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/available/list'),
         columns: [
-            { data: 'rootCategoryName', name : 'rootCategoryName' , title : 'Category Name'},
+            { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
             { data: 'externalId', name : 'externalId', title : 'Category ID' },
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]

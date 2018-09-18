@@ -5,7 +5,7 @@ $( document ).ready(function() {
         type: 'TYPE_3',
         url: $.getURL('/pim/categories/{categoryId}/subCategories/available/list'),
         columns: [
-            { data: 'subCategoryName', name : 'subCategoryName' , title : 'Category Name'},
+            { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
             { data: 'externalId', name : 'externalId', title : 'Category ID' },
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]
