@@ -5,7 +5,6 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Entity;
-import com.bigname.pim.api.domain.EntityAssociation;
 import com.bigname.pim.api.service.BaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -53,24 +52,4 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
         return result;
     }
-
-
-    /*public <A extends EntityAssociation> Result<Map<String, String>> allAssociations(HttpServletRequest request, Page<A> paginatedResult) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
-        return result;
-    }*/
 }

@@ -8,11 +8,9 @@ import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
-import com.bigname.pim.api.exception.GenericPlatformException;
-import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.FindBy;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.util.FindBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -27,29 +25,33 @@ import javax.validation.Valid;
 import java.util.*;
 
 /**
- * Created by Manu on 8/8/2018.
+ * The Controller class for Website
+ *
+ * @author Manu V NarayanaPrasad (manu@blacwood.com)
+ * @since 1.0
  */
 @Controller
 @RequestMapping("pim/websites")
 public class WebsiteController extends BaseController<Website, WebsiteService>{
 
     private WebsiteService websiteService;
-    private CatalogService catalogService;
 
-    public WebsiteController(WebsiteService websiteService, CatalogService catalogService) {
+    public WebsiteController(WebsiteService websiteService) {
         super(websiteService);
         this.websiteService = websiteService;
-        this.catalogService = catalogService;
     }
 
-    @RequestMapping()
-    public ModelAndView all() {
-        Map<String, Object> model = new HashMap<>();
-        model.put("active", "WEBSITES");
-//        model.put("websites", websiteService.getAll(0, 25, null, false).getContent());
-        return new ModelAndView("website/websites", model);
-    }
 
+    /**
+     * Handler method to create a new website
+     *
+     * @param website The website model attribute that needs to be created
+     * @param result The BindingResult instance
+     * @param model The Model instance
+     *
+     * @return The ModelAndView instance for the list websites page (if no validation errors),
+     *         otherwise the ModelAndView instance for the website details page to show the validation errors
+     */
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView create(@ModelAttribute("website") @Valid Website website, BindingResult result, Model model) {
         if(result.hasErrors()) {
@@ -60,6 +62,16 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         return new ModelAndView("redirect:/pim/websites");
     }
 
+    /**
+     * Handler method to update a website instance
+     * @param id websiteId of the website instance that needs to be updated
+     * @param website The modified website instance corresponding to the given websiteId
+     * @param result The BindingResult instance
+     * @param model The Model instance
+     *
+     * @return The ModelAndView instance for the list websites page (if no validation errors),
+     *         otherwise the ModelAndView instance for the website details page to show the validation errors
+     */
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
     public ModelAndView update(@PathVariable(value = "id") String id, @ModelAttribute("website") @Valid Website website, BindingResult result, Model model) {
         if(result.hasErrors()) {
@@ -69,6 +81,13 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         return new ModelAndView("redirect:/pim/websites");
     }
 
+    /**
+     * Handler method to load the website details page or the create new website page
+     *
+     * @param id websiteId of the website instance that needs to be loaded
+     *
+     * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
+     */
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
         Map<String, Object> model = new HashMap<>();
@@ -80,17 +99,38 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         } else {
             Optional<Website> website = websiteService.get(id, FindBy.EXTERNAL_ID, false);
             if(website.isPresent()) {
-//                website.get().setCatalogs(websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("website", website.get());
                 model.put("breadcrumbs", new Breadcrumbs("Websites", "Websites", "/pim/websites", website.get().getWebsiteName(), ""));
             } else {
-                throw new EntityNotFoundException("Unable to find Website with website Id: " + id);
+                throw new EntityNotFoundException("Unable to find Website with Id: " + id);
             }
         }
         return new ModelAndView("website/website", model);
     }
 
+    /**
+     * Handler method to load the list websites page
+     *
+     * @return The ModelAndView instance for the list websites page
+     */
+    @RequestMapping()
+    public ModelAndView all() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "WEBSITES");
+        return new ModelAndView("website/websites", model);
+    }
+
+    /**
+     * Handler method to load a list of all the catalogs associated with the given websiteId.
+     * This is a JSON data endpoint required for the dataTable
+     *
+     * @param id
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
     @RequestMapping("/{id}/catalogs")
     @ResponseBody
     public Result<Map<String, String>> getWebsiteCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -111,13 +151,28 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         return result;
     }
 
+    /**
+     * Handler method for the availableCatalogs page.
+     *
+     * @param id
+     * @return
+     */
     @RequestMapping(value = "/{id}/catalogs/available")
     public ModelAndView availableCatalogs(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
-//        model.put("catalogs", websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID));
         return new ModelAndView("catalog/availableCatalogs", model);
     }
 
+    /**
+     * Handler method to load a list of all the available catalogs that can be associated to the given websiteId.
+     * This is a JSON data endpoint required for the dataTable
+     *
+     * @param id
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
     @RequestMapping("/{id}/catalogs/available/list")
     @ResponseBody
     public Result<Map<String, String>> getAvailableCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -125,7 +180,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
+        Sort sort;
         if(pagination.hasSorts()) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         } else {
@@ -140,9 +195,16 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
         return result;
     }
 
+    /**
+     * Handler method to associate a catalog to a website
+     *
+     * @param id
+     * @param catalogId
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/{id}/catalogs/{catalogId}", method = RequestMethod.POST)
-    public Map<String, Object> addCatalogs(@PathVariable(value = "id") String id, @PathVariable(value = "catalogId") String catalogId) {
+    public Map<String, Object> addCatalog(@PathVariable(value = "id") String id, @PathVariable(value = "catalogId") String catalogId) {
         Map<String, Object> model = new HashMap<>();
         boolean success = websiteService.addCatalog(id, FindBy.EXTERNAL_ID, catalogId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);

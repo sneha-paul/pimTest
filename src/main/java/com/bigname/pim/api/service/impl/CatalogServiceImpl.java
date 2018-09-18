@@ -57,20 +57,6 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
 
     @Override
     public Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
-      /*  Pageable pageable = PageRequest.of(page, size, Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")));
-        Optional<Catalog> _catalog = get(catalogId, findBy, activeRequired);
-        if(_catalog.isPresent()) {
-            Catalog catalog = _catalog.get();
-            Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
-            List<String> categoryIds = new ArrayList<>();
-            rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
-            if(categoryIds.size() > 0) {
-                Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                rootCategories.forEach(rc -> rc.init(catalog, categoriesMap.get(rc.getRootCategoryId())));
-            }
-            return rootCategories;
-        }
-        return new PageImpl<>(new ArrayList<>(), pageable, 0);*/
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
@@ -98,7 +84,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
             Optional<Category> rootCategory = categoryService.get(rootCategoryId, findBy2);
             if(rootCategory.isPresent()) {
                 Optional<RootCategory> top = rootCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
+                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
             }
         }
         return null;

@@ -6,12 +6,10 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
-import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -37,20 +35,6 @@ public class CategoryController extends BaseController<Category, CategoryService
     public CategoryController( CategoryService categoryService){
         super(categoryService);
         this.categoryService = categoryService;
-    }
-
-    @RequestMapping()
-    public ModelAndView all(){
-        Map<String, Object> model = new HashMap<>();
-        model.put("active", "CATEGORIES");
-       // model.put("categories", categoryService.getAll(0, 25, null, false).getContent());
-        return new ModelAndView("category/categories", model);
-    }
-
-    @RequestMapping("/available")
-    public ModelAndView availableCategories() {
-        Map<String, Object> model = new HashMap<>();
-        return new ModelAndView("category/availableCategories", model);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -83,15 +67,21 @@ public class CategoryController extends BaseController<Category, CategoryService
         } else {
             Optional<Category> category = categoryService.get(id, FindBy.findBy(true), false);
             if(category.isPresent()) {
-             //   category.get().setSubCategories(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
                 model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories", category.get().getCategoryName(), ""));
             } else {
-                throw new EntityNotFoundException("Unable to find Category with category Id: " + id);
+                throw new EntityNotFoundException("Unable to find Category with Id: " + id);
             }
         }
         return new ModelAndView("category/category", model);
+    }
+
+    @RequestMapping()
+    public ModelAndView all(){
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "CATEGORIES");
+        return new ModelAndView("category/categories", model);
     }
 
     @RequestMapping("/{id}/subCategories")
@@ -117,7 +107,6 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{id}/subCategories/available")
     public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
-     //   model.put("categories", categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID));
         return new ModelAndView("category/availableSubCategories", model);
     }
 
@@ -128,7 +117,7 @@ public class CategoryController extends BaseController<Category, CategoryService
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
+        Sort sort;
         if(pagination.hasSorts()) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         } else {
@@ -145,7 +134,7 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @ResponseBody
     @RequestMapping(value = "/{id}/subCategories/{subCategoryId}", method = RequestMethod.POST)
-    public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "subCategoryId") String subCategoryId) {
+    public Map<String, Object> addSubCategory(@PathVariable(value = "id") String id, @PathVariable(value = "subCategoryId") String subCategoryId) {
         Map<String, Object> model = new HashMap<>();
         boolean success = categoryService.addSubCategory(id, FindBy.EXTERNAL_ID, subCategoryId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);

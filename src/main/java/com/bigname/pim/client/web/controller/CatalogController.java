@@ -7,13 +7,10 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
-import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
-import com.bigname.pim.api.exception.GenericPlatformException;
 import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.util.FindBy;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.util.FindBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -28,34 +25,19 @@ import javax.validation.Valid;
 import java.util.*;
 
 /**
- * Created by Manu on 8/8/2018.
+ *
+ * @author Manu V NarayanaPrasad (manu@blacwood.com)
+ * @since 1.0
  */
 @Controller
 @RequestMapping("pim/catalogs")
 public class CatalogController extends BaseController<Catalog, CatalogService>{
 
     private CatalogService catalogService;
-    private CategoryService categoryService;
 
-    public CatalogController(CatalogService catalogService, CategoryService categoryService) {
+    public CatalogController(CatalogService catalogService) {
         super(catalogService);
         this.catalogService = catalogService;
-        this.categoryService = categoryService;
-    }
-
-    @RequestMapping()
-    public ModelAndView all() {
-        Map<String, Object> model = new HashMap<>();
-        model.put("active", "CATALOGS");
-        //model.put("catalogs", catalogService.getAll(0, 25, null, false).getContent());
-        return new ModelAndView("catalog/catalogs", model);
-    }
-
-    @RequestMapping("/available")
-    public ModelAndView availableCatalogs() {
-        Map<String, Object> model = new HashMap<>();
-//        model.put("catalogs", catalogService.getAll(0, 25, null, false).getContent());
-        return new ModelAndView("catalog/availableCatalogs", model);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -88,17 +70,22 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         } else {
             Optional<Catalog> catalog = catalogService.get(id, FindBy.findBy(true), false);
             if(catalog.isPresent()) {
-             //   catalog.get().setRootCategories(catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, 0, 25, false));
                 model.put("mode", "DETAILS");
                 model.put("catalog", catalog.get());
                 model.put("breadcrumbs", new Breadcrumbs("Catalogs", "Catalogs", "/pim/catalogs", catalog.get().getCatalogName(), ""));
             } else {
-                throw new EntityNotFoundException("Unable to find Catalog with catalog Id: " + id);
+                throw new EntityNotFoundException("Unable to find Catalog with Id: " + id);
             }
         }
         return new ModelAndView("catalog/catalog", model);
     }
 
+    @RequestMapping()
+    public ModelAndView all() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "CATALOGS");
+        return new ModelAndView("catalog/catalogs", model);
+    }
 
     @RequestMapping("/{id}/rootCategories")
     @ResponseBody
@@ -124,7 +111,6 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     @RequestMapping(value = "/{id}/rootCategories/available")
     public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
-        //model.put("categories", catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID));
         return new ModelAndView("category/availableRootCategories", model);
     }
 
@@ -135,7 +121,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
+        Sort sort;
         if(pagination.hasSorts()) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         } else {
@@ -152,7 +138,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
 
     @ResponseBody
     @RequestMapping(value = "/{id}/rootCategories/{rootCategoryId}", method = RequestMethod.POST)
-    public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "rootCategoryId") String rootCategoryId) {
+    public Map<String, Object> addRootCategory(@PathVariable(value = "id") String id, @PathVariable(value = "rootCategoryId") String rootCategoryId) {
         Map<String, Object> model = new HashMap<>();
         boolean success = catalogService.addRootCategory(id, FindBy.EXTERNAL_ID, rootCategoryId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);
