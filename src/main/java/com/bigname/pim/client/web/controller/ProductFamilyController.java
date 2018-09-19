@@ -124,14 +124,17 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
             if (result.hasErrors()) {
 
             } else {
-                if(productFamily.get().getProductFamilyAttributes().contains(attribute)) {
-                    productFamily.get().getProductFamilyAttributes().remove(attribute);
+                if(type.equals("PRODUCT")) {
+                    if (productFamily.get().getProductFamilyAttributes().contains(attribute)) {
+                        productFamily.get().getProductFamilyAttributes().remove(attribute);
+                    }
+                    productFamily.get().getProductFamilyAttributes().add(attribute);
+                } else if(type.equals("VARIANT")) {
+                    if (productFamily.get().getProductVariantFamilyAttributes().contains(attribute)) {
+                        productFamily.get().getProductVariantFamilyAttributes().remove(attribute);
+                    }
+                    productFamily.get().getProductVariantFamilyAttributes().add(attribute);
                 }
-                productFamily.get().getProductFamilyAttributes().add(attribute);
-                if(productFamily.get().getProductVariantFamilyAttributes().contains(attribute)) {
-                    productFamily.get().getProductVariantFamilyAttributes().remove(attribute);
-                }
-                productFamily.get().getProductVariantFamilyAttributes().add(attribute);
                 productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
                 model.put("success", true);
                 model.put("attribute", attribute);
