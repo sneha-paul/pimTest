@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="popup-content" style="padding:20px">
     <div class="body">
-        <form id="family-attribute-form" method="post" action="/pim/productFamilies/ENVELOPE/PRODUCT/attribute">
+        <form id="family-attribute-form" method="post" action="/pim/productFamilies/${productFamilyId}/${type}/attribute">
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <div class="form-group">

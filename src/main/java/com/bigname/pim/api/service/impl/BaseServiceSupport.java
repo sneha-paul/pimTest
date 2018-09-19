@@ -104,13 +104,13 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
 
     protected static <E> Page<E> paginate(List<E> list, int page, int size) {
         List<E> sublist = new ArrayList<>();
-        int from = page * size, to = from + size;
+        int from = page, to = from + size;
         if(from < list.size() && to >= from) {
             if(to > list.size()) {
                 to = list.size();
             }
             sublist = list.subList(from, to);
         }
-        return new PageImpl<E>(sublist, PageRequest.of(page, size), sublist.size());
+        return new PageImpl<E>(sublist, PageRequest.of(page, size), list.size());
     }
 }

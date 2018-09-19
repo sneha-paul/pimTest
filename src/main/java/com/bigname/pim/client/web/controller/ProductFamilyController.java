@@ -110,6 +110,8 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     public ModelAndView attributeDetails(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type) {
         Map<String, Object> model = new HashMap<>();
         model.put("attribute", new Attribute());
+        model.put("type", type);
+        model.put("productFamilyId", id);
         return new ModelAndView("product/productFamilyAttribute", model);
     }
 
