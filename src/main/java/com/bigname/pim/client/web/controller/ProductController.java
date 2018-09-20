@@ -71,7 +71,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("product", new Product());
-            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))));
+            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))).getContent());
             model.put("breadcrumbs", new Breadcrumbs("Products", "Products", "/pim/products", "Create Product", ""));
         } else {
             Optional<Product> product = productService.get(id, FindBy.findBy(true), false);
