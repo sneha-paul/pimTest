@@ -2,6 +2,7 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.exception.EntityNotFoundException;
+import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.data.domain.Sort;
+
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -27,10 +30,12 @@ import java.util.Optional;
 public class ProductController extends BaseController<Product, ProductService>{
 
     private ProductService productService;
+    private ProductFamilyService productFamilyService;
 
-    public ProductController( ProductService productService){
+    public ProductController( ProductService productService,ProductFamilyService productFamilyService){
         super(productService);
         this.productService = productService;
+        this.productFamilyService = productFamilyService;
     }
 
     @RequestMapping()
@@ -66,6 +71,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("product", new Product());
+            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))));
             model.put("breadcrumbs", new Breadcrumbs("Products", "Products", "/pim/products", "Create Product", ""));
         } else {
             Optional<Product> product = productService.get(id, FindBy.findBy(true), false);
@@ -79,4 +85,5 @@ public class ProductController extends BaseController<Product, ProductService>{
         }
         return new ModelAndView("product/product", model);
     }
+
 }

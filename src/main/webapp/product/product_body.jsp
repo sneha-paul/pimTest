@@ -33,6 +33,7 @@
                                                             <div class="form-group">
                                                                 <label>ProductFamily</label>
                                                                 <select class="form-control" id="">
+
                                                                 </select>
                                                             </div>
 
@@ -131,6 +132,10 @@
                                     <div class="form-group">
                                         <label>ProductFamily</label>
                                         <select class="form-control" id="">
+                                            <option value="">Select One</option>
+                                            <c:forEach items="${productFamilies}" var="productFamily">
+                                                <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>
+                                            </c:forEach>
                                         </select>
                                     </div>
                                 </div>
