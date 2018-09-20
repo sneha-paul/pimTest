@@ -100,7 +100,7 @@
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
             });*/
         </script>
-        <script src="/assets/js/pages/ui/product/product.js"></script>
+       <%-- <script src="/assets/js/pages/ui/product/product.js"></script>--%>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">
