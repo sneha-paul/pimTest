@@ -30,6 +30,11 @@
                                                                 <label>Product ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                                 <input type="text" name="productId" class="form-control" value="${product.productId}" required="true"/>
                                                             </div>
+                                                            <div class="form-group">
+                                                                <label>ProductFamily</label>
+                                                                <select class="form-control" id="">
+                                                                </select>
+                                                            </div>
 
                                                             <div class="form-group">
                                                                 <label>Status</label>
@@ -122,6 +127,11 @@
                                         <label>Product ID</label>
                                         <form:input type="text" path="productId" class="form-control" required="true"/>
                                         <form:errors path="productId" cssClass="error"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>ProductFamily</label>
+                                        <select class="form-control" id="">
+                                        </select>
                                     </div>
                                 </div>
                             </div>
