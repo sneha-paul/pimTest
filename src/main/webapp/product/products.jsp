@@ -11,14 +11,14 @@
         <tiles:addAttribute>/assets/js/t2.js</tiles:addAttribute>
     </tiles:putListAttribute>
     <tiles:putAttribute name="body" value="/product/products_body.jsp"/>
-    <%--<tiles:putListAttribute name="pageBottomScripts">
+    <tiles:putListAttribute name="pageBottomScripts">
         <tiles:addAttribute>/assets/js/f1.js</tiles:addAttribute>
         <tiles:addAttribute>/assets/js/f2.js</tiles:addAttribute>
-    </tiles:putListAttribute>--%>
-    <tiles:putAttribute name="pageBottomScripts">
+    </tiles:putListAttribute>
+   <%-- <tiles:putAttribute name="pageBottomScripts">
         <script type="javascript" src="/assets/js/f1/js"></script>
         <script type="javascript" src="/assets/js/f2/js"></script>
-    </tiles:putAttribute>
+    </tiles:putAttribute>--%>
     <tiles:putAttribute name="script">
         <script>console.log('hi');</script>
     </tiles:putAttribute>
