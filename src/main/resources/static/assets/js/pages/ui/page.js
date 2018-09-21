@@ -116,18 +116,18 @@
             }
             return $.getPageAttribute("urlRoot") + url;
         },
-        bindFormSubmit: function(submitEl, formEl) {
-
+        bindFormSubmit: function(submitEl) {
             $(submitEl).on('click', function(e) {
                 e.preventDefault();
-                //Clear validation errors - TODO
-                if(typeof formEl === 'undefined') {
-                    formEl = $(this).closest('form');
-                }
-                $.submitForm(formEl);
+                $.submitAction(this);
             });
         },
+        submitAction: function(submitEl) {
+            //Clear validation errors - TODO
+            $.submitForm($(submitEl).closest('form'));
+        },
         submitForm: function(formEl, successCallback) {
+            // $(formEl).on('submit', function(){return false;});
             $.post({
                 url: $(formEl).attr('action'),
                 data: $(formEl).serialize(),

@@ -32,14 +32,16 @@
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>ProductFamily</label>
-                                                                <select class="form-control" id="">
+                                                                <select class="form-control" name="productFamilyId">
                                                                     <option value="">Select One</option>
                                                                     <c:forEach items="${productFamilies}" var="productFamily">
-                                                                        <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>
+                                                                        <option value="${productFamily.id}">${productFamily.productFamilyName}</option>
                                                                     </c:forEach>
                                                                 </select>
                                                             </div>
-
+                                                            <script>
+                                                                $('select[name="productFamilyId"]').val('${product.productFamilyId}');
+                                                            </script>
                                                             <div class="form-group">
                                                                 <label>Status</label>
                                                                 <br/>
@@ -60,25 +62,30 @@
                                 </div>
                             </div>
                             <div class="tab-pane" id="ProductAttributes">
-                                <div class="row clearfix">
+                                <div class="row clearfix m-t-20">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <div class="row p-b-25">
-                                                    <div class="col-lg-12 col-md-12">
-                                                        <div class="pull-right">
-                                                            <button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add Product Attributes</span></button>
-                                                        </div>
+                                                <form id="family-attributes-form" method="post" action="/pim/products/${product.productId}/familyAttributes" novalidate>
+                                                    <div class="row">
+                                                        <c:if test="${not empty product.productFamily}">
+                                                            <c:forEach items="${product.productFamily.productFamilyAttributes}" var="attribute">
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <div class="form-group">
+                                                                        <label>${attribute.label}</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                        <input type="text" name="${attribute.name}" value="${product.familyAttributes[attribute.name]}" class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                            </c:forEach>
+                                                        </c:if>
                                                     </div>
-                                                </div>
-                                                <%--<div class="table-responsive">
-                                                    <table id="paginatedCatalogsTable" class="table table-hover dataTable table-custom" style="width: 100%">
-                                                        <thead class="thead-dark">
-
-                                                        </thead>
-
-                                                    </table>
-                                                </div>--%>
+                                                    <br>
+                                                    <button id="my123" type="submit" class="btn btn-primary">Save</button>
+                                                    <script>
+                                                        $.bindFormSubmit($('#my123'));
+                                                    </script>
+                                                    <%--<a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>--%>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -119,25 +126,23 @@
                         <h1>Create Product</h1>
                     </div>
                     <div class="body">
-                        <form:form id="create-form" method="post" action="/pim/products" modelAttribute="product">
+                        <form id="create-form" method="post" action="/pim/products">
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group">
                                         <label>Product Name</label>
-                                        <form:input type="text" path="productName" class="form-control" required="true"/>
-                                        <form:errors path="productName" cssClass="error"/>
+                                        <input type="text" name="productName" class="form-control" required="true"/>
                                     </div>
                                     <div class="form-group">
                                         <label>Product ID</label>
-                                        <form:input type="text" path="productId" class="form-control" required="true"/>
-                                        <form:errors path="productId" cssClass="error"/>
+                                        <input type="text" name="productId" class="form-control" required="true"/>
                                     </div>
                                     <div class="form-group">
                                         <label>ProductFamily</label>
-                                        <select class="form-control" id="" name="productFamilyId">
+                                        <select class="form-control" name="productFamilyId">
                                             <option value="">Select One</option>
                                             <c:forEach items="${productFamilies}" var="productFamily">
-                                                <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>
+                                                <option value="${productFamily.id}">${productFamily.productFamilyName}</option>
                                             </c:forEach>
                                         </select>
                                     </div>
@@ -146,7 +151,7 @@
                             <br>
                             <button type="submit" class="btn btn-primary">Create</button>
                             <a href="/pim/products/"><button type="button" class="btn btn-danger">Cancel</button></a>
-                        </form:form>
+                        </form>
                     </div>
                 </div>
             </div>

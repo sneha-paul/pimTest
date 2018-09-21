@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,6 +27,11 @@ public class Product extends Entity<Product> {
 
     private String productFamilyId;
 
+    @Transient
+    private ProductFamily productFamily;
+
+    private Map<String, Object> familyAttributes = new HashMap<>();
+
     public Product() {
         super();
     }
@@ -34,6 +40,7 @@ public class Product extends Entity<Product> {
         super(externalId);
         this.productName = productName;
         this.productFamilyId = productFamilyId;
+
     }
 
     public String getProductId() {
@@ -61,6 +68,22 @@ public class Product extends Entity<Product> {
         this.productFamilyId = productFamilyId;
     }
 
+    public ProductFamily getProductFamily() {
+        return productFamily;
+    }
+
+    public void setProductFamily(ProductFamily productFamily) {
+        this.productFamily = productFamily;
+    }
+
+    public Map<String, Object> getFamilyAttributes() {
+        return familyAttributes;
+    }
+
+    public void setFamilyAttributes(Map<String, Object> familyAttributes) {
+        this.familyAttributes = familyAttributes;
+    }
+
     void setExternalId() {
         this.productId = getExternalId();
     }
@@ -71,6 +94,7 @@ public class Product extends Entity<Product> {
         this.setProductName(product.getProductName());
         this.setProductFamilyId(product.getProductFamilyId());
         this.setActive(product.getActive());
+        this.setFamilyAttributes(product.getFamilyAttributes());
         return this;
     }
 
