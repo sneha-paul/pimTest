@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
     <c:when test="${mode eq 'DETAILS'}">
         <div class="row clearfix">
@@ -114,34 +113,34 @@
                         <h1>Create Website</h1>
                     </div>
                     <div class="body">
-                        <form:form id="create-form" method="post" action="/pim/websites" modelAttribute="website">
+                        <form id="create-form" method="post" action="/pim/websites">
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group">
                                         <label>Website Name</label>
-                                        <form:input type="text" path="websiteName" class="form-control" required="true"/>
-                                        <form:errors path="websiteName" cssClass="error"/>
+                                        <input type="text" name="websiteName" class="form-control" />
                                     </div>
                                     <div class="form-group">
                                         <label>Website URL</label>
-                                        <form:input type="url" path="url" class="form-control" required="true"/>
-                                        <form:errors path="url" cssClass="error"/>
+                                        <input type="url" name="url" class="form-control" />
                                     </div>
                                     <div class="form-group">
                                         <label>Website ID</label>
-                                        <form:input type="text" path="websiteId" class="form-control" required="true"/>
-                                        <form:errors path="websiteId" cssClass="error"/>
+                                        <input type="text" name="websiteId" class="form-control" />
                                     </div>
                                 </div>
                             </div>
                             <br>
                             <button type="submit" class="btn btn-primary">Create</button>
                             <a href="/pim/websites/"><button type="button" class="btn btn-danger">Cancel</button></a>
-                        </form:form>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+            $.bindFormSubmit($('form').find('button[type="submit"]'));
+        </script>
     </c:otherwise>
 </c:choose>
 

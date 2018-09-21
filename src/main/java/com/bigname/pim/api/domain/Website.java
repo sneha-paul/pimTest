@@ -1,32 +1,31 @@
 package com.bigname.pim.api.domain;
 
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
+
+import static com.bigname.common.util.RegExBuilder.*;
 
 
 public class Website extends Entity<Website> {
 
-
     @Transient
-    @NotEmpty(message = "Website Id cannot be empty")
-    String websiteId;
+    @NotEmpty(message = "website.websiteId.empty")
+    @Pattern(regexp = "[" + ALPHA + UNDERSCORE + "]", message = "website.websiteId.invalid")
+    private String websiteId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Website Name cannot be empty")
+    @NotEmpty(message = "website.websiteName.empty")
+    @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "website.websiteName.invalid")
     private String websiteName;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Website URL cannot be empty")
+    @NotEmpty(message = "website.url.empty")
     private String url;
-
-    /*@Transient
-    private Page<WebsiteCatalog> catalogs;*/
 
     public Website() {
         super();
@@ -62,14 +61,6 @@ public class Website extends Entity<Website> {
     public void setUrl(String url) {
         this.url = url;
     }
-
-    /*public Page<WebsiteCatalog> getCatalogs() {
-        return catalogs;
-    }
-
-    public void setCatalogs(Page<WebsiteCatalog> catalogs) {
-        this.catalogs = catalogs;
-    }*/
 
     void setExternalId() {
         this.websiteId = getExternalId();

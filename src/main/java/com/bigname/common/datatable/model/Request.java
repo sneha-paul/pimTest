@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.bigname.common.util.ValidationUtil.*;
+
 /**
  * The datatable request class
  *
@@ -237,27 +239,27 @@ public class Request {
 
             List<Column> columns = new ArrayList<>();
 
-            if(!ValidationUtil.isObjectEmpty(this.getSearch())) {
+            if(isNotEmpty(this.getSearch())) {
                 this.setGlobalSearch(true);
             }
 
             for(int i=0; i < getNumberOfColumns(request); i++) {
                 if(null != request.getParameter("columns["+ i +"][data]")
                         && !"null".equalsIgnoreCase(request.getParameter("columns["+ i +"][data]"))
-                        && !ValidationUtil.isObjectEmpty(request.getParameter("columns["+ i +"][data]"))) {
+                        && isNotEmpty(request.getParameter("columns["+ i +"][data]"))) {
                     Column column = new Column(request, i);
                     if(i == sortableCol) {
                         this.setOrder(column);
                     }
                     columns.add(column);
 
-                    if(!ValidationUtil.isObjectEmpty(column.getSearch())) {
+                    if(isNotEmpty(column.getSearch())) {
                         this.setGlobalSearch(false);
                     }
                 }
             }
 
-            if(!ValidationUtil.isObjectEmpty(columns)) {
+            if(isNotEmpty(columns)) {
                 this.setColumns(columns);
             }
         }
@@ -290,7 +292,7 @@ public class Request {
         pagination.setPageSize(this.getLength());
 
         SortBy sortBy = null;
-        if(!ValidationUtil.isObjectEmpty(this.getOrder())) {
+        if(isNotEmpty(this.getOrder())) {
             sortBy = new SortBy();
             sortBy.addSort(this.getOrder().getData(), SortOrder.fromValue(this.getOrder().getSortDir()));
         }
@@ -299,7 +301,7 @@ public class Request {
         filterBy.setGlobalSearch(this.isGlobalSearch());
         for(Column column : this.getColumns()) {
             if(column.isSearchable()) {
-                if(!ValidationUtil.isObjectEmpty(this.getSearch()) || !ValidationUtil.isObjectEmpty(column.getSearch())) {
+                if(isNotEmpty(this.getSearch()) || isNotEmpty(column.getSearch())) {
                     filterBy.addFilter(column.getData(), (this.isGlobalSearch()) ? this.getSearch() : column.getSearch());
                 }
             }

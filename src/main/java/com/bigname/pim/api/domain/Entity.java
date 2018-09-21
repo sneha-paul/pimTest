@@ -3,6 +3,7 @@ package com.bigname.pim.api.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.validation.BindingResult;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
@@ -80,6 +81,8 @@ abstract public class Entity<T> implements Serializable {
     }
 
     abstract void setExternalId();
+
+//    abstract public Map<String, String> getFieldErrors(BindingResult result);
 
     abstract public T merge(T t);
 
