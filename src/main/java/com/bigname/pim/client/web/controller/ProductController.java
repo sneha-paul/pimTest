@@ -78,6 +78,7 @@ public class ProductController extends BaseController<Product, ProductService>{
             if(product.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("product", product.get());
+                model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))).getContent());
                 model.put("breadcrumbs", new Breadcrumbs("Product", "Products", "/pim/products", product.get().getProductName(), ""));
             } else {
                 throw new EntityNotFoundException("Unable to find Product with Id: " + id);

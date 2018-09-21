@@ -11,7 +11,7 @@
                     <div class="body">
                         <ul class="nav nav-tabs-new2">
                             <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#Attributes">Attributes</a></li>
-                            <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Catalogs">Catalogs</a></li>--%>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#ProductAttributes">Product Attributes</a></li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane show active" id="Attributes">
@@ -33,7 +33,10 @@
                                                             <div class="form-group">
                                                                 <label>ProductFamily</label>
                                                                 <select class="form-control" id="">
-
+                                                                    <option value="">Select One</option>
+                                                                    <c:forEach items="${productFamilies}" var="productFamily">
+                                                                        <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>
+                                                                    </c:forEach>
                                                                 </select>
                                                             </div>
 
@@ -56,7 +59,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <%--<div class="tab-pane" id="Catalogs">
+                            <div class="tab-pane" id="ProductAttributes">
                                 <div class="row clearfix">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
@@ -64,23 +67,23 @@
                                                 <div class="row p-b-25">
                                                     <div class="col-lg-12 col-md-12">
                                                         <div class="pull-right">
-                                                            <button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add Catalog</span></button>
+                                                            <button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add Product Attributes</span></button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="table-responsive">
+                                                <%--<div class="table-responsive">
                                                     <table id="paginatedCatalogsTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                         <thead class="thead-dark">
 
                                                         </thead>
 
                                                     </table>
-                                                </div>
+                                                </div>--%>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>--%>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -131,7 +134,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>ProductFamily</label>
-                                        <select class="form-control" id="">
+                                        <select class="form-control" id="" name="productFamilyId">
                                             <option value="">Select One</option>
                                             <c:forEach items="${productFamilies}" var="productFamily">
                                                 <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>

@@ -24,15 +24,16 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Name cannot be empty")
     private String productName;
 
-    private String description;
+    private String productFamilyId;
 
     public Product() {
         super();
     }
 
-    public Product(String externalId, String productName) {
+    public Product(String externalId, String productName, String productFamilyId) {
         super(externalId);
         this.productName = productName;
+        this.productFamilyId = productFamilyId;
     }
 
     public String getProductId() {
@@ -52,12 +53,12 @@ public class Product extends Entity<Product> {
         this.productName = productName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getProductFamilyId() {
+        return productFamilyId;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setProductFamilyId(String productFamilyId) {
+        this.productFamilyId = productFamilyId;
     }
 
     void setExternalId() {
@@ -68,7 +69,7 @@ public class Product extends Entity<Product> {
     public Product merge(Product product) {
         this.setExternalId(product.getExternalId());
         this.setProductName(product.getProductName());
-        this.setDescription(product.getDescription());
+        this.setProductFamilyId(product.getProductFamilyId());
         this.setActive(product.getActive());
         return this;
     }
@@ -78,6 +79,7 @@ public class Product extends Entity<Product> {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
         map.put("productName", getProductName());
+        map.put("productFamilyId",getProductFamilyId());
         map.put("active", getActive());
         return map;
     }
