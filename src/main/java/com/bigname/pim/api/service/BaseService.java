@@ -2,11 +2,15 @@ package com.bigname.pim.api.service;
 
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
+import javax.validation.ConstraintViolation;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by manu on 8/18/18.
@@ -23,4 +27,6 @@ public interface BaseService<T, DAO> {
     List<T> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired);
 
     Optional<T> get(String id, FindBy findBy, boolean... activeRequired);
+
+    Map<String, Pair<String, Object>> validate(T t, Class<?>... groups);
 }

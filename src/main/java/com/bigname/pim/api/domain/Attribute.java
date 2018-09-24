@@ -18,7 +18,7 @@ public class Attribute {
         this.type = type;
         this.name = name;
         this.label = label;
-        this.required = required;
+        this.required = "Y".equalsIgnoreCase(required)  ? "N" : required;
     }
 
     public String getType() {
@@ -50,7 +50,7 @@ public class Attribute {
     }
 
     public void setRequired(String required) {
-        this.required = required;
+        this.required = "Y".equalsIgnoreCase(required)  ? "N" : required;
     }
 
     public Map<String, String> toMap() {

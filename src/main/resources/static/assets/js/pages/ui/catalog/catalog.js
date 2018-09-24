@@ -13,7 +13,7 @@ $(function(){
             },
             buttons: [
                // {text: 'OK', style: 'info',   close: true, click: eventA },
-                {text: 'CANCEL', style: 'danger', close: true, click: eventB }
+                {text: 'CLOSE', style: 'danger', close: true, click: eventB }
             ]
         };
         eModal.ajax(options);

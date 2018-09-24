@@ -9,9 +9,11 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Validator;
 import java.util.*;
 
 @Service
@@ -23,8 +25,9 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
     private CategoryService categoryService;
 
 
-    public CatalogServiceImpl(CatalogDAO catalogDAO, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, CategoryService categoryService) {
-        super(catalogDAO, "catalog");
+    @Autowired
+    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, CategoryService categoryService) {
+        super(catalogDAO, "catalog", validator);
         this.catalogDAO = catalogDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
         this.rootCategoryDAO = rootCategoryDAO;

@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -15,6 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,28 +36,32 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     private CategoryService categoryService;
 
-    public CategoryController( CategoryService categoryService){
+    public CategoryController(CategoryService categoryService){
         super(categoryService);
         this.categoryService = categoryService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ModelAndView create(@ModelAttribute("category") @Valid Category category, BindingResult result, Model model) {
-        if(result.hasErrors()) {
-            return new ModelAndView("category/category");
+    @ResponseBody
+    public Map<String, Object> create(Category category) {
+        Map<String, Object> model = new HashMap<>();
+        if(isValid(category, model, Category.CreateGroup.class)) {
+            category.setActive("N");
+            categoryService.create(category);
+            model.put("success", true);
         }
-        category.setActive("N");
-        categoryService.create(category);
-        return new ModelAndView("redirect:/pim/categories");
+        return model;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public ModelAndView update(@PathVariable(value = "id") String id, @ModelAttribute("category") @Valid Category category, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            return new ModelAndView("category/category");
+    @ResponseBody
+    public Map<String, Object> update(@PathVariable(value = "id") String id, Category category) {
+        Map<String, Object> model = new HashMap<>();
+        if(isValid(category, model, category.getGroup().equals("DETAILS") ? Category.DetailsGroup.class : category.getGroup().equals("SEO") ? Category.SeoGroup.class : null)) {
+            categoryService.update(id, FindBy.EXTERNAL_ID, category);
+            model.put("success", true);
         }
-        categoryService.update(id, FindBy.EXTERNAL_ID, category);
-        return new ModelAndView("redirect:/pim/categories");
+        return model;
     }
 
     @RequestMapping(value = {"/{id}", "/create"})

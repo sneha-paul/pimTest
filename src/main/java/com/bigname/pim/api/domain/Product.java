@@ -25,6 +25,10 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Name cannot be empty")
     private String productName;
 
+    private String productDescription;
+
+
+
     private String productFamilyId;
 
     @Transient

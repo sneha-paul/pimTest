@@ -23,12 +23,13 @@ $( document ).ready(function() {
             if(data.success === true) {
                 $.refreshDataTable('catalogs');
                 $.refreshDataTable('availableCatalogs');
+                toastr.success('Successfully added the website catalog', 'Website Catalog Added');
             } else {
-                alert('Failed');
+                toastr.success('Error occurred while adding the website catalog', 'Error Adding Website Catalog');
             }
 
         }).fail(function(jqXHR, status) {
-            alert("Failed:" + status);
+            toastr.success('Error occurred while adding the website catalog', 'Error Adding Website Catalog');
         });
     });
 });

@@ -4,17 +4,24 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.service.BaseService;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,4 +59,16 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
         return result;
     }
+
+    private Map<String, Pair<String, Object>> validate(T t, Class<?>... groups) {
+        return service.validate(t, groups);
+    }
+
+    protected boolean isValid(T t, Map<String, Object> model, Class<?> groups) {
+        model.put("fieldErrors", validate(t, groups));
+        model.put("group", t.getGroup());
+        return ValidationUtil.isEmpty(model.get("fieldErrors"));
+    }
+
+
 }

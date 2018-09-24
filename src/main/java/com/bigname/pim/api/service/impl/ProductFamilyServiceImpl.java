@@ -5,11 +5,13 @@ import com.bigname.pim.api.domain.ProductFamily;
 import com.bigname.pim.api.persistence.dao.ProductFamilyDAO;
 import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.util.FindBy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,8 +25,9 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
 
     private ProductFamilyDAO productFamilyDAO;
 
-    public ProductFamilyServiceImpl(ProductFamilyDAO productFamilyDAO) {
-        super(productFamilyDAO, "productFamily");
+    @Autowired
+    public ProductFamilyServiceImpl(ProductFamilyDAO productFamilyDAO, Validator validator) {
+        super(productFamilyDAO, "productFamily", validator);
         this.productFamilyDAO = productFamilyDAO;
     }
 

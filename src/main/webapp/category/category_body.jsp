@@ -5,49 +5,56 @@
             <div class="col-lg-12 col-md-12">
                 <div class="card">
                     <div class="header">
-                        <h2>${category.categoryName} <small><code class="highlighter-rouge">${category.categoryId}</code></small></h2>
+                        <h2>${category.categoryName} <small><code class="highlighter-rouge">${category.categoryId}</code></small><small class="pull-right m-t--15"><code style="color:#808080">_id: ${category.id}</code></small></h2>
                     </div>
                     <div class="body">
                         <ul class="nav nav-tabs-new2">
-                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#Attributes">Attributes</a></li>
-                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SubCategories">SubCategories</a></li>
+                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SEO">SEO</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SUB_CATEGORIES">SubCategories</a></li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane show active" id="Attributes">
+                            <div class="tab-pane show active" id="DETAILS">
                                 <div class="row clearfix m-t-20">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <form id="update-form" method="post" action="/pim/categories/${category.categoryId}" novalidate>
+                                                <form method="post" action="/pim/categories/${category.categoryId}" data-success-message='["Successfully updated the category", "Category Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
-                                                                <label>Category Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                                                <input type="text" name="categoryName" value="${category.categoryName}" class="form-control" required>
+                                                                <label for="categoryName">Category Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                <input type="text" id="categoryName" name="categoryName" value="${category.categoryName}" class="form-control" />
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label>Category ID</label><code class="highlighter-rouge m-l-10">*</code>
-                                                                <input type="text" name="categoryId" class="form-control" value="${category.categoryId}" required>
+                                                                <label for="categoryId">Category ID</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                <input type="text" id="categoryId" name="categoryId" class="form-control" value="${category.categoryId}" />
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label>Category Description</label>
-                                                                <textarea class="form-control" name="description" rows="5" cols="30" required="">${category.description}</textarea>
+                                                                <label for="description">Category Description</label>
+                                                                <textarea class="form-control" id="description" name="description" rows="5" cols="30" required="">${category.description}</textarea>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="longDescription">Category Long Description</label>
+                                                                <textarea class="form-control" id="longDescription" name="longDescription" rows="5" cols="30" required="">${category.longDescription}</textarea>
                                                             </div>
 
                                                             <div class="form-group">
                                                                 <label>Status</label>
                                                                 <br/>
-                                                                <label class="fancy-checkbox">
-                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${category.active eq 'Y'}">checked="checked"</c:if>>
+                                                                <label for="active" class="fancy-checkbox">
+                                                                    <input type="checkbox" id="active" name="active" value="Y" <c:if test="${category.active eq 'Y'}">checked="checked"</c:if>>
                                                                     <span>Active</span>
                                                                 </label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <br>
-                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                    <input type="hidden" name="group" value="DETAILS"/>
+                                                    <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                                                     <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
                                                 </form>
                                             </div>
@@ -55,7 +62,41 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane" id="SubCategories">
+                            <div class="tab-pane" id="SEO">
+                                <div class="row clearfix m-t-20">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="card">
+                                            <div class="body">
+                                                <form method="post" action="/pim/categories/${category.categoryId}" data-success-message='["Successfully updated the category", "Category Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-sm-12">
+                                                            <div class="form-group">
+                                                                <label for="metaTitle">Meta Title</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                <input type="text" id="metaTitle" name="metaTitle" class="form-control" value="${category.metaTitle}" />
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="metaKeywords">Meta Keywords</label>
+                                                                <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <input type="hidden" name="group" value="SEO"/>
+                                                    <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
+                                                    <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="SUB_CATEGORIES">
                                 <div class="row clearfix">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
@@ -69,25 +110,7 @@
                                                 </div>
                                                 <div class="table-responsive">
                                                     <table id="paginatedSubCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
-                                                        <thead class="thead-dark">
-                                                    <%--<tr>
-                                                        <th>Category Name</th>
-                                                        <th>Category ID</th>
-                                                        <th>Status</th>
-                                                        <th>Actions</th>
-                                                    </tr>--%>
-                                                        </thead>
-                                                   <%-- <c:forEach items="${category.subCategories.content}" var="relatedCategory">
-                                                        <c:set var="subCategory" value="${relatedCategory.child}" />
-                                                        <tr>
-                                                            <td>${subCategory.categoryName}<i class="table-dragger-handle sindu_handle"></i></td>
-                                                            <td>${subCategory.categoryId}</td>
-                                                            <td><c:choose><c:when test="${relatedCategory.active eq 'Y'}"><span class="badge badge-success">Active</span><</c:when><c:otherwise><span class="badge badge-danger">Inactive</span><</c:otherwise></c:choose>/td>
-                                                            <td>
-                                                                <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>
-                                                            </td>
-                                                        </tr>
-                                                    </c:forEach>--%>
+                                                        <thead class="thead-dark"></thead>
                                                     </table>
                                                 </div>
                                             </div>
@@ -130,29 +153,31 @@
                         <h1>Create Category</h1>
                     </div>
                     <div class="body">
-                        <form id="create-form" method="post" action="/pim/categories" novalidate>
+                        <form method="post" action="/pim/categories" data-success-message='["Successfully created the category", "Category Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group">
-                                        <label>Category Name</label>
-                                        <input type="text" name="categoryName" class="form-control" required>
+                                        <label>Category Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                        <input type="text" name="categoryName" class="form-control">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Category ID</label>
-                                        <input type="text" name="categoryId" class="form-control" required>
+                                        <label>Category ID</label><code class="highlighter-rouge m-l-10">*</code>
+                                        <input type="text" name="categoryId" class="form-control">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Category Description</label>
-                                        <textarea class="form-control" name="description" value="${category.description}" rows="5" cols="30" required=""></textarea>
+                                        <textarea class="form-control" name="description" value="${category.description}" rows="5" cols="30"></textarea>
                                     </div>
                                 </div>
                             </div>
                             <br>
-                            <button type="submit" class="btn btn-primary">Create</button>
+                            <input type="hidden" name="group" value="CREATE"/>
+                            <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Create</button>
                             <a href="/pim/categories/"><button type="button" class="btn btn-danger">Cancel</button></a>
                         </form>
+
                     </div>
                 </div>
             </div>
