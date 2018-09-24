@@ -2,9 +2,11 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.exception.EntityNotFoundException;
+import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,10 +29,12 @@ import java.util.Optional;
 public class ProductVariantController extends BaseController<ProductVariant, ProductVariantService> {
 
     private ProductVariantService productVariantService;
+    private ProductFamilyService productFamilyService;
 
-    public ProductVariantController( ProductVariantService productVariantService){
+    public ProductVariantController( ProductVariantService productVariantService, ProductFamilyService productFamilyService){
         super(productVariantService);
         this.productVariantService = productVariantService;
+        this.productFamilyService = productFamilyService;
     }
 
     @RequestMapping()
@@ -66,12 +70,14 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("productVariant", new ProductVariant());
+            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))).getContent());
             model.put("breadcrumbs", new Breadcrumbs("ProductVariants", "ProductVariants", "/pim/productVariants", "Create ProductVariant", ""));
         } else {
             Optional<ProductVariant> productVariant = productVariantService.get(id, FindBy.findBy(true), false);
             if(productVariant.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("productVariant", productVariant.get());
+                model.put("productFamily", productFamilyService.get(productVariant.get().getProductFamilyId(),FindBy.findBy(true), false));
                 model.put("breadcrumbs", new Breadcrumbs("ProductVariant", "ProductVariants", "/pim/productVariants", productVariant.get().getProductVariantName(), ""));
             } else {
                 throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + id);

@@ -32,12 +32,13 @@
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>ProductFamily</label>
-                                                                <select class="form-control" id="">
+                                                                <input type="text" name="productFamilyId" class="form-control" value="${product.productFamilyId}"  readonly required="true"/>
+                                                               <%-- <select class="form-control" id="">
                                                                     <option value="">Select One</option>
                                                                     <c:forEach items="${productFamilies}" var="productFamily">
                                                                         <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>
                                                                     </c:forEach>
-                                                                </select>
+                                                                </select>--%>
                                                             </div>
 
                                                             <div class="form-group">
@@ -64,21 +65,9 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <div class="row p-b-25">
-                                                    <div class="col-lg-12 col-md-12">
-                                                        <div class="pull-right">
-                                                            <button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add Product Attributes</span></button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <%--<div class="table-responsive">
-                                                    <table id="paginatedCatalogsTable" class="table table-hover dataTable table-custom" style="width: 100%">
-                                                        <thead class="thead-dark">
 
-                                                        </thead>
 
-                                                    </table>
-                                                </div>--%>
+
                                             </div>
                                         </div>
                                     </div>
@@ -93,23 +82,8 @@
             $.initPage({
                 'productId' : '${product.productId}'
             });
-            /*$( document ).ready(function() {
-                $.initDataTable({
-                    selector: '#paginatedCatalogsTable',
-                    name: 'catalogs',
-                    type: 'TYPE_2',
-                    url: $.getURL('/pim/websites/{websiteId}/catalogs'),
-                    columns: [
-                        { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-                        { data: 'catalogId', name : 'catalogId', title : 'Catalog ID' },
-                        { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                        { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-                    ]
-                });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
-            });*/
+
         </script>
-       <%-- <script src="/assets/js/pages/ui/product/product.js"></script>--%>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">

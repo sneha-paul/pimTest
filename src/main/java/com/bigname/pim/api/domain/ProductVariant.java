@@ -22,15 +22,16 @@ public class ProductVariant extends Entity<ProductVariant> {
     @NotEmpty(message = "ProductVariant Name cannot be empty")
     private String productVariantName;
 
-    private String description;
+    private String productFamilyId;
 
     public ProductVariant() {
         super();
     }
 
-    public ProductVariant(String externalId, String productVariantName) {
+    public ProductVariant(String externalId, String productVariantName, String productFamilyId) {
         super(externalId);
         this.productVariantName = productVariantName;
+        this.productFamilyId = productFamilyId;
     }
 
     public String getProductVariantId() {
@@ -50,12 +51,12 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.productVariantName = productVariantName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getProductFamilyId() {
+        return productFamilyId;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setProductFamilyId(String productFamilyId) {
+        this.productFamilyId = productFamilyId;
     }
 
     void setExternalId() {
@@ -66,7 +67,7 @@ public class ProductVariant extends Entity<ProductVariant> {
     public ProductVariant merge(ProductVariant productVariant) {
         this.setExternalId(productVariant.getExternalId());
         this.setProductVariantName(productVariant.getProductVariantName());
-        this.setDescription(productVariant.getDescription());
+        this.setProductFamilyId(productVariant.getProductFamilyId());
         this.setActive(productVariant.getActive());
         return this;
     }
@@ -76,6 +77,7 @@ public class ProductVariant extends Entity<ProductVariant> {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
         map.put("productVariantName", getProductVariantName());
+        map.put("productFamilyId",getProductFamilyId());
         map.put("active", getActive());
         return map;
     }
