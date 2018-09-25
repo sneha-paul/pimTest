@@ -34,10 +34,17 @@
                         $.each(json.data, function(index, value) {
 
                             if(options.type === 'TYPE_1') {
-                                var action = 'Y' === value.active ? 'Disable' : 'Enable';
-                                value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
-                                    '<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a> ' +
-                                    '<button type="button" class="btn btn-sm btn-outline-danger js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="icon-ban"></i></button>';
+                                var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
+                                if('Y' !== value.active) {
+                                    icon = 'icon-check';
+                                    action = 'Enable';
+                                    btnClass = 'btn-success';
+                                }
+                                // var icon = 'Y' === value.active ? 'icon-ban' : 'icon-check';
+                                // var action = 'Y' === value.active ? 'Disable' : 'Enable';
+                                value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
+                                    '<a href="javascript:void(0);" class="btn btn-sm btn-primary" title="Clone"><i class="icon-docs"></i></a> ' +
+                                    '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             } else if(options.type === 'TYPE_2') {
                                 value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
@@ -165,19 +172,20 @@
                 method: 'PUT',
                 text: 'This will ' + (isActive === 'Y' ? 'disable' : 'enable') + ' the ' + entityName + "!",
                 confirmButtonText: 'Yes, ' + (isActive === 'Y' ? 'disable' : 'enable') +' it!',
+                confirmButtonColor: isActive === 'Y' ? '#dc3545' : '#28a745',
                 successTitle: isActive === 'Y' ? 'Disabled!' : 'Enabled!',
                 successText: 'The ' + entityName + ' has been ' + (isActive === 'Y' ? 'disabled.' : 'enabled.')
             }, callback);
         },
 
         confirmedAJAXRequest: function(options, callback) {
-            var defaultOptions = {
+            const defaultOptions = {
                 method: 'PUT',
                 title: 'Are you sure?',
                 text: 'Do you want to continue?',
                 type: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
+                confirmButtonColor: '#28a745',
                 confirmButtonText: 'Yes!',
                 errorTitle: 'Error!',
                 errorText: 'The AJAX request failed!',
@@ -231,7 +239,7 @@
             }).then(function(response) {
                 var data = typeof response.value !== 'undefined' ? JSON.parse(response.value) : {};
                 if (data.success) {
-                    swal(options.successTitle, options.successText, options.successType);
+                    swal({title: options.successTitle, text: options.successText, type: options.successType, timer: 3000});
                     callback();
                 }
             }, function(error) {
