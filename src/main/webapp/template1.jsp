@@ -41,6 +41,9 @@
     <script src="/assets/vendor/jquery/jquery-3.3.1.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/popper.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <%--<script src="/assets/vendor/sweetalert/sweetalert.min.js"></script>--%>
+    <%--<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>--%>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.2/dist/sweetalert2.all.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
     <script src="/assets/js/pages/ui/page.js"></script>
 
@@ -119,7 +122,7 @@
 <script src="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable-conditional-paging.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable.js"></script>
-<script src="/assets/vendor/sweetalert/sweetalert.min.js"></script>
+
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
 <script src="/assets/vendor/parsleyjs/js/parsley.min.js"></script>

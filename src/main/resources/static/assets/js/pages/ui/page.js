@@ -34,9 +34,10 @@
                         $.each(json.data, function(index, value) {
 
                             if(options.type === 'TYPE_1') {
+                                var action = 'Y' === value.active ? 'Disable' : 'Enable';
                                 value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-outline-success" title="Details"><i class="icon-eye"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary" title="clone"><i class="icon-docs"></i></a> ' +
-                                    '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable/Enable" data-type="confirm"><i class="icon-ban"></i></a>';
+                                    '<button type="button" class="btn btn-sm btn-outline-danger js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="icon-ban"></i></button>';
                             } else if(options.type === 'TYPE_2') {
                                 value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
@@ -58,6 +59,9 @@
                 },
                 columns: options.columns
             }));
+            $(options.selector).on('click', '.js-toggle-status', function () {
+                $.toggleStatus($.getURL('/pim/categories/{externalId}/active/{active}', {externalId: $(this).data('external-id'), active : $(this).data('active')}), 'category', $.refreshDataTable.bind(this, options.name), $(this).data('active'));
+            });
         },
         refreshDataTable: function(name) {
             $.getDataTable(name).ajax.reload();
@@ -125,14 +129,24 @@
         },
         submitForm: function(formEl, successCallback) {
             $.clearFieldErrors(formEl);
-            $.post({
+
+            var method = $(formEl).data('method');
+            if(typeof method === 'undefined' || method === '') {
+                method = 'POST';
+            }
+            $.ajax({
                 url: $(formEl).attr('action'),
                 data: $(formEl).serialize(),
+                method: method,
                 success: function(data) {
                     if(data.success) {
                         toastr.success($(formEl).data('success-message')[0], $(formEl).data('success-message')[1]);
                         if(successCallback) {
                             successCallback();
+                        } else {
+                            if(typeof data.path !== 'undefined' && data.path !== '') {
+                                window.location.href = data.path;
+                            }
                         }
                     } else {
                         $.renderFieldErrors(formEl, data.fieldErrors);
@@ -144,6 +158,167 @@
                 }
             });
         },
+
+        toggleStatus: function(url, entityName, callback, isActive) {
+            $.confirmedAJAXRequest({
+                url: url,
+                method: 'PUT',
+                text: 'This will ' + (isActive === 'Y' ? 'disable' : 'enable') + ' the ' + entityName + "!",
+                confirmButtonText: 'Yes, ' + (isActive === 'Y' ? 'disable' : 'enable') +' it!',
+                successTitle: isActive === 'Y' ? 'Disabled!' : 'Enabled!',
+                successText: 'The ' + entityName + ' has been ' + (isActive === 'Y' ? 'disabled.' : 'enabled.')
+            }, callback);
+        },
+
+        confirmedAJAXRequest: function(options, callback) {
+            var defaultOptions = {
+                method: 'PUT',
+                title: 'Are you sure?',
+                text: 'Do you want to continue?',
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'Yes!',
+                errorTitle: 'Error!',
+                errorText: 'The AJAX request failed!',
+                errorType: 'error',
+                successTitle: 'Done!',
+                successText: 'The AJAX request completed successfully!',
+                successType: 'success',
+                callback: callback
+            };
+            options = Object.assign({},defaultOptions, options);
+            swal({
+                title: options.title,
+                text: options.text,
+                type: options.type,
+                showCancelButton: options.showCancelButton,
+                confirmButtonColor: options.confirmButtonColor,
+                confirmButtonText: options.confirmButtonText,
+
+                preConfirm: (yes) => {
+                    if(yes) {
+                        // Return a new promise.
+                        return new Promise(function (resolve, reject) {
+                            // Do the usual XHR stuff
+                            var req = new XMLHttpRequest();
+                            req.open(options.method, options.url);
+
+                            req.onload = function () {
+                                // This is called even on 404 etc
+                                // so check the status
+                                if (req.status == 200) {
+                                    // Resolve the promise with the response text
+                                    resolve(req.response);
+                                }
+                                else {
+                                    // Otherwise reject with the status text
+                                    // which will hopefully be a meaningful error
+                                    reject(Error(req.statusText));
+                                }
+                            };
+
+                            // Handle network errors
+                            req.onerror = function () {
+                                reject(Error("Network Error"));
+                            };
+
+                            // Make the request
+                            req.send();
+                        });
+                    }
+                }
+            }).then(function(response) {
+                var data = typeof response.value !== 'undefined' ? JSON.parse(response.value) : {};
+                if (data.success) {
+                    swal(options.successTitle, options.successText, options.successType);
+                    callback();
+                }
+            }, function(error) {
+                swal(options.errorTitle, options.errorText, options.errorType);
+            });
+        },
+        confirmedAJAXRequest1: function(options, callback) {
+            var defaultOptions = {
+                title: 'Are you sure?',
+                text: 'Do you want to continue?',
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'Yes!',
+                errorTitle: 'Error!',
+                errorText: 'The AJAX request failed!',
+                errorType: 'error',
+                successTitle: 'Done!',
+                successText: 'The AJAX request completed successfully!',
+                successType: 'success',
+            };
+            $.extend(true, options, defaultOptions);
+            swal({
+                title: options.title,
+                text: options.text,
+                type: options.type,
+                showCancelButton: options.showCancelButton,
+                confirmButtonColor: options.confirmButtonColor,
+                confirmButtonText: options.confirmButtonText,
+
+                preConfirm: (yes) => {
+                    return Promise.resolve($.ajax({
+                            url: options.url,
+                            data: {},
+                            method:'PUT'
+                        }));
+                        // resolve({result: {value: 'Manu'}});
+
+                    /*return new Promise(function(resolve, reject) {
+                            $.ajax({
+                                url: options.url,
+                                data: {},
+                                method:'PUT',
+                                success: function(data) {
+                                    /!*if(data.success) {
+                                        swal(options.successTitle, options.successText, options.successType);
+                                        resolve(true);
+                                    }*!/
+                                    return data;
+
+                                },
+                                error: function(err) {
+                                    swal(options.errorTitle, options.errorText, options.errorType);
+                                    reject(false);
+                                }
+                            });
+                            /!*axios.post(options.url, {})
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error(response.statusText);
+                                    }
+                                    return response.json()
+                                }).catch(error => {
+                                    swal(options.errorTitle, options.errorText, options.errorType);
+
+                            })*!/
+                    });*/
+                    /*return post(options.url).then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        return response.json()
+                    }).catch(error => {
+                        swal(options.errorTitle, options.errorText, options.errorType);
+                    })*/
+                }
+            }).then((result) => { console.log(result.value.success);
+                if (result.value.success) {
+                    swal(
+                        options.successTitle,
+                        options.successText,
+                        options.successType
+                    )
+                }
+            });
+        },
+
         renderFieldErrors: function(formEl, errors) {
             $.each(errors, function(name, error) {
                 $(formEl.find('input[name="' + name + '"],textarea[name="' + name + '"]').addClass('parsley-error')).after($('<ul class="parsley-errors-list filled"><li>' + error['value0'] + '</li></ul>'));
