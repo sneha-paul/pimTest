@@ -65,7 +65,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
 
     @Override
     public boolean toggle(String id, FindBy findBy, Toggle active) {
-        Optional<T> _t = get(id, findBy);
+        Optional<T> _t = get(id, findBy, false);
         if(_t.isPresent()) {
             T t = _t.get();
             t.setActive(active.state());

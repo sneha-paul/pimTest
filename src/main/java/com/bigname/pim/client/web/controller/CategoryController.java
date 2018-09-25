@@ -11,6 +11,7 @@ import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -49,11 +50,12 @@ public class CategoryController extends BaseController<Category, CategoryService
             category.setActive("N");
             categoryService.create(category);
             model.put("success", true);
+            model.put("path", "/pim/categories");
         }
         return model;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Category category) {
         Map<String, Object> model = new HashMap<>();
@@ -61,6 +63,14 @@ public class CategoryController extends BaseController<Category, CategoryService
             categoryService.update(id, FindBy.EXTERNAL_ID, category);
             model.put("success", true);
         }
+        return model;
+    }
+
+    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", categoryService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
     }
 
