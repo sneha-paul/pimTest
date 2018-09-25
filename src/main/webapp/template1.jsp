@@ -19,9 +19,10 @@
     <meta name="author" content="WrapTheme, design by: ThemeMakker.com">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
-    <!-- VENDOR CSS -->
+    <%-- VENDOR CSS --%>
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
 
     <link rel="stylesheet" href="/assets/vendor/sweetalert/sweetalert.css"/>
     <link rel="stylesheet" href="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css">
@@ -29,20 +30,21 @@
     <link rel="stylesheet" href="/assets/vendor/parsleyjs/css/parsley.css">
     <link rel="stylesheet" href="/assets/vendor/table-dragger/table-dragger.min.css">
 
-    <!-- MAIN CSS -->
+    <%-- MAIN CSS --%>
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/color_skins.css">
-    <!-- PAGE LEVEL CSS -->
+    <%-- PAGE LEVEL CSS --%>
     <c:forEach var="pageCss" items="${pageStyles}">
         <link type="text/css" rel="stylesheet" media="all" href='<c:out value="${pageCss}"/>'>
     </c:forEach>
 
     <script src="/assets/vendor/jquery/jquery-3.3.1.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/popper.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
     <script src="/assets/js/pages/ui/page.js"></script>
 
-    <!-- PAGE LEVEL JS -->
+    <%-- PAGE LEVEL JS --%>
     <c:forEach var="pageJS" items="${pageTopScripts}">
         <script type="text/javascript" src='<c:out value="${pageJS}"/>'></script>
     </c:forEach>
@@ -54,14 +56,14 @@
 </head>
 <body class="theme-orange">
 
-<!-- Page Loader -->
+<%-- Page Loader --%>
 <div class="page-loader-wrapper">
     <div class="loader">
         <div class="m-t-30"><img src="/assets/img/logo.png" width="98" alt="BIGNAME PIM"></div>
         <p>Please wait...</p>
     </div>
 </div>
-<!-- Overlay For Sidebars -->
+<%-- Overlay For Sidebars --%>
 
 <div id="wrapper">
     <nav class="navbar navbar-fixed-top">
@@ -107,7 +109,7 @@
         </div>
     </div>
 </div>
-<!-- Javascript -->
+<%-- Javascript --%>
 
 <%--<script src="/assets/bundles/libscripts.bundle.js"></script>--%>
 <script src="/assets/bundles/vendorscripts.bundle.js"></script>
@@ -117,7 +119,7 @@
 <script src="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable-conditional-paging.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable.js"></script>
-<script src="/assets/vendor/sweetalert/sweetalert.min.js"></script> <!-- SweetAlert Plugin Js -->
+<script src="/assets/vendor/sweetalert/sweetalert.min.js"></script>
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
 <script src="/assets/vendor/parsleyjs/js/parsley.min.js"></script>
@@ -129,18 +131,12 @@
 <script src="/assets/vendor/table-dragger/table-dragger.min.js"></script>
 <script src="/assets/vendor/emodal/eModal.js"></script>
 <script src="/assets/js/pages/ui/website/website.js"></script>
-<!-- PAGE LEVEL JS -->
+<%-- PAGE LEVEL JS --%>
 <c:forEach var="customJS" items="${pageBottomScripts}">
     <script src="<c:out value='${customJS}'/>"></script>
 </c:forEach>
 <tiles:insertAttribute name="footer" ignore="true"/>
 <tiles:insertAttribute name="script" ignore="true" />
-<script>
-    /*$(function(){
-        $('.dataTable').DataTable({
-            paginate: false
-        });
-    });*/
-</script>
+
 </body>
 </html>

@@ -7,9 +7,11 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Validator;
 import java.util.*;
 
 /**
@@ -22,8 +24,8 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     private RelatedCategoryDAO relatedCategoryDAO;
 
     @Autowired
-    public CategoryServiceImpl(CategoryDAO categoryDAO, RelatedCategoryDAO relatedCategoryDAO) {
-        super(categoryDAO, "category");
+    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO) {
+        super(categoryDAO, "category", validator);
         this.categoryDAO = categoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
     }

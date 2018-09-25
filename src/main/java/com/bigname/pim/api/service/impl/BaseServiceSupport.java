@@ -8,15 +8,15 @@ import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import com.google.common.base.Preconditions;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.util.*;
 
 import static com.bigname.pim.util.FindBy.EXTERNAL_ID;
 import static com.bigname.pim.util.FindBy.INTERNAL_ID;
@@ -29,8 +29,10 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     public static final int MAX_PAGE_SIZE = 200;
     protected DAO dao;
     protected String entityName;
+    protected Validator validator;
 
-    public BaseServiceSupport(DAO dao, String entityName) {
+    protected BaseServiceSupport(DAO dao, String entityName, Validator validator) {
+        this.validator = validator;
         this.dao = dao;
         this.entityName = entityName;
     }
@@ -72,6 +74,12 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         } else {
             return false;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Pair<String, Object>> validate(T t, Class<?>... groups) {
+        Set<ConstraintViolation<T>> violations = validator.validate(t, groups);
+        return t.getValidationErrors(violations);
     }
 
     @Override

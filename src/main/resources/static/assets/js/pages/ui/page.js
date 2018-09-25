@@ -102,8 +102,6 @@
             return $.getPageAttributes()[key];
         },
         getURL: function(uri, params) {
-            // var attr = {'id' : 'manu', 'id2': 'prasad'};
-            // var input = '/pim/websites/{id}/availableCatalogs/{id}';
             var url = uri;
             var match;
             var regex = /(\{(\S+?)\})/g;
@@ -116,27 +114,46 @@
             }
             return $.getPageAttribute("urlRoot") + url;
         },
-        bindFormSubmit: function(submitEl, formEl) {
-
+        bindFormSubmit: function(submitEl) {
             $(submitEl).on('click', function(e) {
-                e.preventDefault();
-                //Clear validation errors - TODO
-                if(typeof formEl === 'undefined') {
-                    formEl = $(this).closest('form');
-                }
-                $.submitForm(formEl);
+                $.submitAction(this, e);
             });
         },
+        submitAction: function(e, submitEl) {
+            e.preventDefault();
+            $.submitForm($(submitEl).closest('form'));
+        },
         submitForm: function(formEl, successCallback) {
+            $.clearFieldErrors(formEl);
             $.post({
                 url: $(formEl).attr('action'),
                 data: $(formEl).serialize(),
                 success: function(data) {
-                    if(successCallback) {
-                        successCallback();
+                    if(data.success) {
+                        toastr.success($(formEl).data('success-message')[0], $(formEl).data('success-message')[1]);
+                        if(successCallback) {
+                            successCallback();
+                        }
+                    } else {
+                        $.renderFieldErrors(formEl, data.fieldErrors);
+                        toastr.error($(formEl).data('error-message')[0], $(formEl).data('error-message')[1], {timeOut: 3000})
                     }
+                },
+                error: function (resp) {
+                    toastr.error('An error occurred while saving the data', "Error", {timeOut: 3000});
                 }
             });
+        },
+        renderFieldErrors: function(formEl, errors) {
+            $.each(errors, function(name, error) {
+                $(formEl.find('input[name="' + name + '"],textarea[name="' + name + '"]').addClass('parsley-error')).after($('<ul class="parsley-errors-list filled"><li>' + error['value0'] + '</li></ul>'));
+            });
+        },
+        clearFieldErrors: function(formEl) {
+            $(formEl).find('ul.parsley-errors-list').remove();
+            $(formEl).find('.parsley-error').each(function() {
+                $(this).removeClass('parsley-error');
+            })
         },
         loadJavaScript: function loadScript(url, el, callback){
 
@@ -174,4 +191,6 @@
     var page = new Page();
     var loc = window.location;
     $.setPageAttribute("urlRoot", loc.protocol + "//" + loc.hostname + ":" + loc.port);
+    toastr.options.preventDuplicates = true;
+    toastr.options.positionClass = 'toast-bottom-right';
 })();

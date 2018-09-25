@@ -23,12 +23,13 @@ $( document ).ready(function() {
             if(data.success === true) {
                 $.refreshDataTable('rootCategories');
                 $.refreshDataTable('availableRootCategories');
+                toastr.success('Successfully added the root category', 'Root Category Added');
             } else {
-                alert('Failed');
+                toastr.success('Error occurred while adding the root category', 'Error Adding Root Category');
             }
 
         }).fail(function(jqXHR, status) {
-            alert("Failed:" + status);
+            toastr.success('Error occurred while adding the root category', 'Error Adding Root Category');
         });
     });
 });

@@ -57,6 +57,8 @@ abstract public class ValidationUtil {
             }
         } else if(object instanceof Collection) {
             return isCollectionEmpty((Collection<?>)object);
+        } else if(object instanceof Map) {
+            return ((Map)object).isEmpty();
         }
         return false;
     }

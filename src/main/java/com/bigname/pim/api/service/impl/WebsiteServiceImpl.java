@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Validator;
 import java.util.*;
 
 @Service
@@ -25,8 +26,8 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
 
 
     @Autowired
-    public WebsiteServiceImpl(WebsiteDAO websiteDAO, WebsiteCatalogDAO websiteCatalogDAO, CatalogService catalogService) {
-        super(websiteDAO, "website");
+    public WebsiteServiceImpl(WebsiteDAO websiteDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, CatalogService catalogService) {
+        super(websiteDAO, "website", validator);
         this.websiteDAO = websiteDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
         this.catalogService = catalogService;

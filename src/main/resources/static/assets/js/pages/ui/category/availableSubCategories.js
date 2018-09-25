@@ -23,12 +23,13 @@ $( document ).ready(function() {
             if(data.success === true) {
                 $.refreshDataTable('subCategories');
                 $.refreshDataTable('availableSubCategories');
+                toastr.success('Successfully added the sub category', 'Sub Category Added');
             } else {
-                alert('Failed');
+                toastr.success('Error occurred while adding the sub category', 'Error Adding Sub Category');
             }
 
         }).fail(function(jqXHR, status) {
-            alert("Failed:" + status);
+            toastr.success('Error occurred while adding the sub category', 'Error Adding Sub Category');
         });
     });
 });
