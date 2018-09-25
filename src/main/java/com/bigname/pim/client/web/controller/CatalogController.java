@@ -39,8 +39,20 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         super(catalogService);
         this.catalogService = catalogService;
     }
-
     @RequestMapping(method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> create( Catalog catalog) {
+        Map<String, Object> model = new HashMap<>();
+        if(isValid(catalog, model, Catalog.CreateGroup.class)) {
+            catalog.setActive("N");
+            catalogService.create(catalog);
+            model.put("success", true);
+            model.put("path", "/pim/catalogs");
+        }
+        return model;
+    }
+
+   /* @RequestMapping(method = RequestMethod.POST)
     public ModelAndView create(@ModelAttribute("catalog") @Valid Catalog catalog, BindingResult result, Model model) {
         if(result.hasErrors()) {
             return new ModelAndView("catalog/catalog");
@@ -48,9 +60,20 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         catalog.setActive("N");
         catalogService.create(catalog);
         return new ModelAndView("redirect:/pim/catalogs");
+    }*/
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> update(@PathVariable(value = "id") String id, Catalog catalog) {
+        Map<String, Object> model = new HashMap<>();
+        //if(isValid(catalog, model, catalog.getGroup().equals("DETAILS") ? Category.DetailsGroup.class : catalog.getGroup().equals("SEO") ? Category.SeoGroup.class : null)) {
+            catalogService.update(id, FindBy.EXTERNAL_ID, catalog);
+            model.put("success", true);
+        //}
+        return model;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    /*@RequestMapping(value = "/{id}", method = RequestMethod.POST)
     public ModelAndView update(@PathVariable(value = "id") String id, @ModelAttribute("catalog") @Valid Catalog catalog, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return new ModelAndView("catalog/catalog");
@@ -58,7 +81,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         catalogService.update(id, FindBy.EXTERNAL_ID, catalog);
         return new ModelAndView("redirect:/pim/catalogs");
     }
-
+*/
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
         Map<String, Object> model = new HashMap<>();

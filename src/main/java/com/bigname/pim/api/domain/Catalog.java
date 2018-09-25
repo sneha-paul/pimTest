@@ -20,11 +20,11 @@ public class Catalog extends Entity<Catalog> {
 
 
     @Transient
-    @NotEmpty(message = "Catalog Id cannot be empty")
+    @NotEmpty(message = "Catalog Id cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
     String catalogId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Catalog Name cannot be empty")
+    @NotEmpty(message = "Catalog Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String catalogName;
 
     private String description;
@@ -78,11 +78,17 @@ public class Catalog extends Entity<Catalog> {
         this.catalogId = getExternalId();
     }
 
+    @Override
     public Catalog merge(Catalog catalog) {
-        this.setExternalId(catalog.getExternalId());
-        this.setCatalogName(catalog.getCatalogName());
-        this.setDescription(catalog.getDescription());
-        this.setActive(catalog.getActive());
+        switch(catalog.getGroup()) {
+            case "DETAILS" :
+                this.setExternalId(catalog.getExternalId());
+                this.setCatalogName(catalog.getCatalogName());
+                this.setDescription(catalog.getDescription());
+                this.setActive(catalog.getActive());
+                break;
+        }
+
         return this;
     }
 
