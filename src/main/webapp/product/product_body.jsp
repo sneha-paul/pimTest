@@ -33,8 +33,12 @@
                                                             <div class="form-group">
                                                                 <label>ProductFamily</label>
 
-                                                                <input type="text" name="productFamilyId" class="form-control" value="${product.productFamilyId}"  readonly required="true"/>
-
+                                                                <select class="form-control" name="productFamilyId">
+                                                                    <option value="">Select One</option>
+                                                                    <c:forEach items="${productFamilies}" var="productFamily">
+                                                                        <option value="${productFamily.id}">${productFamily.productFamilyName}</option>
+                                                                    </c:forEach>
+                                                                </select>
                                                             </div>
                                                             <script>
                                                                 $('select[name="productFamilyId"]').val('${product.productFamilyId}');
