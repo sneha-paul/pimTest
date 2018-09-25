@@ -62,6 +62,26 @@
                                         <div class="col-lg-12 col-md-12">
                                             <div class="card">
                                                 <div class="body">
+                                                    <form id="family-attributes-form" method="post" action="/pim/products/${product.productId}/familyAttributes" novalidate>
+                                                        <div class="row">
+                                                            <c:if test="${not empty productVariant.productFamily}">
+                                                                <c:forEach items="${productVariant.productFamily.productFamilyAttributes}" var="attribute">
+                                                                    <div class="col-md-6 col-sm-12">
+                                                                        <div class="form-group">
+                                                                            <label>${attribute.label}</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                            <input type="text" name="${attribute.name}" value="${productVariant.familyAttributes[attribute.name]}" class="form-control"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </c:forEach>
+                                                            </c:if>
+                                                        </div>
+                                                        <br>
+                                                        <button id="my123" type="submit" class="btn btn-primary">Save</button>
+                                                        <script>
+                                                            $.bindFormSubmit($('#my123'));
+                                                        </script>
+                                                            <%--<a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>--%>
+                                                    </form>
 
                                                 </div>
                                             </div>
@@ -77,23 +97,7 @@
             $.initPage({
                 'productVariantId' : '${productVariant.productVariantId}'
             });
-            /*$( document ).ready(function() {
-             $.initDataTable({
-             selector: '#paginatedCatalogsTable',
-             name: 'catalogs',
-             type: 'TYPE_2',
-             url: $.getURL('/pim/websites/{websiteId}/catalogs'),
-             columns: [
-             { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-             { data: 'catalogId', name : 'catalogId', title : 'Catalog ID' },
-             { data: 'active', name : 'active' , title : 'Status', orderable: false},
-             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-             ]
-             });
-             //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
-             });*/
         </script>
-       <%-- <script src="/assets/js/pages/ui/product/product.js"></script>--%>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">
@@ -103,18 +107,18 @@
                         <h1>Create ProductVariant</h1>
                     </div>
                     <div class="body">
-                        <form:form id="create-form" method="post" action="/pim/productVariants" modelAttribute="productVariant">
+                        <form id="create-form" method="post" action="/pim/productVariants">
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group">
                                         <label>ProductVariant Name</label>
-                                        <form:input type="text" path="productVariantName" class="form-control" required="true"/>
-                                        <form:errors path="productVariantName" cssClass="error"/>
+                                        <input type="text" path="productVariantName" class="form-control" required="true"/>
+                                       <%-- <form:errors path="productVariantName" cssClass="error"/>--%>
                                     </div>
                                     <div class="form-group">
                                         <label>ProductVariant ID</label>
-                                        <form:input type="text" path="productVariantId" class="form-control" required="true"/>
-                                        <form:errors path="productVariantId" cssClass="error"/>
+                                        <input type="text" path="productVariantId" class="form-control" required="true"/>
+                                        <%--<form:errors path="productVariantId" cssClass="error"/>--%>
                                     </div>
                                     <div class="form-group">
                                         <label>ProductFamily</label>
@@ -130,7 +134,6 @@
                             <br>
                             <button type="submit" class="btn btn-primary">Create</button>
                             <a href="/pim/productVariants/"><button type="button" class="btn btn-danger">Cancel</button></a>
-                        </form:form>
                     </div>
                 </div>
             </div>

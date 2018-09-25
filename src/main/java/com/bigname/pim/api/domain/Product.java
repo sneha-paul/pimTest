@@ -27,8 +27,6 @@ public class Product extends Entity<Product> {
 
     private String productDescription;
 
-
-
     private String productFamilyId;
 
     @Transient

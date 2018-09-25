@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -23,6 +24,11 @@ public class ProductVariant extends Entity<ProductVariant> {
     private String productVariantName;
 
     private String productFamilyId;
+
+    @Transient
+    private ProductFamily productFamily;
+
+    private Map<String, Object> familyAttributes = new HashMap<>();
 
     public ProductVariant() {
         super();
@@ -59,6 +65,23 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.productFamilyId = productFamilyId;
     }
 
+    public ProductFamily getProductFamily() {
+        return productFamily;
+    }
+
+    public void setProductFamily(ProductFamily productFamily) {
+        this.productFamily = productFamily;
+    }
+
+    public Map<String, Object> getFamilyAttributes() {
+        return familyAttributes;
+    }
+
+    public void setFamilyAttributes(Map<String, Object> familyAttributes) {
+        this.familyAttributes = familyAttributes;
+    }
+
+
     void setExternalId() {
         this.productVariantId = getExternalId();
     }
@@ -69,6 +92,7 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.setProductVariantName(productVariant.getProductVariantName());
         this.setProductFamilyId(productVariant.getProductFamilyId());
         this.setActive(productVariant.getActive());
+        this.setFamilyAttributes(productVariant.getFamilyAttributes());
         return this;
     }
 
