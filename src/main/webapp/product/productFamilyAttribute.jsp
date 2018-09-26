@@ -1,12 +1,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="popup-content" style="padding:20px">
     <div class="body">
-        <form id="family-attribute-form" method="post" action="/pim/productFamilies/${productFamilyId}/${type}/attribute">
+        <form method="post" action="/pim/productFamilies/${productFamilyId}/${type}/attribute" data-method="PUT"
+              data-success-message='["Successfully created the family attribute", "Attribute Created"]'
+              data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <div class="form-group">
                         <label>Attribute Name</label>
                         <input type="text" name="name" value="${attribute.name}" class="form-control" required="true"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Attribute Label</label>
+                        <input type="text" name="label" value="${attribute.label}" class="form-control" required="true"/>
                     </div>
                     <div class="form-group">
                         <label>Attribute Type</label>

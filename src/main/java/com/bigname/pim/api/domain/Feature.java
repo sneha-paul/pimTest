@@ -1,44 +1,31 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
-import org.javatuples.Pair;
-
-import javax.validation.ConstraintViolation;
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Created by manu on 9/4/18.
+ * @author Manu V NarayanaPrasad (manu@blacwood.com)
+ * @since 1.0
  */
-public class Attribute extends ValidatableEntity {
-    @NotEmpty(message = "Attribute type cannot be empty")
-    private String type;
-
-    @NotEmpty(message = "Attribute name cannot be empty")
+public class Feature extends ValidatableEntity {
+    @NotEmpty(message = "Feature name cannot be empty")
     private String name;
 
-    @NotEmpty(message = "Attribute label cannot be empty")
+    @NotEmpty(message = "Feature label cannot be empty")
     private String label;
 
-    private String required;
+    private String required = "N";
+    private String selectable = "Y";
+    private Map<String, String> values = new HashMap<>();
 
-    public Attribute() {}
+    public Feature() {}
 
-    public Attribute(String type, String name, String label, String required) {
-        this.type = type;
+    public Feature(String name, String label, String required) {
         this.name = name;
         this.label = label;
         this.required = "Y".equalsIgnoreCase(required)  ? "Y" : "N";
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getName() {
@@ -65,12 +52,33 @@ public class Attribute extends ValidatableEntity {
         this.required = "Y".equalsIgnoreCase(required)  ? "Y" : "N";
     }
 
+    public String getSelectable() {
+        return selectable;
+    }
+
+    public void setSelectable(String selectable) {
+        this.selectable = "Y".equalsIgnoreCase(selectable)  ? "Y" : "N";;
+    }
+
+    public Map<String, String> getValues() {
+        return values;
+    }
+
+    public void setValues(Map<String, String> values) {
+        this.values = values;
+    }
+
+    public Map<String, String> addValue(String key, String value) {
+        getValues().put(key, value);
+        return values;
+    }
+
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("name", getName());
-        map.put("type", getType());
         map.put("label", getLabel());
         map.put("required", getRequired());
+        map.put("selectable", getSelectable());
         return map;
     }
 
@@ -79,9 +87,9 @@ public class Attribute extends ValidatableEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Attribute attribute = (Attribute) o;
+        Feature feature = (Feature) o;
 
-        return name.equals(attribute.name);
+        return name.equals(feature.name);
     }
 
     @Override

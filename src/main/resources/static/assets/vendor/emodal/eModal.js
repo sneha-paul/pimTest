@@ -147,7 +147,7 @@
                                     //add close event
                                     if (btnOp[index]) {
                                         btn.attr('data-dismiss', 'modal')
-                                            .addClass('x');
+                                            .addClass('x js-eModal-close');
                                     }
                                     break;
                                 case EVENT_CLICK:

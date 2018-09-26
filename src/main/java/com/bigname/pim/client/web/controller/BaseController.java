@@ -7,6 +7,7 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Entity;
+import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.service.BaseService;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
@@ -60,13 +61,13 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return result;
     }
 
-    private Map<String, Pair<String, Object>> validate(T t, Class<?>... groups) {
-        return service.validate(t, groups);
+    private <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
+        return service.validate(e, groups);
     }
 
-    protected boolean isValid(T t, Map<String, Object> model, Class<?> groups) {
-        model.put("fieldErrors", validate(t, groups));
-        model.put("group", t.getGroup());
+    protected <E extends ValidatableEntity> boolean isValid(E e, Map<String, Object> model, Class<?>... groups) {
+        model.put("fieldErrors", validate(e, groups));
+        model.put("group", e.getGroup());
         return ValidationUtil.isEmpty(model.get("fieldErrors"));
     }
 

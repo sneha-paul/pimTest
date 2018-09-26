@@ -10,12 +10,14 @@
                     </div>
                     <div class="body">
                         <ul class="nav nav-tabs-new2">
-                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#Attributes">Attributes</a></li>
+                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#Details">Details</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#ProductAttributes">Product Attributes</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#VariantAttributes">Variant Attributes</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#ProductFeatures">Product Features</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#VariantFeatures">Variant Features</a></li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane show active" id="Attributes">
+                            <div class="tab-pane show active" id="Details">
                                 <div class="row clearfix m-t-20">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
@@ -101,6 +103,56 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="tab-pane" id="ProductFeatures">
+                                <div class="row clearfix">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="card">
+                                            <div class="body">
+                                                <div class="row p-b-25">
+                                                    <div class="col-lg-12 col-md-12">
+                                                        <div class="pull-right">
+                                                            <button type="button" class="btn btn-success js-add-productFeature"><i class="fa fa-plus"></i> <span class="p-l-5">Add Product Feature</span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table id="paginatedProductFeaturesTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark">
+
+                                                        </thead>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="VariantFeatures">
+                                <div class="row clearfix">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="card">
+                                            <div class="body">
+                                                <div class="row p-b-25">
+                                                    <div class="col-lg-12 col-md-12">
+                                                        <div class="pull-right">
+                                                            <button type="button" class="btn btn-success js-add-variantFeature"><i class="fa fa-plus"></i> <span class="p-l-5">Add Variant Feature</span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table id="paginatedVariantFeaturesTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark">
+
+                                                        </thead>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,7 +167,7 @@
                     selector: '#paginatedProductAttributesTable',
                     name: 'productAttributes',
                     type: 'TYPE_2',
-                    url: $.getURL('/pim/productFamilies/{productFamilyId}/{type}/attributes', {type : 'PRODUCT'}),
+                    url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attributes'),
                     columns: [
                         { data: 'name', name : 'name' , title : 'Attribute Name'},
                         { data: 'type', name : 'type', title : 'Type' },
@@ -127,11 +179,37 @@
                     selector: '#paginatedVariantAttributesTable',
                     name: 'variantAttributes',
                     type: 'TYPE_2',
-                    url: $.getURL('/pim/productFamilies/{productFamilyId}/{type}/attributes', {type : 'VARIANT'}),
+                    url: $.getURL('/pim/productFamilies/{productFamilyId}/VARIANT/attributes'),
                     columns: [
                         { data: 'name', name : 'name' , title : 'Attribute Name'},
                         { data: 'type', name : 'type', title : 'Type' },
                         { data: 'required', name : 'required' , title : 'Required'}
+                    ]
+                });
+
+                $.initDataTable({
+                    selector: '#paginatedProductFeaturesTable',
+                    name: 'productFeatures',
+                    type: 'TYPE_2',
+                    url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/features'),
+                    columns: [
+                        { data: 'name', name : 'name' , title : 'Feature Name'},
+                        { data: 'label', name : 'label', title : 'Label' },
+                        { data: 'required', name : 'required' , title : 'Required'},
+                        { data: 'selectable', name : 'selectable' , title : 'Selectable'}
+                    ]
+                });
+
+                $.initDataTable({
+                    selector: '#paginatedVariantFeaturesTable',
+                    name: 'variantFeatures',
+                    type: 'TYPE_2',
+                    url: $.getURL('/pim/productFamilies/{productFamilyId}/VARIANT/features'),
+                    columns: [
+                        { data: 'name', name : 'name' , title : 'Feature Name'},
+                        { data: 'label', name : 'label', title : 'Label' },
+                        { data: 'required', name : 'required' , title : 'Required'},
+                        { data: 'selectable', name : 'selectable' , title : 'Selectable'}
                     ]
                 });
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();

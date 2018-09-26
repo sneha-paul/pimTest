@@ -5,6 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Attribute;
+import com.bigname.pim.api.domain.Feature;
 import com.bigname.pim.api.domain.ProductFamily;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.ProductFamilyService;
@@ -96,7 +97,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
 
     @RequestMapping("/{id}/{type}/attributes")
     @ResponseBody
-    public Result<Map<String, String>> getFamilyAttributes(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, HttpServletRequest request, HttpServletResponse response, Model model) {
+    public Result<Map<String, String>> getFamilyAttributes(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, HttpServletRequest request) {
 
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
@@ -124,30 +125,81 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return new ModelAndView("product/productFamilyAttribute", model);
     }
 
-    @RequestMapping(value = "/{id}/{type}/attribute", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/{type}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, @Valid Attribute attribute, BindingResult result) {
+    public Map<String, Object> saveAttribute(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, Attribute attribute) {
         Map<String, Object> model = new HashMap<>();
+        attribute.setRequired(attribute.getRequired());
         Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
-        if(productFamily.isPresent()) {
-            if (result.hasErrors()) {
-
-            } else {
-                if(type.equals("PRODUCT")) {
-                    if (productFamily.get().getProductFamilyAttributes().contains(attribute)) {
-                        productFamily.get().getProductFamilyAttributes().remove(attribute);
-                    }
-                    productFamily.get().getProductFamilyAttributes().add(attribute);
-                } else if(type.equals("VARIANT")) {
-                    if (productFamily.get().getProductVariantFamilyAttributes().contains(attribute)) {
-                        productFamily.get().getProductVariantFamilyAttributes().remove(attribute);
-                    }
-                    productFamily.get().getProductVariantFamilyAttributes().add(attribute);
+        if(productFamily.isPresent() && isValid(attribute, model)) {
+            if(type.equals("PRODUCT")) {
+                if (productFamily.get().getProductFamilyAttributes().contains(attribute)) {
+                    productFamily.get().getProductFamilyAttributes().remove(attribute);
                 }
-                productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
-                model.put("success", true);
-                model.put("attribute", attribute);
+                productFamily.get().getProductFamilyAttributes().add(attribute);
+            } else if(type.equals("VARIANT")) {
+                if (productFamily.get().getProductVariantFamilyAttributes().contains(attribute)) {
+                    productFamily.get().getProductVariantFamilyAttributes().remove(attribute);
+                }
+                productFamily.get().getProductVariantFamilyAttributes().add(attribute);
             }
+            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
+            model.put("success", true);
+        }
+        return model;
+    }
+
+    @RequestMapping("/{id}/{type}/features")
+    @ResponseBody
+    public Result<Map<String, String>> getFamilyFeatures(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, HttpServletRequest request) {
+
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<Feature> paginatedResult = productFamilyService.getFamilyFeatures(id, FindBy.EXTERNAL_ID, type, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
+    @RequestMapping("/{id}/{type}/feature")
+    public ModelAndView featureDetails(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("feature", new Feature());
+        model.put("type", type);
+        model.put("productFamilyId", id);
+        return new ModelAndView("product/productFamilyFeature", model);
+    }
+
+    @RequestMapping(value = "/{id}/{type}/feature", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> saveFeature(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, Feature feature) {
+        Map<String, Object> model = new HashMap<>();
+        feature.setRequired(feature.getRequired());
+        feature.setSelectable(feature.getSelectable());
+        Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
+        if(productFamily.isPresent() && isValid(feature, model)) {
+            if(type.equals("PRODUCT")) {
+                if (productFamily.get().getProductFamilyFeatures().contains(feature)) {
+                    productFamily.get().getProductFamilyFeatures().remove(feature);
+                }
+                productFamily.get().getProductFamilyFeatures().add(feature);
+            } else if(type.equals("VARIANT")) {
+                if (productFamily.get().getProductVariantFamilyFeatures().contains(feature)) {
+                    productFamily.get().getProductVariantFamilyFeatures().remove(feature);
+                }
+                productFamily.get().getProductVariantFamilyFeatures().add(feature);
+            }
+            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
+            model.put("success", true);
         }
         return model;
     }

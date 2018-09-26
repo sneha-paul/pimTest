@@ -1,6 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.Entity;
+import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.exception.EntityCreateException;
 import com.bigname.pim.api.persistence.dao.BaseDAO;
 import com.bigname.pim.api.service.BaseService;
@@ -77,9 +78,9 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Pair<String, Object>> validate(T t, Class<?>... groups) {
-        Set<ConstraintViolation<T>> violations = validator.validate(t, groups);
-        return t.getValidationErrors(violations);
+    public <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
+        Set<ConstraintViolation<E>> violations = validator.validate(e, groups);
+        return e.getValidationErrors(violations);
     }
 
     @Override
@@ -119,6 +120,6 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
             }
             sublist = list.subList(from, to);
         }
-        return new PageImpl<E>(sublist, PageRequest.of(page, size), list.size());
+        return new PageImpl<>(sublist, PageRequest.of(page, size), list.size());
     }
 }

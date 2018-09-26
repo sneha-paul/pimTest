@@ -1,6 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.Attribute;
+import com.bigname.pim.api.domain.Feature;
 import com.bigname.pim.api.domain.ProductFamily;
 import com.bigname.pim.api.persistence.dao.ProductFamilyDAO;
 import com.bigname.pim.api.service.ProductFamilyService;
@@ -53,5 +54,23 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
             attributes.sort(Comparator.comparing(Attribute::getName));
         }
         return paginate(attributes, page, size);
+    }
+
+    @Override
+    public Page<Feature> getFamilyFeatures(String productFamilyId, FindBy findBy, String type, int page, int size, Sort sort) {
+        /*if(sort == null) {
+            sort = Sort.by(Sort.Direction.ASC, "name");
+        }*/
+        List<Feature> features = new ArrayList<>();
+        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        if(productFamily.isPresent()) {
+            if(type.equals("PRODUCT")) {
+                features = productFamily.get().getProductFamilyFeatures();
+            } else if(type.equals("VARIANT")) {
+                features = productFamily.get().getProductVariantFamilyFeatures();
+            }
+            features.sort(Comparator.comparing(Feature::getName));
+        }
+        return paginate(features, page, size);
     }
 }

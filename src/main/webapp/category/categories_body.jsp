@@ -8,7 +8,7 @@
                     <div class="col-lg-12 col-md-12"><div class="pull-right"><a href="/pim/categories/create"><button type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Category</span></button></a></div></div>
                 </div>
                 <div class="table-responsive">
-                    <table id="paginatedTable" class="table table-hover dataTable table-custom m-b-0">
+                    <table id="paginatedTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
                         <thead class="thead-dark">
                         </thead>
                     </table>

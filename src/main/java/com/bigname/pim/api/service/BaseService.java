@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service;
 
+import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
@@ -28,5 +29,5 @@ public interface BaseService<T, DAO> {
 
     Optional<T> get(String id, FindBy findBy, boolean... activeRequired);
 
-    Map<String, Pair<String, Object>> validate(T t, Class<?>... groups);
+    <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups);
 }

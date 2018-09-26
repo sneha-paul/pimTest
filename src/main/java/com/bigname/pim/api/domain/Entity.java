@@ -22,7 +22,7 @@ import java.util.UUID;
  * Created by manu on 8/18/18.
  */
 @Document
-abstract public class Entity<T> implements Serializable {
+abstract public class Entity<T> extends ValidatableEntity implements Serializable {
     @Id
     private String id;
 
@@ -30,10 +30,6 @@ abstract public class Entity<T> implements Serializable {
     private String externalId;
 
     private String active;
-
-    @Transient
-    @JsonIgnore
-    private String group = "";
 
     protected Entity() {
         this.id = UUID.randomUUID().toString();
@@ -73,14 +69,6 @@ abstract public class Entity<T> implements Serializable {
         this.active = active;
     }
 
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,17 +89,7 @@ abstract public class Entity<T> implements Serializable {
 
     abstract void setExternalId();
 
-    public Map<String, Pair<String, Object>> getValidationErrors(Set<ConstraintViolation<T>> violations) {
-        Map<String, Pair<String, Object>> errors = new LinkedHashMap<>();
-        if(violations.size() > 0) {
-            violations.forEach(v -> {
-                if(!errors.containsKey(v.getPropertyPath().toString())) {
-                    errors.put(v.getPropertyPath().toString(), Pair.with(v.getMessage(), v.getInvalidValue()));
-                }
-            });
-        }
-        return errors;
-    }
+
 
     abstract public T merge(T t);
 

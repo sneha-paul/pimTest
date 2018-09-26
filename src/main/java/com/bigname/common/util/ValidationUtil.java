@@ -1,7 +1,9 @@
 package com.bigname.common.util;
 
+import org.javatuples.Pair;
 import org.springframework.validation.BindingResult;
 
+import javax.validation.ConstraintViolation;
 import java.util.*;
 
 /**
@@ -73,11 +75,16 @@ abstract public class ValidationUtil {
         return !isEmpty(object);
     }
 
-    /*public static Map<String, String> getValidationErrors(BindingResult result) {
-        Map<String, String> errors = new HashMap<>();
-        if(result.hasErrors()) {
+    public static <T> Map<String, Pair<String, Object>> getValidationErrors(Set<ConstraintViolation<T>> violations) {
+        Map<String, Pair<String, Object>> errors = new LinkedHashMap<>();
+        if(violations.size() > 0) {
+            violations.forEach(v -> {
+                if(!errors.containsKey(v.getPropertyPath().toString())) {
+                    errors.put(v.getPropertyPath().toString(), Pair.with(v.getMessage(), v.getInvalidValue()));
+                }
+            });
         }
         return errors;
-    }*/
+    }
 
 }

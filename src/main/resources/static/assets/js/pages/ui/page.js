@@ -94,6 +94,9 @@
                 eModal.ajax($.extend(true, defaultOptions, options));
             });
         },
+        closeModal: function() {
+            $('.js-eModal-close').trigger('click');
+        },
         bindDataTable: function(options, dataTable) {
             var name = typeof options.names === 'undefined' ? options.name : options.names[0];
             $.setPageAttribute(name + '_datatable', dataTable);
