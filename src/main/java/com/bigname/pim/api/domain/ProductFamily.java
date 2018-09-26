@@ -15,11 +15,11 @@ import java.util.Map;
 public class ProductFamily extends Entity<ProductFamily> {
 
     @Transient
-    @NotEmpty(message = "Product Family Id cannot be empty")
+    @NotEmpty(message = "Product Family Id cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
     String productFamilyId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Product Family Name cannot be empty")
+    @NotEmpty(message = "Product Family Name cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
     private String productFamilyName;
 
     private List<Attribute> productFamilyAttributes = new ArrayList<>();

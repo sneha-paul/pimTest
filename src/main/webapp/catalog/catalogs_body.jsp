@@ -29,7 +29,7 @@
     $( document ).ready(function() {
         $.initDataTable({
             selector: '#paginatedCatalogsTable',
-            name: 'catalogs',
+            names: ['catalogs','catalog'],
             type: 'TYPE_1',
             url: '/pim/catalogs/',
             columns: [

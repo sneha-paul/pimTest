@@ -11,6 +11,7 @@ import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -82,6 +83,14 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         return new ModelAndView("redirect:/pim/catalogs");
     }
 */
+
+    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", catalogService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
+    }
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
         Map<String, Object> model = new HashMap<>();

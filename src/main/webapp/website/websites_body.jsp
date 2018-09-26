@@ -28,7 +28,7 @@
     $( document ).ready(function() {
         $.initDataTable({
             selector: '#paginatedWebsitesTable',
-            name: 'websites',
+            names: ['websites','website'],
             type: 'TYPE_1',
             url: '/pim/websites/',
             columns: [
