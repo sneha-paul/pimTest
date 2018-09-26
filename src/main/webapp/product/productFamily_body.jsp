@@ -20,7 +20,7 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <form id="update-form" method="post" action="/pim/productFamilies/${productFamily.productFamilyId}" novalidate>
+                                                <form id="update-form" method="post" action="/pim/productFamilies/${productFamily.productFamilyId}" data-method="PUT" data-success-message='["Successfully updated the productFamily", "ProductFamily Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">

@@ -9,14 +9,12 @@ import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -64,6 +62,14 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         }
         productVariantService.update(id, FindBy.EXTERNAL_ID, productVariant);
         return new ModelAndView("redirect:/pim/productVariants");
+    }
+
+    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", productVariantService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
     }
 
     @RequestMapping(value = {"/{id}", "/create"})

@@ -29,7 +29,7 @@
     $( document ).ready(function() {
         $.initDataTable({
             selector: '#paginatedProductVariantsTable',
-            name: 'productVariants',
+            names: ['productVariants','productVariant'],
             type: 'TYPE_1',
             url: '/pim/productVariants/',
             columns: [

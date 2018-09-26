@@ -27,7 +27,7 @@
     $( document ).ready(function() {
         $.initDataTable({
             selector: '#paginatedTable',
-            name: 'productFamilies',
+            names: ['productFamilies','productFamily'],
             type: 'TYPE_1',
             url: '/pim/productFamilies/',
             columns: [

@@ -19,8 +19,7 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <form id="update-form" method="post" action="/pim/productVariants/${productVariant.productVariantId}" novalidate>
-                                                    <div class="row">
+                                                <form id="update-form" method="post" action="/pim/productVariants/${productVariant.productVariantId}" data-method="PUT" data-success-message='["Successfully updated the productVariant", "ProductVariant Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>                                          <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
                                                                 <label>ProductVariant Name</label><code class="highlighter-rouge m-l-10">*</code>

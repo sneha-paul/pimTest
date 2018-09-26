@@ -8,6 +8,7 @@ import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Toggle;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -74,6 +75,14 @@ public class ProductController extends BaseController<Product, ProductService>{
             productService.update(id, FindBy.EXTERNAL_ID, product1);
         });
         model.put("success", true);
+        return model;
+    }
+
+    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", productService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
     }
 
