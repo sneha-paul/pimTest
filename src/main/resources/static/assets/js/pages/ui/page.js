@@ -40,8 +40,6 @@
                                     action = 'Enable';
                                     btnClass = 'btn-success';
                                 }
-                                // var icon = 'Y' === value.active ? 'icon-ban' : 'icon-check';
-                                // var action = 'Y' === value.active ? 'Disable' : 'Enable';
                                 value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-primary" title="Clone"><i class="icon-docs"></i></a> ' +
                                     '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
@@ -67,7 +65,15 @@
                 columns: options.columns
             }));
             $(options.selector).on('click', '.js-toggle-status', function () {
-                $.toggleStatus($.getURL('/pim/categories/{externalId}/active/{active}', {externalId: $(this).data('external-id'), active : $(this).data('active')}), 'category', $.refreshDataTable.bind(this, options.name), $(this).data('active'));
+                if('TYPE_1' === options.type) {
+                    $.toggleStatus(
+                        $.getURL(options.url + '{externalId}/active/{active}', {
+                            externalId: $(this).data('external-id'),
+                            active: $(this).data('active')
+                        }),
+                        typeof options.names !== 'undefined' ? options.names[1] : 'entity',
+                        $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
+                }
             });
         },
         refreshDataTable: function(name) {
@@ -89,8 +95,9 @@
             });
         },
         bindDataTable: function(options, dataTable) {
-            $.setPageAttribute(options.name + '_datatable', dataTable);
-            $.setPageAttribute(options.name + '_datatable_options', options);
+            var name = typeof options.names === 'undefined' ? options.name : options.names[0];
+            $.setPageAttribute(name + '_datatable', dataTable);
+            $.setPageAttribute(name + '_datatable_options', options);
         },
         getDataTable: function(name) {
             return $.getPageAttribute(name + '_datatable');

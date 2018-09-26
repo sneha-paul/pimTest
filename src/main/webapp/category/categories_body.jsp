@@ -21,7 +21,7 @@
     $( document ).ready(function() {
         $.initDataTable({
             selector: '#paginatedTable',
-            name: 'categories',
+            names: ['categories', 'category'],
             type: 'TYPE_1',
             url: '/pim/categories/',
             columns: [
