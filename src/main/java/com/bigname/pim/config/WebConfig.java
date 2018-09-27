@@ -18,6 +18,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/*.png/**").addResourceLocations("/static/");
     }
 
+    @Bean("cacheKeyGenerator")
+    public CacheKeyGenerator cacheKeyGenerator() {
+        return new CacheKeyGenerator();
+    }
+
     @Bean(name = "validator")
     public javax.validation.Validator localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();

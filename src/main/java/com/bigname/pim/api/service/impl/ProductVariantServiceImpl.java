@@ -25,7 +25,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    protected ProductVariant createOrUpdate(ProductVariant productVariant) {
+    public ProductVariant createOrUpdate(ProductVariant productVariant) {
         return productVariantDAO.save(productVariant);
     }
 

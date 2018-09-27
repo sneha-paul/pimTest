@@ -1,7 +1,5 @@
+<%--@elvariable id="productVariant" type="com.bigname.pim.api.domain.ProductVariant"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<c:choose>
-    <c:when test="${mode eq 'DETAILS'}">
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
                 <div class="card">
@@ -19,22 +17,23 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <form id="update-form" method="post" action="/pim/productVariants/${productVariant.productVariantId}" data-method="PUT" data-success-message='["Successfully updated the productVariant", "ProductVariant Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>                                          <div class="row">
+                                                <form method="post" action="/pim/products/${productVariant.productId}/productVariants/${productVariant.productVariantId}" data-method="PUT"
+                                                      data-success-message='["Successfully updated the productVariant", "ProductVariant Updated"]'
+                                                      data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                                    <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
                                                                 <label>ProductVariant Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                                                <input type="text" name="productVariantName" value="${productVariant.productVariantName}" class="form-control" required="true"/>
+                                                                <input type="text" name="productVariantName" value="${productVariant.productVariantName}" class="form-control"/>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>ProductVariant ID</label><code class="highlighter-rouge m-l-10">*</code>
-                                                                <input type="text" name="productVariantId" class="form-control" value="${productVariant.productVariantId}" required="true"/>
+                                                                <input type="text" name="productVariantId" class="form-control" value="${productVariant.productVariantId}"/>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>ProductFamily</label>
-                                                                <input type="text" name="productFamilyName" class="form-control" value="${productVariant.productFamilyId}" required="true"/>
-                                                               <%-- <select class="form-control" id="">
+                                                                <input type="text" name="productFamilyName" disabled="disabled" class="form-control" value="${productVariant.product.productFamily.productFamilyId}"/>
 
-                                                                </select>--%>
                                                             </div>
 
                                                             <div class="form-group">
@@ -56,7 +55,7 @@
                                     </div>
                                 </div>
                             </div>
-                                <div class="tab-pane" id="ProductAttributes">
+                                <%--<div class="tab-pane" id="ProductAttributes">
                                     <div class="row clearfix">
                                         <div class="col-lg-12 col-md-12">
                                             <div class="card">
@@ -79,14 +78,14 @@
                                                         <script>
                                                             $.bindFormSubmit($('#my123'));
                                                         </script>
-                                                            <%--<a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>--%>
+                                                            &lt;%&ndash;<a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>&ndash;%&gt;
                                                     </form>
 
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>--%>
                         </div>
                     </div>
                 </div>
@@ -94,49 +93,8 @@
         </div>
         <script>
             $.initPage({
+                'productId' : '${productVariant.productId}',
                 'productVariantId' : '${productVariant.productVariantId}'
             });
         </script>
-    </c:when>
-    <c:otherwise>
-        <div class="row clearfix">
-            <div class="col-lg-12 col-md-12">
-                <div class="card">
-                    <div class="header">
-                        <h1>Create ProductVariant</h1>
-                    </div>
-                    <div class="body">
-                        <form id="create-form" method="post" action="/pim/productVariants">
-                            <div class="row">
-                                <div class="col-md-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label>ProductVariant Name</label>
-                                        <input type="text" path="productVariantName" class="form-control" required="true"/>
-                                       <%-- <form:errors path="productVariantName" cssClass="error"/>--%>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>ProductVariant ID</label>
-                                        <input type="text" path="productVariantId" class="form-control" required="true"/>
-                                        <%--<form:errors path="productVariantId" cssClass="error"/>--%>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>ProductFamily</label>
-                                        <select class="form-control" id="productFamilyId">
-                                            <option value="">Select One</option>
-                                            <c:forEach items="${productFamilies}" var="productFamily">
-                                                <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <br>
-                            <button type="submit" class="btn btn-primary">Create</button>
-                            <a href="/pim/productVariants/"><button type="button" class="btn btn-danger">Cancel</button></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </c:otherwise>
-</c:choose>
 

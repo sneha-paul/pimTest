@@ -3,6 +3,7 @@ package com.bigname.pim.api.domain;
 import com.bigname.common.util.ValidationUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;

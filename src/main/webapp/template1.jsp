@@ -97,7 +97,7 @@
         <div class="container-fluid">
             <div class="block-header">
                 <div class="row">
-                    <div class="col-lg-6 col-md-8 col-sm-12">
+                    <div>
                         <c:forEach items="${breadcrumbs.breadcrumbs}" var="breadcrumb" varStatus="crumbStatus">
                             <c:if test="${crumbStatus.first}"><h2><a href="javascript:void(0);" class="btn btn-xs btn-link btn-toggle-fullwidth"><i class="fa fa-arrow-left"></i></a> ${breadcrumbs.title}</h2></c:if>
                             <c:if test="${crumbStatus.first}"><ul class="breadcrumb"></c:if>
@@ -142,4 +142,10 @@
 <tiles:insertAttribute name="script" ignore="true" />
 
 </body>
+
+<script>
+    $(function(){
+            $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
+    });
+</script>
 </html>

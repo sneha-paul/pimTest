@@ -18,15 +18,24 @@ public class Product extends Entity<Product> {
 
 
     @Transient
-    @NotEmpty(message = "Product Id cannot be empty")
+    @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class})
     String productId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Product Name cannot be empty")
+    @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class})
     private String productName;
 
-    private String productDescription;
+    private String description;
 
+    private String longDescription;
+
+    private String metaTitle;
+
+    private String metaDescription;
+
+    private String metaKeywords;
+
+    @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})
     private String productFamilyId;
 
     @Transient
@@ -38,6 +47,7 @@ public class Product extends Entity<Product> {
         super();
     }
 
+    //TODO - check to see, if we need the overloaded constructor in all entities, since spring and jpa are using reflection to initialize the instance
     public Product(String externalId, String productName, String productFamilyId) {
         super(externalId);
         this.productName = productName;
@@ -62,6 +72,46 @@ public class Product extends Entity<Product> {
         this.productName = productName;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLongDescription() {
+        return longDescription;
+    }
+
+    public void setLongDescription(String longDescription) {
+        this.longDescription = longDescription;
+    }
+
+    public String getMetaTitle() {
+        return metaTitle;
+    }
+
+    public void setMetaTitle(String metaTitle) {
+        this.metaTitle = metaTitle;
+    }
+
+    public String getMetaDescription() {
+        return metaDescription;
+    }
+
+    public void setMetaDescription(String metaDescription) {
+        this.metaDescription = metaDescription;
+    }
+
+    public String getMetaKeywords() {
+        return metaKeywords;
+    }
+
+    public void setMetaKeywords(String metaKeywords) {
+        this.metaKeywords = metaKeywords;
+    }
+
     public String getProductFamilyId() {
         return productFamilyId;
     }
@@ -76,6 +126,7 @@ public class Product extends Entity<Product> {
 
     public void setProductFamily(ProductFamily productFamily) {
         this.productFamily = productFamily;
+        setProductFamilyId(productFamily.getId());
     }
 
     public Map<String, Object> getFamilyAttributes() {
@@ -92,11 +143,24 @@ public class Product extends Entity<Product> {
 
     @Override
     public Product merge(Product product) {
-        this.setExternalId(product.getExternalId());
-        this.setProductName(product.getProductName());
-        this.setProductFamilyId(product.getProductFamilyId());
-        this.setActive(product.getActive());
-        this.setFamilyAttributes(product.getFamilyAttributes());
+        switch(product.getGroup()) {
+            case "DETAILS":
+                this.setExternalId(product.getExternalId());
+                this.setProductName(product.getProductName());
+                this.setDescription((product.getDescription()));
+                this.setLongDescription((product.getLongDescription()));
+                this.setActive(product.getActive());
+                this.setFamilyAttributes(product.getFamilyAttributes());
+                break;
+            case "SEO":
+                this.setMetaTitle(product.getMetaTitle());
+                this.setMetaDescription(product.getMetaDescription());
+                this.setMetaKeywords(product.getMetaKeywords());
+                break;
+            case "ASSETS":
+                //TODO
+                break;
+        }
         return this;
     }
 
@@ -105,8 +169,10 @@ public class Product extends Entity<Product> {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
         map.put("productName", getProductName());
-        map.put("productFamilyId",getProductFamilyId());
+        map.put("productFamilyId", getProductFamily().getExternalId());
         map.put("active", getActive());
         return map;
     }
+
+    public interface SeoGroup {}
 }

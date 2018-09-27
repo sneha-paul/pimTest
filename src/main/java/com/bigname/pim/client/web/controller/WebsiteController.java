@@ -47,21 +47,9 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      * Handler method to create a new website
      *
      * @param website The website model attribute that needs to be created
-     * @param result The BindingResult instance
-     * @param model The Model instance
      *
-     * @return The ModelAndView instance for the list websites page (if no validation errors),
-     *         otherwise the ModelAndView instance for the website details page to show the validation errors
+     * @return a map of model attributes
      */
-    /*@RequestMapping(method = RequestMethod.POST)
-    public ModelAndView create(@ModelAttribute("website") @Valid Website website, BindingResult result, Model model) {
-        if(result.hasErrors()) {
-            return new ModelAndView("website/website");
-        }
-        website.setActive("N");
-        websiteService.create(website);
-        return new ModelAndView("redirect:/pim/websites");
-    }*/
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
@@ -78,39 +66,21 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
 
     /**
      * Handler method to update a website instance
+     *
      * @param id websiteId of the website instance that needs to be updated
      * @param website The modified website instance corresponding to the given websiteId
-     * @param result The BindingResult instance
-     * @param model The Model instance
      *
-     * @return The ModelAndView instance for the list websites page (if no validation errors),
-     *         otherwise the ModelAndView instance for the website details page to show the validation errors
+     * @return a map of model attributes
      */
-    /*@RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public ModelAndView update(@PathVariable(value = "id") String id, @ModelAttribute("website") @Valid Website website, BindingResult result, Model model) {
-        if(result.hasErrors()) {
-            return new ModelAndView("website/website");
-        }
-        websiteService.update(id, FindBy.EXTERNAL_ID, website);
-        return new ModelAndView("redirect:/pim/websites");
-    }*/
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Website website) {
         Map<String, Object> model = new HashMap<>();
-        //if(isValid(website, model, website.getGroup().equals("DETAILS") ? Website.DetailsGroup.class : website.getGroup().equals("SEO") ? Website.SeoGroup.class : null)) {
-        websiteService.update(id, FindBy.EXTERNAL_ID, website);
-        model.put("success", true);
-        //}
-        return model;
-    }
-
-    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("success", websiteService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        if(isValid(website, model, website.getGroup().equals("DETAILS") ? Website.DetailsGroup.class : null)) {
+            websiteService.update(id, FindBy.EXTERNAL_ID, website);
+            model.put("success", true);
+        }
         return model;
     }
 

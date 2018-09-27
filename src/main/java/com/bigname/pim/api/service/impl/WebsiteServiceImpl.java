@@ -35,7 +35,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
 
 
     @Override
-    protected Website createOrUpdate(Website website) {
+    public Website createOrUpdate(Website website) {
         return websiteDAO.save(website);
     }
 

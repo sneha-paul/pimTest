@@ -16,17 +16,18 @@ import java.util.Map;
 public class ProductVariant extends Entity<ProductVariant> {
 
     @Transient
-    @NotEmpty(message = "ProductVariant Id cannot be empty")
+    @NotEmpty(message = "ProductVariant Id cannot be empty", groups = {CreateGroup.class})
     String productVariantId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "ProductVariant Name cannot be empty")
+    @NotEmpty(message = "ProductVariant Name cannot be empty", groups = {CreateGroup.class})
     private String productVariantName;
 
-    private String productFamilyId;
+    @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class})
+    private String productId;
 
     @Transient
-    private ProductFamily productFamily;
+    private Product product;
 
     private Map<String, Object> familyAttributes = new HashMap<>();
 
@@ -34,10 +35,14 @@ public class ProductVariant extends Entity<ProductVariant> {
         super();
     }
 
-    public ProductVariant(String externalId, String productVariantName, String productFamilyId) {
+    public ProductVariant(Product product) {
+        super();
+        setProduct(product);
+    }
+
+    public ProductVariant(String externalId, String productVariantName) {
         super(externalId);
         this.productVariantName = productVariantName;
-        this.productFamilyId = productFamilyId;
     }
 
     public String getProductVariantId() {
@@ -57,20 +62,23 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.productVariantName = productVariantName;
     }
 
-    public String getProductFamilyId() {
-        return productFamilyId;
+    public String getProductId() {
+        return productId;
     }
 
-    public void setProductFamilyId(String productFamilyId) {
-        this.productFamilyId = productFamilyId;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
-    public ProductFamily getProductFamily() {
-        return productFamily;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProductFamily(ProductFamily productFamily) {
-        this.productFamily = productFamily;
+    public void setProduct(Product product) {
+        this.product = product;
+        if(product != null) {
+            setProductId(product.getId());
+        }
     }
 
     public Map<String, Object> getFamilyAttributes() {
@@ -90,7 +98,6 @@ public class ProductVariant extends Entity<ProductVariant> {
     public ProductVariant merge(ProductVariant productVariant) {
         this.setExternalId(productVariant.getExternalId());
         this.setProductVariantName(productVariant.getProductVariantName());
-        this.setProductFamilyId(productVariant.getProductFamilyId());
         this.setActive(productVariant.getActive());
         this.setFamilyAttributes(productVariant.getFamilyAttributes());
         return this;
@@ -101,7 +108,7 @@ public class ProductVariant extends Entity<ProductVariant> {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
         map.put("productVariantName", getProductVariantName());
-        map.put("productFamilyId",getProductFamilyId());
+//        map.put("productFamilyId",getProductFamilyId());
         map.put("active", getActive());
         return map;
     }

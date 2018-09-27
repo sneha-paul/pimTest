@@ -1,11 +1,13 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.common.datatable.model.Result;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductFamily;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.ProductFamilyService;
+import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
@@ -17,6 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,36 +30,86 @@ import java.util.Optional;
  * Created by sruthi on 20-09-2018.
  */
 @Controller
-@RequestMapping("pim/productVariants")
+@RequestMapping("pim/products")
 public class ProductVariantController extends BaseController<ProductVariant, ProductVariantService> {
 
     private ProductVariantService productVariantService;
     private ProductFamilyService productFamilyService;
 
-    public ProductVariantController( ProductVariantService productVariantService, ProductFamilyService productFamilyService){
+    private ProductService productService;
+
+    public ProductVariantController( ProductVariantService productVariantService, ProductFamilyService productFamilyService, ProductService productService){
         super(productVariantService);
         this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;
+        this.productService = productService;
     }
 
-    @RequestMapping()
-    public ModelAndView all(){
+
+
+    @RequestMapping(value = "/{productId}/variants", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> create(@PathVariable(value = "productId") String productId, ProductVariant productVariant) {
         Map<String, Object> model = new HashMap<>();
-        model.put("active", "PRODUCTVARIANTS");
-        return new ModelAndView("product/productVariants", model);
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public ModelAndView create(@ModelAttribute("productVariant") @Valid ProductVariant productVariant, BindingResult result, Model model) {
-        if(result.hasErrors()) {
-            return new ModelAndView("product/productVariant");
+        productVariant.setProductId(productId);
+        if(isValid(productVariant, model, ProductVariant.CreateGroup.class)) {
+            productVariant.setActive("N");
+            productVariantService.create(productVariant);
+            model.put("success", true);
         }
-        productVariant.setActive("N");
-        productVariantService.create(productVariant);
-        return new ModelAndView("redirect:/pim/productVariants");
+        return model;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    @RequestMapping("/{productId}/variants/list")
+    @ResponseBody
+    @Override
+    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
+        return super.all(request, response, model);
+    }
+
+    @RequestMapping(value = {"/{productId}/variants/{variantId}", "/{productId}/variants/create"})
+    public ModelAndView variantDetails(@PathVariable(value = "productId") String productId, @PathVariable(value = "variantId", required = false) String variantId) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "PRODUCTS");
+        Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
+        if(_product.isPresent()) {
+            Product product = _product.get();
+            if(variantId == null) {
+                ProductVariant productVariant = new ProductVariant(product);
+                model.put("mode", "CREATE");
+                model.put("productVariant", productVariant);
+            } else {
+                Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
+                if(_productVariant.isPresent()) {
+                    ProductVariant productVariant = _productVariant.get();
+                    productVariant.setProduct(product);
+                    model.put("mode", "DETAILS");
+                    model.put("productVariant", productVariant);
+                    model.put("productFamily", productVariant.getProduct().getProductFamily());
+                    model.put("breadcrumbs", new Breadcrumbs("Product",
+                            "Products", "/pim/products",
+                            product.getProductName(), "/pim/products/" + productId,
+                            "Product Variants", "/pim/products/" + productId + "#productVariants",
+                            productVariant.getProductVariantName(), ""));
+                } else {
+                    throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
+                }
+            }
+        } else {
+            throw new EntityNotFoundException("Unable to find Product with Id: " + productId);
+        }
+
+        return new ModelAndView("product/productVariant", model);
+    }
+
+    @RequestMapping(value = "/{productId}/variants/{variantId}/active/{active}", method = RequestMethod.PUT)
+    @Override
+    public Map<String, Object> toggle(@PathVariable(value = "variantId") String id, @PathVariable(value = "active") String active) {
+        return super.toggle(id, active);
+    }
+
+
+    /*@RequestMapping(value = "/{id}", method = RequestMethod.POST)
     public ModelAndView update(@PathVariable(value = "id") String id, @ModelAttribute("productVariant") @Valid ProductVariant productVariant, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return new ModelAndView("product/productVariant");
@@ -70,33 +124,7 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         Map<String, Object> model = new HashMap<>();
         model.put("success", productVariantService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
-    }
+    }*/
 
-    @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("active", "PRODUCTVARIANTS");
-        if(id == null) {
-            model.put("mode", "CREATE");
-            model.put("productVariant", new ProductVariant());
-            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))).getContent());
-            model.put("breadcrumbs", new Breadcrumbs("ProductVariants", "ProductVariants", "/pim/productVariants", "Create ProductVariant", ""));
-        } else {
-            Optional<ProductVariant> _productVariant = productVariantService.get(id, FindBy.findBy(true), false);
-            if(_productVariant.isPresent()) {
-                ProductVariant productVariant = _productVariant.get();
-                if(ValidationUtil.isNotEmpty(productVariant.getProductFamilyId())) {
-                    Optional<ProductFamily> productFamily = productFamilyService.get(productVariant.getProductFamilyId(), FindBy.INTERNAL_ID);
-                    productFamily.ifPresent(productVariant::setProductFamily);
-                }
-                model.put("mode", "DETAILS");
-                model.put("productVariant", productVariant);
-                model.put("productFamily", productFamilyService.get(productVariant.getProductFamilyId(),FindBy.findBy(true), false));
-                model.put("breadcrumbs", new Breadcrumbs("ProductVariant", "ProductVariants", "/pim/productVariants", productVariant.getProductVariantName(), ""));
-            } else {
-                throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + id);
-            }
-        }
-        return new ModelAndView("product/productVariant", model);
-    }
+
 }

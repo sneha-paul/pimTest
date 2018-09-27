@@ -10,6 +10,8 @@ import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +40,8 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         this.entityName = entityName;
     }
 
-    abstract protected T createOrUpdate(T t);
+//    @CachePut(value = "entities", keyGenerator = "cacheKeyGenerator")
+    abstract public T createOrUpdate(T t);
 
     @Override
     public T create(T t) {
@@ -104,6 +107,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
 
     @Override
+//    @Cacheable(value = "entities", keyGenerator = "cacheKeyGenerator")
     public Optional<T> get(String id, FindBy findBy, boolean... activeRequired) {
         if(id == null || id.isEmpty()) {
             return Optional.empty();

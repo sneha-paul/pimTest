@@ -36,7 +36,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
 
 
     @Override
-    protected Catalog createOrUpdate(Catalog catalog) {
+    public Catalog createOrUpdate(Catalog catalog) {
         return catalogDAO.save(catalog);
     }
 

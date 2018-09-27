@@ -33,7 +33,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     }
 
     @Override
-    protected ProductFamily createOrUpdate(ProductFamily productFamily) {
+    public ProductFamily createOrUpdate(ProductFamily productFamily) {
         return productFamilyDAO.save(productFamily);
     }
 

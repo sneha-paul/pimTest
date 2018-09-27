@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client"})
 @EnableMongoRepositories(basePackages = {"com.bigname.pim.api.persistence"})
+//@EnableCaching
 @Import({
 		WebConfig.class,
 		TilesConfig.class

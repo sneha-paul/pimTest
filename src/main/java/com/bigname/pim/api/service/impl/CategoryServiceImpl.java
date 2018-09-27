@@ -37,7 +37,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    protected Category createOrUpdate(Category category) {
+    public Category createOrUpdate(Category category) {
         return categoryDAO.save(category);
     }
 

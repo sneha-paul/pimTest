@@ -20,7 +20,9 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <form method="post" action="/pim/categories/${category.categoryId}" data-method="PUT" data-success-message='["Successfully updated the category", "Category Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                                <form method="post" action="/pim/categories/${category.categoryId}" data-method="PUT"
+                                                      data-success-message='["Successfully updated the category", "Category Updated"]'
+                                                      data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             <div class="form-group">
@@ -196,7 +198,9 @@
                         <h1>Create Category</h1>
                     </div>
                     <div class="body">
-                        <form method="post" action="/pim/categories" data-method="POST" data-success-message='["Successfully created the category", "Category Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
+                        <form method="post" action="/pim/categories" data-method="POST"
+                              data-success-message='["Successfully created the category", "Category Created"]'
+                              data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group">

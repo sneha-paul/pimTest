@@ -4,17 +4,21 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.ValidationUtil;
+import static com.bigname.common.util.ValidationUtil.*;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.service.BaseService;
+import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,6 +65,14 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return result;
     }
 
+    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", service.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
+    }
+
     private <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
         return service.validate(e, groups);
     }
@@ -68,7 +80,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     protected <E extends ValidatableEntity> boolean isValid(E e, Map<String, Object> model, Class<?>... groups) {
         model.put("fieldErrors", validate(e, groups));
         model.put("group", e.getGroup());
-        return ValidationUtil.isEmpty(model.get("fieldErrors"));
+        return isEmpty(model.get("fieldErrors"));
     }
 
 

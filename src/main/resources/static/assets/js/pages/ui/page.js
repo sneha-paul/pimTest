@@ -339,7 +339,7 @@
 
         renderFieldErrors: function(formEl, errors) {
             $.each(errors, function(name, error) {
-                $(formEl.find('input[name="' + name + '"],textarea[name="' + name + '"]').addClass('parsley-error')).after($('<ul class="parsley-errors-list filled"><li>' + error['value0'] + '</li></ul>'));
+                $(formEl.find('input[name="' + name + '"],select[name="' + name + '"],textarea[name="' + name + '"]').addClass('parsley-error')).after($('<ul class="parsley-errors-list filled"><li>' + error['value0'] + '</li></ul>'));
             });
         },
         clearFieldErrors: function(formEl) {
