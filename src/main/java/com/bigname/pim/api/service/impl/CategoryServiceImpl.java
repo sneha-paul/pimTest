@@ -2,8 +2,10 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
+import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +24,16 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
     private CategoryDAO categoryDAO;
     private RelatedCategoryDAO relatedCategoryDAO;
+    private CategoryProductDAO categoryProductDAO;
+    private ProductService productService;
 
     @Autowired
-    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO) {
+    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductService productService) {
         super(categoryDAO, "category", validator);
         this.categoryDAO = categoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
+        this.categoryProductDAO = categoryProductDAO;
+        this.productService = productService;
     }
 
     @Override
@@ -86,5 +92,26 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             }
         }
         return null;
+    }
+
+    @Override
+    public Page<CategoryProduct> getCategoryProducts(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Optional<Category> _category = get(categoryId, findBy, false);
+        if(_category.isPresent()) {
+            Category category = _category.get();
+            Page<CategoryProduct> categoryProducts = categoryProductDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            List<String> productIds = new ArrayList<>();
+            categoryProducts.forEach(cp -> productIds.add(cp.getProductId()));
+            if(productIds.size() > 0) {
+                Map<String, Product> productsMap = PimUtil.getIdedMap(productService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                categoryProducts.forEach(cp -> cp.init(category, productsMap.get(cp.getProductId())));
+            }
+            return categoryProducts;
+        }
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 }

@@ -7,6 +7,7 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
+import com.bigname.pim.api.domain.CategoryProduct;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.client.model.Breadcrumbs;
@@ -158,4 +159,25 @@ public class CategoryController extends BaseController<Category, CategoryService
         model.put("success", success);
         return model;
     }
+
+    @RequestMapping("/{id}/products")
+    @ResponseBody
+    public Result<Map<String, String>> getCategoryProducts(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<CategoryProduct> paginatedResult = categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
+    }
+
 }

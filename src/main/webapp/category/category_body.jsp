@@ -12,6 +12,7 @@
                             <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SEO">SEO</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SUB_CATEGORIES">SubCategories</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#PRODUCTS">Products</a></li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane show active" id="DETAILS">
@@ -118,6 +119,28 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="tab-pane" id="PRODUCTS">
+                                <div class="row clearfix">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="card">
+                                            <div class="body">
+                                                <div class="row p-b-25">
+                                                    <div class="col-lg-12 col-md-12">
+                                                        <div class="pull-right">
+                                                            <button type="button" class="btn btn-success js-add-products"><i class="fa fa-plus"></i> <span class="p-l-5">Add Products</span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table id="paginatedProductsTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark"></thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -135,7 +158,7 @@
                     url: $.getURL('/pim/categories/{categoryId}/subCategories'),
                     columns: [
                         { data: 'subCategoryName', name : 'subCategoryName' , title : 'Category Name'},
-                        { data: 'subCategoryId', name : 'rootCategoryId', title : 'Category ID' },
+                        { data: 'subCategoryId', name : 'subCategoryId', title : 'Category ID' },
                         { data: 'active', name : 'active' , title : 'Status', orderable: false},
                         { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
                     ]
@@ -144,6 +167,26 @@
             });
         </script>
         <script src="/assets/js/pages/ui/category/category.js"></script>
+        <script>
+            $.initPage({
+                'categoryId' : '${category.categoryId}'
+            });
+           $( document ).ready(function() {
+                $.initDataTable({
+                    selector: '#paginatedProductsTable',
+                    name: 'products',
+                    type: 'TYPE_2',
+                    url: $.getURL('/pim/categories/{categoryId}/products'),
+                    columns: [
+                        { data: 'productName', name : 'productName' , title : 'Product Name'},
+                        { data: 'productId', name : 'productId', title : 'Product ID' },
+                        { data: 'active', name : 'active' , title : 'Status', orderable: false},
+                        { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                    ]
+                });
+//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+            });
+        </script>
     </c:when>
     <c:otherwise>
         <div class="row clearfix">
