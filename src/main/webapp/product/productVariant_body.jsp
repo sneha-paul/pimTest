@@ -17,7 +17,7 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
                                             <div class="body">
-                                                <form method="post" action="/pim/products/${productVariant.productId}/productVariants/${productVariant.productVariantId}" data-method="PUT"
+                                                <form method="post" action="/pim/products/${productVariant.product.productId}/variants/${productVariant.productVariantId}" data-method="PUT"
                                                       data-success-message='["Successfully updated the productVariant", "ProductVariant Updated"]'
                                                       data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                                     <div class="row">

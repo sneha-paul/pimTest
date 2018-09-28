@@ -112,4 +112,6 @@ public class ProductVariant extends Entity<ProductVariant> {
         map.put("active", getActive());
         return map;
     }
+
+    public interface SeoGroup {}
 }
