@@ -114,4 +114,25 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         }
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
+
+    @Override
+    public Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort) {
+        Optional<Category> category = get(id, findBy, false);
+        Set<String> productIds = new HashSet<>();
+        category.ifPresent(category1 -> categoryProductDAO.findByCategoryId(category1.getId()).forEach(cp -> productIds.add(cp.getProductId())));
+        return productService.getAllWithExclusions(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
+    }
+
+    @Override
+    public CategoryProduct addProduct(String id, FindBy findBy1, String productId, FindBy findBy2) {
+        Optional<Category> category = get(id, findBy1, false);
+        if(category.isPresent()) {
+            Optional<Product> product = productService.get(productId, findBy2);
+            if(product.isPresent()) {
+                Optional<CategoryProduct> top = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return categoryProductDAO.save(new CategoryProduct(category.get().getId(), category.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
+            }
+        }
+        return null;
+    }
 }

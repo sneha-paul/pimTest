@@ -125,4 +125,14 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
     private void setProductFamily(Product product, FindBy findBy) {
         productFamilyService.get(product.getProductFamilyId(), findBy).ifPresent(product::setProductFamily);
     }
+
+
+    @Override
+    public Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "catalogId"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return findBy == FindBy.INTERNAL_ID ? productDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : productDAO.findByProductIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
+    }
 }

@@ -12,5 +12,6 @@ import org.springframework.data.domain.Sort;
  */
 public interface ProductService extends BaseService<Product, ProductDAO> {
     Page<ProductVariant> getProductVariants(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
 }

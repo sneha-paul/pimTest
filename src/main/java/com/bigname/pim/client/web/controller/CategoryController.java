@@ -5,9 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.RelatedCategory;
-import com.bigname.pim.api.domain.CategoryProduct;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.client.model.Breadcrumbs;
@@ -178,6 +176,43 @@ public class CategoryController extends BaseController<Category, CategoryService
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
         return result;
+    }
+
+    @RequestMapping(value = "/{id}/products/available")
+    public ModelAndView availableProducts(@PathVariable(value = "id") String id) {
+        Map<String, Object> model = new HashMap<>();
+        return new ModelAndView("product/availableProducts", model);
+    }
+
+    @RequestMapping("/{id}/products/available/list")
+    @ResponseBody
+    public Result<Map<String, String>> getAvailableProducts(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        } else {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<Product> paginatedResult = categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/{id}/products/{productId}", method = RequestMethod.POST)
+    public Map<String, Object> addCatalog(@PathVariable(value = "id") String id, @PathVariable(value = "productId") String productId) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = categoryService.addProduct(id, FindBy.EXTERNAL_ID, productId, FindBy.EXTERNAL_ID) != null;
+        model.put("success", success);
+        return model;
     }
 
 }
