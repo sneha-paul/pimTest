@@ -7,6 +7,7 @@ $( document ).ready(function() {
         columns: [
             { data: 'productName', name : 'productName' , title : 'Product Name'},
             { data: 'externalId', name : 'externalId', title : 'Product ID' },
+            { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family' },
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]
     });

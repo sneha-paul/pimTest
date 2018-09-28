@@ -59,7 +59,7 @@
                                                 </div>
                                             </div>
                                             <br>
-                                            <input type="hidden" name="group" value="details"/>
+                                            <input type="hidden" name="group" value="DETAILS"/>
                                             <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                                             <a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>
                                         </form>

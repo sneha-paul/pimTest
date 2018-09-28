@@ -130,7 +130,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             Optional<Product> product = productService.get(productId, findBy2);
             if(product.isPresent()) {
                 Optional<CategoryProduct> top = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return categoryProductDAO.save(new CategoryProduct(category.get().getId(), category.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
+                return categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
             }
         }
         return null;

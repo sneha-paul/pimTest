@@ -3,11 +3,7 @@
         <div class="table-responsive">
             <table id="paginatedAvailableCatalogsTable" class="table table-hover dataTable table-custom" style="width:100%">
                 <thead class="thead-dark">
-                <tr>
-                    <th>Catalog Name</th>
-                    <th>Catalog ID</th>
-                    <th>Action</th>
-                </tr>
+
                 </thead>
             </table>
         </div>
