@@ -3,7 +3,7 @@ $( document ).ready(function() {
         selector: '#paginatedAvailableProductsTable',
         name: 'availableProducts',
         type: 'TYPE_3',
-        url: $.getURL('/pim/websites/{websiteId}/products/available/list'),
+        url: $.getURL('/pim/categories/{categoryId}/products/available/list'),
         columns: [
             { data: 'productName', name : 'productName' , title : 'Product Name'},
             { data: 'externalId', name : 'externalId', title : 'Product ID' },
@@ -15,7 +15,7 @@ $( document ).ready(function() {
         var productId = $(this).data('external-id');
 
         $.ajax({
-            url: $.getURL('/pim/websites/{websiteId}/products/{productId}', {'productId': productId}),
+            url: $.getURL('/pim/categories/{categoryId}/products/{productId}', {'productId': productId}),
             data: {},
             method: 'POST',
             dataType: 'json'
