@@ -1,9 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -18,7 +16,8 @@ public class Feature extends ValidatableEntity {
 
     private String required = "N";
     private String selectable = "Y";
-    private Map<String, String> values = new HashMap<>();
+
+    private List<FeatureOption> values = new ArrayList<>();
 
     public Feature() {}
 
@@ -60,17 +59,12 @@ public class Feature extends ValidatableEntity {
         this.selectable = "Y".equalsIgnoreCase(selectable)  ? "Y" : "N";;
     }
 
-    public Map<String, String> getValues() {
+    public List<FeatureOption> getValues() {
         return values;
     }
 
-    public void setValues(Map<String, String> values) {
+    public void setValues(List<FeatureOption> values) {
         this.values = values;
-    }
-
-    public Map<String, String> addValue(String key, String value) {
-        getValues().put(key, value);
-        return values;
     }
 
     public Map<String, String> toMap() {

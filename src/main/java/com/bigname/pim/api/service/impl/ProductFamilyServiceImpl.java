@@ -45,14 +45,14 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
         }*/
         List<Attribute> attributes = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        if(productFamily.isPresent()) {
+        /*if(productFamily.isPresent()) {
             if(type.equals("PRODUCT")) {
                 attributes = productFamily.get().getProductFamilyAttributes();
             } else if(type.equals("VARIANT")) {
                 attributes = productFamily.get().getProductVariantFamilyAttributes();
             }
             attributes.sort(Comparator.comparing(Attribute::getName));
-        }
+        }*/
         return paginate(attributes, page, size);
     }
 

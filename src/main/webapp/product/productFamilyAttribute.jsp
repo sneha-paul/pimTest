@@ -7,23 +7,26 @@
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <div class="form-group">
+                        <label for="attributeGroupId">Attribute Group</label>
+                        <select class="form-control" id="attributeGroupId" name="attributeGroupId">
+                            <option value="DEFAULT_GROUP">Default Group</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Attribute Name</label>
                         <input type="text" name="name" value="${attribute.name}" class="form-control" required="true"/>
                     </div>
                     <div class="form-group">
-                        <label>Attribute Label</label>
-                        <input type="text" name="label" value="${attribute.label}" class="form-control" required="true"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Attribute Type</label>
-                        <input type="text" name="type" value="${attribute.type}" class="form-control" required="true"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Validation</label>
+                        <label>Options</label>
                         <br/>
                         <label class="fancy-checkbox">
                             <input type="checkbox" name="required" value="Y" <c:if test="${attribute.required eq 'Y'}">checked="checked"</c:if>>
                             <span>Required</span>
+                        </label>
+                        <br/>
+                        <label class="fancy-checkbox">
+                            <input type="checkbox" name="selectable" value="Y" <c:if test="${attribute.selectable eq 'Y'}">checked="checked"</c:if>>
+                            <span>Selectable</span>
                         </label>
                     </div>
                 </div>

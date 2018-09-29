@@ -82,6 +82,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
 
     @SuppressWarnings("unchecked")
     public <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
+        e.orchestrate();
         Set<ConstraintViolation<E>> violations = validator.validate(e, groups);
         return e.getValidationErrors(violations);
     }

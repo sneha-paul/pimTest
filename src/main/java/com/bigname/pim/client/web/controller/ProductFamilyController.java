@@ -5,6 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Attribute;
+import com.bigname.pim.api.domain.AttributeGroup;
 import com.bigname.pim.api.domain.Feature;
 import com.bigname.pim.api.domain.ProductFamily;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -125,24 +126,17 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return new ModelAndView("product/productFamilyAttribute", model);
     }
 
-    @RequestMapping(value = "/{id}/{type}/attribute", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, Attribute attribute) {
+    public Map<String, Object> saveAttribute(@PathVariable(value = "id") String id, Attribute attribute, @RequestParam String groupName) { //TODO - pass the groupId and group name as a pipe delimited single value through Attribute bean and remove the groupName explicit request parameter
         Map<String, Object> model = new HashMap<>();
-        attribute.setRequired(attribute.getRequired());
+
+        // Get the productFamily
         Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
+
+        //If productFamily exists and attribute name is not empty. TODO - may need to validate attributeGroup ID and AttributeGroup name
         if(productFamily.isPresent() && isValid(attribute, model)) {
-            if(type.equals("PRODUCT")) {
-                if (productFamily.get().getProductFamilyAttributes().contains(attribute)) {
-                    productFamily.get().getProductFamilyAttributes().remove(attribute);
-                }
-                productFamily.get().getProductFamilyAttributes().add(attribute);
-            } else if(type.equals("VARIANT")) {
-                if (productFamily.get().getProductVariantFamilyAttributes().contains(attribute)) {
-                    productFamily.get().getProductVariantFamilyAttributes().remove(attribute);
-                }
-                productFamily.get().getProductVariantFamilyAttributes().add(attribute);
-            }
+            productFamily.get().addAttribute(attribute);
             productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
             model.put("success", true);
         }

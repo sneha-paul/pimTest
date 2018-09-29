@@ -11,6 +11,7 @@ import static com.bigname.common.util.ValidationUtil.*;
  */
 abstract public class ConversionUtil {
 
+    public static final String ID_REG_EX_PATTERN = "[^a-zA-Z0-9]+";
     public static <T> List<T> toList(T... varArgs) {
 
         return toObjectList(true, varArgs).stream().map(e -> (T)e).collect(Collectors.toList());
@@ -46,5 +47,9 @@ abstract public class ConversionUtil {
             }
         }
         return list;
+    }
+
+    public static String toId(String value) {
+        return value.replaceAll(ID_REG_EX_PATTERN, "_").toUpperCase();
     }
 }

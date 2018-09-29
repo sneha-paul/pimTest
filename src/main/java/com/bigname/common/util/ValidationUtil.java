@@ -75,16 +75,4 @@ abstract public class ValidationUtil {
         return !isEmpty(object);
     }
 
-    public static <T> Map<String, Pair<String, Object>> getValidationErrors(Set<ConstraintViolation<T>> violations) {
-        Map<String, Pair<String, Object>> errors = new LinkedHashMap<>();
-        if(violations.size() > 0) {
-            violations.forEach(v -> {
-                if(!errors.containsKey(v.getPropertyPath().toString())) {
-                    errors.put(v.getPropertyPath().toString(), Pair.with(v.getMessage(), v.getInvalidValue()));
-                }
-            });
-        }
-        return errors;
-    }
-
 }

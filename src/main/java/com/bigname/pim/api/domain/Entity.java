@@ -96,6 +96,4 @@ abstract public class Entity<T> extends ValidatableEntity implements Serializabl
 
     abstract public Map<String, String> toMap();
 
-    public interface CreateGroup {}
-    public interface DetailsGroup {}
 }

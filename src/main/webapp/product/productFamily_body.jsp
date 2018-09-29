@@ -10,14 +10,14 @@
                     </div>
                     <div class="body">
                         <ul class="nav nav-tabs-new2">
-                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#Details">Details</a></li>
+                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#ProductAttributes">Product Attributes</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#VariantAttributes">Variant Attributes</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#ProductFeatures">Product Features</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#VariantFeatures">Variant Features</a></li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane show active" id="Details">
+                            <div class="tab-pane show active" id="details">
                                 <div class="row clearfix m-t-20">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="card">
@@ -169,6 +169,7 @@
                     type: 'TYPE_2',
                     url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attributes'),
                     columns: [
+                        { data: 'label', name : 'label' , title : 'Attribute Text'},
                         { data: 'name', name : 'name' , title : 'Attribute Name'},
                         { data: 'type', name : 'type', title : 'Type' },
                         { data: 'required', name : 'required' , title : 'Required'}

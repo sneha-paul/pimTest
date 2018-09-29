@@ -1,44 +1,49 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
-import org.javatuples.Pair;
+import com.bigname.common.util.ConversionUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Transient;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.constraints.NotEmpty;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by manu on 9/4/18.
  */
 public class Attribute extends ValidatableEntity {
-    @NotEmpty(message = "Attribute type cannot be empty")
-    private String type;
-
     @NotEmpty(message = "Attribute name cannot be empty")
     private String name;
 
-    @NotEmpty(message = "Attribute label cannot be empty")
-    private String label;
+    @NotEmpty(message = "Attribute type cannot be empty")
+    private String type;
 
-    private String required;
+    private String dataType = "string"; //Initial version only supports String type
+    private String id;
+    private String required = "N";
+    private String selectable = "N";
+    private String active = "Y";
+    private long sequenceNum;
+    private int subSequenceNum;
+
+    @Transient @JsonIgnore
+    private String attributeGroupId = AttributeGroup.DEFAULT_GROUP_ID;
+
+    @Transient @JsonIgnore
+    private String attributeGroupName = AttributeGroup.DEFAULT_GROUP_NAME;
+
+    @Transient
+    private AttributeGroup attributeGroup;
+
+    private Set<AttributeOption> options = new TreeSet<>();
 
     public Attribute() {}
 
-    public Attribute(String type, String name, String label, String required) {
-        this.type = type;
-        this.name = name;
-        this.label = label;
-        this.required = "Y".equalsIgnoreCase(required)  ? "Y" : "N";
+    public String getId() {
+        return id;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -49,12 +54,20 @@ public class Attribute extends ValidatableEntity {
         this.name = name;
     }
 
-    public String getLabel() {
-        return label;
+    public String getType() {
+        return type;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public String getRequired() {
@@ -62,15 +75,102 @@ public class Attribute extends ValidatableEntity {
     }
 
     public void setRequired(String required) {
-        this.required = "Y".equalsIgnoreCase(required)  ? "Y" : "N";
+        this.required = toYesNo(required, "Y");
+    }
+
+    public String getSelectable() {
+        return selectable;
+    }
+
+    public void setSelectable(String selectable) {
+        this.selectable = toYesNo(selectable, "Y");
+    }
+
+    public String getActive() {
+        return active;
+    }
+
+    public void setActive(String active) {
+        this.active = toYesNo(active, "Y");
+    }
+
+    public long getSequenceNum() {
+        return sequenceNum;
+    }
+
+    public void setSequenceNum(long sequenceNum) {
+        this.sequenceNum = sequenceNum;
+    }
+
+    public int getSubSequenceNum() {
+        return subSequenceNum;
+    }
+
+    public void setSubSequenceNum(int subSequenceNum) {
+        this.subSequenceNum = subSequenceNum;
+    }
+
+    public String getAttributeGroupId() {
+        return attributeGroupId;
+    }
+
+    public void setAttributeGroupId(String attributeGroupId) {
+        this.attributeGroupId = attributeGroupId;
+    }
+
+    public String getAttributeGroupName() {
+        return attributeGroupName;
+    }
+
+    public void setAttributeGroupName(String attributeGroupName) {
+        this.attributeGroupName = attributeGroupName;
+    }
+
+    public AttributeGroup getAttributeGroup() {
+        return attributeGroup;
+    }
+
+    public Attribute setAttributeGroup(AttributeGroup attributeGroup) {
+        if(isEmpty(attributeGroup)) {
+            attributeGroup = AttributeGroup.getDefaultGroup();
+        }
+        this.attributeGroup = attributeGroup;
+        this.setAttributeGroupId(this.attributeGroup.getId());
+        this.setAttributeGroupName(this.attributeGroup.getName());
+        return this;
+    }
+
+    public Set<AttributeOption> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Set<AttributeOption> options) {
+        this.options = options;
+    }
+
+    public Set<AttributeOption> addOptions(AttributeOption... options) {
+        ConversionUtil.toList(options).forEach(option -> getOptions().add(option));
+        return getOptions();
+    }
+
+    @Override
+    public void orchestrate() {
+        setRequired(getRequired());
+        setSelectable(getSelectable());
+        if(isEmpty(getId())) {
+            setId(toId(getName()));
+        }
     }
 
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
+        map.put("id", getId());
+        map.put("dataType", getDataType());
         map.put("name", getName());
-        map.put("type", getType());
-        map.put("label", getLabel());
+        map.put("group", isNotEmpty(attributeGroup) ? attributeGroup.getName() : "");
         map.put("required", getRequired());
+        map.put("selectable", getSelectable());
+        map.put("options", Integer.toString(options.size()));
         return map;
     }
 
@@ -81,11 +181,11 @@ public class Attribute extends ValidatableEntity {
 
         Attribute attribute = (Attribute) o;
 
-        return name.equals(attribute.name);
+        return id.equals(attribute.id);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return id.hashCode();
     }
 }
