@@ -107,7 +107,13 @@ public class AttributeGroup extends ValidatableEntity {
     }
 
     public Map<String, Attribute> addAttributes(Attribute... attributes) {
-        ConversionUtil.toList(attributes).forEach(attribute -> getAttributes().put(attribute.getId(), attribute));
+        ConversionUtil.toList(attributes).forEach(attribute -> {
+            if(!getAttributes().containsKey(attribute.getId())) {
+                getAttributes().put(attribute.getId(), attribute);
+            } else {
+                // Don't allow to update an already created attribute. This may cause attribute id collision
+            }
+        });
         return getAttributes();
     }
 
