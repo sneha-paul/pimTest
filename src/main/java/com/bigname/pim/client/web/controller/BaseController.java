@@ -56,7 +56,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         } else {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
-        Page<T> paginatedResult = service.getAll(pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+        Page<T> paginatedResult = service.getAll(pagination.getPageNumber()/pagination.getPageSize(), pagination.getPageSize(), sort, false);
         List<Map<String, String>> dataObjects = new ArrayList<>();
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
