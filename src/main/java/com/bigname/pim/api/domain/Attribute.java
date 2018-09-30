@@ -26,17 +26,21 @@ public class Attribute extends ValidatableEntity {
     private int subSequenceNum;
 
     @Transient @JsonIgnore
-    private String attributeGroupId = AttributeGroup.DEFAULT_GROUP_ID;
-
-    @Transient @JsonIgnore
-    private String attributeGroupName = AttributeGroup.DEFAULT_GROUP_NAME;
+    private String attributeGroupId;
 
     @Transient
+    private String attributeGroupName;
+
+    @Transient @JsonIgnore
     private AttributeGroup attributeGroup;
 
     private Set<AttributeOption> options = new TreeSet<>();
 
     public Attribute() {}
+
+    public Attribute(String type) {
+        this.type = type;
+    }
 
     public String getId() {
         return id;
@@ -134,6 +138,7 @@ public class Attribute extends ValidatableEntity {
         if(isEmpty(attributeGroup)) {
             attributeGroup = AttributeGroup.getDefaultGroup();
         }
+        attributeGroup.addAttributes(this);
         this.attributeGroup = attributeGroup;
         this.setAttributeGroupId(this.attributeGroup.getId());
         this.setAttributeGroupName(this.attributeGroup.getName());
@@ -167,7 +172,7 @@ public class Attribute extends ValidatableEntity {
         map.put("id", getId());
         map.put("dataType", getDataType());
         map.put("name", getName());
-        map.put("group", isNotEmpty(attributeGroup) ? attributeGroup.getName() : "");
+        map.put("group", getAttributeGroupName());
         map.put("required", getRequired());
         map.put("selectable", getSelectable());
         map.put("options", Integer.toString(options.size()));

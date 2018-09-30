@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
-    <c:when test="${mode eq 'DETAILS'}">
+    <c:when test="${mode eq 'DETAILS'}"><%--@elvariable id="productFamily" type="com.bigname.pim.api.domain.ProductFamily"--%>
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
                 <div class="card">
@@ -169,10 +169,11 @@
                     type: 'TYPE_2',
                     url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attributes'),
                     columns: [
-                        { data: 'label', name : 'label' , title : 'Attribute Text'},
                         { data: 'name', name : 'name' , title : 'Attribute Name'},
-                        { data: 'type', name : 'type', title : 'Type' },
-                        { data: 'required', name : 'required' , title : 'Required'}
+                        { data: 'id', name : 'id' , title : 'Attribute ID'},
+                        { data: 'group', name : 'group', title : 'Attribute Group' },
+                        { data: 'selectable', name : 'selectable' , title : 'Selectable'},
+                        { data: 'actions', name : 'actions' , title : 'Actions'}
                     ]
                 });
 

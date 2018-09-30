@@ -80,8 +80,8 @@ public class ProductFamily extends Entity<ProductFamily> {
 
     public AttributeGroup getAttributeGroup(Attribute attribute) {
         String type = attribute.getType();
-        String groupName = attribute.getAttributeGroupName();
-        String groupId = attribute.getAttributeGroupId();
+        String groupName = attribute.getAttributeGroup().getName();
+        String groupId = attribute.getAttributeGroup().getId();
 
         AttributeGroup attributeGroup = type.equals("VARIANT") ? getProductVariantFamilyAttributes().get(groupId) : getProductFamilyAttributes().get(groupId);
 

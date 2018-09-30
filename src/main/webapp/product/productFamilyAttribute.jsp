@@ -1,16 +1,35 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<style>
+    /*.layer {
+        opacity: 0;
+        -webkit-transition: all .5s ease;
+        -moz-transition: all .5s ease;
+        transition: all .5s ease;
+        width:0px;
+    }*/
+
+</style>
 <div class="popup-content" style="padding:20px">
     <div class="body">
-        <form method="post" action="/pim/productFamilies/${productFamilyId}/${type}/attribute" data-method="PUT"
+        <form method="post" action="/pim/productFamilies/{productFamilyId}/attribute" data-method="PUT"
               data-success-message='["Successfully created the family attribute", "Attribute Created"]'
               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+            <input type="hidden" name="type" value="PRODUCT"/>
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <div class="form-group">
-                        <label for="attributeGroupId">Attribute Group</label>
-                        <select class="form-control" id="attributeGroupId" name="attributeGroupId">
-                            <option value="DEFAULT_GROUP">Default Group</option>
+                        <label for="js-attribute-group-id">Attribute Group</label>
+                        <select class="form-control" id="js-attribute-group-id" name="attributeGroup.id">
+                            <option value="">Add a NEW GROUP</option>
+                            <c:forEach var="pair" items="${attributeGroups}">
+                                <option value="${pair.value0}" <c:if test="${pair.value0 eq 'DEFAULT_GROUP'}">selected</c:if>>${pair.value1}</option>
+                            </c:forEach>
+
                         </select>
+                    </div>
+                    <div class="form-group js-attribute-group-name" style="display: none">
+                            <label for="attribute-group-name">Attribute Group Name</label>
+                            <input type="text" id="attribute-group-name" name="attributeGroup.name" class="form-control" />
                     </div>
                     <div class="form-group">
                         <label>Attribute Name</label>

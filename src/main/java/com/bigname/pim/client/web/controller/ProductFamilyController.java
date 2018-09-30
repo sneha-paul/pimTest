@@ -120,21 +120,21 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     @RequestMapping("/{id}/{type}/attribute")
     public ModelAndView attributeDetails(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type) {
         Map<String, Object> model = new HashMap<>();
-        model.put("attribute", new Attribute());
-        model.put("type", type);
-        model.put("productFamilyId", id);
+        model.put("attribute", new Attribute(type));
+        model.put("attributeGroups", productFamilyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, type, null));
         return new ModelAndView("product/productFamilyAttribute", model);
     }
 
-    @RequestMapping(value = "/{id}/attribute", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{productFamilyId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "id") String id, Attribute attribute, @RequestParam String groupName) { //TODO - pass the groupId and group name as a pipe delimited single value through Attribute bean and remove the groupName explicit request parameter
+    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute) {
         Map<String, Object> model = new HashMap<>();
 
         // Get the productFamily
         Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
 
-        //If productFamily exists and attribute name is not empty. TODO - may need to validate attributeGroup ID and AttributeGroup name
+        //If productFamily exists and attribute name is not empty.
+        // TODO - cross field validation to see if one of attributeGroup ID and AttributeGroup name is not empty
         if(productFamily.isPresent() && isValid(attribute, model)) {
             productFamily.get().addAttribute(attribute);
             productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());

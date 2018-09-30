@@ -152,7 +152,7 @@
                 method = 'POST';
             }
             $.ajax({
-                url: $(formEl).attr('action'),
+                url: $.getURL($(formEl).attr('action')),
                 data: $(formEl).serialize(),
                 method: method,
                 success: function(data) {
