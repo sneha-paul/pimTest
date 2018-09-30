@@ -4,10 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.pim.api.domain.Attribute;
-import com.bigname.pim.api.domain.AttributeGroup;
-import com.bigname.pim.api.domain.Feature;
-import com.bigname.pim.api.domain.ProductFamily;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
@@ -22,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.*;
 
@@ -117,6 +113,27 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return result;
     }
 
+    @RequestMapping("/{productFamilyId}/{type}/attributes/{attributeId}/options/list")
+    @ResponseBody
+    public Result<Map<String, String>> getFamilyAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, @PathVariable(value = "type") String type, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
+
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<AttributeOption> paginatedResult = productFamilyService.getFamilyAttributeOptions(productFamilyId, FindBy.EXTERNAL_ID, type, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
     @RequestMapping("/{id}/{type}/attribute")
     public ModelAndView attributeDetails(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type) {
         Map<String, Object> model = new HashMap<>();
@@ -125,15 +142,37 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return new ModelAndView("product/productFamilyAttribute", model);
     }
 
+    @RequestMapping("/{productFamilyId}/{type}/attributes/{attributeId}/options")
+    public ModelAndView attributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId,
+                                         @PathVariable(value = "type") String type,
+                                         @PathVariable(value = "attributeId") String attributeId) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("attributeId", attributeId);
+        model.put("type", type);
+        return new ModelAndView("product/productFamilyAttributeOptions", model);
+    }
+
+    @RequestMapping(value = "/{productFamilyId}/{type}/attributes/{attributeId}/options", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> saveAttributeOptions(
+                                         @PathVariable(value = "productFamilyId") String productFamilyId,
+                                         @PathVariable(value = "type") String type,
+                                         AttributeOption attributeOption) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<ProductFamily> productFamily = productFamilyService.get(productFamilyId, FindBy.EXTERNAL_ID, false);
+        if(productFamily.isPresent() && isValid(attributeOption, model)) {
+            productFamily.get().addAttributeOption(attributeOption, type);
+            productFamilyService.update(productFamilyId, FindBy.EXTERNAL_ID, productFamily.get());
+            model.put("success", true);
+        }
+        return model;
+    }
+
     @RequestMapping(value = "/{productFamilyId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute) {
         Map<String, Object> model = new HashMap<>();
-
-        // Get the productFamily
         Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
-
-        //If productFamily exists and attribute name is not empty.
         // TODO - cross field validation to see if one of attributeGroup ID and AttributeGroup name is not empty
         if(productFamily.isPresent() && isValid(attribute, model)) {
             productFamily.get().addAttribute(attribute);

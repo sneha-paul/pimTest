@@ -1,4 +1,7 @@
 package com.bigname.pim.api.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Transient;
+
 import javax.validation.constraints.NotEmpty;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,10 +14,19 @@ public class AttributeOption extends ValidatableEntity {
     @NotEmpty(message = "Option value cannot be empty")
     private String value;
 
+    @NotEmpty(message = "Option id cannot be empty")
     private String id;
+
+    @NotEmpty(message = "Option fullId cannot be empty")
+    private String fullId;
+
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
+
+    @NotEmpty(message = "Attribute id cannot be empty")
+    @Transient @JsonIgnore
+    private String attributeId;
 
     public AttributeOption() {
     }
@@ -25,6 +37,22 @@ public class AttributeOption extends ValidatableEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFullId() {
+        return fullId;
+    }
+
+    public void setFullId(String fullId) {
+        this.fullId = fullId;
+    }
+
+    public String getAttributeId() {
+        return attributeId;
+    }
+
+    public void setAttributeId(String attributeId) {
+        this.attributeId = attributeId;
     }
 
     public String getValue() {
@@ -65,6 +93,7 @@ public class AttributeOption extends ValidatableEntity {
         if(isEmpty(getId())) {
             setId(toId(getValue()));
         }
+        fullId = attributeId + "|" + getId();
     }
 
     public Map<String, String> toMap() {

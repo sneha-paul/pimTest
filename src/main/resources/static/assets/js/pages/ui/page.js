@@ -36,7 +36,7 @@
                             if('GROUP_4' === options.buttonGroup) {
                                 value.actions = '';
                                 if('Y' === value.selectable) {
-                                    value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-external-id="' + value.name + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
+                                    value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-external-id="' + value.fullId + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
                                 }
                             } else if(options.type === 'TYPE_1') {
                                 var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
@@ -84,11 +84,10 @@
             $(options.selector).on('click', '.js-attribute-options', function(){
                 if('GROUP_4' === options.buttonGroup) {
                     $.showModal({
-                        url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attribute'),
-                        name:'product-attribute',
-                        title:'Product Attribute',
+                        url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
+                        name:'product-attribute-options',
+                        title:'Product Attribute Options',
                         buttons: [
-                            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('productAttributes');$.closeModal();});}},
                             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
                         ]
                     });
@@ -163,9 +162,9 @@
                 $.submitAction(this, e);
             });
         },
-        submitAction: function(e, submitEl) {
+        submitAction: function(e, submitEl, successCallback) {
             e.preventDefault();
-            $.submitForm($(submitEl).closest('form'));
+            $.submitForm($(submitEl).closest('form'), successCallback);
         },
         submitForm: function(formEl, successCallback) {
             $.clearFieldErrors(formEl);

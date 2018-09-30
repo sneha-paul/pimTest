@@ -19,6 +19,7 @@ public class Attribute extends ValidatableEntity {
 
     private String dataType = "string"; //Initial version only supports String type
     private String id;
+    private String fullId;
     private String required = "N";
     private String selectable = "N";
     private String active = "Y";
@@ -48,6 +49,21 @@ public class Attribute extends ValidatableEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFullId() {
+        if(isEmpty(fullId) && isNotEmpty(getAttributeGroup())) {
+            fullId = getAttributeGroup().getFullId() + "|" + getId();
+        }
+        return fullId;
+    }
+
+    public void setFullId() {
+        this.fullId = this.attributeGroup.getFullId() + "|" + this.getId();
+    }
+
+    public void setFullId(String fullId) {
+        this.fullId = fullId;
     }
 
     public String getName() {
@@ -140,6 +156,7 @@ public class Attribute extends ValidatableEntity {
         }
         attributeGroup.addAttributes(this);
         this.attributeGroup = attributeGroup;
+        this.setFullId();
         this.setAttributeGroupId(this.attributeGroup.getId());
         this.setAttributeGroupName(this.attributeGroup.getName());
         return this;
@@ -170,6 +187,7 @@ public class Attribute extends ValidatableEntity {
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("id", getId());
+        map.put("fullId", getFullId());
         map.put("dataType", getDataType());
         map.put("name", getName());
         map.put("group", getAttributeGroupName());

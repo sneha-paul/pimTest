@@ -1,15 +1,5 @@
 <%--@elvariable id="attributeGroups" type="java.util.List<org.javatuples.Pair<String, String>"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<style>
-    /*.layer {
-        opacity: 0;
-        -webkit-transition: all .5s ease;
-        -moz-transition: all .5s ease;
-        transition: all .5s ease;
-        width:0px;
-    }*/
-
-</style>
 <div class="popup-content" style="padding:20px">
     <div class="body">
         <form method="post" action="/pim/productFamilies/{productFamilyId}/attribute" data-method="PUT"
@@ -25,7 +15,6 @@
                             <c:forEach var="pair" items="${attributeGroups}">
                                 <option value="${pair.value0}" <c:if test="${pair.value0 eq 'DEFAULT_GROUP'}">selected</c:if>>${pair.value1}</option>
                             </c:forEach>
-
                         </select>
                     </div>
                     <div class="form-group js-attribute-group-name" style="display: none">

@@ -1,12 +1,12 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.pim.api.domain.Attribute;
-import com.bigname.pim.api.domain.AttributeGroup;
-import com.bigname.pim.api.domain.Feature;
-import com.bigname.pim.api.domain.ProductFamily;
+import com.bigname.common.util.StringUtil;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.ProductFamilyDAO;
 import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PimUtil;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -74,6 +74,9 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
             Map<String, AttributeGroup> attributeGroups1 = "VARIANTS".equals(type) ? productFamily.get().getProductVariantFamilyAttributes() : productFamily.get().getProductFamilyAttributes();
             attributeGroups1.forEach(((s, attributeGroup) -> attributeGroups.add(attributeGroup)));
         }
+        if(ValidationUtil.isEmpty(attributeGroups)) {
+            attributeGroups.add(AttributeGroup.getDefaultGroup());
+        }
         //TODO - Sorting
         return attributeGroups;
     }
@@ -102,5 +105,34 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
             features.sort(Comparator.comparing(Feature::getName));
         }
         return paginate(features, page, size);
+    }
+
+    @Override
+    public Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String type, String attributeId, int page, int size, Sort sort) {
+        String[] attributeFullId = StringUtil.split(attributeId, "\\|");
+
+         /*if(sort == null) {
+            sort = Sort.by(Sort.Direction.ASC, "name");
+        }*/
+        Map<String, AttributeGroup> attributeGroups = new HashMap<>();
+        List<AttributeOption> options = new ArrayList<>();
+        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        if(productFamily.isPresent()) {
+            options = new ArrayList<>(productFamily.get().getAttribute(attributeId, type).getOptions());
+            //TODO - sort this based on the requested sort
+        }
+        /*if(productFamily.isPresent()) {
+            if(type.equals("PRODUCT")) {
+                attributeGroups = productFamily.get().getProductFamilyAttributes();
+            } else if(type.equals("VARIANT")) {
+                attributeGroups = productFamily.get().getProductVariantFamilyAttributes();
+            }
+            if(attributeGroups.containsKey(attributeGroupId) && attributeGroups.get(attributeGroupId).getAttributes().containsKey(attributeKey)) {
+                options = new ArrayList<>(attributeGroups.get(attributeGroupId).getAttributes().get(attributeKey) .getOptions());
+            }
+
+//          TODO - sort this based on the requested sort
+        }*/
+        return paginate(options, page, size);
     }
 }

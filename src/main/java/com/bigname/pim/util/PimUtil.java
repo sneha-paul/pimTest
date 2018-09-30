@@ -1,5 +1,7 @@
 package com.bigname.pim.util;
 
+import com.bigname.common.util.StringUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Entity;
 
 import java.util.*;
@@ -49,5 +51,9 @@ public class PimUtil {
         Map<String, T> idedMap = new HashMap<>();
         entityList.forEach(e -> idedMap.put(findBy == FindBy.INTERNAL_ID ? e.getId() : e.getExternalId(), e));
         return idedMap;
+    }
+
+    public static Map<String, String> getTokenizedParameter(String value) {
+        return StringUtil.toMap(StringUtil.split(value, "\\|"));
     }
 }

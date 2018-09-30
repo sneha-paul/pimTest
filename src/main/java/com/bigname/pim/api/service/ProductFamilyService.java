@@ -1,9 +1,6 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.pim.api.domain.Attribute;
-import com.bigname.pim.api.domain.AttributeGroup;
-import com.bigname.pim.api.domain.Feature;
-import com.bigname.pim.api.domain.ProductFamily;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.ProductFamilyDAO;
 import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
@@ -23,4 +20,6 @@ public interface ProductFamilyService extends BaseService<ProductFamily, Product
     List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String type, Sort sort);
 
     Page<Feature> getFamilyFeatures(String productFamilyId, FindBy findBy, String type, int page, int size, Sort sort);
+
+    Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String type, String attributeId, int pageNumber, int size, Sort sort);
 }

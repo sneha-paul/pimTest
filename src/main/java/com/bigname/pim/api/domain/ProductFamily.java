@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -105,6 +106,25 @@ public class ProductFamily extends Entity<ProductFamily> {
             familyAttributes.put(attributeGroup.getId(), attributeGroup);
         }
         return this;
+    }
+
+    public ProductFamily addAttributeOption(AttributeOption attributeOption, String type) {
+        getAttribute(attributeOption.getAttributeId(), type).addOptions(attributeOption);
+        return this;
+    }
+
+    public Attribute getAttribute(String attributeId, String type) {
+        String[] ids = StringUtil.split(attributeId, "\\|");
+        AttributeGroup attributeGroup = AttributeGroup.getDefaultGroup();
+        for(int i = 0; i < ids.length - 1; i ++) {
+            if(i == 0) {
+                attributeGroup = getProductFamilyAttributes().get(ids[0]);
+            } else {
+//                attributeGroup = attributeGroup.getSubGroups().get(ids[0]);
+            }
+        }
+        return attributeGroup.getAttributes().get(ids[ids.length - 1]);
+
     }
 
     public List<Feature> getProductFamilyFeatures() {

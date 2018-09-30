@@ -19,6 +19,7 @@ public class AttributeGroup extends ValidatableEntity {
     private String name;
 
     private String id;
+    private String fullId;
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
@@ -43,6 +44,17 @@ public class AttributeGroup extends ValidatableEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFullId() {
+        if(isEmpty(fullId)) {
+            fullId = getFullId(this);
+        }
+        return fullId;
+    }
+
+    public void setFullId(String fullId) {
+        this.fullId = fullId;
     }
 
     public String getName() {
@@ -83,6 +95,7 @@ public class AttributeGroup extends ValidatableEntity {
 
     public void setParentGroup(AttributeGroup parentGroup) {
         this.parentGroup = parentGroup;
+        this.setFullId(getFullId(this));
     }
 
     public Set<AttributeGroup> getSubGroups() {
@@ -123,6 +136,7 @@ public class AttributeGroup extends ValidatableEntity {
         if(isEmpty(getId())) {
             setId(toId(getName()));
         }
+        setFullId(getFullId(this));
     }
 
     public Map<String, String> toMap() {
@@ -134,6 +148,16 @@ public class AttributeGroup extends ValidatableEntity {
         map.put("attributes", Integer.toString(getAttributes().size()));
         map.put("subGroups", Integer.toString(getSubGroups().size()));
         return map;
+    }
+
+    private String getFullId(AttributeGroup attributeGroup) {
+        String fullId = "";
+        if(isNotEmpty(attributeGroup.getParentGroup())) {
+            fullId += getFullId(attributeGroup.getParentGroup()) + "|" + attributeGroup.getId();
+        } else {
+            fullId = attributeGroup.getId();
+        }
+        return fullId;
     }
 
     @Override
