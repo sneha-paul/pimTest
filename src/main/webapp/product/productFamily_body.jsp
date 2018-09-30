@@ -167,6 +167,7 @@
                     selector: '#paginatedProductAttributesTable',
                     name: 'productAttributes',
                     type: 'TYPE_2',
+                    buttonGroup: 'GROUP_4',
                     url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attributes'),
                     columns: [
                         { data: 'name', name : 'name' , title : 'Attribute Name'},

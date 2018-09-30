@@ -33,7 +33,12 @@
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
 
-                            if(options.type === 'TYPE_1') {
+                            if('GROUP_4' === options.buttonGroup) {
+                                value.actions = '';
+                                if('Y' === value.selectable) {
+                                    value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-external-id="' + value.name + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
+                                }
+                            } else if(options.type === 'TYPE_1') {
                                 var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
                                 if('Y' !== value.active) {
                                     icon = 'icon-check';
@@ -75,6 +80,20 @@
                         $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
                 }
             });
+
+            $(options.selector).on('click', '.js-attribute-options', function(){
+                if('GROUP_4' === options.buttonGroup) {
+                    $.showModal({
+                        url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attribute'),
+                        name:'product-attribute',
+                        title:'Product Attribute',
+                        buttons: [
+                            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('productAttributes');$.closeModal();});}},
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ]
+                    });
+                }
+            });
         },
         refreshDataTable: function(name) {
             $.getDataTable(name).ajax.reload();
@@ -84,15 +103,19 @@
             $.initDataTable($.getDataTableOptions(name));
         },
         addModal: function(options) {
+            $(options.selector).off().on('click', function() {
+                $.showModal(options);
+            });
+        },
+        showModal: function(options) {
             var defaultOptions = {
                 loadingHtml: '<span class="fa fa-circle-o-notch fa-spin fa-3x text-primary"></span><span class="h4">Loading</span>',
                 size: eModal.size.lg,
                 name:'Modal',
                 title: 'Modal'
             };
-            $(options.selector).off().on('click', function() {
-                eModal.ajax($.extend(true, defaultOptions, options));
-            });
+
+            eModal.ajax(Object.assign({},defaultOptions, options));
         },
         closeModal: function() {
             $('.js-eModal-close').trigger('click');
@@ -249,7 +272,7 @@
             }).then(function(response) {
                 var data = typeof response.value !== 'undefined' ? JSON.parse(response.value) : {};
                 if (data.success) {
-                    swal({title: options.successTitle, text: options.successText, type: options.successType, timer: 3000});
+                    swal({title: options.successTitle, text: options.successText, type: options.successType, timer: 3000/*, animation: false*/});
                     callback();
                 }
             }, function(error) {
