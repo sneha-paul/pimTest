@@ -9,7 +9,9 @@
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SEO">SEO</a></li>
+                    <c:if test="${not empty product.productFamily.productFamilyAttributes['SEO']}">
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SEO">SEO</a></li>
+                    </c:if>
                     <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#digitalAssets">Digital Assets</a></li>--%>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>
                     <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>--%>
@@ -130,22 +132,47 @@
                                     <div class="body">
                                         <form method="post" action="/pim/categories/${category.categoryId}" data-method="PUT" data-success-message='["Successfully updated the category", "Category Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
-                                                <div class="col-md-6 col-sm-12">
-                                                    <div class="form-group">
-                                                        <label for="metaTitle">Meta Title</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="metaTitle" name="metaTitle" class="form-control" value="${category.metaTitle}" />
-                                                    </div>
+                                                <c:if test="${not empty product.productFamily}">
+                                                    <c:set var="attributeGroup" value="${product.productFamily.productFamilyAttributes['SEO']}" />
+                                                    <c:if test="${not empty attributeGroup}">
+                                                        <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
+                                                            <c:set var="attribute" value="${attributeEntry.value}"/>
+                                                            <div class="col-md-6 col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label>${attribute.name}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                    <c:choose>
+                                                                        <c:when test="${attribute.uiType eq 'DROPDOWN'}">
+                                                                            <select name="${attribute.id}" class="form-control">
+                                                                                <option value="">Select One</option>
+                                                                                <c:forEach items="${attribute.options}" var="option">
+                                                                                    <option value="${option.id}" <c:if test="${option.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${option.value}</option>
+                                                                                </c:forEach>
+                                                                            </select>
+                                                                        </c:when>
+                                                                        <c:when test="${attribute.uiType eq 'TEXTAREA'}">
+                                                                            <textarea class="form-control" name="${attribute.id}">${product.familyAttributes[attribute.id]}</textarea>
+                                                                        </c:when>
+                                                                        <c:when test="${attribute.uiType eq 'CHECKBOX'}">
 
-                                                    <div class="form-group">
-                                                        <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
-                                                    </div>
+                                                                            <br/>${product.familyAttributes[attribute.id]}
+                                                                            <c:forEach items="${attribute.options}" var="option">
+                                                                                <c:set var="propertyName" value="${attribute.id}_${option.id}"/>
 
-                                                    <div class="form-group">
-                                                        <label for="metaKeywords">Meta Keywords</label>
-                                                        <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
-                                                    </div>
-                                                </div>
+                                                                                <label class="fancy-checkbox">
+                                                                                    <input type="checkbox" class="js-checkbox" name="${propertyName}" value="Y" <c:if test="${product.familyAttributes[propertyName] eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <span>${option.value}</span>
+                                                                                </label>
+                                                                            </c:forEach>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <input type="text" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                            </div>
+                                                        </c:forEach>
+                                                    </c:if>
+                                                </c:if>
                                             </div>
                                             <br>
                                             <input type="hidden" name="group" value="SEO"/>
@@ -202,7 +229,7 @@
                                             <div class="row">
                                                 <c:if test="${not empty product.productFamily}">
                                                     <c:forEach items="${product.productFamily.productFamilyAttributes}" var="attributeGroupEntry">
-                                                        <c:if test="${attributeGroupEntry.key ne 'DEFAULT_GROUP'}">
+                                                        <c:if test="${attributeGroupEntry.key ne 'DEFAULT_GROUP' and attributeGroupEntry.key ne 'SEO'}">
                                                             <c:forEach items="${attributeGroupEntry.value.attributes}" var="attributeEntry">
                                                                 <c:set var="attribute" value="${attributeEntry.value}"/>
                                                                 <div class="col-md-6 col-sm-12">

@@ -28,16 +28,6 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class})
     private String productName;
 
-    private String description;
-
-    private String longDescription;
-
-    private String metaTitle;
-
-    private String metaDescription;
-
-    private String metaKeywords;
-
     @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})
     private String productFamilyId;
 
@@ -75,46 +65,6 @@ public class Product extends Entity<Product> {
         this.productName = productName;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLongDescription() {
-        return longDescription;
-    }
-
-    public void setLongDescription(String longDescription) {
-        this.longDescription = longDescription;
-    }
-
-    public String getMetaTitle() {
-        return metaTitle;
-    }
-
-    public void setMetaTitle(String metaTitle) {
-        this.metaTitle = metaTitle;
-    }
-
-    public String getMetaDescription() {
-        return metaDescription;
-    }
-
-    public void setMetaDescription(String metaDescription) {
-        this.metaDescription = metaDescription;
-    }
-
-    public String getMetaKeywords() {
-        return metaKeywords;
-    }
-
-    public void setMetaKeywords(String metaKeywords) {
-        this.metaKeywords = metaKeywords;
-    }
-
     public String getProductFamilyId() {
         return productFamilyId;
     }
@@ -150,15 +100,9 @@ public class Product extends Entity<Product> {
             case "DETAILS":
                 this.setExternalId(product.getExternalId());
                 this.setProductName(product.getProductName());
-                this.setDescription((product.getDescription()));
-                this.setLongDescription((product.getLongDescription()));
                 this.setActive(product.getActive());
                 break;
-            case "SEO":
-                this.setMetaTitle(product.getMetaTitle());
-                this.setMetaDescription(product.getMetaDescription());
-                this.setMetaKeywords(product.getMetaKeywords());
-                break;
+
             case "ASSETS":
                 //TODO
                 break;

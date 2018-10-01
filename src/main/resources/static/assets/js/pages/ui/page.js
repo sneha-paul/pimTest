@@ -22,7 +22,7 @@
             $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
                 serverSide: true,
-                pageLength: 5,
+                pageLength: 25,
                 conditionalPaging: true,
                 searching: false,
                 language: {
