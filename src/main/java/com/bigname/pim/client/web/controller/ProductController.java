@@ -58,8 +58,9 @@ public class ProductController extends BaseController<Product, ProductService>{
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, Product product) {
+    public Map<String, Object> update(@PathVariable(value = "id") String id, Product product, @RequestParam Map<String, Object> attributes) {
         Map<String, Object> model = new HashMap<>();
+        product.setFamilyAttributes(attributes);
         if(isValid(product, model, product.getGroup().equals("DETAILS") ? Product.DetailsGroup.class : product.getGroup().equals("SEO") ? Product.SeoGroup.class : null)) {
             productService.update(id, FindBy.EXTERNAL_ID, product);
             model.put("success", true);

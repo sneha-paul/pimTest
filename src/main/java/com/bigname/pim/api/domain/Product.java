@@ -1,5 +1,7 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.BeanUtil;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
@@ -135,7 +137,7 @@ public class Product extends Entity<Product> {
     }
 
     public void setFamilyAttributes(Map<String, Object> familyAttributes) {
-        this.familyAttributes = familyAttributes;
+        this.familyAttributes = CollectionsUtil.filterMap(familyAttributes, BeanUtil.getAllFieldNames(this.getClass()));
     }
 
     void setExternalId() {
@@ -151,7 +153,6 @@ public class Product extends Entity<Product> {
                 this.setDescription((product.getDescription()));
                 this.setLongDescription((product.getLongDescription()));
                 this.setActive(product.getActive());
-
                 break;
             case "SEO":
                 this.setMetaTitle(product.getMetaTitle());
@@ -161,9 +162,9 @@ public class Product extends Entity<Product> {
             case "ASSETS":
                 //TODO
                 break;
-            case "FAMILY_ATTRIBUTES":
-                this.setFamilyAttributes(product.getFamilyAttributes());
-                break;
+        }
+        if(isNotEmpty(product.getFamilyAttributes())) {
+            product.getFamilyAttributes().forEach(this.getFamilyAttributes()::put);
         }
         return this;
     }

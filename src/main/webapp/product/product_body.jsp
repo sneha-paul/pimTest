@@ -11,13 +11,13 @@
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SEO">SEO</a></li>
                     <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#digitalAssets">Digital Assets</a></li>--%>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productAttributes">Product Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>
                     <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>--%>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productVariants">Product Variants</a></li>
                     <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productCategories">Categories</a></li>--%>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane show active" id="Attributes">
+                    <div class="tab-pane show active" id="details">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -31,10 +31,14 @@
                                                         <label>Product Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" name="productName" value="${product.productName}" class="form-control" required="true"/>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">
                                                         <label>Product ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" name="productId" class="form-control" value="${product.productId}" required="true"/>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">
                                                         <label>ProductFamily</label>
 
@@ -48,6 +52,8 @@
                                                     <script>
                                                         $('select[name="productFamilyId"]').val('${product.productFamilyId}');
                                                     </script>
+                                                </div>
+                                                <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">
                                                         <label>Status</label>
                                                         <br/>
@@ -57,6 +63,32 @@
                                                         </label>
                                                     </div>
                                                 </div>
+                                                <c:if test="${not empty product.productFamily}">
+                                                    <c:set var="attributeGroup" value="${product.productFamily.productFamilyAttributes['DEFAULT_GROUP']}" />
+                                                    <c:if test="${not empty attributeGroup}">
+                                                        <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
+                                                            <c:set var="attribute" value="${attributeEntry.value}"/>
+                                                            <div class="col-md-6 col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label>${attribute.name}</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                    <c:choose>
+                                                                        <c:when test="${attribute.selectable eq 'Y'}">
+                                                                            <select name="${attribute.id}" class="form-control">
+                                                                                <option value="">Select One</option>
+                                                                                <c:forEach items="${attribute.options}" var="option">
+                                                                                    <option value="${option.id}" <c:if test="${option.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${option.value}</option>
+                                                                                </c:forEach>
+                                                                            </select>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <input type="text" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                            </div>
+                                                        </c:forEach>
+                                                    </c:if>
+                                                </c:if>
                                             </div>
                                             <br>
                                             <input type="hidden" name="group" value="DETAILS"/>
@@ -136,7 +168,7 @@
                             </div>
                         </div>
                     </div>--%>
-                    <div class="tab-pane" id="productAttributes">
+                    <div class="tab-pane" id="productFeatures">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -146,29 +178,31 @@
                                               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
                                                 <c:if test="${not empty product.productFamily}">
-                                                    <c:forEach items="${product.productFamily.productFamilyAttributes}" var="attributeGroup">
-                                                        <c:forEach items="${attributeGroup.value.attributes}" var="attributeEntry">
-                                                            <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                            <div class="col-md-6 col-sm-12">
-                                                                <div class="form-group">
-                                                                    <label>${attribute.name}</label><code class="highlighter-rouge m-l-10">*</code>
-                                                                    <c:choose>
-                                                                        <c:when test="${attribute.selectable eq 'Y'}">
-                                                                            <select name="${attribute.id}" class="form-control">
-                                                                                <option value="">Select One</option>
-                                                                                <c:forEach items="${attribute.options}" var="option">
-                                                                                    <option value="${option.id}" <c:if test="${option.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${option.value}</option>
-                                                                                </c:forEach>
-                                                                            </select>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <input type="text" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
+                                                    <c:forEach items="${product.productFamily.productFamilyAttributes}" var="attributeGroupEntry">
+                                                        <c:if test="${attributeGroupEntry.key ne 'DEFAULT_GROUP'}">
+                                                            <c:forEach items="${attributeGroupEntry.value.attributes}" var="attributeEntry">
+                                                                <c:set var="attribute" value="${attributeEntry.value}"/>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <div class="form-group">
+                                                                        <label>${attribute.name}</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                        <c:choose>
+                                                                            <c:when test="${attribute.selectable eq 'Y'}">
+                                                                                <select name="${attribute.id}" class="form-control">
+                                                                                    <option value="">Select One</option>
+                                                                                    <c:forEach items="${attribute.options}" var="option">
+                                                                                        <option value="${option.id}" <c:if test="${option.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${option.value}</option>
+                                                                                    </c:forEach>
+                                                                                </select>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <input type="text" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
 
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </c:forEach>
+                                                            </c:forEach>
+                                                        </c:if>
                                                     </c:forEach>
                                                 </c:if>
                                             </div>
