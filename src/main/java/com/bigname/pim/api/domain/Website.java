@@ -14,17 +14,17 @@ import static com.bigname.common.util.RegExBuilder.*;
 public class Website extends Entity<Website> {
 
     @Transient
-    @NotEmpty(message = "website.websiteId.empty")
-    @Pattern(regexp = "[" + ALPHA + UNDERSCORE + "]", message = "website.websiteId.invalid")
+    @NotEmpty(message = "Website Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "website.websiteId.invalid")
     private String websiteId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "website.websiteName.empty")
+    @NotEmpty(message = "Website name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "website.websiteName.invalid")
     private String websiteName;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "website.url.empty")
+    @NotEmpty(message = "Website URL cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String url;
 
     public Website() {
