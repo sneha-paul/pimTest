@@ -1,3 +1,4 @@
+<%--@elvariable id="attribute" type="com.bigname.pim.api.domain.Attribute"--%>
 <%--@elvariable id="attributeGroups" type="java.util.List<org.javatuples.Pair<String, String>"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="popup-content" style="padding:20px">
@@ -17,10 +18,7 @@
                             </c:forEach>
                         </select>
                     </div>
-                    <div class="form-group js-attribute-group-name" style="display: none">
-                            <label for="attribute-group-name">Attribute Group Name</label>
-                            <input type="text" id="attribute-group-name" name="attributeGroup.name" class="form-control" />
-                    </div>
+
                     <div class="form-group">
                         <label>Attribute Name</label>
                         <input type="text" name="name" value="${attribute.name}" class="form-control" required="true"/>
@@ -31,6 +29,7 @@
                             <option value="INPUT_BOX">Input Box</option>
                             <option value="DROPDOWN">Dropdown</option>
                             <option value="CHECKBOX">Checkbox</option>
+                            <option value="RADIO_BUTTON">Checkbox</option>
                             <option value="TEXTAREA">Textarea</option>
                         </select>
                     </div>
@@ -41,10 +40,16 @@
                             <input type="checkbox" name="required" value="Y" <c:if test="${attribute.required eq 'Y'}">checked="checked"</c:if>>
                             <span>Required</span>
                         </label>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <div class="form-group js-attribute-group-name" style="display: none">
+                        <label for="attribute-group-name">Attribute Group Name</label>
+                        <input type="text" id="attribute-group-name" name="attributeGroup.name" class="form-control" />
                         <br/>
                         <label class="fancy-checkbox">
-                            <input type="checkbox" name="selectable" value="Y" <c:if test="${attribute.selectable eq 'Y'}">checked="checked"</c:if>>
-                            <span>Selectable</span>
+                            <input type="checkbox" name="attributeGroup.masterGroup" value="Y" <c:if test="${attribute.attributeGroup.masterGroup eq 'Y'}">checked="checked"</c:if>>
+                            <span>Master Group</span>
                         </label>
                     </div>
                 </div>

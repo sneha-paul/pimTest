@@ -6,7 +6,7 @@
             <div class="col-lg-12 col-md-12">
                 <div class="card">
                     <div class="header">
-                        <h2>${productFamily.productFamilyName} <small><code class="highlighter-rouge">${productFamily.productFamilyId}</code></small></h2>
+                        <h2>${productFamily.productFamilyName} <small><code class="highlighter-rouge">${productFamily.productFamilyId}</code></small><small class="pull-right m-t--15"><code style="color:#808080">_id: ${productFamily.id}</code></small></h2>
                     </div>
                     <div class="body">
                         <ul class="nav nav-tabs-new2">

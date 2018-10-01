@@ -4,17 +4,16 @@
     <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="header">
-                <h2>${product.productName} <small><code class="highlighter-rouge">${product.productId}</code></small></h2>
+                <h2>${product.productName} <small><code class="highlighter-rouge">${product.productId}</code></small><small class="pull-right" style="margin-top: -15px"><code style="color:#808080">_id: ${product.id}</code></small></h2>
             </div>
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
-                    <c:if test="${not empty product.productFamily.productFamilyAttributes['SEO']}">
-                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SEO">SEO</a></li>
-                    </c:if>
-                    <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#digitalAssets">Digital Assets</a></li>--%>
+                    <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#digitalAssets">Digital Assets</a></li> //TODO--%>
+                    <c:forEach var="attributeGroup" items="${product.productFamily.getMasterGroups(\"PRODUCT\")}">
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#${attributeGroup.id}">${attributeGroup.name}</a></li>
+                    </c:forEach>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>
-                    <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>--%>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productVariants">Product Variants</a></li>
                     <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productCategories">Categories</a></li>--%>
                 </ul>
@@ -125,15 +124,52 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="SEO">
+                    <%--<div class="tab-pane" id="digitalAssets"> <!-- TODO -->
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
                                         <form method="post" action="/pim/categories/${category.categoryId}" data-method="PUT" data-success-message='["Successfully updated the category", "Category Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
+                                                <div class="col-md-6 col-sm-12">
+                                                    <div class="form-group">
+                                                        <label for="metaTitle">Meta Title</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <input type="text" id="metaTitle" name="metaTitle" class="form-control" value="${category.metaTitle}" />
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="metaKeywords">Meta Keywords</label>
+                                                        <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <input type="hidden" name="group" value="SEO"/>
+                                            <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
+                                            <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>--%>
+                    <c:forEach var="attributeGroup" items="${product.productFamily.getMasterGroups(\"PRODUCT\")}">
+                        <div class="tab-pane" id="${attributeGroup.id}">
+                        <div class="row clearfix m-t-20">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card">
+                                    <div class="body">
+                                        <form method="post" action="/pim/products/${product.productId}" data-method="PUT"
+                                              data-success-message='["Successfully updated the product", "Product Updated"]'
+                                              data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                            <div class="row">
                                                 <c:if test="${not empty product.productFamily}">
-                                                    <c:set var="attributeGroup" value="${product.productFamily.productFamilyAttributes['SEO']}" />
+                                                    <%--<c:set var="attributeGroup" value="${product.productFamily.productFamilyAttributes['SEO']}" />--%>
                                                     <c:if test="${not empty attributeGroup}">
                                                         <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                             <c:set var="attribute" value="${attributeEntry.value}"/>
@@ -175,49 +211,15 @@
                                                 </c:if>
                                             </div>
                                             <br>
-                                            <input type="hidden" name="group" value="SEO"/>
                                             <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
-                                            <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                            <a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <%--<div class="tab-pane" id="digitalAssets"> <!-- TODO -->
-                        <div class="row clearfix m-t-20">
-                            <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <form method="post" action="/pim/categories/${category.categoryId}" data-method="PUT" data-success-message='["Successfully updated the category", "Category Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
-                                            <div class="row">
-                                                <div class="col-md-6 col-sm-12">
-                                                    <div class="form-group">
-                                                        <label for="metaTitle">Meta Title</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="metaTitle" name="metaTitle" class="form-control" value="${category.metaTitle}" />
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="metaKeywords">Meta Keywords</label>
-                                                        <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <input type="hidden" name="group" value="SEO"/>
-                                            <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
-                                            <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>--%>
+                    </c:forEach>
                     <div class="tab-pane" id="productFeatures">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">

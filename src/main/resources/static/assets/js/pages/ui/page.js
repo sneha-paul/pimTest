@@ -26,7 +26,7 @@
                 conditionalPaging: true,
                 searching: false,
                 language: {
-                    info: "_START_ to _END_ of _TOTAL_",
+                    info: "_START_ to _END_ of _TOTAL_"
                 },
                 ajax: {
                     url: options.url + (options.type !== 'TYPE_1' ? '' : 'list'),

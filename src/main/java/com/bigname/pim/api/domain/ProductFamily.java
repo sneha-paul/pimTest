@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by manu on 9/1/18.
@@ -88,7 +89,7 @@ public class ProductFamily extends Entity<ProductFamily> {
 
         if(isEmpty(attributeGroup)) {
             if(isNotEmpty(groupName)) {
-                attributeGroup = new AttributeGroup(groupName);
+                attributeGroup = new AttributeGroup(groupName, attribute.getAttributeGroup().getMasterGroup());
             } else {
                 attributeGroup = AttributeGroup.getDefaultGroup();
             }
@@ -167,5 +168,10 @@ public class ProductFamily extends Entity<ProductFamily> {
         map.put("productFamilyName", getProductFamilyName());
         map.put("active", getActive());
         return map;
+    }
+
+    public List<AttributeGroup> getMasterGroups(String type) {
+        Map<String, AttributeGroup> attributeGroupsMap = type.equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
+        return attributeGroupsMap.entrySet().stream().filter(e -> e.getValue().getMasterGroup().equals("Y")).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 }

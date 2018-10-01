@@ -21,6 +21,7 @@ public class AttributeGroup extends ValidatableEntity {
     private String id;
     private String fullId;
     private String active = "Y";
+    private String masterGroup = "N";
     private long sequenceNum;
     private int subSequenceNum;
 
@@ -33,8 +34,9 @@ public class AttributeGroup extends ValidatableEntity {
 
     public AttributeGroup() { }
 
-    public AttributeGroup(String name) {
+    public AttributeGroup(String name, String masterGroup) {
         this.name = name;
+        setMasterGroup(masterGroup);
         orchestrate();
     }
 
@@ -71,6 +73,14 @@ public class AttributeGroup extends ValidatableEntity {
 
     public void setActive(String active) {
         this.active = toYesNo(active, "Y");
+    }
+
+    public String getMasterGroup() {
+        return masterGroup;
+    }
+
+    public void setMasterGroup(String masterGroup) {
+        this.masterGroup = toYesNo(masterGroup, "Y");
     }
 
     public long getSequenceNum() {
@@ -176,6 +186,6 @@ public class AttributeGroup extends ValidatableEntity {
     }
 
     public static AttributeGroup getDefaultGroup() {
-        return new AttributeGroup(DEFAULT_GROUP_NAME);
+        return new AttributeGroup(DEFAULT_GROUP_NAME, "N");
     }
 }

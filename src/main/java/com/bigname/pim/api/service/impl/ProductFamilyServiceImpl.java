@@ -53,8 +53,9 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
             }
             attributeGroups.forEach((s, attributeGroup) -> {
                 attributeGroup.getAttributes().forEach((s1, attribute) -> {
-                    attribute.setAttributeGroupName(attributeGroup.getName());
-                    attribute.setAttributeGroupId(attributeGroup.getId());
+                    attribute.setAttributeGroup(attributeGroup);
+//                    attribute.setAttributeGroupName(attributeGroup.getName());
+//                    attribute.setAttributeGroupId(attributeGroup.getId());
                     attributes.add(attribute);
                 });
             });

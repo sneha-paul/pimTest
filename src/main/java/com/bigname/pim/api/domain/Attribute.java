@@ -27,11 +27,11 @@ public class Attribute extends ValidatableEntity {
     private long sequenceNum;
     private int subSequenceNum;
 
-    @Transient @JsonIgnore
+   /* @Transient @JsonIgnore
     private String attributeGroupId;
 
     @Transient
-    private String attributeGroupName;
+    private String attributeGroupName;*/
 
     @Transient @JsonIgnore
     private AttributeGroup attributeGroup;
@@ -140,22 +140,6 @@ public class Attribute extends ValidatableEntity {
         this.subSequenceNum = subSequenceNum;
     }
 
-    public String getAttributeGroupId() {
-        return attributeGroupId;
-    }
-
-    public void setAttributeGroupId(String attributeGroupId) {
-        this.attributeGroupId = attributeGroupId;
-    }
-
-    public String getAttributeGroupName() {
-        return attributeGroupName;
-    }
-
-    public void setAttributeGroupName(String attributeGroupName) {
-        this.attributeGroupName = attributeGroupName;
-    }
-
     public AttributeGroup getAttributeGroup() {
         return attributeGroup;
     }
@@ -167,8 +151,6 @@ public class Attribute extends ValidatableEntity {
         attributeGroup.addAttributes(this);
         this.attributeGroup = attributeGroup;
         this.setFullId();
-        this.setAttributeGroupId(this.attributeGroup.getId());
-        this.setAttributeGroupName(this.attributeGroup.getName());
         return this;
     }
 
@@ -201,7 +183,7 @@ public class Attribute extends ValidatableEntity {
         map.put("uiType", getUiType().name());
         map.put("dataType", getDataType());
         map.put("name", getName());
-        map.put("group", getAttributeGroupName());
+        map.put("group", getAttributeGroup().getName());
         map.put("required", getRequired());
         map.put("selectable", getSelectable());
         map.put("options", Integer.toString(options.size()));
