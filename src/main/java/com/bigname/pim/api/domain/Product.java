@@ -151,7 +151,7 @@ public class Product extends Entity<Product> {
                 this.setDescription((product.getDescription()));
                 this.setLongDescription((product.getLongDescription()));
                 this.setActive(product.getActive());
-                this.setFamilyAttributes(product.getFamilyAttributes());
+
                 break;
             case "SEO":
                 this.setMetaTitle(product.getMetaTitle());
@@ -160,6 +160,9 @@ public class Product extends Entity<Product> {
                 break;
             case "ASSETS":
                 //TODO
+                break;
+            case "FAMILY_ATTRIBUTES":
+                this.setFamilyAttributes(product.getFamilyAttributes());
                 break;
         }
         return this;

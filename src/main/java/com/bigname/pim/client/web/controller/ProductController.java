@@ -109,6 +109,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         Map<String, Object> model = new HashMap<>();
         Optional<Product> product = productService.get(id, FindBy.EXTERNAL_ID, false);
         product.ifPresent(product1 -> {
+            product1.setGroup((String)attributes.remove("group"));
             product1.setFamilyAttributes(attributes);
             productService.update(id, FindBy.EXTERNAL_ID, product1);
         });

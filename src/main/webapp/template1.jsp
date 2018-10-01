@@ -21,6 +21,7 @@
 
     <%-- VENDOR CSS --%>
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
 
@@ -125,6 +126,7 @@
 
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 <script src="/assets/vendor/parsleyjs/js/parsley.min.js"></script>
 
 <script src="/assets/bundles/mainscripts.bundle.js"></script>

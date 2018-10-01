@@ -146,17 +146,34 @@
                                               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
                                                 <c:if test="${not empty product.productFamily}">
-                                                    <c:forEach items="${product.productFamily.productFamilyAttributes}" var="attribute">
-                                                        <div class="col-md-6 col-sm-12">
-                                                            <div class="form-group">
-                                                                <label>${attribute.label}</label><code class="highlighter-rouge m-l-10">*</code>
-                                                                <input type="text" name="${attribute.name}" value="${product.familyAttributes[attribute.name]}" class="form-control"/>
+                                                    <c:forEach items="${product.productFamily.productFamilyAttributes}" var="attributeGroup">
+                                                        <c:forEach items="${attributeGroup.value.attributes}" var="attributeEntry">
+                                                            <c:set var="attribute" value="${attributeEntry.value}"/>
+                                                            <div class="col-md-6 col-sm-12">
+                                                                <div class="form-group">
+                                                                    <label>${attribute.name}</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                    <c:choose>
+                                                                        <c:when test="${attribute.selectable eq 'Y'}">
+                                                                            <select name="${attribute.id}" class="form-control">
+                                                                                <option value="">Select One</option>
+                                                                                <c:forEach items="${attribute.options}" var="option">
+                                                                                    <option value="${option.id}" <c:if test="${option.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${option.value}</option>
+                                                                                </c:forEach>
+                                                                            </select>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <input type="text" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </c:forEach>
                                                     </c:forEach>
                                                 </c:if>
                                             </div>
                                             <br>
+                                            <input type="hidden" name="group" value="FAMILY_ATTRIBUTES"/>
                                             <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                                         </form>
                                     </div>
