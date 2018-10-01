@@ -17,7 +17,8 @@ public class Attribute extends ValidatableEntity {
     @NotEmpty(message = "Attribute type cannot be empty")
     private String type;
 
-    private String dataType = "string"; //Initial version only supports String type
+    private Type uiType = Type.INPUT_BOX;
+    private String dataType = "string";  //Initial version only supports String type
     private String id;
     private String fullId;
     private String required = "N";
@@ -80,6 +81,15 @@ public class Attribute extends ValidatableEntity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Type getUiType() {
+        return uiType;
+    }
+
+    public void setUiType(Type uiType) {
+        this.uiType = uiType;
+        setSelectable(uiType.isSelectable());
     }
 
     public String getDataType() {
@@ -188,6 +198,7 @@ public class Attribute extends ValidatableEntity {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("id", getId());
         map.put("fullId", getFullId());
+        map.put("uiType", getUiType().name());
         map.put("dataType", getDataType());
         map.put("name", getName());
         map.put("group", getAttributeGroupName());
@@ -210,5 +221,33 @@ public class Attribute extends ValidatableEntity {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public enum Type {
+        INPUT_BOX("Input Box", "N"), DROPDOWN("Dropdown", "Y"), CHECKBOX("Checkbox", "Y"), TEXTAREA("Textarea", "N");
+        String label = "";
+        String selectable = "N";
+        Type(String label, String selectable) {
+            this.label = label;
+            this.selectable = selectable;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String isSelectable() {
+            return selectable;
+        }
+
+        public static Type get(String value) {
+            for (Type type : values()) {
+                if(type.name().equals(value)) {
+                    return type;
+                }
+            }
+            return Type.INPUT_BOX;
+
+        }
     }
 }

@@ -70,15 +70,38 @@
                                                             <c:set var="attribute" value="${attributeEntry.value}"/>
                                                             <div class="col-md-6 col-sm-12">
                                                                 <div class="form-group">
-                                                                    <label>${attribute.name}</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                    <label>${attribute.name}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
                                                                     <c:choose>
-                                                                        <c:when test="${attribute.selectable eq 'Y'}">
+                                                                        <c:when test="${attribute.uiType eq 'DROPDOWN'}">
                                                                             <select name="${attribute.id}" class="form-control">
                                                                                 <option value="">Select One</option>
                                                                                 <c:forEach items="${attribute.options}" var="option">
                                                                                     <option value="${option.id}" <c:if test="${option.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${option.value}</option>
                                                                                 </c:forEach>
                                                                             </select>
+                                                                        </c:when>
+                                                                        <c:when test="${attribute.uiType eq 'TEXTAREA'}">
+                                                                            <textarea class="form-control" name="${attribute.id}">${product.familyAttributes[attribute.id]}</textarea>
+                                                                        </c:when>
+                                                                        <c:when test="${attribute.uiType eq 'CHECKBOX'}">
+
+                                                                            <br/>${product.familyAttributes[attribute.id]}
+                                                                            <c:forEach items="${attribute.options}" var="option">
+                                                                                <c:set var="propertyName" value="${attribute.id}_${option.id}"/>
+
+                                                                                <label class="fancy-checkbox">
+                                                                                    <input type="checkbox" class="js-checkbox" name="${propertyName}" value="Y" <c:if test="${product.familyAttributes[propertyName] eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <%--<c:choose>
+                                                                                        <c:when test="${product.familyAttributes[propertyName] ne 'Y'}">
+                                                                                            <input type="hidden" name="${propertyName}" disabled="disabled" value="Y" />
+                                                                                        </c:when>
+                                                                                        <c:otherwise>
+                                                                                            <input type="hidden" name="${propertyName}" value="N" />
+                                                                                        </c:otherwise>
+                                                                                    </c:choose>--%>
+                                                                                    <span>${option.value}</span>
+                                                                                </label>
+                                                                            </c:forEach>
                                                                         </c:when>
                                                                         <c:otherwise>
                                                                             <input type="text" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
@@ -321,6 +344,10 @@
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });
+
+        /*$('form').on('click', '.js-checkbox', function() {
+            $(this).parent().find('input').prop('disabled', $(this).prop('checked'));
+        });*/
     });
 </script>
 

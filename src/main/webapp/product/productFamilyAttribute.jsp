@@ -26,6 +26,15 @@
                         <input type="text" name="name" value="${attribute.name}" class="form-control" required="true"/>
                     </div>
                     <div class="form-group">
+                        <label for="uiType">Attribute UI Type</label>
+                        <select class="form-control" id="uiType" name="uiType">
+                            <option value="INPUT_BOX">Input Box</option>
+                            <option value="DROPDOWN">Dropdown</option>
+                            <option value="CHECKBOX">Checkbox</option>
+                            <option value="TEXTAREA">Textarea</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Options</label>
                         <br/>
                         <label class="fancy-checkbox">

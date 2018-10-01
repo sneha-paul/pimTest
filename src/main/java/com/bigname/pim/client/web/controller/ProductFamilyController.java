@@ -170,7 +170,8 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
 
     @RequestMapping(value = "/{productFamilyId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute) {
+    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute, @RequestParam String uiType) {
+        attribute.setUiType(Attribute.Type.get(uiType));
         Map<String, Object> model = new HashMap<>();
         Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
         // TODO - cross field validation to see if one of attributeGroup ID and AttributeGroup name is not empty
