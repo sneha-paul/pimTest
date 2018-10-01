@@ -141,7 +141,7 @@ public class CategoryController extends BaseController<Category, CategoryService
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Category> paginatedResult = categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Category> paginatedResult = categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

@@ -55,7 +55,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
         Optional<Catalog> catalog = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
         catalog.ifPresent(catalog1 -> rootCategoryDAO.findByCatalogId(catalog1.getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId())));
-        return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
+        return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
     public RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2) {
         Optional<Catalog> catalog = get(id, findBy1, false);
         if(catalog.isPresent()) {
-            Optional<Category> rootCategory = categoryService.get(rootCategoryId, findBy2);
+            Optional<Category> rootCategory = categoryService.get(rootCategoryId, findBy2, false);
             if(rootCategory.isPresent()) {
                 Optional<RootCategory> top = rootCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
                 return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));

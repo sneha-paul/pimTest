@@ -31,7 +31,7 @@ public class Pagination  {
      * @return the pageNumber
      */
     public Integer getPageNumber() {
-        return (null == pageNumber) ? 0 : pageNumber;
+        return (null == pageNumber) ? 0 : pageNumber/getPageSize();
     }
 
     /**

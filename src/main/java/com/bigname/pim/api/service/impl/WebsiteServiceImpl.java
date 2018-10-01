@@ -44,7 +44,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
         Optional<Website> website = get(id, findBy, false);
         Set<String> catalogIds = new HashSet<>();
         website.ifPresent(website1 -> websiteCatalogDAO.findByWebsiteId(website1.getId()).forEach(wc -> catalogIds.add(wc.getCatalogId())));
-        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
+        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
     public WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2) {
         Optional<Website> website = get(id, findBy1, false);
         if(website.isPresent()) {
-            Optional<Catalog> catalog = catalogService.get(catalogId, findBy2);
+            Optional<Catalog> catalog = catalogService.get(catalogId, findBy2, false);
             if(catalog.isPresent()) {
                 Optional<WebsiteCatalog> top = websiteCatalogDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
                 return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));

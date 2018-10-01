@@ -52,12 +52,12 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort) {
+    public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         Optional<Category> category = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
         category.ifPresent(category1 -> relatedCategoryDAO.findByCategoryId(category1.getId()).forEach(rc -> categoryIds.add(rc.getSubCategoryId())));
         categoryIds.add(category.get().getId());
-        return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
+        return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     public RelatedCategory addSubCategory(String id, FindBy findBy1, String subCategoryId, FindBy findBy2) {
         Optional<Category> category = get(id, findBy1, false);
         if(category.isPresent()) {
-            Optional<Category> subCategory = get(subCategoryId, findBy2);
+            Optional<Category> subCategory = get(subCategoryId, findBy2, false);
             if(subCategory.isPresent()) {
                 Optional<RelatedCategory> top = relatedCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
                 return relatedCategoryDAO.save(new RelatedCategory(category.get().getId(), subCategory.get().getId(), top.map(EntityAssociation::getSubSequenceNum).orElse(0)));
@@ -120,14 +120,14 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         Optional<Category> category = get(id, findBy, false);
         Set<String> productIds = new HashSet<>();
         category.ifPresent(category1 -> categoryProductDAO.findByCategoryId(category1.getId()).forEach(cp -> productIds.add(cp.getProductId())));
-        return productService.getAllWithExclusions(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort);
+        return productService.getAllWithExclusions(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
     }
 
     @Override
     public CategoryProduct addProduct(String id, FindBy findBy1, String productId, FindBy findBy2) {
         Optional<Category> category = get(id, findBy1, false);
         if(category.isPresent()) {
-            Optional<Product> product = productService.get(productId, findBy2);
+            Optional<Product> product = productService.get(productId, findBy2, false);
             if(product.isPresent()) {
                 Optional<CategoryProduct> top = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
                 return categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));

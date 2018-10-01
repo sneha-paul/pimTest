@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface CategoryService extends  BaseService<Category, CategoryDAO> {
     Page<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
-    Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort);
+    Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     RelatedCategory addSubCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
     Page<CategoryProduct> getCategoryProducts(String websiteId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);

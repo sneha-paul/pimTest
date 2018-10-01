@@ -15,7 +15,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table id="paginatedCatalogsTable" class="table table-hover dataTable table-custom m-b-0">
+                    <table id="paginatedCatalogsTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important;">
                         <thead class="thead-dark">
 
                         </thead>
