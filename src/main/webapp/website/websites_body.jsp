@@ -7,9 +7,7 @@
                 <div class="row p-b-25">
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
-                            <a href="/pim/websites/create">
-                                <button type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Website</span></button>
-                            </a>
+                            <button id="js-create-website" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Website</span></button>
                         </div>
                     </div>
                 </div>
@@ -39,5 +37,15 @@
             ]
         });
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+    });
+    $.addModal({
+        selector: '#js-create-website',
+        url: $.getURL('/pim/websites/create'),
+        name:'create-website',
+        title:'Create Website',
+        buttons: [
+            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('websites');$.closeModal();});}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
     });
 </script>

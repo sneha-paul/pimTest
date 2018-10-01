@@ -59,7 +59,6 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
             website.setActive("N");
             websiteService.create(website);
             model.put("success", true);
-            model.put("path", "/pim/websites");
         }
         return model;
     }
