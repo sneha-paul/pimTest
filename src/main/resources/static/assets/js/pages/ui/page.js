@@ -238,6 +238,8 @@
                 showCancelButton: options.showCancelButton,
                 confirmButtonColor: options.confirmButtonColor,
                 confirmButtonText: options.confirmButtonText,
+                animation: false,
+
 
                 preConfirm: (yes) => {
                     if(yes) {
@@ -274,7 +276,7 @@
             }).then(function(response) {
                 var data = typeof response.value !== 'undefined' ? JSON.parse(response.value) : {};
                 if (data.success) {
-                    swal({title: options.successTitle, text: options.successText, type: options.successType, timer: 3000/*, animation: false*/});
+                    swal({title: options.successTitle, text: options.successText, type: options.successType, timer: 3000, animation: false});
                     callback();
                 }
             }, function(error) {
