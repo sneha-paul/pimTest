@@ -9,7 +9,7 @@
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
-                    <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#digitalAssets">Digital Assets</a></li> //TODO--%>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#digitalAssets">Digital Assets</a></li>
                     <c:forEach var="attributeGroup" items="${product.productFamily.getMasterGroups(\"PRODUCT\")}">
                         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#${attributeGroup.id}">${attributeGroup.name}</a></li>
                     </c:forEach>
@@ -21,7 +21,7 @@
                     <div class="tab-pane show active" id="details">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
-                                <div class="card">
+                                <div class="card" >
                                     <div class="body">
                                         <form method="post" action="/pim/products/${product.productId}" data-method="PUT"
                                               data-success-message='["Successfully updated the product", "Product Updated"]'
@@ -62,6 +62,23 @@
                                                             <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Active</span>
                                                         </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-sm-12">
+                                                    <div class="form-group">
+                                                <fieldset>
+                                                    <legend>Fieldset Title</legend>
+
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <div class="form-group">
+                                                                <label>Product Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                <input type="text" name="productName" value="" class="form-control" required="true"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </fieldset>
                                                     </div>
                                                 </div>
                                                 <c:if test="${not empty product.productFamily}">
@@ -124,12 +141,14 @@
                             </div>
                         </div>
                     </div>
-                    <%--<div class="tab-pane" id="digitalAssets"> <!-- TODO -->
+                    <div class="tab-pane" id="digitalAssets">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
-                                <div class="card">
+                                <div class="card inner overflowhidden">
                                     <div class="body">
-                                        <form method="post" action="/pim/categories/${category.categoryId}" data-method="PUT" data-success-message='["Successfully updated the category", "Category Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                        <fieldset><legend>Section Name</legend></fieldset>
+                                        <hr style="border:0; margin-top: -5px;border-bottom: 1rem; border-top:1px solid rgba(0,0,0,.1)"/>
+                                        <form method="post">
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">
@@ -148,6 +167,110 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="card inner group overflowhidden">
+                                                <div class="body">
+                                                        <fieldset>
+                                                            <legend>Fieldset Title</legend>
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-body">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6 col-sm-12">
+                                                                            <div class="form-group">
+                                                                                <label>Product Name</label><code
+                                                                                    class="highlighter-rouge m-l-10">*</code>
+                                                                                <input type="text"
+                                                                                       name="productName" value=""
+                                                                                       class="form-control"
+                                                                                       required="true"/>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Product Name</label><code
+                                                                                    class="highlighter-rouge m-l-10">*</code>
+                                                                                <input type="text"
+                                                                                       name="productName" value=""
+                                                                                       class="form-control"
+                                                                                       required="true"/>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                                <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label for="metaKeywords">Meta Keywords</label>
+                                                                                <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                            <label>ProductFamily</label>
+
+                                                                            <select class="form-control" name="productFamilyId">
+                                                                                <option value="">Select One</option>
+                                                                            </select>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Status</label>
+                                                                                <br/>
+                                                                                <label class="fancy-checkbox">
+                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <span>Active</span>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Status</label>
+                                                                                <br/>
+                                                                                <label class="fancy-checkbox custom-color-blue">
+                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <span>Active</span>
+                                                                                </label>
+                                                                                <br/>
+                                                                                <label class="fancy-checkbox">
+                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <span>Active</span>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Status</label>
+                                                                                <br/>
+                                                                                <label class="fancy-radio"><input name="gender3" value="male" type="radio" checked=""><span><i></i>Male</span></label>
+                                                                                <label class="fancy-radio"><input name="gender3" value="male" type="radio" checked=""><span><i></i>Female</span></label>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Date</label>
+                                                                                <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
+                                                                                    <input type="text" class="form-control datepicker">
+                                                                                    <div class="input-group-append">
+                                                                                        <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Date Range</label>
+                                                                                <div class="input-daterange input-group" data-provide="datepicker">
+                                                                                    <input type="text" class="input-sm form-control datepicker" name="start">
+                                                                                    <div class="input-group-append">
+                                                                                        <button class="btn btn-secondary" style="border-bottom-right-radius: 0.25rem;border-top-right-radius: 0.25rem;" type="button"><i class="fa fa-calendar"></i></button>
+                                                                                    </div>
+                                                                                    <span class="input-group-addon text-center" style="width: 40px;">to</span>
+                                                                                    <input type="text" class="input-sm form-control datepicker" name="end">
+                                                                                    <div class="input-group-append">
+                                                                                        <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </div>
+                                            </div>
                                             <br>
                                             <input type="hidden" name="group" value="SEO"/>
                                             <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
@@ -157,7 +280,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>--%>
+                    </div>
                     <c:forEach var="attributeGroup" items="${product.productFamily.getMasterGroups(\"PRODUCT\")}">
                         <div class="tab-pane" id="${attributeGroup.id}">
                         <div class="row clearfix m-t-20">
@@ -373,6 +496,7 @@
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });
+        $('.datepicker').datepicker();
 
         /*$('form').on('click', '.js-checkbox', function() {
             $(this).parent().find('input').prop('disabled', $(this).prop('checked'));

@@ -22,6 +22,7 @@
     <%-- VENDOR CSS --%>
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <link rel="stylesheet" href="/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
 
@@ -55,6 +56,37 @@
 
     <style>
         a:focus {outline:0;}
+        .card.inner {
+            border: 1px solid #CCC;
+            background-color: #f4f7f6;
+        }
+        .card.inner-outline {
+            border: 1px solid #CCC;
+        }
+
+        .card.inner.group {
+            border: none;
+            box-shadow: none;
+        }
+
+        .card.inner.group legend {
+            font-size: 1.2rem;
+        }
+        .card.inner.group > div.body {
+            padding-left: 4px;
+        }
+
+        .theme-orange .fancy-radio input[type="radio"]:checked + span i:after {
+            background-color: #fff
+        }
+
+        .theme-orange .fancy-radio input[type="radio"]:checked + span i {
+            background-color: #fff
+        }
+
+        .theme-orange .fancy-radio input[type="radio"]:checked + span i:after {
+            background-color: #f68c1f
+        }
     </style>
 
 </head>
@@ -126,6 +158,7 @@
 
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+<script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 <script src="/assets/vendor/parsleyjs/js/parsley.min.js"></script>
 
