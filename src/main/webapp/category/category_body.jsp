@@ -1,6 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:choose>
-    <c:when test="${mode eq 'DETAILS'}">
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
                 <div class="card">
@@ -189,45 +187,5 @@
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
             });
         </script>
-    </c:when>
-    <c:otherwise>
-        <div class="row clearfix">
-            <div class="col-lg-12 col-md-12">
-                <div class="card">
-                    <div class="header">
-                        <h1>Create Category</h1>
-                    </div>
-                    <div class="body">
-                        <form method="post" action="/pim/categories" data-method="POST"
-                              data-success-message='["Successfully created the category", "Category Created"]'
-                              data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
-                            <div class="row">
-                                <div class="col-md-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label>Category Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                        <input type="text" name="categoryName" class="form-control">
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label>Category ID</label><code class="highlighter-rouge m-l-10">*</code>
-                                        <input type="text" name="categoryId" class="form-control">
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label>Category Description</label>
-                                        <textarea class="form-control" name="description" value="${category.description}" rows="5" cols="30"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <br>
-                            <input type="hidden" name="group" value="CREATE"/>
-                            <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Create</button>
-                            <a href="/pim/categories/"><button type="button" class="btn btn-danger">Cancel</button></a>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </c:otherwise>
-</c:choose>

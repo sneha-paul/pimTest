@@ -49,7 +49,6 @@ public class CategoryController extends BaseController<Category, CategoryService
             category.setActive("N");
             categoryService.create(category);
             model.put("success", true);
-            model.put("path", "/pim/categories");
         }
         return model;
     }
