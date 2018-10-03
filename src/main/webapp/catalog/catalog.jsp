@@ -1,29 +1,41 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
-
-<tiles:insertDefinition name="mainLayout">
-    <tiles:putAttribute name="title" value="PIM - Catalogs"/>
-    <tiles:putListAttribute name="pageStyles">
-        <tiles:addAttribute>/assets/css/c1.css</tiles:addAttribute>
-        <tiles:addAttribute>/assets/css/c2.css</tiles:addAttribute>
-    </tiles:putListAttribute>
-    <tiles:putListAttribute name="pageTopScripts">
-        <tiles:addAttribute>/assets/js/t1.js</tiles:addAttribute>
-        <tiles:addAttribute>/assets/js/t2.js</tiles:addAttribute>
-    </tiles:putListAttribute>
-    <tiles:putAttribute name="body" value="/catalog/catalog_body.jsp"/>
-    <tiles:putListAttribute name="pageBottomScripts">
-        <tiles:addAttribute>/assets/js/f1.js</tiles:addAttribute>
-        <tiles:addAttribute>/assets/js/f2.js</tiles:addAttribute>
-    </tiles:putListAttribute>
-    <%--<tiles:putAttribute name="pageBottomScripts">
-        <script type="javascript" src="/assets/js/f1.js"></script>
-        <script type="javascript" src="/assets/js/f2.js"></script>
-    </tiles:putAttribute>--%>
-    <tiles:putAttribute name="script">
-        <script>
-            $(function() {
-
-            });
-        </script>
-    </tiles:putAttribute>
-</tiles:insertDefinition>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:choose>
+    <c:when test="${mode eq 'DETAILS'}">
+        <tiles:insertDefinition name="mainLayout">
+            <tiles:putAttribute name="title" value="PIM - Catalogs"/>
+            <tiles:putAttribute name="body" value="/catalog/catalog_body.jsp"/>
+        </tiles:insertDefinition>
+    </c:when>
+    <c:otherwise>
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="body">
+                        <form method="post" action="/pim/catalogs" data-method="POST" data-success-message='["Successfully created the website", "Catalog Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="form-group">
+                                        <label>Catalog Name</label>
+                                        <input type="text" name="catalogName" class="form-control" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Catalog ID</label>
+                                        <input type="text" name="catalogId" class="form-control" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Catalog Description</label>
+                                        <textarea name="description" rows="5" cols="30" class="form-control" ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <input type="hidden" name="group" value="CREATE"/>
+                            <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c:otherwise>
+</c:choose>

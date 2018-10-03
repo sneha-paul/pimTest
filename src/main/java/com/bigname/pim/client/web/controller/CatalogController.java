@@ -7,6 +7,7 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
+import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.client.model.Breadcrumbs;
@@ -40,6 +41,8 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         super(catalogService);
         this.catalogService = catalogService;
     }
+
+
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> create( Catalog catalog) {
@@ -48,29 +51,18 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
             catalog.setActive("N");
             catalogService.create(catalog);
             model.put("success", true);
-            model.put("path", "/pim/catalogs");
         }
         return model;
     }
-
-   /* @RequestMapping(method = RequestMethod.POST)
-    public ModelAndView create(@ModelAttribute("catalog") @Valid Catalog catalog, BindingResult result, Model model) {
-        if(result.hasErrors()) {
-            return new ModelAndView("catalog/catalog");
-        }
-        catalog.setActive("N");
-        catalogService.create(catalog);
-        return new ModelAndView("redirect:/pim/catalogs");
-    }*/
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Catalog catalog) {
         Map<String, Object> model = new HashMap<>();
-        //if(isValid(catalog, model, catalog.getGroup().equals("DETAILS") ? Category.DetailsGroup.class : catalog.getGroup().equals("SEO") ? Category.SeoGroup.class : null)) {
+        if(isValid(catalog, model, catalog.getGroup().equals("DETAILS") ? Category.DetailsGroup.class : null)) {
             catalogService.update(id, FindBy.EXTERNAL_ID, catalog);
             model.put("success", true);
-        //}
+        }
         return model;
     }
 

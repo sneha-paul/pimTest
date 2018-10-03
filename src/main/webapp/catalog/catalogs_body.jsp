@@ -5,12 +5,9 @@
 
             <div class="body">
                 <div class="row p-b-25">
-
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
-                            <a href="/pim/catalogs/create">
-                                <button type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Catalog</span></button>
-                            </a>
+                            <button id="js-create-catalog" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Catalog</span></button>
                         </div>
                     </div>
                 </div>
@@ -40,5 +37,15 @@
             ]
         });
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+    });
+    $.addModal({
+        selector: '#js-create-catalog',
+        url: $.getURL('/pim/catalogs/create'),
+        name:'create-catalog',
+        title:'Create Catalog',
+        buttons: [
+            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('catalogs');$.closeModal();});}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
     });
 </script>
