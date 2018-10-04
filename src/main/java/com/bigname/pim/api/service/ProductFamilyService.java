@@ -15,9 +15,11 @@ import java.util.List;
 public interface ProductFamilyService extends BaseService<ProductFamily, ProductFamilyDAO>  {
     Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, String type, int page, int size, Sort sort);
 
-    List<AttributeGroup> getAttributeGroups(String productFamilyId, FindBy findBy, String type, Sort sort);
+//    List<AttributeGroup> getAttributeGroups(String productFamilyId, FindBy findBy, String type, Sort sort);
 
-    List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String type, Sort sort);
+    List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort);
+
+    List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort);
 
     Page<Feature> getFamilyFeatures(String productFamilyId, FindBy findBy, String type, int page, int size, Sort sort);
 

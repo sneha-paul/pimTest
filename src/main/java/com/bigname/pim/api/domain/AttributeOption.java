@@ -86,7 +86,6 @@ public class AttributeOption extends ValidatableEntity {
     public void setSubSequenceNum(int subSequenceNum) {
         this.subSequenceNum = subSequenceNum;
     }
-
     @Override
     public void orchestrate() {
         setActive(getActive());

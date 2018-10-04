@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by manu on 9/4/18.
@@ -64,29 +65,42 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
         return paginate(attributes, page, size);
     }
 
-    @Override
+    /*@Override
     public List<AttributeGroup> getAttributeGroups(String productFamilyId, FindBy findBy, String type, Sort sort) {
         if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }
         List<AttributeGroup> attributeGroups = new ArrayList<>();
-        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        *//*Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
         if(productFamily.isPresent()) {
             Map<String, AttributeGroup> attributeGroups1 = "VARIANTS".equals(type) ? productFamily.get().getProductVariantFamilyAttributes() : productFamily.get().getProductFamilyAttributes();
             attributeGroups1.forEach(((s, attributeGroup) -> attributeGroups.add(attributeGroup)));
         }
-        if(ValidationUtil.isEmpty(attributeGroups)) {
+        if(!attributeGroups.contains(AttributeGroup.getDefaultGroup())) {
             attributeGroups.add(AttributeGroup.getDefaultGroup());
         }
+        if(!attributeGroups.contains(AttributeGroup.getFeatureGroup())) {
+            attributeGroups.add(AttributeGroup.getFeatureGroup());
+        }*//*
         //TODO - Sorting
         return attributeGroups;
+    }*/
+
+    @Override
+    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort) {
+        List<Pair<String, String>> idNamePairs = new ArrayList<>();
+        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(entityType.equals("VARIANT") ? productFamily1.getProductVariantFamilyAttributes() : productFamily1.getProductFamilyAttributes(), "LEAF_ONLY", true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
+//        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
+        return idNamePairs;
     }
 
     @Override
-    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String type, Sort sort) {
+    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        getAttributeGroups(productFamilyId, findBy, type, sort).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getId(), attributeGroup.getName())));
-        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
+        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(entityType.equals("VARIANT") ? productFamily1.getProductVariantFamilyAttributes() : productFamily1.getProductFamilyAttributes(), "MASTER_ONLY", true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
+//        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
 
@@ -119,7 +133,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
         List<AttributeOption> options = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
         if(productFamily.isPresent()) {
-            options = new ArrayList<>(productFamily.get().getAttribute(attributeId, type).getOptions());
+//            options = new ArrayList<>(productFamily.get().getAttribute(attributeId, type).getOptions());
             //TODO - sort this based on the requested sort
         }
         /*if(productFamily.isPresent()) {

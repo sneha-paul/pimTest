@@ -1,6 +1,5 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ConversionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
@@ -8,40 +7,140 @@ import javax.validation.constraints.NotEmpty;
 import java.util.*;
 
 /**
- * Created by manu on 9/4/18.
+ * @author Manu V NarayanaPrasad (manu@blacwood.com)
+ * @since 1.0
  */
 public class Attribute extends ValidatableEntity {
+
     @NotEmpty(message = "Attribute name cannot be empty")
     private String name;
 
-    @NotEmpty(message = "Attribute type cannot be empty")
-    private String type;
+    @NotEmpty(message = "Attribute entity type cannot be empty")
+    private String entityType;
 
-    private Type uiType = Type.INPUT_BOX;
+    private String label;
+    private UIType _uiType = UIType.INPUT_BOX;
     private String dataType = "string";  //Initial version only supports String type
     private String id;
     private String fullId;
+    private String regEx;
     private String required = "N";
     private String selectable = "N";
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
 
-   /* @Transient @JsonIgnore
-    private String attributeGroupId;
+    @Transient @JsonIgnore
+    private String uiType = UIType.INPUT_BOX.name();
 
     @Transient
-    private String attributeGroupName;*/
-
-    @Transient @JsonIgnore
+    @JsonIgnore
     private AttributeGroup attributeGroup;
 
-    private Set<AttributeOption> options = new TreeSet<>();
+    private Map<String, AttributeOption> options = new LinkedHashMap<>();
 
     public Attribute() {}
 
-    public Attribute(String type) {
-        this.type = type;
+    public Attribute(Attribute attributeDTO, Map<String, AttributeGroup> familyGroups) {
+        this(attributeDTO.getName()); orchestrate();
+        this.setRequired(attributeDTO.getRequired());
+//        this.setRegEx(attributeDTO.getRegEx()); TODO - uncomment to enable validation
+//        this.setDataType(attributeDTO.getDataType()); TODO - uncomment to enable multiple data type
+        this._uiType = attributeDTO.getUiType();
+        AttributeGroup attributeGroup, attributeGroupDTO = attributeDTO.getAttributeGroup();
+        if(isNotEmpty(attributeGroupDTO)) {
+            //Available parameters - attribute.name, attribute.attributeGroup.id, attribute.attributeGroup.name, attribute.attributeGroup.masterGroup, attribute.attributeGroup.parentGroup.id
+            //attribute.name won't be empty in all the below scenarios
+            //Scenario 1 - attribute.attributeGroup.id is not empty
+            if(isNotEmpty(attributeGroupDTO.getFullId())) { //Existing attributeGroup
+                //Find the leaf group corresponding to the given id
+                attributeGroup = AttributeGroup.getLeafGroup(attributeGroupDTO.getFullId(), familyGroups);
+                if(isEmpty(attributeGroup)) { // Can't find the leaf group for the given id, so defaulting it to default group
+                    attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
+                }
+            } else { //Creating a new attributeGroup, Scenario 2 - attribute.attributeGroup.name is not empty
+                if(isNotEmpty(booleanValue(attributeGroupDTO.getMasterGroup()))) { // Scenario 3 - attribute.attributeGroup.masterGroup is 'Y'. Creating a new master AttributeGroup(can ignore attribute.attributeGroup.parentGroup.id, if present)
+                    attributeGroup = AttributeGroup.createLeafGroup(attributeGroupDTO.getName(), null);
+                    if(isEmpty(attributeGroup)) { //unable to create the new master group, so defaulting to default group
+                        attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
+                    }
+                } else { //Creating a new non-master attributeGroup
+                    if (isEmpty(attributeGroupDTO.getParentGroup().getId())) { // Creating a new level3 group under the default level2 group
+                        attributeGroup = AttributeGroup.createLeafGroup(attributeDTO.getName(), null, AttributeGroup.createDefaultMasterGroup(booleanValue(getUiType().isSelectable())));
+                    } else { // Scenario 4 - attribute.attributeGroup.parentGroup.Id is not empty. Creating a new group under the default level2 group of the selected parent master group
+                        AttributeGroup parentMasterGroup = AttributeGroup.getMasterGroup(attributeGroupDTO.getParentGroup().getFullId(), familyGroups);
+                        if(isEmpty(parentMasterGroup)) {
+                            parentMasterGroup = AttributeGroup.createDefaultMasterGroup(booleanValue(getUiType().isSelectable()));
+                        }
+                        attributeGroup = AttributeGroup.createLeafGroup(attributeGroupDTO.getName(), null, parentMasterGroup);
+                    }
+                }
+            }
+        } else { /* This is the case when both attribute.attributeGroup.id and attribute.attributeGroup.name are empty, which won't happen if validation rules are correct */
+            attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
+        }
+
+        this.attributeGroup = attributeGroup;
+    }
+
+
+
+    public Attribute(String name) {
+        if(isEmpty(name)) {
+            throw new IllegalArgumentException("The name constructor argument for Attribute() cannot be empty");
+        }
+        this.name = name;
+        this.label = name;
+
+    }
+
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLabel() {
+        if(isEmpty(label)) {
+            label = getName();
+        }
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public UIType getUiType() {
+        if(isNotEmpty(uiType)) {
+            _uiType = UIType.get(uiType);
+        }
+        return _uiType;
+    }
+
+    public void setUiType(UIType uiType) {
+        this._uiType = uiType;
+        setSelectable(uiType.isSelectable());
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public String getId() {
@@ -59,45 +158,16 @@ public class Attribute extends ValidatableEntity {
         return fullId;
     }
 
-    public void setFullId() {
-        this.fullId = this.attributeGroup.getFullId() + "|" + this.getId();
-    }
-
-    public void setFullId(String fullId) {
+    private void setFullId(String fullId) {
         this.fullId = fullId;
     }
 
-    public String getName() {
-        return name;
+    public String getRegEx() {
+        return regEx;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Type getUiType() {
-        return uiType;
-    }
-
-    public void setUiType(Type uiType) {
-        this.uiType = uiType;
-        setSelectable(uiType.isSelectable());
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    public void setRegEx(String regEx) {
+        this.regEx = regEx;
     }
 
     public String getRequired() {
@@ -109,6 +179,7 @@ public class Attribute extends ValidatableEntity {
     }
 
     public String getSelectable() {
+        setSelectable(_uiType.isSelectable());
         return selectable;
     }
 
@@ -144,27 +215,16 @@ public class Attribute extends ValidatableEntity {
         return attributeGroup;
     }
 
-    public Attribute setAttributeGroup(AttributeGroup attributeGroup) {
-        if(isEmpty(attributeGroup)) {
-            attributeGroup = AttributeGroup.getDefaultGroup();
-        }
-        attributeGroup.addAttributes(this);
+    public void setAttributeGroup(AttributeGroup attributeGroup) {
         this.attributeGroup = attributeGroup;
-        this.setFullId();
-        return this;
     }
 
-    public Set<AttributeOption> getOptions() {
+    public Map<String, AttributeOption> getOptions() {
         return options;
     }
 
-    public void setOptions(Set<AttributeOption> options) {
+    public void setOptions(Map<String, AttributeOption> options) {
         this.options = options;
-    }
-
-    public Set<AttributeOption> addOptions(AttributeOption... options) {
-        ConversionUtil.toList(options).forEach(option -> getOptions().add(option));
-        return getOptions();
     }
 
     @Override
@@ -190,26 +250,11 @@ public class Attribute extends ValidatableEntity {
         return map;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Attribute attribute = (Attribute) o;
-
-        return id.equals(attribute.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    public enum Type {
-        INPUT_BOX("Input Box", "N"), DROPDOWN("Dropdown", "Y"), CHECKBOX("Checkbox", "Y"), TEXTAREA("Textarea", "N");
+    public enum UIType {
+        INPUT_BOX("Input Box", "N"), DROPDOWN("Dropdown", "Y"), CHECKBOX("Checkbox", "Y"), RADIO_BUTTON("Radio Button", "Y"), TEXTAREA("Textarea", "N"), DATE_PICKER("Date Picker", "N");
         String label = "";
         String selectable = "N";
-        Type(String label, String selectable) {
+        UIType(String label, String selectable) {
             this.label = label;
             this.selectable = selectable;
         }
@@ -222,13 +267,13 @@ public class Attribute extends ValidatableEntity {
             return selectable;
         }
 
-        public static Type get(String value) {
-            for (Type type : values()) {
+        public static UIType get(String value) {
+            for (UIType type : values()) {
                 if(type.name().equals(value)) {
                     return type;
                 }
             }
-            return Type.INPUT_BOX;
+            return UIType.INPUT_BOX;
 
         }
     }

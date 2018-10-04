@@ -92,6 +92,29 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return new ModelAndView("product/productFamily", model);
     }
 
+    @RequestMapping("/{id}/{entityType}/attribute")
+    public ModelAndView attributeDetails(@PathVariable(value = "id") String id, @PathVariable(value = "entityType") String type) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("attribute", new Attribute());
+        model.put("attributeGroups", productFamilyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, type, null));
+        model.put("parentAttributeGroups", productFamilyService.getParentAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, type, null));
+        return new ModelAndView("product/productFamilyAttribute", model);
+    }
+
+    @RequestMapping(value = "/{productFamilyId}/attribute", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
+        // TODO - cross field validation to see if one of attributeGroup ID and AttributeGroup name is not empty
+        if(productFamily.isPresent() && isValid(attribute, model)) {
+            productFamily.get().addAttribute(attribute);
+            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
+            model.put("success", true);
+        }
+        return model;
+    }
+
     @RequestMapping("/{id}/{type}/attributes")
     @ResponseBody
     public Result<Map<String, String>> getFamilyAttributes(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, HttpServletRequest request) {
@@ -134,14 +157,6 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return result;
     }
 
-    @RequestMapping("/{id}/{type}/attribute")
-    public ModelAndView attributeDetails(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("attribute", new Attribute(type));
-        model.put("attributeGroups", productFamilyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, type, null));
-        return new ModelAndView("product/productFamilyAttribute", model);
-    }
-
     @RequestMapping("/{productFamilyId}/{type}/attributes/{attributeId}/options")
     public ModelAndView attributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId,
                                          @PathVariable(value = "type") String type,
@@ -163,21 +178,6 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         if(productFamily.isPresent() && isValid(attributeOption, model)) {
             productFamily.get().addAttributeOption(attributeOption, type);
             productFamilyService.update(productFamilyId, FindBy.EXTERNAL_ID, productFamily.get());
-            model.put("success", true);
-        }
-        return model;
-    }
-
-    @RequestMapping(value = "/{productFamilyId}/attribute", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute, @RequestParam String uiType) {
-        attribute.setUiType(Attribute.Type.get(uiType));
-        Map<String, Object> model = new HashMap<>();
-        Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
-        // TODO - cross field validation to see if one of attributeGroup ID and AttributeGroup name is not empty
-        if(productFamily.isPresent() && isValid(attribute, model)) {
-            productFamily.get().addAttribute(attribute);
-            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
             model.put("success", true);
         }
         return model;

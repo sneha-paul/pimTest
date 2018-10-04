@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.Transient;
 import javax.validation.ConstraintViolation;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +35,11 @@ abstract public class ValidatableEntity implements Serializable {
 
     public void orchestrate() {}
 
+    public <T extends ValidatableEntity> T getOrchestratedInstance(T t) {
+        t.orchestrate();
+        return t;
+    }
+
     public <E> Map<String, Pair<String, Object>> getValidationErrors(Set<ConstraintViolation<E>> violations) {
        Map<String, Pair<String, Object>> errors = new LinkedHashMap<>();
         if(violations.size() > 0) {
@@ -45,20 +52,44 @@ abstract public class ValidatableEntity implements Serializable {
         return errors;
     }
 
-    static boolean isEmpty(Object object) {
+    static boolean isEmpty(Object... objects) {
+        if(objects == null) {
+            return true;
+        } else if(objects.length == 1) {
+            return ValidationUtil.isEmpty(objects[0]);
+        }
+        for(Object obj : ConversionUtil.toList(objects)) {
+            if(ValidationUtil.isEmpty(obj)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*static boolean isEmpty(Object object) {
         return ValidationUtil.isEmpty(object);
+    }*/
+
+    static boolean isNotEmpty(Object... objects) {
+        return !isEmpty(objects);
     }
 
-    static boolean isNotEmpty(Object object) {
-        return ValidationUtil.isNotEmpty(object);
+    static boolean isNull(Object... objects) {
+        if(objects == null) {
+            return true;
+        } else if(objects.length == 1) {
+            return ValidationUtil.isNull(objects[0]);
+        }
+        for(Object obj : ConversionUtil.toList(objects)) {
+            if(ValidationUtil.isNull(obj)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    static boolean isNull(Object object) {
-        return ValidationUtil.isNull(object);
-    }
-
-    static boolean isNotNull(Object object) {
-        return ValidationUtil.isNotNull(object);
+    static boolean isNotNull(Object... objects) {
+        return !isNull(objects);
     }
 
     static String toId(String value) {
@@ -78,6 +109,14 @@ abstract public class ValidatableEntity implements Serializable {
             default:
                 return value;
         }
+    }
+
+    static List<String> getPipedValues(String value) {
+        return StringUtil.splitPipeDelimitedAsList(value);
+    }
+
+    static boolean booleanValue(String value) {
+        return "Y".equals(value);
     }
 
     public interface CreateGroup {}

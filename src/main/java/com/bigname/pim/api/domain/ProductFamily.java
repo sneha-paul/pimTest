@@ -75,12 +75,12 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.productVariantFamilyAttributes = productVariantFamilyAttributes;
     }
 
-    public Attribute setAttributeGroup(Attribute attribute) {
+    /*public Attribute setAttributeGroup(Attribute attribute) {
         attribute.setAttributeGroup(getAttributeGroup(attribute));
         return attribute;
-    }
+    }*/
 
-    public AttributeGroup getAttributeGroup(Attribute attribute) {
+    /*public AttributeGroup getAttributeGroup(Attribute attribute) {
         String type = attribute.getType();
         String groupName = attribute.getAttributeGroup().getName();
         String groupId = attribute.getAttributeGroup().getId();
@@ -91,13 +91,25 @@ public class ProductFamily extends Entity<ProductFamily> {
             if(isNotEmpty(groupName)) {
                 attributeGroup = new AttributeGroup(groupName, attribute.getAttributeGroup().getMasterGroup());
             } else {
-                attributeGroup = AttributeGroup.getDefaultGroup();
+                attributeGroup = AttributeGroup.FEATURE_GROUP_ID.equals(groupId) ? AttributeGroup.getFeatureGroup() : AttributeGroup.getDefaultGroup();
             }
         }
         return attributeGroup;
+    }*/
+
+    public ProductFamily addAttribute(Attribute attributeDTO) {
+        Map<String, AttributeGroup> familyAttributeGroups = attributeDTO.getEntityType().equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
+        Attribute attribute = new Attribute(attributeDTO, familyAttributeGroups);
+        boolean added = AttributeGroup.addAttribute(attribute, familyAttributeGroups);
+        if(!added) {
+            //Adding the attribute failed
+        }
+        return this;
     }
 
-    public ProductFamily addAttribute(Attribute attribute) {
+
+
+    /*public ProductFamily addAttribute(Attribute attribute) {
         setAttributeGroup(attribute);
         AttributeGroup attributeGroup = attribute.getAttributeGroup();
         Map<String, AttributeGroup> familyAttributes = attribute.getType().equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
@@ -107,14 +119,14 @@ public class ProductFamily extends Entity<ProductFamily> {
             familyAttributes.put(attributeGroup.getId(), attributeGroup);
         }
         return this;
-    }
+    }*/
 
     public ProductFamily addAttributeOption(AttributeOption attributeOption, String type) {
-        getAttribute(attributeOption.getAttributeId(), type).addOptions(attributeOption);
+//        getAttribute(attributeOption.getAttributeId(), type).addOptions(attributeOption);
         return this;
     }
 
-    public Attribute getAttribute(String attributeId, String type) {
+    /*public Attribute getAttribute(String attributeId, String type) {
         String[] ids = StringUtil.split(attributeId, "\\|");
         AttributeGroup attributeGroup = AttributeGroup.getDefaultGroup();
         for(int i = 0; i < ids.length - 1; i ++) {
@@ -126,7 +138,7 @@ public class ProductFamily extends Entity<ProductFamily> {
         }
         return attributeGroup.getAttributes().get(ids[ids.length - 1]);
 
-    }
+    }*/
 
     public List<Feature> getProductFamilyFeatures() {
         return productFamilyFeatures;

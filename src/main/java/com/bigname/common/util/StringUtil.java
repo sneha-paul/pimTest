@@ -1,6 +1,8 @@
 package com.bigname.common.util;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,5 +31,8 @@ public class StringUtil {
 
     public static final String[] splitPipeDelimited(String value) {
         return split(value, "\\|");
+    }
+    public static final List<String> splitPipeDelimitedAsList(String value) {
+        return Arrays.asList(split(value, "\\|"));
     }
 }
