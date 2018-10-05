@@ -31,7 +31,7 @@ public class Attribute extends ValidatableEntity {
     private int subSequenceNum;
 
     @Transient @JsonIgnore
-    private String uiType = UIType.INPUT_BOX.name();
+    private String uiType;
 
     @Transient
     @JsonIgnore
@@ -42,8 +42,11 @@ public class Attribute extends ValidatableEntity {
     public Attribute() {}
 
     public Attribute(Attribute attributeDTO, Map<String, AttributeGroup> familyGroups) {
-        this(attributeDTO.getName()); orchestrate();
+        this(attributeDTO.getName());
         this.setRequired(attributeDTO.getRequired());
+        orchestrate();
+        AttributeGroup.tune(familyGroups, null);
+
 //        this.setRegEx(attributeDTO.getRegEx()); TODO - uncomment to enable validation
 //        this.setDataType(attributeDTO.getDataType()); TODO - uncomment to enable multiple data type
         this._uiType = attributeDTO.getUiType();
@@ -52,14 +55,14 @@ public class Attribute extends ValidatableEntity {
             //Available parameters - attribute.name, attribute.attributeGroup.id, attribute.attributeGroup.name, attribute.attributeGroup.masterGroup, attribute.attributeGroup.parentGroup.id
             //attribute.name won't be empty in all the below scenarios
             //Scenario 1 - attribute.attributeGroup.id is not empty
-            if(isNotEmpty(attributeGroupDTO.getFullId())) { //Existing attributeGroup
+            if(isEmpty(attributeGroupDTO.getName()) && isNotEmpty(attributeGroupDTO.getFullId())) { //Existing attributeGroup
                 //Find the leaf group corresponding to the given id
                 attributeGroup = AttributeGroup.getLeafGroup(attributeGroupDTO.getFullId(), familyGroups);
                 if(isEmpty(attributeGroup)) { // Can't find the leaf group for the given id, so defaulting it to default group
                     attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
                 }
             } else { //Creating a new attributeGroup, Scenario 2 - attribute.attributeGroup.name is not empty
-                if(isNotEmpty(booleanValue(attributeGroupDTO.getMasterGroup()))) { // Scenario 3 - attribute.attributeGroup.masterGroup is 'Y'. Creating a new master AttributeGroup(can ignore attribute.attributeGroup.parentGroup.id, if present)
+                if(booleanValue(attributeGroupDTO.getMasterGroup())) { // Scenario 3 - attribute.attributeGroup.masterGroup is 'Y'. Creating a new master AttributeGroup(can ignore attribute.attributeGroup.parentGroup.id, if present)
                     attributeGroup = AttributeGroup.createLeafGroup(attributeGroupDTO.getName(), null);
                     if(isEmpty(attributeGroup)) { //unable to create the new master group, so defaulting to default group
                         attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
@@ -81,6 +84,9 @@ public class Attribute extends ValidatableEntity {
         }
 
         this.attributeGroup = attributeGroup;
+        if(!this.attributeGroup.getAttributes().containsKey(this.getId())) {
+            this.attributeGroup.getAttributes().put(this.getId(), this);
+        }
     }
 
 

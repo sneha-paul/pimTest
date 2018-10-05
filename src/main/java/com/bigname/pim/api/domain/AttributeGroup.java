@@ -43,8 +43,6 @@ public class AttributeGroup extends ValidatableEntity {
 
     private int subSequenceNum;
 
-    @Transient
-    @JsonIgnore
     private String masterGroup = "N";
 
     @Transient
@@ -57,9 +55,10 @@ public class AttributeGroup extends ValidatableEntity {
 
     public AttributeGroup() {}
 
-    public AttributeGroup(String name, String label) {
+    public AttributeGroup(String name, String label, boolean masterGroup) {
         this.name = name;
         this.label = isNotEmpty(label) ? label : name;
+        this.setMasterGroup(masterGroup ? "Y" : "N");
         if(DEFAULT_GROUP.equals(this.name)) {
             setDefaultGroup("Y");
         }
@@ -67,7 +66,7 @@ public class AttributeGroup extends ValidatableEntity {
     }
 
     public AttributeGroup(String name, String label, AttributeGroup parentGroup) {
-        this(name, label);
+        this(name, label, false);
         this.parentGroup = parentGroup;
         this.parentGroup.getChildGroups().put(this.getId(), this);
         orchestrate();
@@ -163,6 +162,9 @@ public class AttributeGroup extends ValidatableEntity {
         this.parentGroup = parentGroup;
         if(!parentGroup.isEmpty()) {
             setFullId(getFullId(this));
+            if(isNotEmpty(this.getChildGroups())) {
+                this.getChildGroups().forEach((k, c) -> c.setFullId(c.getFullId(c)));
+            }
         }
         return this;
     }
@@ -244,12 +246,25 @@ public class AttributeGroup extends ValidatableEntity {
     private static AttributeGroup getLeafGroup(List<String> groupIds, Map<String, AttributeGroup> groups) {
         if(isNotEmpty(groupIds, groupIds.get(0)) && groups.containsKey(groupIds.get(0))) {
             if(groupIds.size() > 1) {
-                return getLeafGroup(groupIds.subList(1, groupIds.size() - 1), groups.get(groupIds.get(0)).getChildGroups());
+                AttributeGroup child = getLeafGroup(groupIds.subList(1, groupIds.size()), groups.get(groupIds.get(0)).getChildGroups());
+                AttributeGroup parent = groups.get(groupIds.get(0));
+                setParent(child, parent);
+                return child;
             } else {
                 return groups.get(groupIds.get(0));
             }
         } else {
             return null;
+        }
+    }
+
+    private static void setParent(AttributeGroup child, AttributeGroup parent) {
+        if(!booleanValue(child.getMasterGroup())) {
+            if (isEmpty(child.getParentGroup())) {
+                child.setParentGroup(parent);
+            } else {
+                setParent(child.getParentGroup(), parent);
+            }
         }
     }
 
@@ -276,8 +291,8 @@ public class AttributeGroup extends ValidatableEntity {
             if(isNotEmpty(familyMasterGroup)) {
                 AttributeGroup attributeLevel2Group = attributeMasterGroup.getChildGroups().get(DEFAULT_GROUP_ID);
                 AttributeGroup familyLevel2Group = familyMasterGroup.getChildGroups().get(DEFAULT_GROUP_ID);
-                if(isNotEmpty(familyLevel2Group, attributeLevel2Group)) {
-                    AttributeGroup attributeLeafGroup = getLeafGroup(attribute.getFullId(), familyAttributeGroups);
+                if(isNotEmpty(familyLevel2Group, attributeLevel2Group, attribute.getAttributeGroup())) {
+                    AttributeGroup attributeLeafGroup = getLeafGroup(attribute.getAttributeGroup().getFullId(), familyAttributeGroups);
                     if(isNotEmpty(attributeLeafGroup)) {
                         AttributeGroup familyLeafGroup = familyLevel2Group.getChildGroups().get(attributeLeafGroup.getId());
                         if(isEmpty(familyLeafGroup)) {
@@ -297,11 +312,11 @@ public class AttributeGroup extends ValidatableEntity {
     }
 
     public static AttributeGroup getDetailsMasterGroup(String label) {
-        return new AttributeGroup(DETAILS_GROUP, isEmpty(label) ? "Details" : label);
+        return new AttributeGroup(DETAILS_GROUP, isEmpty(label) ? "Details" : label, true);
     }
 
     public static AttributeGroup getFeaturesMasterGroup(String label) {
-        return new AttributeGroup(FEATURES_GROUP, isEmpty(label) ? "Features" : label);
+        return new AttributeGroup(FEATURES_GROUP, isEmpty(label) ? "Features" : label, true);
     }
 
     public static AttributeGroup getDefaultGroup(String name, String label, AttributeGroup parentGroup) {
@@ -337,12 +352,12 @@ public class AttributeGroup extends ValidatableEntity {
     }
 
     public static AttributeGroup createLeafGroup(String name, String label) {
-        return new AttributeGroup(AttributeGroup.DEFAULT_GROUP, label, new AttributeGroup(AttributeGroup.DEFAULT_GROUP, "Default Group(L2)",new AttributeGroup(name, label)));
+        return new AttributeGroup(AttributeGroup.DEFAULT_GROUP, isEmpty(label) ? name : label, new AttributeGroup(AttributeGroup.DEFAULT_GROUP, "Default Group(L2)",new AttributeGroup(name, label, true)));
     }
 
     public static AttributeGroup createLeafGroup(String name, String label, AttributeGroup masterGroup) {
         if(isNotEmpty(masterGroup, masterGroup.getChildGroups(), masterGroup.getChildGroups().get(DEFAULT_GROUP_ID))) {
-            return new AttributeGroup(name, label, masterGroup.getChildGroups().get(DEFAULT_GROUP_ID)).getParentGroup().getParentGroup();
+            return new AttributeGroup(name, label, masterGroup.getChildGroups().get(DEFAULT_GROUP_ID));
         } else {
             return null;
         }
@@ -424,5 +439,15 @@ public class AttributeGroup extends ValidatableEntity {
                 });
         }
         return attributeGroups;
+    }
+
+    public static void tune(Map<String, AttributeGroup> attributeGroups, AttributeGroup parent) {
+
+        attributeGroups.forEach((k, attributeGroup) -> {
+            if(isNotEmpty(parent)) {
+                attributeGroup.setParentGroup(parent);
+            }
+            tune(attributeGroup.getChildGroups(), attributeGroup);
+        });
     }
 }
