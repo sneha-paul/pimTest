@@ -234,6 +234,7 @@ public class Attribute extends ValidatableEntity {
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("id", getId());
+        map.put("fullId", getAttributeGroup().getFullId() + '|' + getId());
         map.put("uiType", getUiType().name());
         map.put("dataType", getDataType());
         map.put("name", getName());

@@ -101,9 +101,7 @@ public class ProductFamily extends Entity<ProductFamily> {
         Map<String, AttributeGroup> familyAttributeGroups = attributeDTO.getEntityType().equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
         Attribute attribute = new Attribute(attributeDTO, familyAttributeGroups);
         boolean added = AttributeGroup.addAttribute(attribute, familyAttributeGroups);
-        if(!added) {
-            //Adding the attribute failed
-        }
+        if(!added) { /*Adding the attribute failed */ }
         return this;
     }
 
@@ -121,8 +119,11 @@ public class ProductFamily extends Entity<ProductFamily> {
         return this;
     }*/
 
-    public ProductFamily addAttributeOption(AttributeOption attributeOption, String type) {
-//        getAttribute(attributeOption.getAttributeId(), type).addOptions(attributeOption);
+    public ProductFamily addAttributeOption(AttributeOption attributeOptionDTO, String entityType) {
+        String attributeId = attributeOptionDTO.getAttributeId();
+        AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), "VARIANT".equals(entityType) ? getProductVariantFamilyAttributes() : getProductFamilyAttributes())
+                .getAttributes()
+                .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
         return this;
     }
 

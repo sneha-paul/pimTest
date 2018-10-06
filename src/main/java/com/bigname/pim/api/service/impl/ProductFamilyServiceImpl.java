@@ -109,31 +109,19 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     }
 
     @Override
-    public Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String type, String attributeId, int page, int size, Sort sort) {
-        String[] attributeFullId = StringUtil.split(attributeId, "\\|");
-
+    public Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String entityType, String attributeId, int page, int size, Sort sort) {
          /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
-        Map<String, AttributeGroup> attributeGroups = new HashMap<>();
         List<AttributeOption> options = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
         if(productFamily.isPresent()) {
-//            options = new ArrayList<>(productFamily.get().getAttribute(attributeId, type).getOptions());
+            options = AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), "VARIANT".equals(entityType) ? productFamily.get().getProductVariantFamilyAttributes() : productFamily.get().getProductFamilyAttributes())
+                    .getAttributes()
+                    .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
+                    .getOptions().entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
             //TODO - sort this based on the requested sort
         }
-        /*if(productFamily.isPresent()) {
-            if(type.equals("PRODUCT")) {
-                attributeGroups = productFamily.get().getProductFamilyAttributes();
-            } else if(type.equals("VARIANT")) {
-                attributeGroups = productFamily.get().getProductVariantFamilyAttributes();
-            }
-            if(attributeGroups.containsKey(attributeGroupId) && attributeGroups.get(attributeGroupId).getAttributes().containsKey(attributeKey)) {
-                options = new ArrayList<>(attributeGroups.get(attributeGroupId).getAttributes().get(attributeKey) .getOptions());
-            }
-
-//          TODO - sort this based on the requested sort
-        }*/
         return paginate(options, page, size);
     }
 }

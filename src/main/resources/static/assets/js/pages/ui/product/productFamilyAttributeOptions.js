@@ -4,7 +4,7 @@ $(function(){
         selector: '#paginatedAttributeOptionsTable',
         name: 'productAttributeOptions',
         type: 'TYPE_2',
-        url: $.getURL('/pim/productFamilies/{productFamilyId}/{type}/attributes/{attributeId}/options/list'),
+        url: $.getURL('/pim/productFamilies/{productFamilyId}/{entityType}/attributes/{attributeId}/options/list'),
         columns: [
             { data: 'value', name : 'value' , title : 'Value'},
             { data: 'id', name : 'id', title : 'ID' },

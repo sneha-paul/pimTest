@@ -136,9 +136,9 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return result;
     }
 
-    @RequestMapping("/{productFamilyId}/{type}/attributes/{attributeId}/options/list")
+    @RequestMapping("/{productFamilyId}/{entityType}/attributes/{attributeId}/options/list")
     @ResponseBody
-    public Result<Map<String, String>> getFamilyAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, @PathVariable(value = "type") String type, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
+    public Result<Map<String, String>> getFamilyAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, @PathVariable(value = "entityType") String entityType, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
 
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
@@ -149,7 +149,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<AttributeOption> paginatedResult = productFamilyService.getFamilyAttributeOptions(productFamilyId, FindBy.EXTERNAL_ID, type, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<AttributeOption> paginatedResult = productFamilyService.getFamilyAttributeOptions(productFamilyId, FindBy.EXTERNAL_ID, entityType, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -157,82 +157,28 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return result;
     }
 
-    @RequestMapping("/{productFamilyId}/{type}/attributes/{attributeId}/options")
+    @RequestMapping("/{productFamilyId}/{entityType}/attributes/{attributeId}/options")
     public ModelAndView attributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId,
-                                         @PathVariable(value = "type") String type,
+                                         @PathVariable(value = "entityType") String entityType,
                                          @PathVariable(value = "attributeId") String attributeId) {
         Map<String, Object> model = new HashMap<>();
+//        model.put("productFamilyId", productFamilyId);
         model.put("attributeId", attributeId);
-        model.put("type", type);
+        model.put("type", entityType);
         return new ModelAndView("product/productFamilyAttributeOptions", model);
     }
 
-    @RequestMapping(value = "/{productFamilyId}/{type}/attributes/{attributeId}/options", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{productFamilyId}/{entityType}/attributes/{attributeId}/options", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> saveAttributeOptions(
                                          @PathVariable(value = "productFamilyId") String productFamilyId,
-                                         @PathVariable(value = "type") String type,
+                                         @PathVariable(value = "entityType") String entityType,
                                          AttributeOption attributeOption) {
         Map<String, Object> model = new HashMap<>();
         Optional<ProductFamily> productFamily = productFamilyService.get(productFamilyId, FindBy.EXTERNAL_ID, false);
         if(productFamily.isPresent() && isValid(attributeOption, model)) {
-            productFamily.get().addAttributeOption(attributeOption, type);
+            productFamily.get().addAttributeOption(attributeOption, entityType);
             productFamilyService.update(productFamilyId, FindBy.EXTERNAL_ID, productFamily.get());
-            model.put("success", true);
-        }
-        return model;
-    }
-
-    @RequestMapping("/{id}/{type}/features")
-    @ResponseBody
-    public Result<Map<String, String>> getFamilyFeatures(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, HttpServletRequest request) {
-
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Feature> paginatedResult = productFamilyService.getFamilyFeatures(id, FindBy.EXTERNAL_ID, type, pagination.getPageNumber(), pagination.getPageSize(), sort);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
-    }
-
-    @RequestMapping("/{id}/{type}/feature")
-    public ModelAndView featureDetails(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("feature", new Feature());
-        model.put("type", type);
-        model.put("productFamilyId", id);
-        return new ModelAndView("product/productFamilyFeature", model);
-    }
-
-    @RequestMapping(value = "/{id}/{type}/feature", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> saveFeature(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, Feature feature) {
-        Map<String, Object> model = new HashMap<>();
-        feature.setRequired(feature.getRequired());
-        feature.setSelectable(feature.getSelectable());
-        Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
-        if(productFamily.isPresent() && isValid(feature, model)) {
-            if(type.equals("PRODUCT")) {
-                if (productFamily.get().getProductFamilyFeatures().contains(feature)) {
-                    productFamily.get().getProductFamilyFeatures().remove(feature);
-                }
-                productFamily.get().getProductFamilyFeatures().add(feature);
-            } else if(type.equals("VARIANT")) {
-                if (productFamily.get().getProductVariantFamilyFeatures().contains(feature)) {
-                    productFamily.get().getProductVariantFamilyFeatures().remove(feature);
-                }
-                productFamily.get().getProductVariantFamilyFeatures().add(feature);
-            }
-            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
             model.put("success", true);
         }
         return model;
