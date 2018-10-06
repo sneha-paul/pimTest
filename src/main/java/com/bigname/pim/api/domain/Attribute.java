@@ -255,7 +255,7 @@ public class Attribute extends ValidatableEntity {
         map.put("uiType", getUiType().name());
         map.put("dataType", getDataType());
         map.put("name", getName());
-        map.put("group", getAttributeGroup().getName());
+        map.put("group", AttributeGroup.getUniqueLeafGroupLabel(getAttributeGroup(), "|"));
         map.put("required", getRequired());
         map.put("selectable", getSelectable());
         map.put("options", Integer.toString(options.size()));

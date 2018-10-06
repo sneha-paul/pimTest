@@ -455,14 +455,14 @@ public class AttributeGroup extends ValidatableEntity {
         });
     }
 
-    public static String getUniqueLeafGroupLabel(AttributeGroup leafGroup) {
+    public static String getUniqueLeafGroupLabel(AttributeGroup leafGroup, String separator) {
         if(isNotEmpty(leafGroup, leafGroup.getParentGroup(), leafGroup.getParentGroup().getParentGroup())) {
             AttributeGroup masterGroup = leafGroup.getParentGroup().getParentGroup();
 
             if(DEFAULT_GROUP_ID.equals(leafGroup.getId())) {
                 return masterGroup.getLabel();
             } else {
-                return masterGroup.getLabel() + " > " + leafGroup.getLabel();
+                return masterGroup.getLabel() + separator + leafGroup.getLabel();
             }
         }
         return isNotEmpty(leafGroup) ? leafGroup.getLabel() : "";

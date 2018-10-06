@@ -66,6 +66,16 @@
                                 }
                             }
 
+                            if(typeof value.group !== 'undefined') {
+                                var groups = value.group.split('|');
+                                if(groups.length > 0) {
+                                    value.group = groups[0];
+                                }
+                                for(var i = 1; i < groups.length; i ++) {
+                                    value.group += '<i class="text-primary p-l-5 p-r-5 fa fa-caret-right"></i>' + groups[i];
+                                }
+                            }
+
                         });
                         return json.data;
                     }
