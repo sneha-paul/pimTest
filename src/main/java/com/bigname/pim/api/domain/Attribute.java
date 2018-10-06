@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
@@ -22,16 +23,12 @@ public class Attribute extends ValidatableEntity {
     private UIType _uiType = UIType.INPUT_BOX;
     private String dataType = "string";  //Initial version only supports String type
     private String id;
-    private String fullId;
     private String regEx;
     private String required = "N";
     private String selectable = "N";
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
-
-    @Transient @JsonIgnore
-    private String uiType;
 
     @Transient
     @JsonIgnore
@@ -47,7 +44,7 @@ public class Attribute extends ValidatableEntity {
         AttributeGroup attributeGroup, attributeGroupDTO = attributeDTO.getAttributeGroup();
         this.setRequired(attributeDTO.getRequired());
         orchestrate();
-
+        this.setId(StringUtil.getUniqueName(this.getId(), AttributeGroup.getAllAttributeIds(familyGroups)));
         if(isNotEmpty(attributeGroupDTO.getFullId()) && AttributeGroup.DEFAULT_GROUP_ID.equals(attributeGroupDTO.getFullId())) {
             attributeGroupDTO.setFullId(AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable())).getFullId());
         }
@@ -136,9 +133,6 @@ public class Attribute extends ValidatableEntity {
     }
 
     public UIType getUiType() {
-        if(isNotEmpty(uiType)) {
-            _uiType = UIType.get(uiType);
-        }
         return _uiType;
     }
 
@@ -161,17 +155,6 @@ public class Attribute extends ValidatableEntity {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getFullId() {
-        if(isEmpty(fullId) && isNotEmpty(getAttributeGroup())) {
-            fullId = getAttributeGroup().getFullId() + "|" + getId();
-        }
-        return fullId;
-    }
-
-    private void setFullId(String fullId) {
-        this.fullId = fullId;
     }
 
     public String getRegEx() {
@@ -251,7 +234,6 @@ public class Attribute extends ValidatableEntity {
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("id", getId());
-        map.put("fullId", getFullId());
         map.put("uiType", getUiType().name());
         map.put("dataType", getDataType());
         map.put("name", getName());

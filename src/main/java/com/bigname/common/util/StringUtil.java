@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -34,5 +35,39 @@ public class StringUtil {
     }
     public static final List<String> splitPipeDelimitedAsList(String value) {
         return Arrays.asList(split(value, "\\|"));
+    }
+
+    public static String getUniqueName(String name, List<String> names) {
+        int idx = getIndex(name, names, 0);
+        return idx > 0 ? name + "_" + idx : name;
+    }
+
+    private static int getIndex(String name, List<String> names, int idx1) {
+        java.util.regex.Pattern p1 = java.util.regex.Pattern.compile("(" + name +"_)(\\d+)$");
+        java.util.regex.Pattern p2 = java.util.regex.Pattern.compile("("+ name + ")");
+        int idx = 0, i = 0;
+        String paramName = name;
+        for (i = 0; i < names.size(); i ++) {
+            String value = names.get(i);
+            Matcher m = p1.matcher(value);
+            if(m.find()) {
+                if(m.groupCount() == 2) {
+                    idx = Integer.parseInt(m.group(2)) + 1;
+                    break;
+                }
+            } else if(!m.find()) {
+                m = p2.matcher(value);
+                if(m.find()) {
+                    if(m.groupCount() == 1) {
+                        idx = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        if(i + 1 < names.size()) {
+            idx = getIndex(paramName, names.subList(i + 1, names.size()), idx > idx1 ? idx : idx1);
+        }
+        return idx > idx1 ? idx : idx1;
     }
 }

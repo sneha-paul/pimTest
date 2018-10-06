@@ -363,7 +363,7 @@ public class AttributeGroup extends ValidatableEntity {
         }
     }
 
-    public static List<AttributeGroup> getAllAttributeGroups(Map<String, AttributeGroup> groups, String mode, boolean firstRun, int... level) {
+    public static List<AttributeGroup> getAllAttributeGroups(Map<String, AttributeGroup> groups, GetMode mode, boolean firstRun, int... level) {
         final List<AttributeGroup> attributeGroups = new ArrayList<>();
         tune(groups, null);
         final List<AttributeGroup> groupsList = new ArrayList<>();
@@ -405,13 +405,13 @@ public class AttributeGroup extends ValidatableEntity {
         });
 
         switch (mode) {
-            case "MASTER_ONLY":
+            case MASTER_ONLY:
                 attributeGroups.addAll(groupsList.stream().filter(g -> ValidationUtil.isEmpty(g.getParentGroup())).collect(Collectors.toList()));
                 break;
-            case "NON_MASTER_PARENT_ONLY":
+            case NON_MASTER_PARENT_ONLY:
                 attributeGroups.addAll(groupsList.stream().filter(g -> ValidationUtil.isNotEmpty(g.getParentGroup()) && ValidationUtil.isNotEmpty(g.getChildGroups())).collect(Collectors.toList()));
                 break;
-            case "LEVEL":
+            case LEVEL:
                 int _level = level == null || level.length != 1 || level[0] < 1 || level[0] > 3 ? 3 : level[0];
                 groupsList.forEach(g -> {
                     if(g.getLevel() == _level) {
@@ -421,7 +421,7 @@ public class AttributeGroup extends ValidatableEntity {
                     }
                 });
                 break;
-            case "LEAF_ONLY":
+            case LEAF_ONLY:
                 groupsList.forEach(g -> {
                     if(isEmpty(g.getChildGroups())) {
                         attributeGroups.add(g);
@@ -430,7 +430,7 @@ public class AttributeGroup extends ValidatableEntity {
                     }
                 });
                 break;
-            default:
+            case All:
                 groupsList.forEach(g -> {
                     attributeGroups.add(g);
                     if(isEmpty(g.getChildGroups())) {
@@ -439,6 +439,18 @@ public class AttributeGroup extends ValidatableEntity {
                 });
         }
         return attributeGroups;
+    }
+
+    public static List<Attribute> getAllAttributes(Map<String, AttributeGroup> familyGroups) {
+        List<Attribute> attributes = new ArrayList<>();
+        getAllAttributeGroups(familyGroups, GetMode.LEAF_ONLY, true).forEach(attributeGroup -> attributeGroup.getAttributes().forEach((s, attribute) -> attributes.add(attribute)));
+        return attributes;
+    }
+
+    public static List<String> getAllAttributeIds(Map<String, AttributeGroup> familyGroups) {
+        List<String> attributes = new ArrayList<>();
+        getAllAttributeGroups(familyGroups, GetMode.LEAF_ONLY, true).forEach(attributeGroup -> attributeGroup.getAttributes().forEach((s, attribute) -> attributes.add(attribute.getId())));
+        return attributes;
     }
 
     public static void tune(Map<String, AttributeGroup> attributeGroups, AttributeGroup parent) {
@@ -466,6 +478,15 @@ public class AttributeGroup extends ValidatableEntity {
             }
         }
         return isNotEmpty(leafGroup) ? leafGroup.getLabel() : "";
+    }
+
+    public enum GetMode {
+        MASTER_ONLY,
+        NON_MASTER_PARENT_ONLY,
+        LEVEL,
+        LEAF_ONLY,
+        All
+
     }
 
 }
