@@ -14,6 +14,7 @@
                     <div class="form-group">
                         <label for="js-attribute-group-id">Attribute Group</label>
                         <select class="form-control" id="js-attribute-group-id" name="attributeGroup.fullId">
+                            <option value="DEFAULT_GROUP">Default Group</option>
                             <option value="">Add a NEW GROUP</option>
                             <c:forEach var="pair" items="${attributeGroups}">
                                 <option value="${pair.value0}" <c:if test="${pair.value0 eq 'DEFAULT_GROUP'}">selected</c:if>>${pair.value1}</option>

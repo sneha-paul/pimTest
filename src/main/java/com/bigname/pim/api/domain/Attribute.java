@@ -43,14 +43,20 @@ public class Attribute extends ValidatableEntity {
 
     public Attribute(Attribute attributeDTO, Map<String, AttributeGroup> familyGroups) {
         this(attributeDTO.getName());
+        this.setUiType(attributeDTO.getUiType());
+        AttributeGroup attributeGroup, attributeGroupDTO = attributeDTO.getAttributeGroup();
         this.setRequired(attributeDTO.getRequired());
         orchestrate();
+
+        if(isNotEmpty(attributeGroupDTO.getFullId()) && AttributeGroup.DEFAULT_GROUP_ID.equals(attributeGroupDTO.getFullId())) {
+            attributeGroupDTO.setFullId(AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable())).getFullId());
+        }
+
         AttributeGroup.tune(familyGroups, null);
 
 //        this.setRegEx(attributeDTO.getRegEx()); TODO - uncomment to enable validation
 //        this.setDataType(attributeDTO.getDataType()); TODO - uncomment to enable multiple data type
-        this._uiType = attributeDTO.getUiType();
-        AttributeGroup attributeGroup, attributeGroupDTO = attributeDTO.getAttributeGroup();
+
         if(isNotEmpty(attributeGroupDTO)) {
             //Available parameters - attribute.name, attribute.attributeGroup.id, attribute.attributeGroup.name, attribute.attributeGroup.masterGroup, attribute.attributeGroup.parentGroup.id
             //attribute.name won't be empty in all the below scenarios
