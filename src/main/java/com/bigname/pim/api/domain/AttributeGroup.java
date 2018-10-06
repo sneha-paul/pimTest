@@ -365,7 +365,7 @@ public class AttributeGroup extends ValidatableEntity {
 
     public static List<AttributeGroup> getAllAttributeGroups(Map<String, AttributeGroup> groups, String mode, boolean firstRun, int... level) {
         final List<AttributeGroup> attributeGroups = new ArrayList<>();
-
+        tune(groups, null);
         final List<AttributeGroup> groupsList = new ArrayList<>();
         // This will happen only when no attributes registered yet for an attribute group
         // We have two default master groups, details group and features group.
@@ -447,7 +447,12 @@ public class AttributeGroup extends ValidatableEntity {
             if(isNotEmpty(parent)) {
                 attributeGroup.setParentGroup(parent);
             }
-            tune(attributeGroup.getChildGroups(), attributeGroup);
+            if(isNotEmpty(attributeGroup.getChildGroups())) {
+                tune(attributeGroup.getChildGroups(), attributeGroup);
+            } else if(isNotEmpty(attributeGroup.getAttributes())) {
+                attributeGroup.getAttributes().forEach((k1, attribute) -> attribute.setAttributeGroup(attributeGroup));
+            }
         });
     }
+
 }

@@ -115,9 +115,9 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         return model;
     }
 
-    @RequestMapping("/{id}/{type}/attributes")
+    @RequestMapping("/{id}/{entityType}/attributes")
     @ResponseBody
-    public Result<Map<String, String>> getFamilyAttributes(@PathVariable(value = "id") String id, @PathVariable(value = "type") String type, HttpServletRequest request) {
+    public Result<Map<String, String>> getFamilyAttributes(@PathVariable(value = "id") String id, @PathVariable(value = "entityType") String entityType, HttpServletRequest request) {
 
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
@@ -128,7 +128,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Attribute> paginatedResult = productFamilyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, type, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Attribute> paginatedResult = productFamilyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, entityType, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

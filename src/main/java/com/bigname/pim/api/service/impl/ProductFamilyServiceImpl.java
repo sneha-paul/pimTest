@@ -39,29 +39,15 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
 
 
     @Override
-    public Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, String type, int page, int size, Sort sort) {
+    public Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, String entityType, int page, int size, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
-        Map<String, AttributeGroup> attributeGroups = new HashMap<>();
+        final Map<String, AttributeGroup> attributeGroups = new HashMap<>();
         List<Attribute> attributes = new ArrayList<>();
-        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        if(productFamily.isPresent()) {
-            if(type.equals("PRODUCT")) {
-                attributeGroups = productFamily.get().getProductFamilyAttributes();
-            } else if(type.equals("VARIANT")) {
-                attributeGroups = productFamily.get().getProductVariantFamilyAttributes();
-            }
-            attributeGroups.forEach((s, attributeGroup) -> {
-                attributeGroup.getAttributes().forEach((s1, attribute) -> {
-                    attribute.setAttributeGroup(attributeGroup);
-//                    attribute.setAttributeGroupName(attributeGroup.getName());
-//                    attribute.setAttributeGroupId(attributeGroup.getId());
-                    attributes.add(attribute);
-                });
-            });
-//            TODO - sort this based on the requested sort
-        }
+        get(productFamilyId, findBy, false).ifPresent(productFamily -> attributeGroups.putAll("VARIANTS".equals(entityType) ? productFamily.getProductVariantFamilyAttributes() : productFamily.getProductFamilyAttributes()));
+        AttributeGroup.getAllAttributeGroups(attributeGroups, "LEAF_ONLY", true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
+        //            TODO - sort this based on the requested sort
         return paginate(attributes, page, size);
     }
 
