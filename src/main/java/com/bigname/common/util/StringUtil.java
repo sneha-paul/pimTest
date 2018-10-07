@@ -43,8 +43,8 @@ public class StringUtil {
     }
 
     private static int getIndex(String name, List<String> names, int idx1) {
-        java.util.regex.Pattern p1 = java.util.regex.Pattern.compile("(" + name +"_)(\\d+)$");
-        java.util.regex.Pattern p2 = java.util.regex.Pattern.compile("("+ name + ")");
+        java.util.regex.Pattern p1 = java.util.regex.Pattern.compile("^(" + name +"_)(\\d+)$");
+        java.util.regex.Pattern p2 = java.util.regex.Pattern.compile("^("+ name + ")$");
         int idx = 0, i = 0;
         String paramName = name;
         for (i = 0; i < names.size(); i ++) {
