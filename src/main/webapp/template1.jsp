@@ -67,6 +67,7 @@
         .card.inner.group {
             border: none;
             box-shadow: none;
+            margin-bottom: 0 !important;
         }
 
         .card.inner.group legend {
@@ -74,6 +75,19 @@
         }
         .card.inner.group > div.body {
             padding-left: 4px;
+            padding-bottom: 0 !important;
+        }
+        .card.inner .form-button-group {
+            float: right;
+            margin: 10px 10px 30px !important;
+        }
+
+        .fancy-checkbox input[type="checkbox"]+span:before {
+            background-color: #ffffff;
+        }
+
+        .fancy-radio input[type="radio"]+span i {
+            background-color: #ffffff;
         }
 
         .theme-orange .fancy-radio input[type="radio"]:checked + span i:after {

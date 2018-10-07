@@ -133,8 +133,28 @@ public class ProductFamily extends Entity<ProductFamily> {
         return map;
     }
 
-    public List<AttributeGroup> getMasterGroups(String type) {
+    public List<AttributeGroup> getAddonMasterGroups(String type) {
         Map<String, AttributeGroup> attributeGroupsMap = type.equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
-        return attributeGroupsMap.entrySet().stream().filter(e -> e.getValue().getMasterGroup().equals("Y")).map(Map.Entry::getValue).collect(Collectors.toList());
+        return attributeGroupsMap.entrySet().stream()
+                .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
+                !e.getKey().equals(AttributeGroup.DETAILS_GROUP_ID) &&
+                !e.getKey().equals(AttributeGroup.FEATURES_GROUP_ID)).map(Map.Entry::getValue).collect(Collectors.toList());
+    }
+
+    public AttributeGroup getDetailsMasterGroup(String type) {
+        return getMasterGroup(AttributeGroup.DETAILS_GROUP_ID, type);
+    }
+
+    public AttributeGroup getFeaturesMasterGroup(String type) {
+        return getMasterGroup(AttributeGroup.FEATURES_GROUP_ID, type);
+    }
+
+    public AttributeGroup getMasterGroup(String groupId, String type) {
+        Map<String, AttributeGroup> attributeGroupsMap = type.equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
+
+        List<AttributeGroup> list = attributeGroupsMap.entrySet().stream()
+                .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
+                        e.getKey().equals(groupId)).map(Map.Entry::getValue).collect(Collectors.toList());
+        return isNotEmpty(list) ? list.get(0) : null;
     }
 }
