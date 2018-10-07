@@ -75,28 +75,6 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.productVariantFamilyAttributes = productVariantFamilyAttributes;
     }
 
-    /*public Attribute setAttributeGroup(Attribute attribute) {
-        attribute.setAttributeGroup(getAttributeGroup(attribute));
-        return attribute;
-    }*/
-
-    /*public AttributeGroup getAttributeGroup(Attribute attribute) {
-        String type = attribute.getType();
-        String groupName = attribute.getAttributeGroup().getName();
-        String groupId = attribute.getAttributeGroup().getId();
-
-        AttributeGroup attributeGroup = type.equals("VARIANT") ? getProductVariantFamilyAttributes().get(groupId) : getProductFamilyAttributes().get(groupId);
-
-        if(isEmpty(attributeGroup)) {
-            if(isNotEmpty(groupName)) {
-                attributeGroup = new AttributeGroup(groupName, attribute.getAttributeGroup().getMasterGroup());
-            } else {
-                attributeGroup = AttributeGroup.FEATURE_GROUP_ID.equals(groupId) ? AttributeGroup.getFeatureGroup() : AttributeGroup.getDefaultGroup();
-            }
-        }
-        return attributeGroup;
-    }*/
-
     public ProductFamily addAttribute(Attribute attributeDTO) {
         Map<String, AttributeGroup> familyAttributeGroups = attributeDTO.getEntityType().equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
         Attribute attribute = new Attribute(attributeDTO, familyAttributeGroups);
@@ -105,20 +83,6 @@ public class ProductFamily extends Entity<ProductFamily> {
         return this;
     }
 
-
-
-    /*public ProductFamily addAttribute(Attribute attribute) {
-        setAttributeGroup(attribute);
-        AttributeGroup attributeGroup = attribute.getAttributeGroup();
-        Map<String, AttributeGroup> familyAttributes = attribute.getType().equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
-        if(familyAttributes.containsKey(attributeGroup.getId())) {
-            familyAttributes.get(attributeGroup.getId()).addAttributes(attribute);
-        } else {
-            familyAttributes.put(attributeGroup.getId(), attributeGroup);
-        }
-        return this;
-    }*/
-
     public ProductFamily addAttributeOption(AttributeOption attributeOptionDTO, String entityType) {
         String attributeId = attributeOptionDTO.getAttributeId();
         AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), "VARIANT".equals(entityType) ? getProductVariantFamilyAttributes() : getProductFamilyAttributes())
@@ -126,20 +90,6 @@ public class ProductFamily extends Entity<ProductFamily> {
                 .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
         return this;
     }
-
-    /*public Attribute getAttribute(String attributeId, String type) {
-        String[] ids = StringUtil.split(attributeId, "\\|");
-        AttributeGroup attributeGroup = AttributeGroup.getDefaultGroup();
-        for(int i = 0; i < ids.length - 1; i ++) {
-            if(i == 0) {
-                attributeGroup = getProductFamilyAttributes().get(ids[0]);
-            } else {
-//                attributeGroup = attributeGroup.getSubGroups().get(ids[0]);
-            }
-        }
-        return attributeGroup.getAttributes().get(ids[ids.length - 1]);
-
-    }*/
 
     public List<Feature> getProductFamilyFeatures() {
         return productFamilyFeatures;

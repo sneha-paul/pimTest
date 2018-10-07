@@ -51,27 +51,6 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
         return paginate(attributes, page, size);
     }
 
-    /*@Override
-    public List<AttributeGroup> getAttributeGroups(String productFamilyId, FindBy findBy, String type, Sort sort) {
-        if(sort == null) {
-            sort = Sort.by(Sort.Direction.ASC, "name");
-        }
-        List<AttributeGroup> attributeGroups = new ArrayList<>();
-        *//*Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        if(productFamily.isPresent()) {
-            Map<String, AttributeGroup> attributeGroups1 = "VARIANTS".equals(type) ? productFamily.get().getProductVariantFamilyAttributes() : productFamily.get().getProductFamilyAttributes();
-            attributeGroups1.forEach(((s, attributeGroup) -> attributeGroups.add(attributeGroup)));
-        }
-        if(!attributeGroups.contains(AttributeGroup.getDefaultGroup())) {
-            attributeGroups.add(AttributeGroup.getDefaultGroup());
-        }
-        if(!attributeGroups.contains(AttributeGroup.getFeatureGroup())) {
-            attributeGroups.add(AttributeGroup.getFeatureGroup());
-        }*//*
-        //TODO - Sorting
-        return attributeGroups;
-    }*/
-
     @Override
     public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
