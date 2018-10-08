@@ -60,6 +60,7 @@ public class ProductController extends BaseController<Product, ProductService>{
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Product product, @RequestParam Map<String, Object> attributes) {
         Map<String, Object> model = new HashMap<>();
+        product.setProductId(id);
         product.setFamilyAttributes(attributes);
         if(isValid(product, model, product.getGroup().equals("DETAILS") ? Product.DetailsGroup.class : product.getGroup().equals("SEO") ? Product.SeoGroup.class : null)) {
             productService.update(id, FindBy.EXTERNAL_ID, product);

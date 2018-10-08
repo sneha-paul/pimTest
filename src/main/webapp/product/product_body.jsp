@@ -53,7 +53,7 @@
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="productFamilyId">ProductFamily</label>
-                                                                            <select class="form-control" id="productFamilyId" name="productFamilyId">
+                                                                            <select class="form-control" id="productFamilyId" name="productFamilyId" disabled="disabled">
                                                                                 <option value="">Select One</option>
 
                                                                                 <c:forEach items="${productFamilies}" var="productFamily">
@@ -258,7 +258,8 @@
                                                     </div>
                                                 </c:if>
                                             </c:forEach>
-                                            <div class="form-button-group pull-right m-50">
+                                            <div class="form-button-group pull-right">
+                                                <input type="hidden" name="group" value="DETAILS"/>
                                                 <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                                                 <a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>
                                             </div>
@@ -423,7 +424,7 @@
                                             </c:if>
                                             <form method="post" action="/pim/products/${product.productId}" data-method="PUT"
                                                   data-success-message='["Successfully updated the product", "Product Updated"]'
-                                                  data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                                  data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
                                                 <c:forEach items="${sectionGroup.childGroups}" var="attributeGroupEntry">
                                                     <c:set var="attributeGroup" value="${attributeGroupEntry.value}" />
                                                     <div class="card inner group overflowhidden">
@@ -452,13 +453,13 @@
                                                                                                 <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.familyAttributes[attribute.id]}</textarea>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'CHECKBOX'}">
-                                                                                                <br/>${product.familyAttributes[attribute.id]}
+                                                                                                <br/>
                                                                                                 <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                     <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                     <c:set var="propertyName" value="${attribute.id}_${attributeOption.id}"/>
 
                                                                                                     <label class="fancy-checkbox">
-                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[propertyName] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
                                                                                                             <%--<c:choose>
                                                                                                                 <c:when test="${product.familyAttributes[propertyName] ne 'Y'}">
                                                                                                                     <input type="hidden" name="${propertyName}" disabled="disabled" value="Y" />
@@ -475,13 +476,13 @@
                                                                                                 </c:forEach>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'RADIO_BUTTON'}">
-                                                                                                <br/>${product.familyAttributes[attribute.id]}
+                                                                                                <br/>
                                                                                                 <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                     <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                     <c:set var="propertyName" value="${attribute.id}_${attributeOption.id}"/>
                                                                                                     <%--<label class="fancy-radio"><input name="gender3" value="male" type="radio" checked=""><span><i></i>Male</span></label>--%>
                                                                                                     <label class="fancy-radio">
-                                                                                                        <input type="radio" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[propertyName] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                        <input type="radio" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
                                                                                                             <%--<c:choose>
                                                                                                                 <c:when test="${product.familyAttributes[propertyName] ne 'Y'}">
                                                                                                                     <input type="hidden" name="${propertyName}" disabled="disabled" value="Y" />
@@ -519,7 +520,8 @@
                                                         </div>
                                                     </div>
                                                 </c:forEach>
-                                                <div class="form-button-group pull-right m-50">
+                                                <div class="form-button-group pull-right">
+                                                    <input type="hidden" name="group" value="DETAILS"/>
                                                     <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                                                     <a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>
                                                 </div>
@@ -544,7 +546,7 @@
                                             </c:if>
                                             <form method="post" action="/pim/products/${product.productId}" data-method="PUT"
                                                   data-success-message='["Successfully updated the product", "Product Updated"]'
-                                                  data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                                  data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
                                                 <c:forEach items="${sectionGroup.childGroups}" var="attributeGroupEntry">
                                                     <c:set var="attributeGroup" value="${attributeGroupEntry.value}" />
                                                     <div class="card inner group overflowhidden">
@@ -640,7 +642,8 @@
                                                         </div>
                                                     </div>
                                                 </c:forEach>
-                                                <div class="form-button-group pull-right m-50">
+                                                <div class="form-button-group pull-right">
+                                                    <input type="hidden" name="group" value="DETAILS"/>
                                                     <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                                                     <a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>
                                                 </div>

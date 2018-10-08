@@ -82,6 +82,21 @@
             margin: 10px 10px 30px !important;
         }
 
+        .parsley-errors-list {
+            margin-top: -8px;
+            padding-bottom: 8px;
+        }
+
+        .fancy-checkbox input.parsley-error[type="checkbox"]+span:before {
+            border-color: #efd8d8;
+            background-color: #fbf5f5;
+        }
+
+        .fancy-radio input.parsley-error[type="radio"]+span i {
+            border-color: #efd8d8;
+            background-color: #fbf5f5;
+        }
+
         .fancy-checkbox input[type="checkbox"]+span:before {
             background-color: #ffffff;
         }

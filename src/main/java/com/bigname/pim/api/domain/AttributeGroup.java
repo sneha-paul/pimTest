@@ -284,7 +284,6 @@ public class AttributeGroup extends ValidatableEntity {
 
     public static boolean addAttribute(Attribute attribute, Map<String, AttributeGroup> familyAttributeGroups) {
         boolean success = false;
-//        attribute = attribute.getOrchestratedInstance(attribute);
         AttributeGroup attributeMasterGroup = attribute.getAttributeGroup().getParentGroup().getParentGroup();
         if(isNotEmpty(attributeMasterGroup)) {
             AttributeGroup familyMasterGroup = familyAttributeGroups.get(attributeMasterGroup.getId());
@@ -310,6 +309,8 @@ public class AttributeGroup extends ValidatableEntity {
         }
         return success;
     }
+
+
 
     public static AttributeGroup getDetailsMasterGroup(String label) {
         return new AttributeGroup(DETAILS_GROUP, isEmpty(label) ? "Details" : label, true);
@@ -365,7 +366,7 @@ public class AttributeGroup extends ValidatableEntity {
 
     public static List<AttributeGroup> getAllAttributeGroups(Map<String, AttributeGroup> groups, GetMode mode, boolean firstRun, int... level) {
         final List<AttributeGroup> attributeGroups = new ArrayList<>();
-        tune(groups, null);
+        map(groups);
         final List<AttributeGroup> groupsList = new ArrayList<>();
         // This will happen only when no attributes registered yet for an attribute group
         // We have two default master groups, details group and features group.
@@ -453,18 +454,19 @@ public class AttributeGroup extends ValidatableEntity {
         return attributes;
     }
 
-    public static void tune(Map<String, AttributeGroup> attributeGroups, AttributeGroup parent) {
+    public static Map<String, AttributeGroup> map(Map<String, AttributeGroup> attributeGroups, AttributeGroup... parent) {
 
         attributeGroups.forEach((k, attributeGroup) -> {
-            if(isNotEmpty(parent)) {
-                attributeGroup.setParentGroup(parent);
+            if(isNotEmpty(ConversionUtil.toList(parent))) {
+                attributeGroup.setParentGroup(parent[0]);
             }
             if(isNotEmpty(attributeGroup.getChildGroups())) {
-                tune(attributeGroup.getChildGroups(), attributeGroup);
+                map(attributeGroup.getChildGroups(), attributeGroup);
             } else if(isNotEmpty(attributeGroup.getAttributes())) {
                 attributeGroup.getAttributes().forEach((k1, attribute) -> attribute.setAttributeGroup(attributeGroup));
             }
         });
+        return attributeGroups;
     }
 
     public static String getUniqueLeafGroupLabel(AttributeGroup leafGroup, String separator) {

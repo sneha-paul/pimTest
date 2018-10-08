@@ -2,10 +2,12 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.javatuples.Pair;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -49,7 +51,7 @@ public class Attribute extends ValidatableEntity {
             attributeGroupDTO.setFullId(AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable())).getFullId());
         }
 
-        AttributeGroup.tune(familyGroups, null);
+        AttributeGroup.map(familyGroups);
 
 //        this.setRegEx(attributeDTO.getRegEx()); TODO - uncomment to enable validation
 //        this.setDataType(attributeDTO.getDataType()); TODO - uncomment to enable multiple data type
@@ -222,6 +224,14 @@ public class Attribute extends ValidatableEntity {
         this.options = options;
     }
 
+    public Pair<String, Object> validate(Object value) {
+        String attributeValue = (String) value;
+        if(booleanValue(getRequired()) && isEmpty(attributeValue)) {
+            return Pair.with(getLabel() + " cannot be empty", attributeValue);
+        }
+        return null;
+    }
+
     @Override
     public void orchestrate() {
         setRequired(getRequired());
@@ -243,6 +253,17 @@ public class Attribute extends ValidatableEntity {
         map.put("selectable", getSelectable());
         map.put("options", Integer.toString(options.size()));
         return map;
+    }
+
+    public static Attribute findAttribute(String attributeId, Map<String, AttributeGroup> familyAttributeGroups) {
+        return AttributeGroup
+                .map(familyAttributeGroups).entrySet().parallelStream()
+                .flatMap(g -> g.getValue().getChildGroups().entrySet().parallelStream())
+                .flatMap(g -> g.getValue().getChildGroups().entrySet().parallelStream())
+                .flatMap(g -> g.getValue().getAttributes().entrySet().parallelStream())
+                .filter(a -> a.getValue().getId().equals(attributeId))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList()).get(0);
     }
 
     public enum UIType {

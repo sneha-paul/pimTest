@@ -1,9 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.ProductFamily;
-import com.bigname.pim.api.domain.ProductVariant;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.GenericEntityException;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
@@ -11,6 +9,7 @@ import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -136,5 +136,25 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         Page<Product> products =  findBy == FindBy.INTERNAL_ID ? productDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : productDAO.findByProductIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
         products.forEach(product -> setProductFamily(product, FindBy.INTERNAL_ID));
         return products;
+    }
+
+    @Override
+    public Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, Product product, String group) {
+        if(ValidationUtil.isNotEmpty(product.getFamilyAttributes())) {
+            String attributeId = product.getFamilyAttributes().entrySet().iterator().next().getKey();
+            get(product.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product1 -> {
+                Attribute _attribute = Attribute.findAttribute(attributeId, product1.getProductFamily().getProductFamilyAttributes());
+                AttributeGroup level2Group = _attribute.getAttributeGroup().getParentGroup();
+                level2Group.getChildGroups().forEach((k, attributeGroup) ->
+                    attributeGroup.getAttributes().forEach((k1, attribute) -> {
+                        Pair<String, Object> error = attribute.validate(product.getFamilyAttributes().get(attribute.getId()));
+                        if(ValidationUtil.isNotEmpty(error)) {
+                            fieldErrors.put(attribute.getId(), error);
+                        }
+                    })
+                );
+            });
+        }
+        return fieldErrors;
     }
 }
