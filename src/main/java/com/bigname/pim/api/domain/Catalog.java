@@ -36,10 +36,10 @@ public class Catalog extends Entity<Catalog> {
         super();
     }
 
-    public Catalog(String externalId, String catalogName) {
+    /*public Catalog(String externalId, String catalogName) {
         super(externalId);
         this.catalogName = catalogName;
-    }
+    }*/
 
     public String getCatalogId() {
         return getExternalId();
@@ -90,6 +90,16 @@ public class Catalog extends Entity<Catalog> {
         }
 
         return this;
+    }
+
+    @Override
+    public Catalog cloneInstance() {
+        Catalog clone = new Catalog();
+        clone.setActive("N");
+        clone.setExternalId(cloneValue(getExternalId()));
+        clone.setCatalogName(cloneValue(getCatalogName()));
+        clone.setDescription(cloneValue(getDescription()));
+        return clone;
     }
 
     @Override

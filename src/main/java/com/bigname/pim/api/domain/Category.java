@@ -132,6 +132,7 @@ public class Category extends Entity<Category> {
         clone.setActive("N");
         clone.setExternalId(cloneValue(getExternalId()));
         clone.setCategoryName(cloneValue(getCategoryName()));
+        clone.setDescription(cloneValue(getDescription()));
         return clone;
     }
 
