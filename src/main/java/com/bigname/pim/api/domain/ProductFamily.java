@@ -125,6 +125,16 @@ public class ProductFamily extends Entity<ProductFamily> {
     }
 
     @Override
+    public ProductFamily cloneInstance() {
+        ProductFamily clone = new ProductFamily();
+        clone.setActive("N");
+        clone.setExternalId(cloneValue(getExternalId()));
+        clone.setProductFamilyName(cloneValue(getProductFamilyName()));
+       // clone.setProductFamilyAttributes(cloneValue(getProductFamilyAttributes()));
+        return clone;
+    }
+
+    @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());

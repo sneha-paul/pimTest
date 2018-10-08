@@ -41,12 +41,12 @@ public class Product extends Entity<Product> {
     }
 
     //TODO - check to see, if we need the overloaded constructor in all entities, since spring and jpa are using reflection to initialize the instance
-    public Product(String externalId, String productName, String productFamilyId) {
+   /* public Product(String externalId, String productName, String productFamilyId) {
         super(externalId);
         this.productName = productName;
         this.productFamilyId = productFamilyId;
 
-    }
+    }*/
 
     public String getProductId() {
         return getExternalId();
@@ -111,6 +111,16 @@ public class Product extends Entity<Product> {
             product.getFamilyAttributes().forEach(this.getFamilyAttributes()::put);
         }
         return this;
+    }
+
+    @Override
+    public Product cloneInstance() {
+        Product clone = new Product();
+        clone.setActive("N");
+        clone.setExternalId(cloneValue(getExternalId()));
+        clone.setProductName(cloneValue(getProductName()));
+        clone.setProductFamilyId(cloneValue(getProductFamilyId()));
+        return clone;
     }
 
     @Override
