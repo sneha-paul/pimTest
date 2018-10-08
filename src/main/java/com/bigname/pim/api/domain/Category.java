@@ -51,11 +51,11 @@ public class Category extends Entity<Category> {
         super();
     }
 
-    public Category(String externalId, String categoryName) {
+    /*public Category(String externalId, String categoryName) {
         super(externalId);
         this.categoryName = categoryName;
     }
-
+*/
     public String getCategoryId() {
         return getExternalId();
     }
@@ -123,6 +123,16 @@ public class Category extends Entity<Category> {
 
     void setExternalId() {
         this.categoryId = getExternalId();
+    }
+
+
+    @Override
+    public Category cloneInstance() {
+        Category clone = new Category();
+        clone.setActive("N");
+        clone.setExternalId(cloneValue(getExternalId()));
+        clone.setCategoryName(cloneValue(getCategoryName()));
+        return clone;
     }
 
     @Override
