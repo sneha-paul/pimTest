@@ -225,9 +225,16 @@ public class Attribute extends ValidatableEntity {
     }
 
     public Pair<String, Object> validate(Object value) {
-        String attributeValue = (String) value;
-        if(booleanValue(getRequired()) && isEmpty(attributeValue)) {
-            return Pair.with(getLabel() + " cannot be empty", attributeValue);
+        if(getUiType().isMultiSelect()) {
+            String[] attributeValue = value instanceof String ? new String[] {(String) value} : (String[]) value;
+            if (booleanValue(getRequired()) && (attributeValue.length == 0 || isEmpty(attributeValue[0]))) {
+                return Pair.with(getLabel() + " cannot be empty", attributeValue);
+            }
+        } else {
+            String attributeValue = (String) value;
+            if (booleanValue(getRequired()) && isEmpty(attributeValue)) {
+                return Pair.with(getLabel() + " cannot be empty", attributeValue);
+            }
         }
         return null;
     }
@@ -267,7 +274,18 @@ public class Attribute extends ValidatableEntity {
     }
 
     public enum UIType {
-        INPUT_BOX("Input Box", "N"), DROPDOWN("Dropdown", "Y"), CHECKBOX("Checkbox", "Y"), RADIO_BUTTON("Radio Button", "Y"), TEXTAREA("Textarea", "N"), DATE_PICKER("Date Picker", "N");
+        INPUT_BOX("Input Box", "N"),
+        DROPDOWN("Dropdown", "Y"),
+        CHECKBOX("Checkbox", "Y") {
+            @Override
+            public boolean isMultiSelect() {
+                return true;
+            }
+        },
+        RADIO_BUTTON("Radio Button", "Y"),
+        TEXTAREA("Textarea", "N"),
+        DATE_PICKER("Date Picker", "N");
+
         String label = "";
         String selectable = "N";
         UIType(String label, String selectable) {
@@ -281,6 +299,10 @@ public class Attribute extends ValidatableEntity {
 
         public String isSelectable() {
             return selectable;
+        }
+
+        public boolean isMultiSelect() {
+            return false;
         }
 
         public static UIType get(String value) {

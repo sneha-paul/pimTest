@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.exception.EntityCreateException;
@@ -91,7 +92,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     @SuppressWarnings("unchecked")
     public <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
         e.orchestrate();
-        Set<ConstraintViolation<E>> violations = validator.validate(e, groups);
+        Set<ConstraintViolation<E>> violations = ConversionUtil.toList(groups).size() > 0 ? validator.validate(e, groups) : validator.validate(e);
         if(e.getClass().getSuperclass().equals(Entity.class)) {
             return validate(e.getValidationErrors(violations), (T) e, "DETAILS");
         }

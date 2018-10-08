@@ -91,5 +91,22 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return isEmpty(model.get("fieldErrors"));
     }
 
+    protected Map<String, Object> getAttributesMap(HttpServletRequest request) {
+        Map<String, Object> attributesMap = new HashMap<>();
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        if(isNotEmpty(request)) {
+            parameterMap.forEach((param, value) -> {
+                if(value.length == 0) {
+                    attributesMap.put(param, "");
+                } else if(value.length == 1) {
+                    attributesMap.put(param, value[0]);
+                } else {
+                    attributesMap.put(param, value);
+                }
+            });
+        }
+        return attributesMap;
+    }
+
 
 }

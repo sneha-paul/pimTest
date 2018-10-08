@@ -21,11 +21,11 @@ public class Product extends Entity<Product> {
 
 
     @Transient
-    @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class})
+    @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     String productId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class})
+    @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productName;
 
     @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})
@@ -132,6 +132,4 @@ public class Product extends Entity<Product> {
         map.put("active", getActive());
         return map;
     }
-
-    public interface SeoGroup {}
 }

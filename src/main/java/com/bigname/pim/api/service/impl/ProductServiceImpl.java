@@ -147,6 +147,9 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                 AttributeGroup level2Group = _attribute.getAttributeGroup().getParentGroup();
                 level2Group.getChildGroups().forEach((k, attributeGroup) ->
                     attributeGroup.getAttributes().forEach((k1, attribute) -> {
+                        if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getFamilyAttributes().containsKey(k1)) {
+                            product.getFamilyAttributes().put(k1, new String[0]);
+                        }
                         Pair<String, Object> error = attribute.validate(product.getFamilyAttributes().get(attribute.getId()));
                         if(ValidationUtil.isNotEmpty(error)) {
                             fieldErrors.put(attribute.getId(), error);
