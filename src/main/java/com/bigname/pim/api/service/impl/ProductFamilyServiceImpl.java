@@ -64,7 +64,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(entityType.equals("VARIANT") ? productFamily1.getProductVariantFamilyAttributes() : productFamily1.getProductFamilyAttributes(), AttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
+        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(entityType.equals("VARIANT") ? productFamily1.getProductVariantFamilyAttributes() : productFamily1.getProductFamilyAttributes(), AttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
