@@ -73,6 +73,14 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return model;
     }
 
+    @RequestMapping(value = "/{id}/clone/{cloneType}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> clone(@PathVariable(value = "id") String id, @PathVariable(value = "cloneType") String type) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", service.cloneInstance(id, FindBy.EXTERNAL_ID, Entity.CloneType.find(type)));
+        return model;
+    }
+
     private <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
         return service.validate(e, groups);
     }

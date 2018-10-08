@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service;
 
+import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
@@ -22,6 +23,8 @@ public interface BaseService<T, DAO> {
     T update(String id, FindBy findBy, T t);
 
     boolean toggle(String id, FindBy findBy, Toggle active);
+
+    T cloneInstance(String id, FindBy findBy, Entity.CloneType type);
 
     Page<T> getAll(int page, int size, Sort sort, boolean... activeRequired);
 

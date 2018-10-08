@@ -1,6 +1,8 @@
 package com.bigname.pim.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
@@ -27,15 +29,18 @@ public class Website extends Entity<Website> {
     @NotEmpty(message = "Website URL cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String url;
 
+    @Transient @JsonIgnore
+    private Page<WebsiteCatalog> catalogs;
+
     public Website() {
         super();
     }
 
-    public Website(String externalId, String websiteName, String url) {
+    /*public Website(String externalId, String websiteName, String url) {
         super(externalId);
         this.websiteName = websiteName;
         this.url = url;
-    }
+    }*/
 
     public String getWebsiteId() {
         return getExternalId();
@@ -64,6 +69,16 @@ public class Website extends Entity<Website> {
 
     void setExternalId() {
         this.websiteId = getExternalId();
+    }
+
+    @Override
+    public Website cloneInstance() {
+        Website clone = new Website();
+        clone.setActive("N");
+        clone.setExternalId(cloneValue(getExternalId()));
+        clone.setWebsiteName(cloneValue(getWebsiteName()));
+        clone.setUrl(cloneValue(getUrl()));
+        return clone;
     }
 
     @Override

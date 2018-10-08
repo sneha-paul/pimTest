@@ -53,6 +53,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T update(String id, FindBy findBy, T t) {
         Optional<T> _t1 = get(id, findBy, false);
         if(!_t1.isPresent()) {
@@ -78,6 +79,13 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         } else {
             return false;
         }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public T cloneInstance(String id, FindBy findBy, Entity.CloneType type) {
+        Optional<T> _t =get(id, findBy, false);
+        return _t.map(t -> cloneInstance((T) t.cloneInstance(), type)).orElse(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -126,5 +134,9 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
             sublist = list.subList(from, to);
         }
         return new PageImpl<>(sublist, PageRequest.of(page, size), list.size());
+    }
+
+    protected T cloneInstance(T t, Entity.CloneType type) {
+        return create(t);
     }
 }

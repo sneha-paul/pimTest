@@ -49,7 +49,7 @@
                                     btnClass = 'btn-success';
                                 }
                                 value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
-                                    '<a href="javascript:void(0);" class="btn btn-sm btn-primary" title="Clone"><i class="icon-docs"></i></a> ' +
+                                    '<button type="button" class="btn btn-sm btn-primary js-clone" data-external-id="' + value.externalId + '" title="Clone"><i class="icon-docs"></i></button> ' +
                                     '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             } else if(options.type === 'TYPE_2') {
                                 value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
@@ -91,6 +91,18 @@
                         }),
                         typeof options.names !== 'undefined' ? options.names[1] : 'entity',
                         $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
+                }
+            });
+
+            $(options.selector).on('click', '.js-clone', function () {
+                if('TYPE_1' === options.type) {
+                    $.cloneInstance(
+                        $.getURL(options.url + '{externalId}/clone/{cloneType}', {
+                            externalId: $(this).data('external-id'),
+                            cloneType: 'LIGHT'
+                        }),
+                        typeof options.names !== 'undefined' ? options.names[1] : 'entity',
+                        $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]));
                 }
             });
 
@@ -220,6 +232,18 @@
                 confirmButtonColor: isActive === 'Y' ? '#dc3545' : '#28a745',
                 successTitle: isActive === 'Y' ? 'Disabled!' : 'Enabled!',
                 successText: 'The ' + entityName + ' has been ' + (isActive === 'Y' ? 'disabled.' : 'enabled.')
+            }, callback);
+        },
+
+        cloneInstance: function(url, entityName, callback) {
+            $.confirmedAJAXRequest({
+                url: url,
+                method: 'PUT',
+                text: 'This will clone the ' + entityName + "!",
+                confirmButtonText: 'Yes, clone it!',
+                confirmButtonColor: '#28a745',
+                successTitle: 'Cloned!',
+                successText: 'The ' + entityName + ' has been cloned.'
             }, callback);
         },
 

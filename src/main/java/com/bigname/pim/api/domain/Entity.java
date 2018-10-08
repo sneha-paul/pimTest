@@ -90,10 +90,29 @@ abstract public class Entity<T> extends ValidatableEntity implements Serializabl
 
     abstract void setExternalId();
 
+    public T cloneInstance() {
+        return null;
+    }
 
+    protected String cloneValue(String value) {
+        return value + "_COPY";
+    }
 
     abstract public T merge(T t);
 
     abstract public Map<String, String> toMap();
+
+    public enum CloneType {
+        LIGHT, SHALLOW, DEEP;
+
+        public static CloneType find(String value) {
+            for (CloneType type : values()) {
+                if(type.name().equalsIgnoreCase(value)) {
+                    return type;
+                }
+            }
+            return LIGHT;
+        }
+    }
 
 }

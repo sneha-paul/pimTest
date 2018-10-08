@@ -120,6 +120,11 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         return super.toggle(id, active);
     }
 
+    @RequestMapping(value = "/{productId}/variants/{variantId}/clone/{cloneType}", method = RequestMethod.PUT)
+    @Override
+    public Map<String, Object> clone(String id, String type) {
+        return super.clone(id, type);
+    }
 
     /*@RequestMapping(value = "/{id}", method = RequestMethod.POST)
     public ModelAndView update(@PathVariable(value = "id") String id, @ModelAttribute("productVariant") @Valid ProductVariant productVariant, BindingResult result, Model model) {
