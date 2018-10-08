@@ -45,22 +45,26 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ModelAndView create(@Valid ProductFamily productFamily, BindingResult result, Model model) {
-        if(result.hasErrors()) {
-            return new ModelAndView("product/productFamily");
+    @ResponseBody
+    public Map<String, Object> create( ProductFamily productFamily) {
+        Map<String, Object> model = new HashMap<>();
+        if(isValid(productFamily, model, ProductFamily.CreateGroup.class)) {
+            productFamily.setActive("N");
+            productFamilyService.create(productFamily);
+            model.put("success", true);
         }
-        productFamily.setActive("N");
-        productFamilyService.create(productFamily);
-        return new ModelAndView("redirect:/pim/productFamilies");
+        return model;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public ModelAndView update(@PathVariable(value = "id") String id, @Valid ProductFamily productFamily, BindingResult result, Model model) {
-        if(result.hasErrors()) {
-            return new ModelAndView("product/productFamily");
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> update(@PathVariable(value = "id") String id, ProductFamily productFamily) {
+        Map<String, Object> model = new HashMap<>();
+        if(isValid(productFamily, model, productFamily.getGroup().equals("DETAILS") ? ProductFamily.DetailsGroup.class : null)) {
+            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily);
+            model.put("success", true);
         }
-        productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily);
-        return new ModelAndView("redirect:/pim/productFamilies");
+        return model;
     }
 
     @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
@@ -171,9 +175,9 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     @RequestMapping(value = "/{productFamilyId}/{entityType}/attributes/{attributeId}/options", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> saveAttributeOptions(
-                                         @PathVariable(value = "productFamilyId") String productFamilyId,
-                                         @PathVariable(value = "entityType") String entityType,
-                                         AttributeOption attributeOption) {
+            @PathVariable(value = "productFamilyId") String productFamilyId,
+            @PathVariable(value = "entityType") String entityType,
+            AttributeOption attributeOption) {
         Map<String, Object> model = new HashMap<>();
         Optional<ProductFamily> productFamily = productFamilyService.get(productFamilyId, FindBy.EXTERNAL_ID, false);
         if(productFamily.isPresent() && isValid(attributeOption, model)) {
