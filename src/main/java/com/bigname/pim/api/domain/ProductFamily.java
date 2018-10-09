@@ -29,10 +29,6 @@ public class ProductFamily extends Entity<ProductFamily> {
 
     private Map<String, AttributeGroup> productVariantFamilyAttributes = new LinkedHashMap<>();
 
-    private List<Feature> productFamilyFeatures = new ArrayList<>();
-
-    private List<Feature> productVariantFamilyFeatures = new ArrayList<>();
-
     public ProductFamily() {
         super();
     }
@@ -91,22 +87,6 @@ public class ProductFamily extends Entity<ProductFamily> {
         return this;
     }
 
-    public List<Feature> getProductFamilyFeatures() {
-        return productFamilyFeatures;
-    }
-
-    public void setProductFamilyFeatures(List<Feature> productFamilyFeatures) {
-        this.productFamilyFeatures = productFamilyFeatures;
-    }
-
-    public List<Feature> getProductVariantFamilyFeatures() {
-        return productVariantFamilyFeatures;
-    }
-
-    public void setProductVariantFamilyFeatures(List<Feature> productVariantFamilyFeatures) {
-        this.productVariantFamilyFeatures = productVariantFamilyFeatures;
-    }
-
     @Override
     void setExternalId() {
         this.productFamilyId = getExternalId();
@@ -119,8 +99,6 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.setActive(productFamily.getActive());
         this.setProductFamilyAttributes(productFamily.getProductFamilyAttributes());
         this.setProductVariantFamilyAttributes(productFamily.getProductVariantFamilyAttributes());
-        this.setProductFamilyFeatures(productFamily.getProductFamilyFeatures());
-        this.setProductVariantFamilyFeatures(productFamily.getProductVariantFamilyFeatures());
         return this;
     }
 
