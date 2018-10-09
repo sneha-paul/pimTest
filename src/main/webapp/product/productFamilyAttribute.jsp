@@ -48,12 +48,13 @@
                     <div class="form-group">
                         <label for="uiType">Attribute UI Type</label>
                         <select class="form-control" id="uiType" name="uiType">
-                            <option value="INPUT_BOX">Input Box</option>
                             <option value="CHECKBOX">Checkbox</option>
                             <option value="DATE_PICKER">Date Picker</option>
                             <option value="DROPDOWN">Dropdown</option>
+                            <option value="INPUT_BOX">Input Box</option>
                             <option value="RADIO_BUTTON">Radio Button</option>
                             <option value="TEXTAREA">Textarea</option>
+                            <option value="YES_NO">Yes/No</option>
                         </select>
                     </div>
                     <div class="form-group">

@@ -70,7 +70,9 @@
                                                                                 <c:forEach items="${defaultDetailsAttributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
                                                                                     <div class="form-group">
-                                                                                        <label for="${attribute.id}">${attribute.name}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        <c:if test="${attribute.uiType ne 'YES_NO'}">
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
                                                                                                 <select id="${attribute.id}" name="${attribute.id}" class="form-control">
@@ -109,6 +111,13 @@
                                                                                                         <br/>
                                                                                                     </c:if>
                                                                                                 </c:forEach>
+                                                                                            </c:when>
+                                                                                            <c:when test="${attribute.uiType eq 'YES_NO'}">
+                                                                                                <br/>
+                                                                                                <label class="fancy-checkbox">
+                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                    <span>${attribute.label}</span>
+                                                                                                </label>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                 <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
@@ -155,7 +164,9 @@
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
                                                                                     <div class="form-group">
-                                                                                        <label for="${attribute.id}">${attribute.name}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
                                                                                                 <select id="${attribute.id}" name="${attribute.id}" class="form-control">
@@ -194,6 +205,13 @@
                                                                                                         <br/>
                                                                                                     </c:if>
                                                                                                 </c:forEach>
+                                                                                            </c:when>
+                                                                                            <c:when test="${attribute.uiType eq 'YES_NO'}">
+                                                                                                <br/>
+                                                                                                <label class="fancy-checkbox">
+                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                    <span>${attribute.label}</span>
+                                                                                                </label>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                 <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
@@ -235,28 +253,7 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card inner overflowhidden">
                                     <div class="body">
-                                        <fieldset><legend>Section Name</legend></fieldset>
-                                        <hr style="border:0; margin-top: -5px;border-bottom: 1rem; border-top:1px solid rgba(0,0,0,.1)"/>
                                         <form method="post">
-                                            <div class="row">
-                                                <div class="col-md-6 col-sm-12">
-                                                    <div class="form-group">
-                                                        <label for="metaTitle">Meta Title</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="metaTitle" name="metaTitle" class="form-control" value="${category.metaTitle}" />
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label for="metaKeywords">Meta Keywords</label>
-                                                        <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-
                                             <div class="card inner group overflowhidden">
                                                 <div class="body">
                                                         <fieldset>
@@ -397,7 +394,9 @@
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
                                                                                     <div class="form-group">
-                                                                                        <label for="${attribute.id}">${attribute.name}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
                                                                                                 <select id="${attribute.id}" name="${attribute.id}" class="form-control">
@@ -442,6 +441,13 @@
                                                                                                         <br/>
                                                                                                     </c:if>
                                                                                                 </c:forEach>
+                                                                                            </c:when>
+                                                                                            <c:when test="${attribute.uiType eq 'YES_NO'}">
+                                                                                                <br/>
+                                                                                                <label class="fancy-checkbox">
+                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                    <span>${attribute.label}</span>
+                                                                                                </label>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                 <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
@@ -504,7 +510,9 @@
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
                                                                                     <div class="form-group">
-                                                                                        <label for="${attribute.id}">${attribute.name}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                        </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
                                                                                                 <select id="${attribute.id}" name="${attribute.id}" class="form-control">
@@ -543,6 +551,13 @@
                                                                                                         <br/>
                                                                                                     </c:if>
                                                                                                 </c:forEach>
+                                                                                            </c:when>
+                                                                                            <c:when test="${attribute.uiType eq 'YES_NO'}">
+                                                                                                <br/>
+                                                                                                <label class="fancy-checkbox">
+                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                    <span>${attribute.label}</span>
+                                                                                                </label>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                 <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">

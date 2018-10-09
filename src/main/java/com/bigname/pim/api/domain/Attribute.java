@@ -283,6 +283,7 @@ public class Attribute extends ValidatableEntity {
             }
         },
         RADIO_BUTTON("Radio Button", "Y"),
+        YES_NO("Yes/No", "N"),
         TEXTAREA("Textarea", "N"),
         DATE_PICKER("Date Picker", "N");
 
