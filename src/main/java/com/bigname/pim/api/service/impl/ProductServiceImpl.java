@@ -143,7 +143,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         if(ValidationUtil.isNotEmpty(product.getFamilyAttributes())) {
             String attributeId = product.getFamilyAttributes().entrySet().iterator().next().getKey();
             get(product.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product1 -> {
-                Attribute _attribute = Attribute.findAttribute(attributeId, product1.getProductFamily().getProductFamilyAttributes());
+                Attribute _attribute = Attribute.findAttribute(attributeId, product1.getProductFamily().getAttributes());
                 AttributeGroup level2Group = _attribute.getAttributeGroup().getParentGroup();
                 level2Group.getChildGroups().forEach((k, attributeGroup) ->
                     attributeGroup.getAttributes().forEach((k1, attribute) -> {

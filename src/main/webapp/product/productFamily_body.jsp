@@ -11,10 +11,9 @@
             </div>
             <div class="body">
                 <ul class="nav nav-tabs-new2">
-                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#ProductAttributes">Product
-                        Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#familyAttributes">Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantGroups">Variant Groups</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="DETAILS">
@@ -69,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="ProductAttributes">
+                    <div class="tab-pane" id="familyAttributes">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -78,14 +77,43 @@
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
                                                     <button type="button"
-                                                            class="btn btn-success js-add-productAttribute"><i
-                                                            class="fa fa-plus"></i> <span class="p-l-5">Add Product Attribute</span>
+                                                            class="btn btn-success js-add-familyAttribute"><i
+                                                            class="fa fa-plus"></i> <span class="p-l-5">Add Attribute</span>
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="paginatedProductAttributesTable"
+                                            <table id="paginatedFamilyAttributesTable"
+                                                   class="table table-hover dataTable table-custom" style="width: 100%">
+                                                <thead class="thead-dark">
+
+                                                </thead>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="variantGroups">
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card">
+                                    <div class="body">
+                                        <div class="row p-b-25">
+                                            <div class="col-lg-12 col-md-12">
+                                                <div class="pull-right">
+                                                    <button type="button"
+                                                            class="btn btn-success js-add-variantGroup"><i
+                                                            class="fa fa-plus"></i> <span class="p-l-5">Add Variant Group</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table id="paginatedVariantGroupsTable"
                                                    class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark">
 
@@ -109,11 +137,11 @@
     });
     $(document).ready(function () {
         $.initDataTable({
-            selector: '#paginatedProductAttributesTable',
-            name: 'productAttributes',
+            selector: '#paginatedFamilyAttributesTable',
+            name: 'familyAttributes',
             type: 'TYPE_2',
             buttonGroup: 'GROUP_4',
-            url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attributes'),
+            url: $.getURL('/pim/productFamilies/{productFamilyId}/attributes'),
             columns: [
                 {data: 'name', name: 'name', title: 'Attribute Name'},
                 {data: 'id', name: 'id', title: 'Attribute ID'},
@@ -122,6 +150,22 @@
                 {data: 'actions', name: 'actions', title: 'Actions'}
             ]
         });
+
+        /*$.initDataTable({
+            selector: '#paginatedVariantGroupsTable',
+            name: 'variantGroups',
+            type: 'TYPE_2',
+            buttonGroup: 'GROUP_4',
+            url: $.getURL('/pim/productFamilies/{productFamilyId}/variantGroups'),
+            columns: [
+                {data: 'name', name: 'name', title: 'Attribute Name'},
+                {data: 'id', name: 'id', title: 'Attribute ID'},
+                {data: 'group', name: 'group', title: 'Attribute Group'},
+                {data: 'selectable', name: 'selectable', title: 'Selectable'},
+                {data: 'actions', name: 'actions', title: 'Actions'}
+            ]
+        });*/
+
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
     });
 </script>

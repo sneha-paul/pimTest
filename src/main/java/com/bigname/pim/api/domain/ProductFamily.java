@@ -25,9 +25,7 @@ public class ProductFamily extends Entity<ProductFamily> {
     @NotEmpty(message = "Product Family Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productFamilyName;
 
-    private Map<String, AttributeGroup> productFamilyAttributes = new LinkedHashMap<>();
-
-    private Map<String, AttributeGroup> productVariantFamilyAttributes = new LinkedHashMap<>();
+    private Map<String, AttributeGroup> attributes = new LinkedHashMap<>();
 
     public ProductFamily() {
         super();
@@ -55,33 +53,25 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.productFamilyName = productFamilyName;
     }
 
-    public Map<String, AttributeGroup> getProductFamilyAttributes() {
-        return productFamilyAttributes;
+    public Map<String, AttributeGroup> getAttributes() {
+        return attributes;
     }
 
-    public void setProductFamilyAttributes(Map<String, AttributeGroup> productFamilyAttributes) {
-        this.productFamilyAttributes = productFamilyAttributes;
-    }
-
-    public Map<String, AttributeGroup> getProductVariantFamilyAttributes() {
-        return productVariantFamilyAttributes;
-    }
-
-    public void setProductVariantFamilyAttributes(Map<String, AttributeGroup> productVariantFamilyAttributes) {
-        this.productVariantFamilyAttributes = productVariantFamilyAttributes;
+    public void setAttributes(Map<String, AttributeGroup> attributes) {
+        this.attributes = attributes;
     }
 
     public ProductFamily addAttribute(Attribute attributeDTO) {
-        Map<String, AttributeGroup> familyAttributeGroups = attributeDTO.getEntityType().equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
+        Map<String, AttributeGroup> familyAttributeGroups = getAttributes();
         Attribute attribute = new Attribute(attributeDTO, familyAttributeGroups);
         boolean added = AttributeGroup.addAttribute(attribute, familyAttributeGroups);
         if(!added) { /*Adding the attribute failed */ }
         return this;
     }
 
-    public ProductFamily addAttributeOption(AttributeOption attributeOptionDTO, String entityType) {
+    public ProductFamily addAttributeOption(AttributeOption attributeOptionDTO) {
         String attributeId = attributeOptionDTO.getAttributeId();
-        AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), "VARIANT".equals(entityType) ? getProductVariantFamilyAttributes() : getProductFamilyAttributes())
+        AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
                 .getAttributes()
                 .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
         return this;
@@ -97,8 +87,7 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.setExternalId(productFamily.getExternalId());
         this.setProductFamilyName(productFamily.getProductFamilyName());
         this.setActive(productFamily.getActive());
-        this.setProductFamilyAttributes(productFamily.getProductFamilyAttributes());
-        this.setProductVariantFamilyAttributes(productFamily.getProductVariantFamilyAttributes());
+        this.setAttributes(productFamily.getAttributes());
         return this;
     }
 
@@ -121,24 +110,24 @@ public class ProductFamily extends Entity<ProductFamily> {
         return map;
     }
 
-    public List<AttributeGroup> getAddonMasterGroups(String type) {
-        Map<String, AttributeGroup> attributeGroupsMap = type.equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
+    public List<AttributeGroup> getAddonMasterGroups() {
+        Map<String, AttributeGroup> attributeGroupsMap = getAttributes();
         return attributeGroupsMap.entrySet().stream()
                 .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
                 !e.getKey().equals(AttributeGroup.DETAILS_GROUP_ID) &&
                 !e.getKey().equals(AttributeGroup.FEATURES_GROUP_ID)).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
-    public AttributeGroup getDetailsMasterGroup(String type) {
-        return getMasterGroup(AttributeGroup.DETAILS_GROUP_ID, type);
+    public AttributeGroup getDetailsMasterGroup() {
+        return getMasterGroup(AttributeGroup.DETAILS_GROUP_ID);
     }
 
-    public AttributeGroup getFeaturesMasterGroup(String type) {
-        return getMasterGroup(AttributeGroup.FEATURES_GROUP_ID, type);
+    public AttributeGroup getFeaturesMasterGroup() {
+        return getMasterGroup(AttributeGroup.FEATURES_GROUP_ID);
     }
 
-    public AttributeGroup getMasterGroup(String groupId, String type) {
-        Map<String, AttributeGroup> attributeGroupsMap = type.equals("VARIANT") ? getProductVariantFamilyAttributes() : getProductFamilyAttributes();
+    public AttributeGroup getMasterGroup(String groupId) {
+        Map<String, AttributeGroup> attributeGroupsMap = getAttributes();
 
         List<AttributeGroup> list = attributeGroupsMap.entrySet().stream()
                 .filter(e -> e.getValue().getMasterGroup().equals("Y") &&

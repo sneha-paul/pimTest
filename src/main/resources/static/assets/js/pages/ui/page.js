@@ -109,7 +109,7 @@
             $(options.selector).on('click', '.js-attribute-options', function(){
                 if('GROUP_4' === options.buttonGroup) {
                     $.showModal({
-                        url: $.getURL('/pim/productFamilies/{productFamilyId}/PRODUCT/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
+                        url: $.getURL('/pim/productFamilies/{productFamilyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
                         name:'product-attribute-options',
                         title:'Product Attribute Options',
                         buttons: [

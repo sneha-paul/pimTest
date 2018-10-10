@@ -13,11 +13,11 @@ import java.util.List;
  * Created by manu on 9/4/18.
  */
 public interface ProductFamilyService extends BaseService<ProductFamily, ProductFamilyDAO>  {
-    Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, String type, int page, int size, Sort sort);
+    Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, int page, int size, Sort sort);
 
-    List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort);
+    List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort);
 
-    List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort);
+    List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort);
 
-    Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String entityType, String attributeId, int pageNumber, int size, Sort sort);
+    Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String attributeId, int pageNumber, int size, Sort sort);
 }

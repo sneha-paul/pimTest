@@ -18,9 +18,6 @@ public class Attribute extends ValidatableEntity {
     @NotEmpty(message = "Attribute name cannot be empty")
     private String name;
 
-    @NotEmpty(message = "Attribute entity type cannot be empty")
-    private String entityType;
-
     private String label;
     private UIType _uiType = UIType.INPUT_BOX;
     private String dataType = "string";  //Initial version only supports String type
@@ -124,14 +121,6 @@ public class Attribute extends ValidatableEntity {
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    public String getEntityType() {
-        return entityType;
-    }
-
-    public void setEntityType(String entityType) {
-        this.entityType = entityType;
     }
 
     public UIType getUiType() {

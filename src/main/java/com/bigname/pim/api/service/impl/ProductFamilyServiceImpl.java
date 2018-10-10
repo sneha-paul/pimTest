@@ -39,45 +39,45 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
 
 
     @Override
-    public Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, String entityType, int page, int size, Sort sort) {
+    public Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, int page, int size, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         final Map<String, AttributeGroup> attributeGroups = new HashMap<>();
         List<Attribute> attributes = new ArrayList<>();
-        get(productFamilyId, findBy, false).ifPresent(productFamily -> attributeGroups.putAll("VARIANTS".equals(entityType) ? productFamily.getProductVariantFamilyAttributes() : productFamily.getProductFamilyAttributes()));
+        get(productFamilyId, findBy, false).ifPresent(productFamily -> attributeGroups.putAll(productFamily.getAttributes()));
         AttributeGroup.getAllAttributeGroups(attributeGroups, AttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         //            TODO - sort this based on the requested sort
         return paginate(attributes, page, size);
     }
 
     @Override
-    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort) {
+    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(entityType.equals("VARIANT") ? productFamily1.getProductVariantFamilyAttributes() : productFamily1.getProductFamilyAttributes(), AttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), AttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
+        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), AttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), AttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
 
     @Override
-    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, String entityType, Sort sort) {
+    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(entityType.equals("VARIANT") ? productFamily1.getProductVariantFamilyAttributes() : productFamily1.getProductFamilyAttributes(), AttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
+        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), AttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
 
     @Override
-    public Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String entityType, String attributeId, int page, int size, Sort sort) {
+    public Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
          /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         List<AttributeOption> options = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
         if(productFamily.isPresent()) {
-            options = AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), "VARIANT".equals(entityType) ? productFamily.get().getProductVariantFamilyAttributes() : productFamily.get().getProductFamilyAttributes())
+            options = AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), productFamily.get().getAttributes())
                     .getAttributes()
                     .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
                     .getOptions().entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
