@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class AttributeGroup extends ValidatableEntity {
+public class FamilyAttributeGroup extends ValidatableEntity {
 
     public static final String DETAILS_GROUP = "Details Group";
     public static final String FEATURES_GROUP = "Features Group";
@@ -47,15 +47,15 @@ public class AttributeGroup extends ValidatableEntity {
 
     @Transient
     @JsonIgnore
-    private AttributeGroup parentGroup;
+    private FamilyAttributeGroup parentGroup;
 
-    private Map<String, AttributeGroup> childGroups = new LinkedHashMap<>();
+    private Map<String, FamilyAttributeGroup> childGroups = new LinkedHashMap<>();
 
     private Map<String, Attribute> attributes = new LinkedHashMap<>();
 
-    public AttributeGroup() {}
+    public FamilyAttributeGroup() {}
 
-    public AttributeGroup(String name, String label, boolean masterGroup) {
+    public FamilyAttributeGroup(String name, String label, boolean masterGroup) {
         this.name = name;
         this.label = isNotEmpty(label) ? label : name;
         this.setMasterGroup(masterGroup ? "Y" : "N");
@@ -65,7 +65,7 @@ public class AttributeGroup extends ValidatableEntity {
         orchestrate();
     }
 
-    public AttributeGroup(String name, String label, AttributeGroup parentGroup) {
+    public FamilyAttributeGroup(String name, String label, FamilyAttributeGroup parentGroup) {
         this(name, label, false);
         this.parentGroup = parentGroup;
         this.parentGroup.getChildGroups().put(this.getId(), this);
@@ -154,11 +154,11 @@ public class AttributeGroup extends ValidatableEntity {
         this.subSequenceNum = subSequenceNum;
     }
 
-    public AttributeGroup getParentGroup() {
+    public FamilyAttributeGroup getParentGroup() {
         return parentGroup;
     }
 
-    public AttributeGroup setParentGroup(AttributeGroup parentGroup) {
+    public FamilyAttributeGroup setParentGroup(FamilyAttributeGroup parentGroup) {
         this.parentGroup = parentGroup;
         if(!parentGroup.isEmpty()) {
             setFullId(getFullId(this));
@@ -169,15 +169,15 @@ public class AttributeGroup extends ValidatableEntity {
         return this;
     }
 
-    public Map<String, AttributeGroup> getChildGroups() {
+    public Map<String, FamilyAttributeGroup> getChildGroups() {
         return childGroups;
     }
 
-    public void setChildGroups(Map<String, AttributeGroup> childGroups) {
+    public void setChildGroups(Map<String, FamilyAttributeGroup> childGroups) {
         this.childGroups = childGroups;
     }
 
-    public AttributeGroup addChildGroup(AttributeGroup childGroup) {
+    public FamilyAttributeGroup addChildGroup(FamilyAttributeGroup childGroup) {
         if(isNotEmpty(childGroup)) {
             if(!childGroups.containsKey(childGroup.getId())) {
                 childGroups.put(childGroup.getId(), childGroup);
@@ -223,7 +223,7 @@ public class AttributeGroup extends ValidatableEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AttributeGroup that = (AttributeGroup) o;
+        FamilyAttributeGroup that = (FamilyAttributeGroup) o;
 
         return this.getFullId(this).equals(that.getFullId(that));
     }
@@ -233,7 +233,7 @@ public class AttributeGroup extends ValidatableEntity {
         return getFullId(this).hashCode();
     }
 
-    private String getFullId(AttributeGroup attributeGroup) {
+    private String getFullId(FamilyAttributeGroup attributeGroup) {
         String fullId = "";
         if(isNotEmpty(attributeGroup.getParentGroup()) && !attributeGroup.getParentGroup().isEmpty()) {
             fullId += getFullId(attributeGroup.getParentGroup()) + "|" + attributeGroup.getId();
@@ -243,11 +243,11 @@ public class AttributeGroup extends ValidatableEntity {
         return fullId;
     }
 
-    private static AttributeGroup getLeafGroup(List<String> groupIds, Map<String, AttributeGroup> groups) {
+    private static FamilyAttributeGroup getLeafGroup(List<String> groupIds, Map<String, FamilyAttributeGroup> groups) {
         if(isNotEmpty(groupIds, groupIds.get(0)) && groups.containsKey(groupIds.get(0))) {
             if(groupIds.size() > 1) {
-                AttributeGroup child = getLeafGroup(groupIds.subList(1, groupIds.size()), groups.get(groupIds.get(0)).getChildGroups());
-                AttributeGroup parent = groups.get(groupIds.get(0));
+                FamilyAttributeGroup child = getLeafGroup(groupIds.subList(1, groupIds.size()), groups.get(groupIds.get(0)).getChildGroups());
+                FamilyAttributeGroup parent = groups.get(groupIds.get(0));
                 setParent(child, parent);
                 return child;
             } else {
@@ -258,7 +258,7 @@ public class AttributeGroup extends ValidatableEntity {
         }
     }
 
-    private static void setParent(AttributeGroup child, AttributeGroup parent) {
+    private static void setParent(FamilyAttributeGroup child, FamilyAttributeGroup parent) {
         if(!booleanValue(child.getMasterGroup())) {
             if (isEmpty(child.getParentGroup())) {
                 child.setParentGroup(parent);
@@ -268,11 +268,11 @@ public class AttributeGroup extends ValidatableEntity {
         }
     }
 
-    public static AttributeGroup getLeafGroup(String fullId, Map<String, AttributeGroup> familyMasterGroups) {
+    public static FamilyAttributeGroup getLeafGroup(String fullId, Map<String, FamilyAttributeGroup> familyMasterGroups) {
         return getLeafGroup(getPipedValues(fullId), familyMasterGroups);
     }
 
-    public static AttributeGroup getMasterGroup(String fullId, Map<String, AttributeGroup> familyMasterGroups) {
+    public static FamilyAttributeGroup getMasterGroup(String fullId, Map<String, FamilyAttributeGroup> familyMasterGroups) {
         List<String> groupIds = getPipedValues(fullId);
         if(isNotEmpty(groupIds) && familyMasterGroups.containsKey(groupIds.get(0))) {
             return familyMasterGroups.get(groupIds.get(0));
@@ -282,20 +282,20 @@ public class AttributeGroup extends ValidatableEntity {
     }
 
 
-    public static boolean addAttribute(Attribute attribute, Map<String, AttributeGroup> familyAttributeGroups) {
+    public static boolean addAttribute(Attribute attribute, Map<String, FamilyAttributeGroup> familyAttributeGroups) {
         boolean success = false;
-        AttributeGroup attributeMasterGroup = attribute.getAttributeGroup().getParentGroup().getParentGroup();
+        FamilyAttributeGroup attributeMasterGroup = attribute.getAttributeGroup().getParentGroup().getParentGroup();
         if(isNotEmpty(attributeMasterGroup)) {
-            AttributeGroup familyMasterGroup = familyAttributeGroups.get(attributeMasterGroup.getId());
+            FamilyAttributeGroup familyMasterGroup = familyAttributeGroups.get(attributeMasterGroup.getId());
             if(isNotEmpty(familyMasterGroup)) {
-                AttributeGroup attributeLevel2Group = attributeMasterGroup.getChildGroups().get(DEFAULT_GROUP_ID);
-                AttributeGroup familyLevel2Group = familyMasterGroup.getChildGroups().get(DEFAULT_GROUP_ID);
+                FamilyAttributeGroup attributeLevel2Group = attributeMasterGroup.getChildGroups().get(DEFAULT_GROUP_ID);
+                FamilyAttributeGroup familyLevel2Group = familyMasterGroup.getChildGroups().get(DEFAULT_GROUP_ID);
                 if(isNotEmpty(familyLevel2Group, attributeLevel2Group, attribute.getAttributeGroup())) {
-                    AttributeGroup attributeLeafGroup = getLeafGroup(attribute.getAttributeGroup().getFullId(), familyAttributeGroups);
+                    FamilyAttributeGroup attributeLeafGroup = getLeafGroup(attribute.getAttributeGroup().getFullId(), familyAttributeGroups);
                     if(isNotEmpty(attributeLeafGroup)) {
-                        AttributeGroup familyLeafGroup = familyLevel2Group.getChildGroups().get(attributeLeafGroup.getId());
+                        FamilyAttributeGroup familyLeafGroup = familyLevel2Group.getChildGroups().get(attributeLeafGroup.getId());
                         if(isEmpty(familyLeafGroup)) {
-                            familyLeafGroup = new AttributeGroup(attributeLeafGroup.getName(), attributeLeafGroup.getLabel(), familyLevel2Group);
+                            familyLeafGroup = new FamilyAttributeGroup(attributeLeafGroup.getName(), attributeLeafGroup.getLabel(), familyLevel2Group);
                         }
                         attribute.setAttributeGroup(familyLeafGroup);
                         familyLeafGroup.getAttributes().put(attribute.getId(), attribute);
@@ -312,19 +312,19 @@ public class AttributeGroup extends ValidatableEntity {
 
 
 
-    public static AttributeGroup getDetailsMasterGroup(String label) {
-        return new AttributeGroup(DETAILS_GROUP, isEmpty(label) ? "Details" : label, true);
+    public static FamilyAttributeGroup getDetailsMasterGroup(String label) {
+        return new FamilyAttributeGroup(DETAILS_GROUP, isEmpty(label) ? "Details" : label, true);
     }
 
-    public static AttributeGroup getFeaturesMasterGroup(String label) {
-        return new AttributeGroup(FEATURES_GROUP, isEmpty(label) ? "Features" : label, true);
+    public static FamilyAttributeGroup getFeaturesMasterGroup(String label) {
+        return new FamilyAttributeGroup(FEATURES_GROUP, isEmpty(label) ? "Features" : label, true);
     }
 
-    public static AttributeGroup getDefaultGroup(String name, String label, AttributeGroup parentGroup) {
-        return new AttributeGroup(name, label, parentGroup);
+    public static FamilyAttributeGroup getDefaultGroup(String name, String label, FamilyAttributeGroup parentGroup) {
+        return new FamilyAttributeGroup(name, label, parentGroup);
     }
 
-    public static AttributeGroup createDefaultMasterGroup(boolean isSelectable) {
+    public static FamilyAttributeGroup createDefaultMasterGroup(boolean isSelectable) {
         if(isSelectable) {
             return createDefaultFeaturesGroup().getParentGroup().getParentGroup();
         } else {
@@ -332,7 +332,7 @@ public class AttributeGroup extends ValidatableEntity {
         }
     }
 
-    public static AttributeGroup createDefaultLeafGroup(boolean isSelectable) {
+    public static FamilyAttributeGroup createDefaultLeafGroup(boolean isSelectable) {
         if(isSelectable) {
             return createDefaultFeaturesGroup();
         } else {
@@ -340,55 +340,55 @@ public class AttributeGroup extends ValidatableEntity {
         }
     }
 
-    public static AttributeGroup createDefaultDetailsGroup() {
-        return new AttributeGroup(AttributeGroup.DEFAULT_GROUP, "Details Group", new AttributeGroup(AttributeGroup.DEFAULT_GROUP, "Default Group(L2)", AttributeGroup.getDetailsMasterGroup("Details")));
+    public static FamilyAttributeGroup createDefaultDetailsGroup() {
+        return new FamilyAttributeGroup(FamilyAttributeGroup.DEFAULT_GROUP, "Details Group", new FamilyAttributeGroup(FamilyAttributeGroup.DEFAULT_GROUP, "Default Group(L2)", FamilyAttributeGroup.getDetailsMasterGroup("Details")));
     }
 
-    public static AttributeGroup createDefaultFeaturesGroup() {
-        return new AttributeGroup(AttributeGroup.DEFAULT_GROUP, "Features Group", new AttributeGroup(AttributeGroup.DEFAULT_GROUP, "Default Group(L2)", AttributeGroup.getFeaturesMasterGroup("Product Features")));
+    public static FamilyAttributeGroup createDefaultFeaturesGroup() {
+        return new FamilyAttributeGroup(FamilyAttributeGroup.DEFAULT_GROUP, "Features Group", new FamilyAttributeGroup(FamilyAttributeGroup.DEFAULT_GROUP, "Default Group(L2)", FamilyAttributeGroup.getFeaturesMasterGroup("Product Features")));
     }
 
-    public static AttributeGroup createMasterGroup(String name, String label) {
+    public static FamilyAttributeGroup createMasterGroup(String name, String label) {
         return createLeafGroup(name, label).getParentGroup().getParentGroup();
     }
 
-    public static AttributeGroup createLeafGroup(String name, String label) {
-        return new AttributeGroup(AttributeGroup.DEFAULT_GROUP, isEmpty(label) ? name : label, new AttributeGroup(AttributeGroup.DEFAULT_GROUP, "Default Group(L2)",new AttributeGroup(name, label, true)));
+    public static FamilyAttributeGroup createLeafGroup(String name, String label) {
+        return new FamilyAttributeGroup(FamilyAttributeGroup.DEFAULT_GROUP, isEmpty(label) ? name : label, new FamilyAttributeGroup(FamilyAttributeGroup.DEFAULT_GROUP, "Default Group(L2)",new FamilyAttributeGroup(name, label, true)));
     }
 
-    public static AttributeGroup createLeafGroup(String name, String label, AttributeGroup masterGroup) {
+    public static FamilyAttributeGroup createLeafGroup(String name, String label, FamilyAttributeGroup masterGroup) {
         if(isNotEmpty(masterGroup, masterGroup.getChildGroups(), masterGroup.getChildGroups().get(DEFAULT_GROUP_ID))) {
-            return new AttributeGroup(name, label, masterGroup.getChildGroups().get(DEFAULT_GROUP_ID));
+            return new FamilyAttributeGroup(name, label, masterGroup.getChildGroups().get(DEFAULT_GROUP_ID));
         } else {
             return null;
         }
     }
 
-    public static List<AttributeGroup> getAllAttributeGroups(Map<String, AttributeGroup> groups, GetMode mode, boolean firstRun, int... level) {
-        final List<AttributeGroup> attributeGroups = new ArrayList<>();
+    public static List<FamilyAttributeGroup> getAllAttributeGroups(Map<String, FamilyAttributeGroup> groups, GetMode mode, boolean firstRun, int... level) {
+        final List<FamilyAttributeGroup> attributeGroups = new ArrayList<>();
         map(groups);
-        final List<AttributeGroup> groupsList = new ArrayList<>();
+        final List<FamilyAttributeGroup> groupsList = new ArrayList<>();
         // This will happen only when no attributes registered yet for an attribute group
         // We have two default master groups, details group and features group.
         if(firstRun ) { //This is the first run of the recursion
 
-            if(!groups.containsKey(AttributeGroup.DETAILS_GROUP_ID)) {
+            if(!groups.containsKey(FamilyAttributeGroup.DETAILS_GROUP_ID)) {
                 //Won't contain the default details master group, so add it
-                groupsList.add(AttributeGroup.createDefaultMasterGroup(false));
+                groupsList.add(FamilyAttributeGroup.createDefaultMasterGroup(false));
             }
 
-            if(!groups.containsKey(AttributeGroup.FEATURES_GROUP_ID)) {
+            if(!groups.containsKey(FamilyAttributeGroup.FEATURES_GROUP_ID)) {
                 //Won't contain the default features master group, so add it
-                groupsList.add(AttributeGroup.createDefaultMasterGroup(true));
+                groupsList.add(FamilyAttributeGroup.createDefaultMasterGroup(true));
             }
         }
 
 
         /*if(firstRun) {
-            List<AttributeGroup> masterGroups = getAllAttributeGroups(groups, "MASTER_ONLY", true);
-            List<AttributeGroup> defaultMasterGroups = masterGroups.stream().filter(g ->
-                    g.getFullId().equals(AttributeGroup.getDetailsMasterGroup(null).getFullId()) ||
-                            g.getFullId().equals(AttributeGroup.getFeaturesMasterGroup(null).getFullId())).collect(Collectors.toList());
+            List<FamilyAttributeGroup> masterGroups = getAllAttributeGroups(groups, "MASTER_ONLY", true);
+            List<FamilyAttributeGroup> defaultMasterGroups = masterGroups.stream().filter(g ->
+                    g.getFullId().equals(FamilyAttributeGroup.getDetailsMasterGroup(null).getFullId()) ||
+                            g.getFullId().equals(FamilyAttributeGroup.getFeaturesMasterGroup(null).getFullId())).collect(Collectors.toList());
 
 
         }*/
@@ -442,19 +442,19 @@ public class AttributeGroup extends ValidatableEntity {
         return attributeGroups;
     }
 
-    public static List<Attribute> getAllAttributes(Map<String, AttributeGroup> familyGroups) {
+    public static List<Attribute> getAllAttributes(Map<String, FamilyAttributeGroup> familyGroups) {
         List<Attribute> attributes = new ArrayList<>();
         getAllAttributeGroups(familyGroups, GetMode.LEAF_ONLY, true).forEach(attributeGroup -> attributeGroup.getAttributes().forEach((s, attribute) -> attributes.add(attribute)));
         return attributes;
     }
 
-    public static List<String> getAllAttributeIds(Map<String, AttributeGroup> familyGroups) {
+    public static List<String> getAllAttributeIds(Map<String, FamilyAttributeGroup> familyGroups) {
         List<String> attributes = new ArrayList<>();
         getAllAttributeGroups(familyGroups, GetMode.LEAF_ONLY, true).forEach(attributeGroup -> attributeGroup.getAttributes().forEach((s, attribute) -> attributes.add(attribute.getId())));
         return attributes;
     }
 
-    public static Map<String, AttributeGroup> map(Map<String, AttributeGroup> attributeGroups, AttributeGroup... parent) {
+    public static Map<String, FamilyAttributeGroup> map(Map<String, FamilyAttributeGroup> attributeGroups, FamilyAttributeGroup... parent) {
 
         attributeGroups.forEach((k, attributeGroup) -> {
             if(isNotEmpty(ConversionUtil.toList(parent))) {
@@ -469,9 +469,9 @@ public class AttributeGroup extends ValidatableEntity {
         return attributeGroups;
     }
 
-    public static String getUniqueLeafGroupLabel(AttributeGroup leafGroup, String separator) {
+    public static String getUniqueLeafGroupLabel(FamilyAttributeGroup leafGroup, String separator) {
         if(isNotEmpty(leafGroup, leafGroup.getParentGroup(), leafGroup.getParentGroup().getParentGroup())) {
-            AttributeGroup masterGroup = leafGroup.getParentGroup().getParentGroup();
+            FamilyAttributeGroup masterGroup = leafGroup.getParentGroup().getParentGroup();
 
             if(DEFAULT_GROUP_ID.equals(leafGroup.getId())) {
                 return masterGroup.getLabel();

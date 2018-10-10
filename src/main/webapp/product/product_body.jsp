@@ -1,9 +1,9 @@
 <%--@elvariable id="product" type="com.bigname.pim.api.domain.Product"--%>
 <%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.api.domain.ProductFamily>"--%>
-<%--@elvariable id="masterGroup" type="com.bigname.pim.api.domain.AttributeGroup"--%>
-<%--@elvariable id="detailsMasterGroup" type="com.bigname.pim.api.domain.AttributeGroup"--%>
-<%--@elvariable id="featuresMasterGroup" type="com.bigname.pim.api.domain.AttributeGroup"--%>
-<%--@elvariable id="defaultDetailsAttributeGroup" type="com.bigname.pim.api.domain.AttributeGroup"--%>
+<%--@elvariable id="masterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
+<%--@elvariable id="detailsMasterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
+<%--@elvariable id="featuresMasterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
+<%--@elvariable id="defaultDetailsAttributeGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="masterGroups" value="${product.productFamily.getAddonMasterGroups(\"PRODUCT\")}"/>
 <c:set var="detailsMasterGroup" value="${product.productFamily.getDetailsMasterGroup(\"PRODUCT\")}"/>

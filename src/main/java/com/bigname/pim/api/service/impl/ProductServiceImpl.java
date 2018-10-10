@@ -144,7 +144,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
             String attributeId = product.getFamilyAttributes().entrySet().iterator().next().getKey();
             get(product.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product1 -> {
                 Attribute _attribute = Attribute.findAttribute(attributeId, product1.getProductFamily().getAttributes());
-                AttributeGroup level2Group = _attribute.getAttributeGroup().getParentGroup();
+                FamilyAttributeGroup level2Group = _attribute.getAttributeGroup().getParentGroup();
                 level2Group.getChildGroups().forEach((k, attributeGroup) ->
                     attributeGroup.getAttributes().forEach((k1, attribute) -> {
                         if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getFamilyAttributes().containsKey(k1)) {

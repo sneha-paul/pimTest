@@ -25,7 +25,7 @@ public class ProductFamily extends Entity<ProductFamily> {
     @NotEmpty(message = "Product Family Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productFamilyName;
 
-    private Map<String, AttributeGroup> attributes = new LinkedHashMap<>();
+    private Map<String, FamilyAttributeGroup> attributes = new LinkedHashMap<>();
 
     public ProductFamily() {
         super();
@@ -53,25 +53,25 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.productFamilyName = productFamilyName;
     }
 
-    public Map<String, AttributeGroup> getAttributes() {
+    public Map<String, FamilyAttributeGroup> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<String, AttributeGroup> attributes) {
+    public void setAttributes(Map<String, FamilyAttributeGroup> attributes) {
         this.attributes = attributes;
     }
 
     public ProductFamily addAttribute(Attribute attributeDTO) {
-        Map<String, AttributeGroup> familyAttributeGroups = getAttributes();
+        Map<String, FamilyAttributeGroup> familyAttributeGroups = getAttributes();
         Attribute attribute = new Attribute(attributeDTO, familyAttributeGroups);
-        boolean added = AttributeGroup.addAttribute(attribute, familyAttributeGroups);
+        boolean added = FamilyAttributeGroup.addAttribute(attribute, familyAttributeGroups);
         if(!added) { /*Adding the attribute failed */ }
         return this;
     }
 
     public ProductFamily addAttributeOption(AttributeOption attributeOptionDTO) {
         String attributeId = attributeOptionDTO.getAttributeId();
-        AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
+        FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
                 .getAttributes()
                 .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
         return this;
@@ -110,26 +110,26 @@ public class ProductFamily extends Entity<ProductFamily> {
         return map;
     }
 
-    public List<AttributeGroup> getAddonMasterGroups() {
-        Map<String, AttributeGroup> attributeGroupsMap = getAttributes();
+    public List<FamilyAttributeGroup> getAddonMasterGroups() {
+        Map<String, FamilyAttributeGroup> attributeGroupsMap = getAttributes();
         return attributeGroupsMap.entrySet().stream()
                 .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
-                !e.getKey().equals(AttributeGroup.DETAILS_GROUP_ID) &&
-                !e.getKey().equals(AttributeGroup.FEATURES_GROUP_ID)).map(Map.Entry::getValue).collect(Collectors.toList());
+                !e.getKey().equals(FamilyAttributeGroup.DETAILS_GROUP_ID) &&
+                !e.getKey().equals(FamilyAttributeGroup.FEATURES_GROUP_ID)).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
-    public AttributeGroup getDetailsMasterGroup() {
-        return getMasterGroup(AttributeGroup.DETAILS_GROUP_ID);
+    public FamilyAttributeGroup getDetailsMasterGroup() {
+        return getMasterGroup(FamilyAttributeGroup.DETAILS_GROUP_ID);
     }
 
-    public AttributeGroup getFeaturesMasterGroup() {
-        return getMasterGroup(AttributeGroup.FEATURES_GROUP_ID);
+    public FamilyAttributeGroup getFeaturesMasterGroup() {
+        return getMasterGroup(FamilyAttributeGroup.FEATURES_GROUP_ID);
     }
 
-    public AttributeGroup getMasterGroup(String groupId) {
-        Map<String, AttributeGroup> attributeGroupsMap = getAttributes();
+    public FamilyAttributeGroup getMasterGroup(String groupId) {
+        Map<String, FamilyAttributeGroup> attributeGroupsMap = getAttributes();
 
-        List<AttributeGroup> list = attributeGroupsMap.entrySet().stream()
+        List<FamilyAttributeGroup> list = attributeGroupsMap.entrySet().stream()
                 .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
                         e.getKey().equals(groupId)).map(Map.Entry::getValue).collect(Collectors.toList());
         return isNotEmpty(list) ? list.get(0) : null;

@@ -43,10 +43,10 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
-        final Map<String, AttributeGroup> attributeGroups = new HashMap<>();
+        final Map<String, FamilyAttributeGroup> attributeGroups = new HashMap<>();
         List<Attribute> attributes = new ArrayList<>();
         get(productFamilyId, findBy, false).ifPresent(productFamily -> attributeGroups.putAll(productFamily.getAttributes()));
-        AttributeGroup.getAllAttributeGroups(attributeGroups, AttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
+        FamilyAttributeGroup.getAllAttributeGroups(attributeGroups, FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         //            TODO - sort this based on the requested sort
         return paginate(attributes, page, size);
     }
@@ -55,7 +55,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), AttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), AttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
+        productFamily.ifPresent(productFamily1 -> FamilyAttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), FamilyAttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
@@ -64,7 +64,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
-        productFamily.ifPresent(productFamily1 -> AttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), AttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
+        productFamily.ifPresent(productFamily1 -> FamilyAttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), FamilyAttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
@@ -77,7 +77,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
         List<AttributeOption> options = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
         if(productFamily.isPresent()) {
-            options = AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), productFamily.get().getAttributes())
+            options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), productFamily.get().getAttributes())
                     .getAttributes()
                     .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
                     .getOptions().entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());

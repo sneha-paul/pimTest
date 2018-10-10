@@ -110,7 +110,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute) {
         Map<String, Object> model = new HashMap<>();
         Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
-        // TODO - cross field validation to see if one of attributeGroup ID and AttributeGroup name is not empty
+        // TODO - cross field validation to see if one of attributeGroup ID and FamilyAttributeGroup name is not empty
         if(productFamily.isPresent() && isValid(attribute, model)) {
             productFamily.get().addAttribute(attribute);
             productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
