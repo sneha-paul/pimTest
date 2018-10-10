@@ -26,10 +26,10 @@ public class Family extends Entity<Family> {
         super();
     }
 
-    public Family(String externalId, String familyName) {
+    /*public Family(String externalId, String familyName) {
         super(externalId);
         this.familyName = familyName;
-    }
+    }*/
 
     public String getFamilyId() {
         return getExternalId();
