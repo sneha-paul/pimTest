@@ -19,5 +19,5 @@ public interface ProductFamilyService extends BaseService<ProductFamily, Product
 
     List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort);
 
-    Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String attributeId, int pageNumber, int size, Sort sort);
+    Page<FamilyAttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String attributeId, int pageNumber, int size, Sort sort);
 }

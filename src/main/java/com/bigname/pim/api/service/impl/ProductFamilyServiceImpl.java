@@ -70,11 +70,11 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     }
 
     @Override
-    public Page<AttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
+    public Page<FamilyAttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
          /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
-        List<AttributeOption> options = new ArrayList<>();
+        List<FamilyAttributeOption> options = new ArrayList<>();
         Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
         if(productFamily.isPresent()) {
             options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), productFamily.get().getAttributes())

@@ -33,7 +33,7 @@ public class FamilyAttribute extends ValidatableEntity {
     @JsonIgnore
     private FamilyAttributeGroup attributeGroup;
 
-    private Map<String, AttributeOption> options = new LinkedHashMap<>();
+    private Map<String, FamilyAttributeOption> options = new LinkedHashMap<>();
 
     public FamilyAttribute() {}
 
@@ -205,11 +205,11 @@ public class FamilyAttribute extends ValidatableEntity {
         this.attributeGroup = attributeGroup;
     }
 
-    public Map<String, AttributeOption> getOptions() {
+    public Map<String, FamilyAttributeOption> getOptions() {
         return options;
     }
 
-    public void setOptions(Map<String, AttributeOption> options) {
+    public void setOptions(Map<String, FamilyAttributeOption> options) {
         this.options = options;
     }
 

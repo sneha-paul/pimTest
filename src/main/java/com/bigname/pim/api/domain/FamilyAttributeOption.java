@@ -1,4 +1,5 @@
 package com.bigname.pim.api.domain;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
@@ -10,7 +11,7 @@ import java.util.Map;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class AttributeOption extends ValidatableEntity {
+public class FamilyAttributeOption extends ValidatableEntity {
     @NotEmpty(message = "Option value cannot be empty")
     private String value;
 
@@ -25,10 +26,11 @@ public class AttributeOption extends ValidatableEntity {
     private int subSequenceNum;
 
     @NotEmpty(message = "Attribute id cannot be empty")
-    @Transient @JsonIgnore
+    @Transient
+    @JsonIgnore
     private String attributeId;
 
-    public AttributeOption() {
+    public FamilyAttributeOption() {
     }
 
     public String getId() {
@@ -103,5 +105,4 @@ public class AttributeOption extends ValidatableEntity {
 
         return map;
     }
-
 }

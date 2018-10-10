@@ -153,7 +153,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<AttributeOption> paginatedResult = productFamilyService.getFamilyAttributeOptions(productFamilyId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<FamilyAttributeOption> paginatedResult = productFamilyService.getFamilyAttributeOptions(productFamilyId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -172,7 +172,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
 
     @RequestMapping(value = "/{productFamilyId}/attributes/{attributeId}/options", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, AttributeOption attributeOption) {
+    public Map<String, Object> saveAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, FamilyAttributeOption attributeOption) {
         Map<String, Object> model = new HashMap<>();
         Optional<ProductFamily> productFamily = productFamilyService.get(productFamilyId, FindBy.EXTERNAL_ID, false);
         if(productFamily.isPresent() && isValid(attributeOption, model)) {

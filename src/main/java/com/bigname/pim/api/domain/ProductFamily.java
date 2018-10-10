@@ -69,7 +69,7 @@ public class ProductFamily extends Entity<ProductFamily> {
         return this;
     }
 
-    public ProductFamily addAttributeOption(AttributeOption attributeOptionDTO) {
+    public ProductFamily addAttributeOption(FamilyAttributeOption attributeOptionDTO) {
         String attributeId = attributeOptionDTO.getAttributeId();
         FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
                 .getAttributes()
