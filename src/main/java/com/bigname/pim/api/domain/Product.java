@@ -32,7 +32,7 @@ public class Product extends Entity<Product> {
     private String productFamilyId;
 
     @Transient
-    private ProductFamily productFamily;
+    private Family productFamily;
 
     private Map<String, Object> familyAttributes = new HashMap<>();
 
@@ -73,11 +73,11 @@ public class Product extends Entity<Product> {
         this.productFamilyId = productFamilyId;
     }
 
-    public ProductFamily getProductFamily() {
+    public Family getProductFamily() {
         return productFamily;
     }
 
-    public void setProductFamily(ProductFamily productFamily) {
+    public void setProductFamily(Family productFamily) {
         this.productFamily = productFamily;
         setProductFamilyId(productFamily.getId());
     }

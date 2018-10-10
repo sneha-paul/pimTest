@@ -6,10 +6,10 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.ProductFamily;
+import com.bigname.pim.api.domain.Family;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.exception.EntityNotFoundException;
-import com.bigname.pim.api.service.ProductFamilyService;
+import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
@@ -36,9 +36,9 @@ import java.util.*;
 public class ProductController extends BaseController<Product, ProductService>{
 
     private ProductService productService;
-    private ProductFamilyService productFamilyService;
+    private FamilyService productFamilyService;
 
-    public ProductController( ProductService productService,ProductFamilyService productFamilyService){
+    public ProductController( ProductService productService,FamilyService productFamilyService){
         super(productService);
         this.productService = productService;
         this.productFamilyService = productFamilyService;
@@ -82,7 +82,7 @@ public class ProductController extends BaseController<Product, ProductService>{
             if(_product.isPresent()) {
                 Product product = _product.get();
                 if(ValidationUtil.isNotEmpty(product.getProductFamilyId())) {
-                    Optional<ProductFamily> productFamily = productFamilyService.get(product.getProductFamilyId(), FindBy.INTERNAL_ID);
+                    Optional<Family> productFamily = productFamilyService.get(product.getProductFamilyId(), FindBy.INTERNAL_ID);
                     productFamily.ifPresent(product::setProductFamily);
                 }
                 model.put("mode", "DETAILS");

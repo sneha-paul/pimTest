@@ -1,16 +1,15 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.ProductFamilyDAO;
-import com.bigname.pim.api.service.ProductFamilyService;
+import com.bigname.pim.api.domain.Family;
+import com.bigname.pim.api.domain.FamilyAttribute;
+import com.bigname.pim.api.domain.FamilyAttributeGroup;
+import com.bigname.pim.api.domain.FamilyAttributeOption;
+import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.PimUtil;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +21,18 @@ import java.util.stream.Collectors;
  * Created by manu on 9/4/18.
  */
 @Service
-public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, ProductFamilyDAO> implements ProductFamilyService {
+public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> implements FamilyService {
 
-    private ProductFamilyDAO productFamilyDAO;
+    private FamilyDAO productFamilyDAO;
 
     @Autowired
-    public ProductFamilyServiceImpl(ProductFamilyDAO productFamilyDAO, Validator validator) {
+    public FamilyServiceImpl(FamilyDAO productFamilyDAO, Validator validator) {
         super(productFamilyDAO, "productFamily", validator);
         this.productFamilyDAO = productFamilyDAO;
     }
 
     @Override
-    public ProductFamily createOrUpdate(ProductFamily productFamily) {
+    public Family createOrUpdate(Family productFamily) {
         return productFamilyDAO.save(productFamily);
     }
 
@@ -54,7 +53,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     @Override
     public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        Optional<Family> productFamily = get(productFamilyId, findBy, false);
         productFamily.ifPresent(productFamily1 -> FamilyAttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), FamilyAttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
@@ -63,7 +62,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
     @Override
     public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        Optional<Family> productFamily = get(productFamilyId, findBy, false);
         productFamily.ifPresent(productFamily1 -> FamilyAttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), FamilyAttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
@@ -75,7 +74,7 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         List<FamilyAttributeOption> options = new ArrayList<>();
-        Optional<ProductFamily> productFamily = get(productFamilyId, findBy, false);
+        Optional<Family> productFamily = get(productFamilyId, findBy, false);
         if(productFamily.isPresent()) {
             options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), productFamily.get().getAttributes())
                     .getAttributes()

@@ -3,10 +3,8 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.ProductFamily;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.exception.EntityNotFoundException;
-import com.bigname.pim.api.service.ProductFamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.client.model.Breadcrumbs;
@@ -34,14 +32,12 @@ import java.util.Optional;
 public class ProductVariantController extends BaseController<ProductVariant, ProductVariantService> {
 
     private ProductVariantService productVariantService;
-    private ProductFamilyService productFamilyService;
 
     private ProductService productService;
 
-    public ProductVariantController( ProductVariantService productVariantService, ProductFamilyService productFamilyService, ProductService productService){
+    public ProductVariantController( ProductVariantService productVariantService, ProductService productService){
         super(productVariantService);
         this.productVariantService = productVariantService;
-        this.productFamilyService = productFamilyService;
         this.productService = productService;
     }
 

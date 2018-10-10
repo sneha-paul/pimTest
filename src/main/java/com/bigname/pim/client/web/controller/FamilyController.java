@@ -6,7 +6,7 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
-import com.bigname.pim.api.service.ProductFamilyService;
+import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
@@ -28,11 +28,11 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("pim/productFamilies")
-public class ProductFamilyController extends BaseController<ProductFamily, ProductFamilyService> {
+public class FamilyController extends BaseController<Family, FamilyService> {
 
-    private ProductFamilyService productFamilyService;
+    private FamilyService productFamilyService;
 
-    public ProductFamilyController(ProductFamilyService productFamilyService) {
+    public FamilyController(FamilyService productFamilyService) {
         super(productFamilyService);
         this.productFamilyService = productFamilyService;
     }
@@ -46,9 +46,9 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> create( ProductFamily productFamily) {
+    public Map<String, Object> create( Family productFamily) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(productFamily, model, ProductFamily.CreateGroup.class)) {
+        if(isValid(productFamily, model, Family.CreateGroup.class)) {
             productFamily.setActive("N");
             productFamilyService.create(productFamily);
             model.put("success", true);
@@ -58,9 +58,9 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, ProductFamily productFamily) {
+    public Map<String, Object> update(@PathVariable(value = "id") String id, Family productFamily) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(productFamily, model, productFamily.getGroup().equals("DETAILS") ? ProductFamily.DetailsGroup.class : null)) {
+        if(isValid(productFamily, model, productFamily.getGroup().equals("DETAILS") ? Family.DetailsGroup.class : null)) {
             productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily);
             model.put("success", true);
         }
@@ -81,14 +81,14 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
         model.put("active", "PRODUCT_FAMILIES");
         if(id == null) {
             model.put("mode", "CREATE");
-            model.put("productFamily", new ProductFamily());
+            model.put("productFamily", new Family());
             model.put("breadcrumbs", new Breadcrumbs("Product Families", "Product Families", "/pim/productFamilies", "Create Product Family", ""));
         } else {
-            Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
+            Optional<Family> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
             if(productFamily.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("productFamily", productFamily.get());
-                model.put("breadcrumbs", new Breadcrumbs("Product Families", "Product Families", "/pim/productFamilies", productFamily.get().getProductFamilyName(), ""));
+                model.put("breadcrumbs", new Breadcrumbs("Product Families", "Product Families", "/pim/productFamilies", productFamily.get().getFamilyName(), ""));
             } else {
                 throw new EntityNotFoundException("Unable to find Product Family with Id: " + id);
             }
@@ -109,7 +109,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     @ResponseBody
     public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, FamilyAttribute attribute) {
         Map<String, Object> model = new HashMap<>();
-        Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
+        Optional<Family> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
         // TODO - cross field validation to see if one of attributeGroup ID and FamilyAttributeGroup name is not empty
         if(productFamily.isPresent() && isValid(attribute, model)) {
             productFamily.get().addAttribute(attribute);
@@ -174,7 +174,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     @ResponseBody
     public Map<String, Object> saveAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, FamilyAttributeOption attributeOption) {
         Map<String, Object> model = new HashMap<>();
-        Optional<ProductFamily> productFamily = productFamilyService.get(productFamilyId, FindBy.EXTERNAL_ID, false);
+        Optional<Family> productFamily = productFamilyService.get(productFamilyId, FindBy.EXTERNAL_ID, false);
         if(productFamily.isPresent() && isValid(attributeOption, model)) {
             productFamily.get().addAttributeOption(attributeOption);
             productFamilyService.update(productFamilyId, FindBy.EXTERNAL_ID, productFamily.get());

@@ -1,56 +1,51 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.StringUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Created by manu on 9/1/18.
  */
-public class ProductFamily extends Entity<ProductFamily> {
+public class Family extends Entity<Family> {
 
     @Transient
-    @NotEmpty(message = "Product Family Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    String productFamilyId;
+    @NotEmpty(message = "Family Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    String familyId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Product Family Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    private String productFamilyName;
+    @NotEmpty(message = "Family Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    private String familyName;
 
     private Map<String, FamilyAttributeGroup> attributes = new LinkedHashMap<>();
 
-    public ProductFamily() {
+    public Family() {
         super();
     }
 
-    public ProductFamily(String externalId, String productFamilyName) {
+    public Family(String externalId, String familyName) {
         super(externalId);
-        this.productFamilyName = productFamilyName;
+        this.familyName = familyName;
     }
 
-    public String getProductFamilyId() {
+    public String getFamilyId() {
         return getExternalId();
     }
 
-    public void setProductFamilyId(String productFamilyId) {
-        this.productFamilyId = productFamilyId;
-        setExternalId(productFamilyId);
+    public void setFamilyId(String familyId) {
+        this.familyId = familyId;
+        setExternalId(familyId);
     }
 
-    public String getProductFamilyName() {
-        return productFamilyName;
+    public String getFamilyName() {
+        return familyName;
     }
 
-    public void setProductFamilyName(String productFamilyName) {
-        this.productFamilyName = productFamilyName;
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
     }
 
     public Map<String, FamilyAttributeGroup> getAttributes() {
@@ -61,7 +56,7 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.attributes = attributes;
     }
 
-    public ProductFamily addAttribute(FamilyAttribute attributeDTO) {
+    public Family addAttribute(FamilyAttribute attributeDTO) {
         Map<String, FamilyAttributeGroup> familyAttributeGroups = getAttributes();
         FamilyAttribute attribute = new FamilyAttribute(attributeDTO, familyAttributeGroups);
         boolean added = FamilyAttributeGroup.addAttribute(attribute, familyAttributeGroups);
@@ -69,7 +64,7 @@ public class ProductFamily extends Entity<ProductFamily> {
         return this;
     }
 
-    public ProductFamily addAttributeOption(FamilyAttributeOption attributeOptionDTO) {
+    public Family addAttributeOption(FamilyAttributeOption attributeOptionDTO) {
         String attributeId = attributeOptionDTO.getAttributeId();
         FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
                 .getAttributes()
@@ -79,25 +74,25 @@ public class ProductFamily extends Entity<ProductFamily> {
 
     @Override
     void setExternalId() {
-        this.productFamilyId = getExternalId();
+        this.familyId = getExternalId();
     }
 
     @Override
-    public ProductFamily merge(ProductFamily productFamily) {
-        this.setExternalId(productFamily.getExternalId());
-        this.setProductFamilyName(productFamily.getProductFamilyName());
-        this.setActive(productFamily.getActive());
-        this.setAttributes(productFamily.getAttributes());
+    public Family merge(Family family) {
+        this.setExternalId(family.getExternalId());
+        this.setFamilyName(family.getFamilyName());
+        this.setActive(family.getActive());
+        this.setAttributes(family.getAttributes());
         return this;
     }
 
     @Override
-    public ProductFamily cloneInstance() {
-        ProductFamily clone = new ProductFamily();
+    public Family cloneInstance() {
+        Family clone = new Family();
         clone.setActive("N");
         clone.setExternalId(cloneValue(getExternalId()));
-        clone.setProductFamilyName(cloneValue(getProductFamilyName()));
-       // clone.setProductFamilyAttributes(cloneValue(getProductFamilyAttributes()));
+        clone.setFamilyName(cloneValue(getFamilyName()));
+       // clone.setFamilyAttributes(cloneValue(getFamilyAttributes()));
         return clone;
     }
 
@@ -105,7 +100,7 @@ public class ProductFamily extends Entity<ProductFamily> {
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
-        map.put("productFamilyName", getProductFamilyName());
+        map.put("familyName", getFamilyName());
         map.put("active", getActive());
         return map;
     }

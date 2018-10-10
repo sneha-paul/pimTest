@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.GenericEntityException;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
-import com.bigname.pim.api.service.ProductFamilyService;
+import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
@@ -28,11 +28,11 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
 
     private ProductDAO productDAO;
     private ProductVariantDAO productVariantDAO;
-    private ProductFamilyService productFamilyService;
+    private FamilyService productFamilyService;
 
 
     @Autowired
-    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantDAO productVariantDAO, ProductFamilyService productFamilyService) {
+    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantDAO productVariantDAO, FamilyService productFamilyService) {
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
         this.productVariantDAO = productVariantDAO;
