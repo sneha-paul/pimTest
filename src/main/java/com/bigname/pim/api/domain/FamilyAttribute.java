@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class Attribute extends ValidatableEntity {
+public class FamilyAttribute extends ValidatableEntity {
 
     @NotEmpty(message = "Attribute name cannot be empty")
     private String name;
@@ -35,9 +35,9 @@ public class Attribute extends ValidatableEntity {
 
     private Map<String, AttributeOption> options = new LinkedHashMap<>();
 
-    public Attribute() {}
+    public FamilyAttribute() {}
 
-    public Attribute(Attribute attributeDTO, Map<String, FamilyAttributeGroup> familyGroups) {
+    public FamilyAttribute(FamilyAttribute attributeDTO, Map<String, FamilyAttributeGroup> familyGroups) {
         this(attributeDTO.getName());
         this.setUiType(attributeDTO.getUiType());
         FamilyAttributeGroup attributeGroup, attributeGroupDTO = attributeDTO.getAttributeGroup();
@@ -93,9 +93,9 @@ public class Attribute extends ValidatableEntity {
 
 
 
-    public Attribute(String name) {
+    public FamilyAttribute(String name) {
         if(isEmpty(name)) {
-            throw new IllegalArgumentException("The name constructor argument for Attribute() cannot be empty");
+            throw new IllegalArgumentException("The name constructor argument for FamilyAttribute() cannot be empty");
         }
         this.name = name;
         this.label = name;
@@ -251,7 +251,7 @@ public class Attribute extends ValidatableEntity {
         return map;
     }
 
-    public static Attribute findAttribute(String attributeId, Map<String, FamilyAttributeGroup> familyAttributeGroups) {
+    public static FamilyAttribute findAttribute(String attributeId, Map<String, FamilyAttributeGroup> familyAttributeGroups) {
         return FamilyAttributeGroup
                 .map(familyAttributeGroups).entrySet().parallelStream()
                 .flatMap(g -> g.getValue().getChildGroups().entrySet().parallelStream())

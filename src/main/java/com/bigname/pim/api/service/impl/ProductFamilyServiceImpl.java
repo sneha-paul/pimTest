@@ -39,12 +39,12 @@ public class ProductFamilyServiceImpl extends BaseServiceSupport<ProductFamily, 
 
 
     @Override
-    public Page<Attribute> getFamilyAttributes(String productFamilyId, FindBy findBy, int page, int size, Sort sort) {
+    public Page<FamilyAttribute> getFamilyAttributes(String productFamilyId, FindBy findBy, int page, int size, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         final Map<String, FamilyAttributeGroup> attributeGroups = new HashMap<>();
-        List<Attribute> attributes = new ArrayList<>();
+        List<FamilyAttribute> attributes = new ArrayList<>();
         get(productFamilyId, findBy, false).ifPresent(productFamily -> attributeGroups.putAll(productFamily.getAttributes()));
         FamilyAttributeGroup.getAllAttributeGroups(attributeGroups, FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         //            TODO - sort this based on the requested sort

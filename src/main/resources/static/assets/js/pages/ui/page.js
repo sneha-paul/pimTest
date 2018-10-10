@@ -110,8 +110,8 @@
                 if('GROUP_4' === options.buttonGroup) {
                     $.showModal({
                         url: $.getURL('/pim/productFamilies/{productFamilyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
-                        name:'product-attribute-options',
-                        title:'Product Attribute Options',
+                        name:'attribute-options',
+                        title:'Attribute Options',
                         buttons: [
                             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
                         ]

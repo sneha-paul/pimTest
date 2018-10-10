@@ -61,9 +61,9 @@ public class ProductFamily extends Entity<ProductFamily> {
         this.attributes = attributes;
     }
 
-    public ProductFamily addAttribute(Attribute attributeDTO) {
+    public ProductFamily addAttribute(FamilyAttribute attributeDTO) {
         Map<String, FamilyAttributeGroup> familyAttributeGroups = getAttributes();
-        Attribute attribute = new Attribute(attributeDTO, familyAttributeGroups);
+        FamilyAttribute attribute = new FamilyAttribute(attributeDTO, familyAttributeGroups);
         boolean added = FamilyAttributeGroup.addAttribute(attribute, familyAttributeGroups);
         if(!added) { /*Adding the attribute failed */ }
         return this;

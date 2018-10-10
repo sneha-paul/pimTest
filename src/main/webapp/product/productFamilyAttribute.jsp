@@ -1,4 +1,4 @@
-<%--@elvariable id="attribute" type="com.bigname.pim.api.domain.Attribute"--%>
+<%--@elvariable id="attribute" type="com.bigname.pim.api.domain.FamilyAttribute"--%>
 <%--@elvariable id="attributeGroups" type="java.util.List<org.javatuples.Pair<String, String>"--%>
 <%--@elvariable id="parentAttributeGroups" type="java.util.List<org.javatuples.Pair<String, String"--%>
 
@@ -51,7 +51,7 @@
                             <option value="CHECKBOX">Checkbox</option>
                             <option value="DATE_PICKER">Date Picker</option>
                             <option value="DROPDOWN">Dropdown</option>
-                            <option value="INPUT_BOX">Input Box</option>
+                            <option value="INPUT_BOX" selected>Input Box</option>
                             <option value="RADIO_BUTTON">Radio Button</option>
                             <option value="TEXTAREA">Textarea</option>
                             <option value="YES_NO">Yes/No</option>

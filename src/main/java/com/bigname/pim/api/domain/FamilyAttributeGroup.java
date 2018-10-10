@@ -51,7 +51,7 @@ public class FamilyAttributeGroup extends ValidatableEntity {
 
     private Map<String, FamilyAttributeGroup> childGroups = new LinkedHashMap<>();
 
-    private Map<String, Attribute> attributes = new LinkedHashMap<>();
+    private Map<String, FamilyAttribute> attributes = new LinkedHashMap<>();
 
     public FamilyAttributeGroup() {}
 
@@ -186,11 +186,11 @@ public class FamilyAttributeGroup extends ValidatableEntity {
         return this;
     }
 
-    public Map<String, Attribute> getAttributes() {
+    public Map<String, FamilyAttribute> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<String, Attribute> attributes) {
+    public void setAttributes(Map<String, FamilyAttribute> attributes) {
         this.attributes = attributes;
     }
 
@@ -282,7 +282,7 @@ public class FamilyAttributeGroup extends ValidatableEntity {
     }
 
 
-    public static boolean addAttribute(Attribute attribute, Map<String, FamilyAttributeGroup> familyAttributeGroups) {
+    public static boolean addAttribute(FamilyAttribute attribute, Map<String, FamilyAttributeGroup> familyAttributeGroups) {
         boolean success = false;
         FamilyAttributeGroup attributeMasterGroup = attribute.getAttributeGroup().getParentGroup().getParentGroup();
         if(isNotEmpty(attributeMasterGroup)) {
@@ -442,8 +442,8 @@ public class FamilyAttributeGroup extends ValidatableEntity {
         return attributeGroups;
     }
 
-    public static List<Attribute> getAllAttributes(Map<String, FamilyAttributeGroup> familyGroups) {
-        List<Attribute> attributes = new ArrayList<>();
+    public static List<FamilyAttribute> getAllAttributes(Map<String, FamilyAttributeGroup> familyGroups) {
+        List<FamilyAttribute> attributes = new ArrayList<>();
         getAllAttributeGroups(familyGroups, GetMode.LEAF_ONLY, true).forEach(attributeGroup -> attributeGroup.getAttributes().forEach((s, attribute) -> attributes.add(attribute)));
         return attributes;
     }

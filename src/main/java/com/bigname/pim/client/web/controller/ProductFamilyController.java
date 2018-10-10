@@ -99,7 +99,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
     @RequestMapping("/{id}/attribute")
     public ModelAndView attributeDetails(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
-        model.put("attribute", new Attribute());
+        model.put("attribute", new FamilyAttribute());
         model.put("attributeGroups", productFamilyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
         model.put("parentAttributeGroups", productFamilyService.getParentAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
         return new ModelAndView("product/productFamilyAttribute", model);
@@ -107,7 +107,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
 
     @RequestMapping(value = "/{productFamilyId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, Attribute attribute) {
+    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, FamilyAttribute attribute) {
         Map<String, Object> model = new HashMap<>();
         Optional<ProductFamily> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
         // TODO - cross field validation to see if one of attributeGroup ID and FamilyAttributeGroup name is not empty
@@ -132,7 +132,7 @@ public class ProductFamilyController extends BaseController<ProductFamily, Produ
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Attribute> paginatedResult = productFamilyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<FamilyAttribute> paginatedResult = productFamilyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
