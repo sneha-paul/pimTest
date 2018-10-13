@@ -28,7 +28,7 @@
             url: '/pim/families/',
             columns: [
                 { data: 'externalId', name : 'externalId', title : 'Family ID' },
-                { data: 'amilyName', name : 'familyName' , title : 'Family Name'},
+                { data: 'familyName', name : 'familyName' , title : 'Family Name'},
                 { data: 'active', name : 'active' , title : 'Status', orderable: false},
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
