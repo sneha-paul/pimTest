@@ -14,7 +14,7 @@
                     <div class="form-group">
                         <label for="js-attribute-group-id">Attribute Group</label>
                         <select class="form-control" id="js-attribute-group-id" name="attributeGroup.fullId">
-                            <option value="DEFAULT_GROUP">Default Group</option>
+                            <%--<option value="DEFAULT_GROUP">Default Group</option>--%>
                             <option value="">Add a NEW GROUP</option>
                             <c:forEach var="pair" items="${attributeGroups}">
                                 <option value="${pair.value0}" <c:if test="${pair.value0 eq 'DEFAULT_GROUP'}">selected</c:if>>${pair.value1}</option>
@@ -25,18 +25,13 @@
                         <div class="form-group js-attribute-group-name">
                             <label for="attribute-group-name">Attribute Group Name</label>
                             <input type="text" id="attribute-group-name" name="attributeGroup.name" class="form-control" />
-                            <br/>
-                            <label class="fancy-checkbox">
-                                <input type="checkbox" class="js-master-group" name="attributeGroup.masterGroup" value="Y" <c:if test="${attribute.attributeGroup.masterGroup eq 'Y'}">checked="checked"</c:if>>
-                                <span>Master Group</span>
-                            </label>
                         </div>
                         <div class="form-group">
                             <label for="js-parent-group-id">Parent Group</label>
                             <select class="form-control" id="js-parent-group-id" name="attributeGroup.parentGroup.id">
                                 <option value="">Select One</option>
-                                <c:forEach var="pair" items="${parentAttributeGroups}">
-                                    <option value="${pair.value0}" <c:if test="${pair.value0 eq 'DEFAULT_GROUP'}">selected</c:if>>${pair.value1}</option>
+                                <c:forEach var="pair" items="${attributeGroups}">
+                                    <option value="${pair.value0}">${pair.value1}</option>
                                 </c:forEach>
                             </select>
                         </div>

@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
 import org.springframework.data.annotation.Transient;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,74 +36,59 @@ public class Attribute extends ValidatableEntity {
 
     public Attribute() {}
 
-    public Attribute(Attribute attributeDTO, Map<String, AttributeGroup> familyGroups) {
-        this(attributeDTO.getName());
-        this.setUiType(attributeDTO.getUiType());
-        AttributeGroup attributeGroup, attributeGroupDTO = attributeDTO.getAttributeGroup();
-        this.setRequired(attributeDTO.getRequired());
-        orchestrate();
-        this.setId(StringUtil.getUniqueName(this.getId(), AttributeGroup.getAllAttributeIds(familyGroups)));
-        if(isNotEmpty(attributeGroupDTO.getFullId()) && AttributeGroup.DEFAULT_GROUP_ID.equals(attributeGroupDTO.getFullId())) {
-            attributeGroupDTO.setFullId(AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable())).getFullId());
-        }
-
-        AttributeGroup.map(familyGroups);
-
-//        this.setRegEx(attributeDTO.getRegEx()); TODO - uncomment to enable validation
-//        this.setDataType(attributeDTO.getDataType()); TODO - uncomment to enable multiple data type
-
-        if(isNotEmpty(attributeGroupDTO)) {
-            //Available parameters - attribute.name, attribute.attributeGroup.id, attribute.attributeGroup.name, attribute.attributeGroup.masterGroup, attribute.attributeGroup.parentGroup.id
-            //attribute.name won't be empty in all the below scenarios
-            //Scenario 1 - attribute.attributeGroup.id is not empty
-            if(isEmpty(attributeGroupDTO.getName()) && isNotEmpty(attributeGroupDTO.getFullId())) { //Existing attributeGroup
-                //Find the leaf group corresponding to the given id
-                attributeGroup = AttributeGroup.getLeafGroup(attributeGroupDTO.getFullId(), familyGroups);
-                if(isEmpty(attributeGroup)) { // Can't find the leaf group for the given id, so defaulting it to default group
-                    attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
-                }
-            } else { //Creating a new attributeGroup, Scenario 2 - attribute.attributeGroup.name is not empty
-                if(booleanValue(attributeGroupDTO.getMasterGroup())) { // Scenario 3 - attribute.attributeGroup.masterGroup is 'Y'. Creating a new master AttributeGroup(can ignore attribute.attributeGroup.parentGroup.id, if present)
-                    attributeGroup = AttributeGroup.createLeafGroup(attributeGroupDTO.getName(), null);
-                    if(isEmpty(attributeGroup)) { //unable to create the new master group, so defaulting to default group
-                        attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
-                    }
-                } else { //Creating a new non-master attributeGroup
-                    if (isEmpty(attributeGroupDTO.getParentGroup().getId())) { // Creating a new level3 group under the default level2 group
-                        attributeGroup = AttributeGroup.createLeafGroup(attributeDTO.getName(), null, AttributeGroup.createDefaultMasterGroup(booleanValue(getUiType().isSelectable())));
-                    } else { // Scenario 4 - attribute.attributeGroup.parentGroup.Id is not empty. Creating a new group under the default level2 group of the selected parent master group
-                        AttributeGroup parentMasterGroup = AttributeGroup.getMasterGroup(attributeGroupDTO.getParentGroup().getFullId(), familyGroups);
-                        if(isEmpty(parentMasterGroup)) {
-                            parentMasterGroup = AttributeGroup.createDefaultMasterGroup(booleanValue(getUiType().isSelectable()));
-                        }
-                        attributeGroup = AttributeGroup.createLeafGroup(attributeGroupDTO.getName(), null, parentMasterGroup);
-                    }
-                }
-            }
-        } else { /* This is the case when both attribute.attributeGroup.id and attribute.attributeGroup.name are empty, which won't happen if validation rules are correct */
-            attributeGroup = AttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
-        }
-
-        this.attributeGroup = attributeGroup;
-        if(!this.attributeGroup.getAttributes().containsKey(this.getId())) {
-            this.attributeGroup.getAttributes().put(this.getId(), this);
-        }
-    }
-
-
-
     public Attribute(String name) {
         if(isEmpty(name)) {
             throw new IllegalArgumentException("The name constructor argument for Attribute() cannot be empty");
         }
         this.name = name;
         this.label = name;
+    }
 
+    private Attribute(Attribute attributeDTO, Map<String, AttributeGroup> attributeGroups) {
+        this(attributeDTO.getName());
+        this.setUiType(attributeDTO.getUiType());
+        AttributeGroup attributeGroup = null;
+        AttributeGroup attributeGroupDTO = attributeDTO.getAttributeGroup();
+        this.setRequired(attributeDTO.getRequired());
+        orchestrate();
+        this.setId(StringUtil.getUniqueName(this.getId(), AttributeGroup.getAllAttributeIds(attributeGroups)));
+        this.setRegEx(attributeDTO.getRegEx());
+        this.setDataType(attributeDTO.getDataType());
+        AttributeGroup defaultGroup = new AttributeGroup(AttributeGroup.DEFAULT_GROUP, null);
+        /*if(!attributeGroups.containsKey(defaultGroup.getId())) {
+            attributeGroup = attributeGroups.put(defaultGroup.getId(), defaultGroup);
+        }*/
+        String parentFullId = isNotEmpty(attributeGroupDTO) && isNotEmpty(attributeGroupDTO.getParentGroup()) ? attributeGroupDTO.getParentGroup().getFullId() : null;
+        AttributeGroup parent = isNotEmpty(parentFullId) ? AttributeGroup.getAttributeGroup(parentFullId, attributeGroups) : null;
+        if(isNotEmpty(attributeGroupDTO)) {
+            if (isNotEmpty(attributeGroupDTO.getFullId())) {
+                attributeGroup = AttributeGroup.getAttributeGroup(attributeGroupDTO.getFullId(), attributeGroups);
+            } else if (isNotEmpty(attributeGroupDTO.getName())) {
+                if(isEmpty(parent)) {
+                    attributeGroup = new AttributeGroup(attributeGroupDTO.getName(), null);
+                    attributeGroups.put(attributeGroup.getId(), attributeGroup);
+                } else {
+                    attributeGroup = new AttributeGroup(attributeGroupDTO.getName(), null, parent);
+                }
+
+            }
+        }
+        if(isEmpty(attributeGroup)) {
+            attributeGroups.put(defaultGroup.getId(), defaultGroup);
+            attributeGroup = attributeGroups.get(defaultGroup.getId());
+        }
+        this.attributeGroup = attributeGroup;
+        if(!this.attributeGroup.getAttributes().containsKey(this.getId())) {
+            this.attributeGroup.getAttributes().put(this.getId(), this);
+        }
+    }
+
+    public static Attribute buildInstance(Attribute attributeDTO, Map<String, AttributeGroup> attributeGroups) {
+        return new Attribute(attributeDTO, attributeGroups);
     }
 
 
-
-    public String getName() {
+        public String getName() {
         return name;
     }
 
@@ -144,6 +130,10 @@ public class Attribute extends ValidatableEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFullId() {
+        return (isNotEmpty(getAttributeGroup()) ? getAttributeGroup().getFullId() : "DEFAULT_GROUP" ) + "|" + getId();
     }
 
     public String getRegEx() {
@@ -219,6 +209,18 @@ public class Attribute extends ValidatableEntity {
         this.options = options;
     }
 
+    public AttributeGroup getTopLevelGroup() {
+        if(isEmpty(getAttributeGroup()) || isEmpty(getAttributeGroup().getParentGroup())) {
+            return getAttributeGroup();
+        } else {
+            AttributeGroup group = getAttributeGroup();
+            while(isNotEmpty(group.getParentGroup())) {
+                group = group.getParentGroup();
+            }
+            return group;
+        }
+    }
+
     public Pair<String, Object> validate(Object value) {
         if(getUiType().isMultiSelect()) {
             String[] attributeValue = value instanceof String ? new String[] {(String) value} : (String[]) value;
@@ -250,14 +252,14 @@ public class Attribute extends ValidatableEntity {
         map.put("uiType", getUiType().name());
         map.put("dataType", getDataType());
         map.put("name", getName());
-        map.put("group", AttributeGroup.getUniqueLeafGroupLabel(getAttributeGroup(), "|"));
+        map.put("group", AttributeGroup.getFullGroupLabel(getAttributeGroup(), "|"));
         map.put("required", getRequired());
         map.put("selectable", getSelectable());
         map.put("options", Integer.toString(options.size()));
         return map;
     }
 
-    public static Attribute findAttribute(String attributeId, Map<String, AttributeGroup> familyAttributeGroups) {
+    /*public static Attribute findAttribute(String attributeId, Map<String, AttributeGroup> familyAttributeGroups) {
         return AttributeGroup
                 .map(familyAttributeGroups).entrySet().parallelStream()
                 .flatMap(g -> g.getValue().getChildGroups().entrySet().parallelStream())
@@ -266,7 +268,9 @@ public class Attribute extends ValidatableEntity {
                 .filter(a -> a.getValue().getId().equals(attributeId))
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList()).get(0);
-    }
+    }*/
+
+
 
     public enum UIType {
         INPUT_BOX("Input Box", "N"),
@@ -311,5 +315,4 @@ public class Attribute extends ValidatableEntity {
 
         }
     }
-
 }

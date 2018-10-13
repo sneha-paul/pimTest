@@ -4,10 +4,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -50,23 +47,25 @@ public class AttributeCollection extends Entity<AttributeCollection> {
         return attributes;
     }
 
+    public Map<String, AttributeGroup> getMappedAttributes() {
+        return AttributeGroup.map(attributes);
+    }
+
     public void setAttributes(Map<String, AttributeGroup> attributes) {
         this.attributes = attributes;
     }
 
     public AttributeCollection addAttribute(Attribute attributeDTO) {
         Map<String, AttributeGroup> attributeGroups = getAttributes();
-        Attribute attribute = new Attribute(attributeDTO, attributeGroups);
-        boolean added = AttributeGroup.addAttribute(attribute, attributeGroups);
-        if(!added) { /*Adding the attribute failed */ }
+        Attribute.buildInstance(attributeDTO, attributeGroups);
         return this;
     }
 
     public AttributeCollection addAttributeOption(AttributeOption attributeOptionDTO) {
-        String attributeId = attributeOptionDTO.getAttributeId();
-        AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
+        String attributeFullId = attributeOptionDTO.getAttributeId();
+        AttributeGroup.getAttributeGroup(attributeFullId.substring(0, attributeFullId.lastIndexOf("|")), getMappedAttributes())
                 .getAttributes()
-                .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
+                .get(attributeFullId.substring(attributeFullId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
         return this;
     }
 
@@ -93,12 +92,12 @@ public class AttributeCollection extends Entity<AttributeCollection> {
         return map;
     }
 
-    public AttributeGroup getMasterGroup(String groupId) {
+    /*public AttributeGroup getMasterGroup(String groupId) {
         Map<String, AttributeGroup> attributeGroupsMap = getAttributes();
 
         List<AttributeGroup> list = attributeGroupsMap.entrySet().stream()
                 .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
                         e.getKey().equals(groupId)).map(Map.Entry::getValue).collect(Collectors.toList());
         return isNotEmpty(list) ? list.get(0) : null;
-    }
+    }*/
 }

@@ -103,7 +103,6 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         Map<String, Object> model = new HashMap<>();
         model.put("attribute", new Attribute());
         model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
-        model.put("parentAttributeGroups", attributeCollectionService.getParentAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
         return new ModelAndView("settings/attribute", model);
     }
 

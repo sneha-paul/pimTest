@@ -20,7 +20,5 @@ public interface AttributeCollectionService extends BaseService<AttributeCollect
 
     List<Pair<String, String>> getAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort);
 
-    List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort);
-
     Page<AttributeOption> getAttributeOptions(String collectionId, FindBy findBy, String attributeId, int pageNumber, int size, Sort sort);
 }

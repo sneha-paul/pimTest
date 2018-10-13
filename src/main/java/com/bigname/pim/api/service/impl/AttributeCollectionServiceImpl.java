@@ -46,7 +46,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         final Map<String, AttributeGroup> attributeGroups = new HashMap<>();
         List<Attribute> attributes = new ArrayList<>();
         get(collectionId, findBy, false).ifPresent(attributeCollection -> attributeGroups.putAll(attributeCollection.getAttributes()));
-        AttributeGroup.getAllAttributeGroups(attributeGroups, AttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
+        AttributeGroup.getAllAttributeGroups(attributeGroups, AttributeGroup.GetMode.ALL, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         //            TODO - sort this based on the requested sort
         return paginate(attributes, page, size);
     }
@@ -55,16 +55,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
     public List<Pair<String, String>> getAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
         Optional<AttributeCollection> attributeCollection = get(collectionId, findBy, false);
-        attributeCollection.ifPresent(attributeCollection1 -> AttributeGroup.getAllAttributeGroups(attributeCollection1.getAttributes(), AttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), AttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
-//        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
-        return idNamePairs;
-    }
-
-    @Override
-    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort) {
-        List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<AttributeCollection> attributeCollection = get(collectionId, findBy, false);
-        attributeCollection.ifPresent(attributeCollection1 -> AttributeGroup.getAllAttributeGroups(attributeCollection1.getAttributes(), AttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
+        attributeCollection.ifPresent(attributeCollection1 -> AttributeGroup.getAllAttributeGroups(attributeCollection1.getAttributes(), AttributeGroup.GetMode.ALL, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), AttributeGroup.getFullGroupLabel(attributeGroup, " > ")))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
@@ -77,7 +68,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         List<AttributeOption> options = new ArrayList<>();
         Optional<AttributeCollection> attributeCollection = get(collectionId, findBy, false);
         if(attributeCollection.isPresent()) {
-            options = AttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), attributeCollection.get().getAttributes())
+            options = AttributeGroup.getAttributeGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), attributeCollection.get().getMappedAttributes())
                     .getAttributes()
                     .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
                     .getOptions().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());

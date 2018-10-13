@@ -109,7 +109,7 @@
             $(options.selector).on('click', '.js-attribute-options', function(){
                 if('GROUP_4' === options.buttonGroup) {
                     $.showModal({
-                        url: $.getURL('/pim/productFamilies/{productFamilyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
+                        url: $.getURL('/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
                         name:'attribute-options',
                         title:'Attribute Options',
                         buttons: [
@@ -118,6 +118,18 @@
                     });
                 }
             });
+            /*$(options.selector).on('click', '.js-attribute-options', function(){
+                if('GROUP_4' === options.buttonGroup) {
+                    $.showModal({
+                        url: $.getURL('/pim/productFamilies/{productFamilyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
+                        name:'attribute-options',
+                        title:'Attribute Options',
+                        buttons: [
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ]
+                    });
+                }
+            });*/
         },
         refreshDataTable: function(name) {
             $.getDataTable(name).ajax.reload();

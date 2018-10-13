@@ -52,44 +52,20 @@ abstract public class ValidatableEntity implements Serializable {
         return errors;
     }
 
-    static boolean isEmpty(Object... objects) {
-        if(objects == null) {
-            return true;
-        } else if(objects.length == 1) {
-            return ValidationUtil.isEmpty(objects[0]);
-        }
-        for(Object obj : ConversionUtil.toList(objects)) {
-            if(ValidationUtil.isEmpty(obj)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /*static boolean isEmpty(Object object) {
+    static boolean isEmpty(Object object) {
         return ValidationUtil.isEmpty(object);
-    }*/
-
-    static boolean isNotEmpty(Object... objects) {
-        return !isEmpty(objects);
     }
 
-    static boolean isNull(Object... objects) {
-        if(objects == null) {
-            return true;
-        } else if(objects.length == 1) {
-            return ValidationUtil.isNull(objects[0]);
-        }
-        for(Object obj : ConversionUtil.toList(objects)) {
-            if(ValidationUtil.isNull(obj)) {
-                return true;
-            }
-        }
-        return false;
+    static boolean isNotEmpty(Object object) {
+        return ValidationUtil.isNotEmpty(object);
     }
 
-    static boolean isNotNull(Object... objects) {
-        return !isNull(objects);
+    static boolean isNull(Object object) {
+        return ValidationUtil.isNull(object);
+    }
+
+    static boolean isNotNull(Object object) {
+        return ValidationUtil.isNotNull(object);
     }
 
     static String toId(String value) {
