@@ -1,7 +1,7 @@
 $(function(){
     $.addModal({
         selector: '.js-add-familyAttribute',
-        url: $.getURL('/pim/productFamilies/{productFamilyId}/attribute'),
+        url: $.getURL('/pim/families/{familyId}/attribute'),
         name:'family-attribute',
         title:'Family Attribute',
         buttons: [
@@ -11,7 +11,7 @@ $(function(){
     });
     $.addModal({
         selector: '.js-add-variantGroup',
-        url: $.getURL('/pim/productFamilies/{productFamilyId}/variantGroup'),
+        url: $.getURL('/pim/families/{familyId}/variantGroup'),
         name:'variantGroup',
         title:'Variant Group',
         buttons: [

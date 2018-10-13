@@ -3,8 +3,8 @@
 <c:choose>
     <c:when test="${mode eq 'DETAILS'}">
         <tiles:insertDefinition name="mainLayout">
-            <tiles:putAttribute name="title" value="PIM - ProductFamilies"/>
-            <tiles:putAttribute name="body" value="/product/productFamily_body.jsp"/>
+            <tiles:putAttribute name="title" value="PIM - Families"/>
+            <tiles:putAttribute name="body" value="/settings/family_body.jsp"/>
         </tiles:insertDefinition>
     </c:when>
     <c:otherwise>
@@ -12,16 +12,16 @@
             <div class="col-lg-12 col-md-12">
                 <div class="card">
                     <div class="body">
-                        <form method="post" action="/pim/productFamilies" data-method="POST" data-success-message='["Successfully created the productFamily", "ProductFamily Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
+                        <form method="post" action="/pim/families" data-method="POST" data-success-message='["Successfully created the family", "Family Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group">
-                                        <label>ProductFamily Name</label>
-                                        <input type="text" name="productFamilyName" class="form-control" />
+                                        <label>Family Name</label>
+                                        <input type="text" name="familyName" class="form-control" />
                                     </div>
                                     <div class="form-group">
-                                        <label>ProductFamily ID</label>
-                                        <input type="text" name="productFamilyId" class="form-control" />
+                                        <label>Family ID</label>
+                                        <input type="text" name="familyId" class="form-control" />
                                     </div>
                                 </div>
                             </div>

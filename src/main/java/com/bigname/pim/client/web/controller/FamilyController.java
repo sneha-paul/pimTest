@@ -27,30 +27,30 @@ import java.util.*;
  * @since 1.0
  */
 @Controller
-@RequestMapping("pim/productFamilies")
+@RequestMapping("pim/families")
 public class FamilyController extends BaseController<Family, FamilyService> {
 
-    private FamilyService productFamilyService;
+    private FamilyService familyService;
 
-    public FamilyController(FamilyService productFamilyService) {
-        super(productFamilyService);
-        this.productFamilyService = productFamilyService;
+    public FamilyController(FamilyService familyService) {
+        super(familyService);
+        this.familyService = familyService;
     }
 
     @RequestMapping()
     public ModelAndView all() {
         Map<String, Object> model = new HashMap<>();
-        model.put("active", "PRODUCT_FAMILIES");
-        return new ModelAndView("product/productFamilies", model);
+        model.put("active", "FAMILIES");
+        return new ModelAndView("settings/families", model);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> create( Family productFamily) {
+    public Map<String, Object> create( Family family) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(productFamily, model, Family.CreateGroup.class)) {
-            productFamily.setActive("N");
-            productFamilyService.create(productFamily);
+        if(isValid(family, model, Family.CreateGroup.class)) {
+            family.setActive("N");
+            familyService.create(family);
             model.put("success", true);
         }
         return model;
@@ -58,10 +58,10 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, Family productFamily) {
+    public Map<String, Object> update(@PathVariable(value = "id") String id, Family family) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(productFamily, model, productFamily.getGroup().equals("DETAILS") ? Family.DetailsGroup.class : null)) {
-            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily);
+        if(isValid(family, model, family.getGroup().equals("DETAILS") ? Family.DetailsGroup.class : null)) {
+            familyService.update(id, FindBy.EXTERNAL_ID, family);
             model.put("success", true);
         }
         return model;
@@ -71,49 +71,49 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     @ResponseBody
     public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", productFamilyService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", familyService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
     }
 
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
         Map<String, Object> model = new HashMap<>();
-        model.put("active", "PRODUCT_FAMILIES");
+        model.put("active", "FAMILIES");
         if(id == null) {
             model.put("mode", "CREATE");
-            model.put("productFamily", new Family());
-            model.put("breadcrumbs", new Breadcrumbs("Product Families", "Product Families", "/pim/productFamilies", "Create Product Family", ""));
+            model.put("family", new Family());
+            model.put("breadcrumbs", new Breadcrumbs("Families", "Families", "/pim/families", "Create Family", ""));
         } else {
-            Optional<Family> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
-            if(productFamily.isPresent()) {
+            Optional<Family> family = familyService.get(id, FindBy.EXTERNAL_ID, false);
+            if(family.isPresent()) {
                 model.put("mode", "DETAILS");
-                model.put("productFamily", productFamily.get());
-                model.put("breadcrumbs", new Breadcrumbs("Product Families", "Product Families", "/pim/productFamilies", productFamily.get().getFamilyName(), ""));
+                model.put("family", family.get());
+                model.put("breadcrumbs", new Breadcrumbs("Families", "Families", "/pim/families", family.get().getFamilyName(), ""));
             } else {
-                throw new EntityNotFoundException("Unable to find Product Family with Id: " + id);
+                throw new EntityNotFoundException("Unable to find Family with Id: " + id);
             }
         }
-        return new ModelAndView("product/productFamily", model);
+        return new ModelAndView("settings/family", model);
     }
 
     @RequestMapping("/{id}/attribute")
     public ModelAndView attributeDetails(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
         model.put("attribute", new FamilyAttribute());
-        model.put("attributeGroups", productFamilyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
-        model.put("parentAttributeGroups", productFamilyService.getParentAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
-        return new ModelAndView("product/productFamilyAttribute", model);
+        model.put("attributeGroups", familyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
+        model.put("parentAttributeGroups", familyService.getParentAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
+        return new ModelAndView("settings/familyAttribute", model);
     }
 
-    @RequestMapping(value = "/{productFamilyId}/attribute", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{familyId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "productFamilyId") String id, FamilyAttribute attribute) {
+    public Map<String, Object> saveAttribute(@PathVariable(value = "familyId") String id, FamilyAttribute attribute) {
         Map<String, Object> model = new HashMap<>();
-        Optional<Family> productFamily = productFamilyService.get(id, FindBy.EXTERNAL_ID, false);
+        Optional<Family> family = familyService.get(id, FindBy.EXTERNAL_ID, false);
         // TODO - cross field validation to see if one of attributeGroup ID and FamilyAttributeGroup name is not empty
-        if(productFamily.isPresent() && isValid(attribute, model)) {
-            productFamily.get().addAttribute(attribute);
-            productFamilyService.update(id, FindBy.EXTERNAL_ID, productFamily.get());
+        if(family.isPresent() && isValid(attribute, model)) {
+            family.get().addAttribute(attribute);
+            familyService.update(id, FindBy.EXTERNAL_ID, family.get());
             model.put("success", true);
         }
         return model;
@@ -132,7 +132,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<FamilyAttribute> paginatedResult = productFamilyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<FamilyAttribute> paginatedResult = familyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -140,9 +140,9 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return result;
     }
 
-    @RequestMapping("/{productFamilyId}/attributes/{attributeId}/options/list")
+    @RequestMapping("/{familyId}/attributes/{attributeId}/options/list")
     @ResponseBody
-    public Result<Map<String, String>> getFamilyAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
+    public Result<Map<String, String>> getFamilyAttributeOptions(@PathVariable(value = "familyId") String familyId, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
 
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
@@ -153,7 +153,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<FamilyAttributeOption> paginatedResult = productFamilyService.getFamilyAttributeOptions(productFamilyId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<FamilyAttributeOption> paginatedResult = familyService.getFamilyAttributeOptions(familyId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -161,23 +161,23 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return result;
     }
 
-    @RequestMapping("/{productFamilyId}/attributes/{attributeId}/options")
-    public ModelAndView attributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId,
+    @RequestMapping("/{familyId}/attributes/{attributeId}/options")
+    public ModelAndView attributeOptions(@PathVariable(value = "familyId") String familyId,
                                          @PathVariable(value = "attributeId") String attributeId) {
         Map<String, Object> model = new HashMap<>();
-//        model.put("productFamilyId", productFamilyId);
+//        model.put("familyId", familyId);
         model.put("attributeId", attributeId);
-        return new ModelAndView("product/productFamilyAttributeOptions", model);
+        return new ModelAndView("settings/familyAttributeOptions", model);
     }
 
-    @RequestMapping(value = "/{productFamilyId}/attributes/{attributeId}/options", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{familyId}/attributes/{attributeId}/options", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttributeOptions(@PathVariable(value = "productFamilyId") String productFamilyId, FamilyAttributeOption attributeOption) {
+    public Map<String, Object> saveAttributeOptions(@PathVariable(value = "familyId") String familyId, FamilyAttributeOption attributeOption) {
         Map<String, Object> model = new HashMap<>();
-        Optional<Family> productFamily = productFamilyService.get(productFamilyId, FindBy.EXTERNAL_ID, false);
-        if(productFamily.isPresent() && isValid(attributeOption, model)) {
-            productFamily.get().addAttributeOption(attributeOption);
-            productFamilyService.update(productFamilyId, FindBy.EXTERNAL_ID, productFamily.get());
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        if(family.isPresent() && isValid(attributeOption, model)) {
+            family.get().addAttributeOption(attributeOption);
+            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
             model.put("success", true);
         }
         return model;

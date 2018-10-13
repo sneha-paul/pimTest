@@ -3,9 +3,9 @@
     <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="header">
-                <h2>${productFamily.productFamilyName}
-                    <small><code class="highlighter-rouge">${productFamily.productFamilyId}</code></small>
-                    <small class="pull-right m-t--15"><code style="color:#808080">_id: ${productFamily.id}</code>
+                <h2>${family.familyName}
+                    <small><code class="highlighter-rouge">${family.familyId}</code></small>
+                    <small class="pull-right m-t--15"><code style="color:#808080">_id: ${family.id}</code>
                     </small>
                 </h2>
             </div>
@@ -22,25 +22,25 @@
                                 <div class="card">
                                     <div class="body">
                                         <form method="post"
-                                              action="/pim/productFamilies/${productFamily.productFamilyId}"
+                                              action="/pim/families/${family.familyId}"
                                               data-method="PUT"
-                                              data-success-message='["Successfully updated the productFamily", "ProductFamily Updated"]'
+                                              data-success-message='["Successfully updated the family", "Family Updated"]'
                                               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">
-                                                        <label for="productFamilyName">Family Name</label><code
+                                                        <label for="familyName">Family Name</label><code
                                                             class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="productFamilyName" name="productFamilyName"
-                                                               value="${productFamily.productFamilyName}"
+                                                        <input type="text" id="familyName" name="familyName"
+                                                               value="${family.familyName}"
                                                                class="form-control"/>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="productFamilyId">Family ID</label><code
+                                                        <label for="familyId">Family ID</label><code
                                                             class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="productFamilyId" name="productFamilyId"
+                                                        <input type="text" id="familyId" name="familyId"
                                                                class="form-control"
-                                                               value="${productFamily.productFamilyId}"/>
+                                                               value="${family.familyId}"/>
                                                     </div>
 
                                                     <div class="form-group">
@@ -48,7 +48,7 @@
                                                         <br/>
                                                         <label for="active" class="fancy-checkbox">
                                                             <input type="checkbox" id="active" name="active" value="Y"
-                                                                   <c:if test="${productFamily.active eq 'Y'}">checked="checked"</c:if>>
+                                                                   <c:if test="${family.active eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Active</span>
                                                         </label>
                                                     </div>
@@ -59,7 +59,7 @@
                                             <button type="submit" class="btn btn-primary"
                                                     onclick="$.submitAction(event, this)">Save
                                             </button>
-                                            <a href="/pim/productFamilies">
+                                            <a href="/pim/families">
                                                 <button type="button" class="btn btn-danger">Cancel</button>
                                             </a>
                                         </form>
@@ -133,7 +133,7 @@
 </div>
 <script>
     $.initPage({
-        'productFamilyId': '${productFamily.productFamilyId}'
+        'familyId': '${family.familyId}'
     });
     $(document).ready(function () {
         $.initDataTable({
@@ -141,7 +141,7 @@
             name: 'familyAttributes',
             type: 'TYPE_2',
             buttonGroup: 'GROUP_4',
-            url: $.getURL('/pim/productFamilies/{productFamilyId}/attributes'),
+            url: $.getURL('/pim/families/{familyId}/attributes'),
             columns: [
                 {data: 'name', name: 'name', title: 'Attribute Name'},
                 {data: 'id', name: 'id', title: 'Attribute ID'},
@@ -156,7 +156,7 @@
             name: 'variantGroups',
             type: 'TYPE_2',
             buttonGroup: 'GROUP_4',
-            url: $.getURL('/pim/productFamilies/{productFamilyId}/variantGroups'),
+            url: $.getURL('/pim/families/{familyId}/variantGroups'),
             columns: [
                 {data: 'name', name: 'name', title: 'Attribute Name'},
                 {data: 'id', name: 'id', title: 'Attribute ID'},
@@ -169,5 +169,5 @@
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
     });
 </script>
-<script src="/assets/js/pages/ui/product/productFamily.js"></script>
+<script src="/assets/js/pages/ui/settings/family.js"></script>
 

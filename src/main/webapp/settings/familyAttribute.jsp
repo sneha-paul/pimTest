@@ -5,10 +5,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="popup-content" style="padding:20px">
     <div class="body">
-        <form method="post" action="/pim/productFamilies/{productFamilyId}/attribute" data-method="PUT"
+        <form method="post" action="/pim/families/{familyId}/attribute" data-method="PUT"
               data-success-message='["Successfully created the family attribute", "Attribute Created"]'
               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
-            <input type="hidden" name="entityType" value="PRODUCT"/>
             <div class="row">
                 <div class="col-md-6 col-sm-12">
                     <div class="form-group">
@@ -71,5 +70,5 @@
     </div>
 </div>
 <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
-<script src="/assets/js/pages/ui/product/productFamilyAttribute.js"></script>
+<script src="/assets/js/pages/ui/settings/familyAttribute.js"></script>
 

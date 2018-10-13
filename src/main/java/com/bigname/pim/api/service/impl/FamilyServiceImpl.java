@@ -23,60 +23,60 @@ import java.util.stream.Collectors;
 @Service
 public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> implements FamilyService {
 
-    private FamilyDAO productFamilyDAO;
+    private FamilyDAO familyDAO;
 
     @Autowired
-    public FamilyServiceImpl(FamilyDAO productFamilyDAO, Validator validator) {
-        super(productFamilyDAO, "productFamily", validator);
-        this.productFamilyDAO = productFamilyDAO;
+    public FamilyServiceImpl(FamilyDAO familyDAO, Validator validator) {
+        super(familyDAO, "family", validator);
+        this.familyDAO = familyDAO;
     }
 
     @Override
-    public Family createOrUpdate(Family productFamily) {
-        return productFamilyDAO.save(productFamily);
+    public Family createOrUpdate(Family family) {
+        return familyDAO.save(family);
     }
 
 
     @Override
-    public Page<FamilyAttribute> getFamilyAttributes(String productFamilyId, FindBy findBy, int page, int size, Sort sort) {
+    public Page<FamilyAttribute> getFamilyAttributes(String familyId, FindBy findBy, int page, int size, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         final Map<String, FamilyAttributeGroup> attributeGroups = new HashMap<>();
         List<FamilyAttribute> attributes = new ArrayList<>();
-        get(productFamilyId, findBy, false).ifPresent(productFamily -> attributeGroups.putAll(productFamily.getAttributes()));
+        get(familyId, findBy, false).ifPresent(family -> attributeGroups.putAll(family.getAttributes()));
         FamilyAttributeGroup.getAllAttributeGroups(attributeGroups, FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         //            TODO - sort this based on the requested sort
         return paginate(attributes, page, size);
     }
 
     @Override
-    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
+    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String familyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<Family> productFamily = get(productFamilyId, findBy, false);
-        productFamily.ifPresent(productFamily1 -> FamilyAttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), FamilyAttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
+        Optional<Family> family = get(familyId, findBy, false);
+        family.ifPresent(family1 -> FamilyAttributeGroup.getAllAttributeGroups(family1.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), FamilyAttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
 
     @Override
-    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String productFamilyId, FindBy findBy, Sort sort) {
+    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String familyId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<Family> productFamily = get(productFamilyId, findBy, false);
-        productFamily.ifPresent(productFamily1 -> FamilyAttributeGroup.getAllAttributeGroups(productFamily1.getAttributes(), FamilyAttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
+        Optional<Family> family = get(familyId, findBy, false);
+        family.ifPresent(family1 -> FamilyAttributeGroup.getAllAttributeGroups(family1.getAttributes(), FamilyAttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
 
     @Override
-    public Page<FamilyAttributeOption> getFamilyAttributeOptions(String productFamilyId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
+    public Page<FamilyAttributeOption> getFamilyAttributeOptions(String familyId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
          /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         List<FamilyAttributeOption> options = new ArrayList<>();
-        Optional<Family> productFamily = get(productFamilyId, findBy, false);
-        if(productFamily.isPresent()) {
-            options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), productFamily.get().getAttributes())
+        Optional<Family> family = get(familyId, findBy, false);
+        if(family.isPresent()) {
+            options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), family.get().getAttributes())
                     .getAttributes()
                     .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
                     .getOptions().entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
