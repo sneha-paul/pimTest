@@ -1,6 +1,7 @@
 <%--@elvariable id="attribute" type="com.bigname.pim.api.domain.FamilyAttribute"--%>
 <%--@elvariable id="attributeGroups" type="java.util.List<org.javatuples.Pair<String, String>"--%>
 <%--@elvariable id="parentAttributeGroups" type="java.util.List<org.javatuples.Pair<String, String"--%>
+<%--@elvariable id="attributeCollections" type="java.util.List<com.bigname.pim.api.domain.AttributeCollection>"--%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="popup-content" style="padding:20px">
@@ -10,6 +11,14 @@
               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
             <div class="row">
                 <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label for="js-attribute-group-id">Attribute Collection</label>
+                        <select class="form-control" id="attribute-collection-id" name="collectionId">
+                            <c:forEach var="collection" items="${attributeCollections}">
+                                <option value="${collection.externalId}">${collection.collectionName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label for="js-attribute-group-id">Attribute Group</label>
                         <select class="form-control" id="js-attribute-group-id" name="attributeGroup.fullId">
@@ -41,8 +50,13 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Attribute Name</label>
-                        <input type="text" name="name" value="${attribute.name}" class="form-control" required="true"/>
+                        <label for="attribute">Attribute Name</label>
+                        <select class="form-control" id="attribute" name="attributeId">
+                            <option value="">Select One</option>
+                            <c:forEach var="attribute" items="${attributeCollections.get(0).allAttributes}">
+                                <option value="${attribute.attributeGroup.fullId}|${attribute.id}">${attribute.label}</option>
+                            </c:forEach>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="uiType">Attribute UI Type</label>

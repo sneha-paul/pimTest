@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -21,6 +22,9 @@ public class AttributeCollection extends Entity<AttributeCollection> {
     private String collectionName;
 
     private Map<String, AttributeGroup> attributes = new LinkedHashMap<>();
+
+    @Transient @JsonIgnore
+    private List<Attribute> allAttributes = new ArrayList<>();
 
     public AttributeCollection() {
         super();
@@ -67,6 +71,14 @@ public class AttributeCollection extends Entity<AttributeCollection> {
                 .getAttributes()
                 .get(attributeFullId.substring(attributeFullId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
         return this;
+    }
+
+    public List<Attribute> getAllAttributes() {
+        return allAttributes;
+    }
+
+    public void setAllAttributes(List<Attribute> allAttributes) {
+        this.allAttributes = allAttributes;
     }
 
     @Override

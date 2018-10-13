@@ -6,6 +6,7 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
+import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
@@ -31,10 +32,12 @@ import java.util.*;
 public class FamilyController extends BaseController<Family, FamilyService> {
 
     private FamilyService familyService;
+    private AttributeCollectionService collectionService;
 
-    public FamilyController(FamilyService familyService) {
+    public FamilyController(FamilyService familyService, AttributeCollectionService collectionService) {
         super(familyService);
         this.familyService = familyService;
+        this.collectionService = collectionService;
     }
 
     @RequestMapping()
@@ -99,6 +102,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     @RequestMapping("/{id}/attribute")
     public ModelAndView attributeDetails(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
+        model.put("attributeCollections", collectionService.getAll(0, 100, null).getContent());
         model.put("attribute", new FamilyAttribute());
         model.put("attributeGroups", familyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
         model.put("parentAttributeGroups", familyService.getParentAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));

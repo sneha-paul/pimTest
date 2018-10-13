@@ -37,6 +37,17 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         return attributeCollectionDAO.save(attributeCollection);
     }
 
+    @Override
+    public Page<AttributeCollection> getAll(int page, int size, Sort sort, boolean... activeRequired) {
+        Page<AttributeCollection> attributeCollections = super.getAll(page, size, sort, activeRequired);
+        attributeCollections.forEach(collection -> setAttributeList(collection));
+        return attributeCollections;
+    }
+
+    private void setAttributeList(AttributeCollection collection) {
+        collection.setAllAttributes(AttributeGroup.getAllAttributes(collection.getMappedAttributes()));
+    }
+
 
     @Override
     public Page<Attribute> getAttributes(String collectionId, FindBy findBy, int page, int size, Sort sort) {
