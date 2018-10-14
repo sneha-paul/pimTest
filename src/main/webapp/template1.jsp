@@ -116,6 +116,11 @@
         .theme-orange .fancy-radio input[type="radio"]:checked + span i:after {
             background-color: #f68c1f
         }
+
+        /*.js-locked {
+            background: url('/assets/img/lock-icon.png') no-repeat right ;
+            padding-left: 5px;
+        }*/
     </style>
 
 </head>

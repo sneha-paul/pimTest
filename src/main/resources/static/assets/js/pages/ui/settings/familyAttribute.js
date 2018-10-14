@@ -12,6 +12,13 @@ $(function(){
                 }
             });
         },
+        bindAttributeChangeEvent : function(selectEl) {
+            $(selectEl).on('change', function(){
+                $('input[name="name"]').val($(this).find('option:selected').data('name'));
+                $('select[name="uiType"]').val($(this).find('option:selected').data('ui'))
+
+            });
+        },
         bindMasterGroupChangeEvent: function(checkboxEl) {
             $(checkboxEl).on('change', function() {
                 var parentGroupEl = $('#js-parent-group-id');
@@ -26,4 +33,5 @@ $(function(){
     });
 $.bindAddNewOption($('#js-attribute-group-id'));
 $.bindMasterGroupChangeEvent($('.js-master-group'));
+$.bindAttributeChangeEvent($('#js-attribute'));
 });

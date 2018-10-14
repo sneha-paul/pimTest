@@ -383,16 +383,6 @@ public class FamilyAttributeGroup extends ValidatableEntity {
             }
         }
 
-
-        /*if(firstRun) {
-            List<FamilyAttributeGroup> masterGroups = getAllAttributeGroups(groups, "MASTER_ONLY", true);
-            List<FamilyAttributeGroup> defaultMasterGroups = masterGroups.stream().filter(g ->
-                    g.getFullId().equals(FamilyAttributeGroup.getDetailsMasterGroup(null).getFullId()) ||
-                            g.getFullId().equals(FamilyAttributeGroup.getFeaturesMasterGroup(null).getFullId())).collect(Collectors.toList());
-
-
-        }*/
-
         //Extract all the groups from the map to a list for easy processing
         groupsList.addAll(groups.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
 
@@ -434,7 +424,7 @@ public class FamilyAttributeGroup extends ValidatableEntity {
             case All:
                 groupsList.forEach(g -> {
                     attributeGroups.add(g);
-                    if(isEmpty(g.getChildGroups())) {
+                    if(isNotEmpty(g.getChildGroups())) {
                         attributeGroups.addAll(getAllAttributeGroups(g.getChildGroups(), mode, false));
                     }
                 });

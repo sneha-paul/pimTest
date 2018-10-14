@@ -44,6 +44,13 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         return attributeCollections;
     }
 
+    @Override
+    public Optional<AttributeCollection> get(String id, FindBy findBy, boolean... activeRequired) {
+        Optional<AttributeCollection> collection =  super.get(id, findBy, activeRequired);
+        collection.ifPresent(this::setAttributeList);
+        return collection;
+    }
+
     private void setAttributeList(AttributeCollection collection) {
         collection.setAllAttributes(AttributeGroup.getAllAttributes(collection.getMappedAttributes()));
     }
@@ -86,5 +93,12 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
             //TODO - sort this based on the requested sort
         }
         return paginate(options, page, size);
+    }
+
+    @Override
+    public Optional<Attribute> findAttribute(String collectionId, FindBy findBy, String attributeFullId) {
+        List<Attribute> attributes = new ArrayList<>();
+        get(collectionId, findBy).ifPresent(attributeCollection -> attributeCollection.getAllAttributes().stream().filter(attribute -> attribute.getFullId().equalsIgnoreCase(attributeFullId)).forEach(attributes::add));
+        return attributes.isEmpty() ? Optional.empty() : Optional.of(attributes.get(0));
     }
 }

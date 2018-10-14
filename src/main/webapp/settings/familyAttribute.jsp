@@ -50,17 +50,21 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="attribute">Attribute Name</label>
-                        <select class="form-control" id="attribute" name="attributeId">
+                        <label for="js-attribute">Attribute</label>
+                        <select class="form-control" id="js-attribute" name="attributeId">
                             <option value="">Select One</option>
                             <c:forEach var="attribute" items="${attributeCollections.get(0).allAttributes}">
-                                <option value="${attribute.attributeGroup.fullId}|${attribute.id}">${attribute.label}</option>
+                                <option value="${attribute.attributeGroup.fullId}|${attribute.id}" data-name="${attribute.name}" data-ui="${attribute.uiType}">${attribute.label}</option>
                             </c:forEach>
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>Attribute Name</label>
+                        <input type="text" name="name" value="" class="form-control" disabled="disabled"/>
+                    </div>
+                    <div class="form-group">
                         <label for="uiType">Attribute UI Type</label>
-                        <select class="form-control" id="uiType" name="uiType">
+                        <select class="form-control" id="uiType" name="uiType" disabled="disabled">
                             <option value="CHECKBOX">Checkbox</option>
                             <option value="DATE_PICKER">Date Picker</option>
                             <option value="DROPDOWN">Dropdown</option>
@@ -76,6 +80,11 @@
                         <label class="fancy-checkbox">
                             <input type="checkbox" name="required" value="Y" <c:if test="${attribute.required eq 'Y'}">checked="checked"</c:if>>
                             <span>Required</span>
+                        </label>
+                        <br/>
+                        <label class="fancy-checkbox">
+                            <input type="checkbox" name="scopable" value="Y" <c:if test="${attribute.required eq 'Y'}">checked="checked"</c:if>>
+                            <span>Scopable</span>
                         </label>
                     </div>
                 </div>

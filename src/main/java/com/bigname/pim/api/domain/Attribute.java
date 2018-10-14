@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  */
 public class Attribute extends ValidatableEntity {
 
+    @NotEmpty(message = "Attribute name cannot be empty")
     private String name;
     private String label;
     private UIType _uiType = UIType.INPUT_BOX;
@@ -88,7 +90,7 @@ public class Attribute extends ValidatableEntity {
     }
 
 
-        public String getName() {
+    public String getName() {
         return name;
     }
 

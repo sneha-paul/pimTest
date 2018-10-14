@@ -17,17 +17,22 @@ public class FamilyAttribute extends ValidatableEntity {
 
     @NotEmpty(message = "Attribute name cannot be empty")
     private String name;
-
     private String label;
-    private UIType _uiType = UIType.INPUT_BOX;
+    private Attribute.UIType _uiType = Attribute.UIType.INPUT_BOX;
     private String dataType = "string";  //Initial version only supports String type
     private String id;
     private String regEx;
     private String required = "N";
     private String selectable = "N";
+    private String scopable = "N";
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
+    private String collectionId;
+    private String attributeId;
+
+    @Transient @JsonIgnore
+    private Attribute attribute;
 
     @Transient
     @JsonIgnore
@@ -38,9 +43,16 @@ public class FamilyAttribute extends ValidatableEntity {
     public FamilyAttribute() {}
 
     public FamilyAttribute(FamilyAttribute attributeDTO, Map<String, FamilyAttributeGroup> familyGroups) {
-        this(attributeDTO.getName());
+
+        this(isNotEmpty(attributeDTO.getName()) ? attributeDTO.getName() : attributeDTO.getAttribute().getName(), isNotEmpty(attributeDTO.getLabel()) ? attributeDTO.getLabel() : attributeDTO.getAttribute().getLabel());
+        this.attribute = attributeDTO.getAttribute();
+        this.collectionId = attributeDTO.getCollectionId();
+        this.attributeId = this.collectionId + "|" + this.attribute.getFullId();
         this.setUiType(attributeDTO.getUiType());
-        FamilyAttributeGroup attributeGroup, attributeGroupDTO = attributeDTO.getAttributeGroup();
+        this.setRequired(attributeDTO.getRequired());
+        this.setScopable(attributeDTO.getScopable());
+        FamilyAttributeGroup attributeGroup = null;
+        FamilyAttributeGroup attributeGroupDTO = attributeDTO.getAttributeGroup();
         this.setRequired(attributeDTO.getRequired());
         orchestrate();
         this.setId(StringUtil.getUniqueName(this.getId(), FamilyAttributeGroup.getAllAttributeIds(familyGroups)));
@@ -50,8 +62,8 @@ public class FamilyAttribute extends ValidatableEntity {
 
         FamilyAttributeGroup.map(familyGroups);
 
-//        this.setRegEx(attributeDTO.getRegEx()); TODO - uncomment to enable validation
-//        this.setDataType(attributeDTO.getDataType()); TODO - uncomment to enable multiple data type
+        this.setRegEx(attributeDTO.getRegEx());
+        this.setDataType(attributeDTO.getDataType());
 
         if(isNotEmpty(attributeGroupDTO)) {
             //Available parameters - attribute.name, attribute.attributeGroup.id, attribute.attributeGroup.name, attribute.attributeGroup.masterGroup, attribute.attributeGroup.parentGroup.id
@@ -85,24 +97,16 @@ public class FamilyAttribute extends ValidatableEntity {
             attributeGroup = FamilyAttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
         }
 
-        this.attributeGroup = attributeGroup;
-        if(!this.attributeGroup.getAttributes().containsKey(this.getId())) {
-            this.attributeGroup.getAttributes().put(this.getId(), this);
+        setAttributeGroup(attributeGroup);
+        if(!getAttributeGroup().getAttributes().containsKey(getId())) {
+            getAttributeGroup().getAttributes().put(getId(), this);
         }
     }
 
-
-
-    public FamilyAttribute(String name) {
-        if(isEmpty(name)) {
-            throw new IllegalArgumentException("The name constructor argument for FamilyAttribute() cannot be empty");
-        }
+    public FamilyAttribute(@NotEmpty(message = "The name constructor argument for FamilyAttribute() cannot be empty") String name, String label) {
         this.name = name;
-        this.label = name;
-
+        this.label = isNotEmpty(label) ? label : name;
     }
-
-
 
     public String getName() {
         return name;
@@ -123,11 +127,11 @@ public class FamilyAttribute extends ValidatableEntity {
         this.label = label;
     }
 
-    public UIType getUiType() {
+    public Attribute.UIType getUiType() {
         return _uiType;
     }
 
-    public void setUiType(UIType uiType) {
+    public void setUiType(Attribute.UIType uiType) {
         this._uiType = uiType;
         setSelectable(uiType.isSelectable());
     }
@@ -146,6 +150,10 @@ public class FamilyAttribute extends ValidatableEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFullId() {
+        return (isNotEmpty(getAttributeGroup()) ? getAttributeGroup().getFullId() : "DEFAULT_GROUP" ) + "|" + getId();
     }
 
     public String getRegEx() {
@@ -173,6 +181,14 @@ public class FamilyAttribute extends ValidatableEntity {
         this.selectable = toYesNo(selectable, "Y");
     }
 
+    public String getScopable() {
+        return scopable;
+    }
+
+    public void setScopable(String scopable) {
+        this.scopable = toYesNo(scopable, "Y");
+    }
+
     public String getActive() {
         return active;
     }
@@ -195,6 +211,30 @@ public class FamilyAttribute extends ValidatableEntity {
 
     public void setSubSequenceNum(int subSequenceNum) {
         this.subSequenceNum = subSequenceNum;
+    }
+
+    public String getAttributeId() {
+        return attributeId;
+    }
+
+    public void setAttributeId(String attributeId) {
+        this.attributeId = attributeId;
+    }
+
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
+    }
+
+    public Attribute getAttribute() {
+        return attribute;
+    }
+
+    public void setAttribute(Attribute attribute) {
+        this.attribute = attribute;
     }
 
     public FamilyAttributeGroup getAttributeGroup() {
@@ -260,49 +300,5 @@ public class FamilyAttribute extends ValidatableEntity {
                 .filter(a -> a.getValue().getId().equals(attributeId))
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList()).get(0);
-    }
-
-    public enum UIType {
-        INPUT_BOX("Input Box", "N"),
-        DROPDOWN("Dropdown", "Y"),
-        CHECKBOX("Checkbox", "Y") {
-            @Override
-            public boolean isMultiSelect() {
-                return true;
-            }
-        },
-        RADIO_BUTTON("Radio Button", "Y"),
-        YES_NO("Yes/No", "N"),
-        TEXTAREA("Textarea", "N"),
-        DATE_PICKER("Date Picker", "N");
-
-        String label = "";
-        String selectable = "N";
-        UIType(String label, String selectable) {
-            this.label = label;
-            this.selectable = selectable;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public String isSelectable() {
-            return selectable;
-        }
-
-        public boolean isMultiSelect() {
-            return false;
-        }
-
-        public static UIType get(String value) {
-            for (UIType type : values()) {
-                if(type.name().equals(value)) {
-                    return type;
-                }
-            }
-            return UIType.INPUT_BOX;
-
-        }
     }
 }

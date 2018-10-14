@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -21,4 +22,6 @@ public interface AttributeCollectionService extends BaseService<AttributeCollect
     List<Pair<String, String>> getAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort);
 
     Page<AttributeOption> getAttributeOptions(String collectionId, FindBy findBy, String attributeId, int pageNumber, int size, Sort sort);
+
+    Optional<Attribute> findAttribute(String collectionId, FindBy findBy, String attributeFullId);
 }

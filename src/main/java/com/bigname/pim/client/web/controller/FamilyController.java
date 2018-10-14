@@ -111,12 +111,14 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
     @RequestMapping(value = "/{familyId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "familyId") String id, FamilyAttribute attribute) {
+    public Map<String, Object> saveAttribute(@PathVariable(value = "familyId") String id, FamilyAttribute familyAttribute) {
         Map<String, Object> model = new HashMap<>();
         Optional<Family> family = familyService.get(id, FindBy.EXTERNAL_ID, false);
         // TODO - cross field validation to see if one of attributeGroup ID and FamilyAttributeGroup name is not empty
-        if(family.isPresent() && isValid(attribute, model)) {
-            family.get().addAttribute(attribute);
+        if(family.isPresent() /*&& isValid(familyAttribute, model)*/) {
+            Attribute attribute = collectionService.findAttribute(familyAttribute.getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.getAttributeId()).get();
+            familyAttribute.setAttribute(attribute);
+            family.get().addAttribute(familyAttribute);
             familyService.update(id, FindBy.EXTERNAL_ID, family.get());
             model.put("success", true);
         }
