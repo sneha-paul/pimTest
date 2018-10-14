@@ -206,10 +206,10 @@ public class FamilyController extends BaseController<Family, FamilyService> {
             List<Map<String, String>> dataObjects = new ArrayList<>();
             List<FamilyAttribute> familyAttribute = FamilyAttributeGroup.getAllAttributes(family.get().getAttributes()).stream().filter(e -> e.getFullId().equals(familyAttributeId)).collect(Collectors.toList());
             if(ValidationUtil.isNotEmpty(familyAttribute)) {
+                Map<String, FamilyAttributeOption> familyAttributeOptions = familyAttribute.get(0).getOptions();
                 collectionService.findAttribute(familyAttribute.get(0).getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.get(0).getAttributeId()).ifPresent(attribute -> {
                     Map<String, AttributeOption> optionsMap = attribute.getOptions();
-                    List<AttributeOption> optionsList = optionsMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
-                    //TODO - remove already set attribute options
+                    List<AttributeOption> optionsList = optionsMap.entrySet().stream().filter(e -> !familyAttributeOptions.keySet().contains(e.getKey())).map(Map.Entry::getValue).collect(Collectors.toList());
                     //TODO - sorting and pagination
                     Page<AttributeOption> paginatedResult = new PageImpl<>(optionsList);
                     paginatedResult.getContent().forEach(e -> {
