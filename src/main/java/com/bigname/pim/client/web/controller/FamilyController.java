@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.AttributeCollectionService;
@@ -12,6 +13,7 @@ import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -176,15 +179,64 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return new ModelAndView("settings/familyAttributeOptions", model);
     }
 
-    @RequestMapping(value = "/{familyId}/attributes/{attributeId}/options", method = RequestMethod.PUT)
+    @RequestMapping("/{familyId}/attributes/{attributeId}/options/available")
+    public ModelAndView availableAttributeOptions(@PathVariable(value = "familyId") String familyId,
+                                         @PathVariable(value = "attributeId") String attributeId) {
+        Map<String, Object> model = new HashMap<>();
+//        model.put("familyId", familyId);
+        model.put("attributeId", attributeId);
+        return new ModelAndView("settings/availableFamilyAttributeOptions", model);
+    }
+
+    @RequestMapping("/{familyId}/attributes/{attributeId}/options/available/list")
     @ResponseBody
-    public Map<String, Object> saveAttributeOptions(@PathVariable(value = "familyId") String familyId, FamilyAttributeOption attributeOption) {
+    public Result<Map<String, String>> getAvailableFamilyAttributeOptions(@PathVariable(value = "familyId") String familyId,
+                                                                          @PathVariable(value = "attributeId") String familyAttributeId,
+                                                                          HttpServletRequest request) {
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        Result<Map<String, String>> result = new Result<>();
+        if(family.isPresent()) {
+            Request dataTableRequest = new Request(request);
+            Pagination pagination = dataTableRequest.getPagination();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort = null;
+            if(pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            List<FamilyAttribute> familyAttribute = FamilyAttributeGroup.getAllAttributes(family.get().getAttributes()).stream().filter(e -> e.getFullId().equals(familyAttributeId)).collect(Collectors.toList());
+            if(ValidationUtil.isNotEmpty(familyAttribute)) {
+                collectionService.findAttribute(familyAttribute.get(0).getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.get(0).getAttributeId()).ifPresent(attribute -> {
+                    Map<String, AttributeOption> optionsMap = attribute.getOptions();
+                    List<AttributeOption> optionsList = optionsMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+                    //TODO - remove already set attribute options
+                    //TODO - sorting and pagination
+                    Page<AttributeOption> paginatedResult = new PageImpl<>(optionsList);
+                    paginatedResult.getContent().forEach(e -> {
+                        e.setCollectionId(familyAttribute.get(0).getCollectionId());
+                        dataObjects.add(e.toMap());
+                    });
+                    result.setDataObjects(dataObjects);
+                    result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+                    result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+                });
+            }
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/{familyId}/attributes/{familyAttributeId}/options/{attributeOptionId}", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> saveAttributeOptions(@PathVariable(value = "familyId") String familyId, FamilyAttributeOption familyAttributeOption) {
         Map<String, Object> model = new HashMap<>();
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
-        if(family.isPresent() && isValid(attributeOption, model)) {
-            family.get().addAttributeOption(attributeOption);
-            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
-            model.put("success", true);
+        if(family.isPresent() && isValid(familyAttributeOption, model, FamilyAttributeOption.AddOptionGroup.class)) {
+            Optional<AttributeOption> attributeOption = collectionService.findAttributeOption(familyAttributeOption.getAttributeOptionId());
+            if(attributeOption.isPresent()) {
+                family.get().addAttributeOption(familyAttributeOption, attributeOption.get());
+                familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+                model.put("success", true);
+            }
         }
         return model;
     }

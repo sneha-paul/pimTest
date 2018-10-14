@@ -39,6 +39,26 @@ $(function(){
         }
     });
 
+    $('.js-available-attribute-option').on('click', function(){
+        $.showModal({
+            url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/available'),
+            name:'available-attribute-options',
+            title:'Available Attribute Options',
+            buttons: [
+                {text: 'CLOSE', style: 'danger', close: true, click: function(){
+                    $.showModal({
+                        url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options'),
+                        name:'attribute-options',
+                        title:'Attribute Options',
+                        buttons: [
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ]
+                    });
+                }}
+            ]
+        });
+    });
+
     $.bindShowInputUIEvent($('.js-add-attribute-option'));
     $.bindHideInputUIEvent($('.js-add-input-ui-group .js-cancel-option'));
 });

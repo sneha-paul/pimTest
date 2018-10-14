@@ -140,7 +140,7 @@
             selector: '#paginatedFamilyAttributesTable',
             name: 'familyAttributes',
             type: 'TYPE_2',
-            buttonGroup: 'GROUP_4',
+            buttonGroup: 'GROUP_4A',
             url: $.getURL('/pim/families/{familyId}/attributes'),
             columns: [
                 {data: 'name', name: 'name', title: 'Attribute Name'},

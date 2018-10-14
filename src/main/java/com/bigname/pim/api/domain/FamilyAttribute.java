@@ -47,8 +47,8 @@ public class FamilyAttribute extends ValidatableEntity {
         this(isNotEmpty(attributeDTO.getName()) ? attributeDTO.getName() : attributeDTO.getAttribute().getName(), isNotEmpty(attributeDTO.getLabel()) ? attributeDTO.getLabel() : attributeDTO.getAttribute().getLabel());
         this.attribute = attributeDTO.getAttribute();
         this.collectionId = attributeDTO.getCollectionId();
-        this.attributeId = this.collectionId + "|" + this.attribute.getFullId();
-        this.setUiType(attributeDTO.getUiType());
+        this.attributeId = this.attribute.getFullId();
+        this.setUiType(attributeDTO.getAttribute().getUiType());
         this.setRequired(attributeDTO.getRequired());
         this.setScopable(attributeDTO.getScopable());
         FamilyAttributeGroup attributeGroup = null;

@@ -24,4 +24,6 @@ public interface AttributeCollectionService extends BaseService<AttributeCollect
     Page<AttributeOption> getAttributeOptions(String collectionId, FindBy findBy, String attributeId, int pageNumber, int size, Sort sort);
 
     Optional<Attribute> findAttribute(String collectionId, FindBy findBy, String attributeFullId);
+
+    Optional<AttributeOption> findAttributeOption(String attributeOptionFullId);
 }

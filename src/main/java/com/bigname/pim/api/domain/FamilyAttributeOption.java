@@ -18,19 +18,29 @@ public class FamilyAttributeOption extends ValidatableEntity {
     @NotEmpty(message = "Option id cannot be empty")
     private String id;
 
-    @NotEmpty(message = "Option fullId cannot be empty")
+    @Transient
     private String fullId;
 
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
 
-    @NotEmpty(message = "Attribute id cannot be empty")
-    @Transient
-    @JsonIgnore
-    private String attributeId;
+    @NotEmpty(message = "Attribute option id cannot be empty", groups = {AddOptionGroup.class})
+    @Transient @JsonIgnore
+    private String attributeOptionId;
 
-    public FamilyAttributeOption() {
+    @NotEmpty(message = "Attribute id cannot be empty", groups = {AddOptionGroup.class})
+    @Transient @JsonIgnore
+    private String familyAttributeId;
+
+    public FamilyAttributeOption() {}
+
+    public FamilyAttributeOption(FamilyAttributeOption familyAttributeOption, AttributeOption attributeOption) {
+        this.value = attributeOption.getValue();
+        this.id = attributeOption.getId();
+        this.familyAttributeId = familyAttributeOption.getFamilyAttributeId();
+//        this.attributeOptionId = attributeOption.getId();
+        orchestrate();
     }
 
     public String getId() {
@@ -49,12 +59,20 @@ public class FamilyAttributeOption extends ValidatableEntity {
         this.fullId = fullId;
     }
 
-    public String getAttributeId() {
-        return attributeId;
+    public String getFamilyAttributeId() {
+        return familyAttributeId;
     }
 
-    public void setAttributeId(String attributeId) {
-        this.attributeId = attributeId;
+    public void setFamilyAttributeId(String familyAttributeId) {
+        this.familyAttributeId = familyAttributeId;
+    }
+
+    public String getAttributeOptionId() {
+        return attributeOptionId;
+    }
+
+    public void setAttributeOptionId(String attributeOptionId) {
+        this.attributeOptionId = attributeOptionId;
     }
 
     public String getValue() {
@@ -91,10 +109,12 @@ public class FamilyAttributeOption extends ValidatableEntity {
     @Override
     public void orchestrate() {
         setActive(getActive());
-        if(isEmpty(getId())) {
+        if(isEmpty(getId()) && isNotEmpty(getValue())) {
             setId(toId(getValue()));
         }
-        fullId = attributeId + "|" + getId();
+        if(isNotEmpty(getId())) {
+            fullId = familyAttributeId + "|" + getId();
+        }
     }
 
     public Map<String, String> toMap() {
@@ -105,4 +125,6 @@ public class FamilyAttributeOption extends ValidatableEntity {
 
         return map;
     }
+
+    public interface AddOptionGroup {}
 }

@@ -29,6 +29,10 @@ public class AttributeOption extends ValidatableEntity {
     @JsonIgnore
     private String attributeId;
 
+    @Transient
+    @JsonIgnore
+    private String collectionId;
+
     public AttributeOption() {
     }
 
@@ -54,6 +58,14 @@ public class AttributeOption extends ValidatableEntity {
 
     public void setAttributeId(String attributeId) {
         this.attributeId = attributeId;
+    }
+
+    public String getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(String collectionId) {
+        this.collectionId = collectionId;
     }
 
     public String getValue() {
@@ -101,6 +113,7 @@ public class AttributeOption extends ValidatableEntity {
         map.put("id", getId());
         map.put("value", getValue());
         map.put("active", getActive());
+        map.put("fullId", getCollectionId() + "|" + getFullId());
 
         return map;
     }

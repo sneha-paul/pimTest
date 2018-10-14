@@ -4,7 +4,7 @@
         <div class="row p-b-25">
             <div class="col-lg-12 col-md-12">
                 <div class="pull-right">
-                    <button type="button" class="btn btn-success js-add-attribute-option"><i class="fa fa-plus"></i> <span class="p-l-5">Add Option</span></button>
+                    <button type="button" class="btn btn-success js-available-attribute-option"><i class="fa fa-plus"></i> <span class="p-l-5">Add Option</span></button>
                     <div class="input-group js-add-input-ui-group" style="display: none">
                         <form method="post" action="/pim/families/{familyId}/attributes/${attributeId}/options" data-method="PUT"
                               data-success-message='["Successfully added the attribute option", "Option Added"]'

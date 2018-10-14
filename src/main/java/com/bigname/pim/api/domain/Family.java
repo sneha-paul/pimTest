@@ -64,11 +64,12 @@ public class Family extends Entity<Family> {
         return this;
     }
 
-    public Family addAttributeOption(FamilyAttributeOption attributeOptionDTO) {
-        String attributeId = attributeOptionDTO.getAttributeId();
+    public Family addAttributeOption(FamilyAttributeOption familyAttributeOptionDTO, AttributeOption attributeOption) {
+        FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption(familyAttributeOptionDTO, attributeOption);
+        String attributeId = familyAttributeOption.getFamilyAttributeId();
         FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
                 .getAttributes()
-                .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
+                .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(familyAttributeOption.getId(), familyAttributeOption);
         return this;
     }
 

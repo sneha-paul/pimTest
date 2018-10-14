@@ -60,7 +60,7 @@
                     </div>
                     <div class="form-group">
                         <label>Attribute Name</label>
-                        <input type="text" name="name" value="" class="form-control" disabled="disabled"/>
+                        <input type="text" name="name" value="" class="form-control"/>
                     </div>
                     <div class="form-group">
                         <label for="uiType">Attribute UI Type</label>

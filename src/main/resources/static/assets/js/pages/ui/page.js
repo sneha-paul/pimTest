@@ -36,7 +36,7 @@
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
 
-                            if('GROUP_4' === options.buttonGroup) {
+                            if('GROUP_4' === options.buttonGroup || 'GROUP_4A' === options.buttonGroup) {
                                 value.actions = '';
                                 if('Y' === value.selectable) {
                                     value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-external-id="' + value.fullId + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
@@ -56,6 +56,8 @@
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
                             } else if(options.type === 'TYPE_3') {
                                 value.actions = '<button type="button" class="btn btn-success js-add" data-external-id="' + value.externalId + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
+                            } else if(options.type === 'TYPE_3A') {
+                                value.actions = '<button type="button" class="btn btn-success js-add" data-option-id="' + value.fullId + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
                             }
 
                             if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {
@@ -110,6 +112,15 @@
                 if('GROUP_4' === options.buttonGroup) {
                     $.showModal({
                         url: $.getURL('/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
+                        name:'attribute-options',
+                        title:'Attribute Options',
+                        buttons: [
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ]
+                    });
+                } else if('GROUP_4A' === options.buttonGroup) {
+                    $.showModal({
+                        url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
                         name:'attribute-options',
                         title:'Attribute Options',
                         buttons: [

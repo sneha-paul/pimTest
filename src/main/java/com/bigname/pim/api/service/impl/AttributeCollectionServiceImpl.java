@@ -1,5 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeGroup;
@@ -100,5 +102,20 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         List<Attribute> attributes = new ArrayList<>();
         get(collectionId, findBy).ifPresent(attributeCollection -> attributeCollection.getAllAttributes().stream().filter(attribute -> attribute.getFullId().equalsIgnoreCase(attributeFullId)).forEach(attributes::add));
         return attributes.isEmpty() ? Optional.empty() : Optional.of(attributes.get(0));
+    }
+
+    @Override
+    public Optional<AttributeOption> findAttributeOption(String attributeOptionFullId) {
+        List<String> idTokens = StringUtil.splitPipeDelimitedAsList(attributeOptionFullId);
+        if (idTokens.size() > 2) {
+            StringBuilder sb = new StringBuilder();
+            String collectionId = idTokens.get(0);
+            idTokens.subList(1, idTokens.size() - 1).forEach(t -> sb.append(sb.length() > 0 ? "|" + t : t));
+            String attributeFullId = sb.toString();
+            String optionId = idTokens.get(idTokens.size() - 1);
+            Optional<Attribute> attribute = findAttribute(collectionId, FindBy.EXTERNAL_ID, attributeFullId);
+            return attribute.map(attribute1 -> attribute1.getOptions().entrySet().stream().filter(e -> {e.getValue().setCollectionId(collectionId);return e.getKey().equals(optionId);}).map(Map.Entry::getValue).findFirst()).orElse(Optional.empty());
+        }
+        return Optional.empty();
     }
 }
