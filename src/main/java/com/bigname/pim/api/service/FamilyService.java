@@ -15,6 +15,8 @@ import java.util.List;
 public interface FamilyService extends BaseService<Family, FamilyDAO>  {
     Page<FamilyAttribute> getFamilyAttributes(String familyId, FindBy findBy, int page, int size, Sort sort);
 
+    Page<VariantGroup> getVariantGroups(String familyId, FindBy findBy, int page, int size, Sort sort);
+
     List<Pair<String, String>> getAttributeGroupsIdNamePair(String familyId, FindBy findBy, Sort sort);
 
     List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String familyId, FindBy findBy, Sort sort);

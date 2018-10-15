@@ -1,9 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.pim.api.domain.Family;
-import com.bigname.pim.api.domain.FamilyAttribute;
-import com.bigname.pim.api.domain.FamilyAttributeGroup;
-import com.bigname.pim.api.domain.FamilyAttributeOption;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.util.FindBy;
@@ -48,6 +45,18 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
         FamilyAttributeGroup.getAllAttributeGroups(attributeGroups, FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         //            TODO - sort this based on the requested sort
         return paginate(attributes, page, size);
+    }
+
+    @Override
+    public Page<VariantGroup> getVariantGroups(String familyId, FindBy findBy, int page, int size, Sort sort) {
+        /*if(sort == null) {
+            sort = Sort.by(Sort.Direction.ASC, "name");
+        }*/
+        final Map<String, VariantGroup> variantGroupsMap = new HashMap<>();
+        get(familyId, findBy, false).ifPresent(family -> variantGroupsMap.putAll(family.getVariantGroups()));
+        List<VariantGroup> variantGroups = variantGroupsMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+        //            TODO - sort this based on the requested sort
+        return paginate(variantGroups, page, size);
     }
 
     @Override

@@ -151,20 +151,20 @@
             ]
         });
 
-        /*$.initDataTable({
+        $.initDataTable({
             selector: '#paginatedVariantGroupsTable',
             name: 'variantGroups',
             type: 'TYPE_2',
             buttonGroup: 'GROUP_4',
             url: $.getURL('/pim/families/{familyId}/variantGroups'),
             columns: [
-                {data: 'name', name: 'name', title: 'Attribute Name'},
-                {data: 'id', name: 'id', title: 'Attribute ID'},
-                {data: 'group', name: 'group', title: 'Attribute Group'},
-                {data: 'selectable', name: 'selectable', title: 'Selectable'},
+                {data: 'name', name: 'name', title: 'Name'},
+                {data: 'id', name: 'id', title: 'Group ID'},
+                {data: 'variantAxis1', name: 'variantAxis1', title: 'Variant Axis Level 1'},
+                {data: 'variantAxis2', name: 'variantAxis2', title: 'Variant Axis Level 2'},
                 {data: 'actions', name: 'actions', title: 'Actions'}
             ]
-        });*/
+        });
 
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
     });

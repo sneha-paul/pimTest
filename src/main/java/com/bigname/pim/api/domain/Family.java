@@ -22,6 +22,8 @@ public class Family extends Entity<Family> {
 
     private Map<String, FamilyAttributeGroup> attributes = new LinkedHashMap<>();
 
+    private Map<String, VariantGroup> variantGroups = new LinkedHashMap<>();
+
     public Family() {
         super();
     }
@@ -71,6 +73,14 @@ public class Family extends Entity<Family> {
                 .getAttributes()
                 .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(familyAttributeOption.getId(), familyAttributeOption);
         return this;
+    }
+
+    public Map<String, VariantGroup> getVariantGroups() {
+        return variantGroups;
+    }
+
+    public void setVariantGroups(Map<String, VariantGroup> variantGroups) {
+        this.variantGroups = variantGroups;
     }
 
     @Override
