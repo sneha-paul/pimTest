@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
@@ -288,17 +289,23 @@ public class FamilyAttribute extends ValidatableEntity {
         }
     }
 
-    public Map<String, String> toMap() {
+    public Map<String, String> toMap(String... profile) {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("id", getId());
-        map.put("fullId", getAttributeGroup().getFullId() + '|' + getId());
-        map.put("uiType", getUiType().name());
-        map.put("dataType", getDataType());
-        map.put("name", getName());
-        map.put("group", FamilyAttributeGroup.getUniqueLeafGroupLabel(getAttributeGroup(), "|"));
-        map.put("required", getRequired());
-        map.put("selectable", getSelectable());
-        map.put("options", Integer.toString(options.size()));
+        if(isNotEmpty(ConversionUtil.toList(profile)) && "AXIS_ATTRIBUTE".equalsIgnoreCase(profile[0])) {
+            map.put("id", getId());
+            map.put("name", getName());
+            map.put("level", Integer.toString(getLevel()));
+        } else {
+            map.put("id", getId());
+            map.put("fullId", getAttributeGroup().getFullId() + '|' + getId());
+            map.put("uiType", getUiType().name());
+            map.put("dataType", getDataType());
+            map.put("name", getName());
+            map.put("group", FamilyAttributeGroup.getUniqueLeafGroupLabel(getAttributeGroup(), "|"));
+            map.put("required", getRequired());
+            map.put("selectable", getSelectable());
+            map.put("options", Integer.toString(options.size()));
+        }
         return map;
     }
 
@@ -311,5 +318,20 @@ public class FamilyAttribute extends ValidatableEntity {
                 .filter(a -> a.getValue().getId().equals(attributeId))
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList()).get(0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FamilyAttribute that = (FamilyAttribute) o;
+
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

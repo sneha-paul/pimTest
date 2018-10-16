@@ -162,7 +162,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
         List<FamilyAttribute> attributes = familyService.getVariantAxisAttributes(familyId, variantGroupId, FindBy.EXTERNAL_ID, sort);
-        attributes.forEach(e -> dataObjects.add(e.toMap()));
+        attributes.forEach(e -> dataObjects.add(e.toMap("AXIS_ATTRIBUTE")));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(attributes.size()));
         result.setRecordsFiltered(Long.toString(attributes.size()));
@@ -190,6 +190,31 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         result.setRecordsTotal(Long.toString(attributes.size()));
         result.setRecordsFiltered(Long.toString(attributes.size()));
         return result;
+    }
+
+    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/axisAttributes/{attributeId}", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> addAxisAttribute(@PathVariable(value = "familyId") String familyId,
+                                                @PathVariable(value = "variantGroupId") String variantGroupId,
+                                                @PathVariable(value = "attributeId") String attributeId) {
+        Map<String, Object> model = new HashMap<>();
+
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        if(family.isPresent()) {
+            FamilyAttribute axisAttribute = FamilyAttribute.findAttribute(attributeId, family.get().getAttributes());
+            if(ValidationUtil.isNotEmpty(axisAttribute)) {
+                Map<Integer, List<FamilyAttribute>> variantAxis = family.get().getVariantGroups().get(variantGroupId).getVariantAxis();
+                if(ValidationUtil.isNotEmpty(variantAxis) && variantAxis.containsKey(1)) {
+                    variantAxis.get(1).add(axisAttribute);
+                } else {
+                    variantAxis.put(1, Arrays.asList(axisAttribute));
+                }
+            }
+            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+            model.put("success", true);
+        }
+
+        return model;
     }
 
     @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}", method = RequestMethod.PUT)

@@ -12,7 +12,7 @@ $( document ).ready(function() {
     });
 
     $('#paginatedAvailableAttributeOptionsTable').on('click', '.js-add', function(){
-        var optionId = $(this).data('option-id');
+        var optionId = $(this).data('id');
 
         $.ajax({
             url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/{optionId}', {'optionId': optionId}),

@@ -59,7 +59,7 @@
                             } else if(options.type === 'TYPE_3') {
                                 value.actions = '<button type="button" class="btn btn-success js-add" data-external-id="' + value.externalId + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
                             } else if(options.type === 'TYPE_3A') {
-                                value.actions = '<button type="button" class="btn btn-success js-add" data-option-id="' + value.fullId + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
+                                value.actions = '<button type="button" class="btn btn-success js-add" data-id="' + value.id + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
                             }
 
                             if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {
