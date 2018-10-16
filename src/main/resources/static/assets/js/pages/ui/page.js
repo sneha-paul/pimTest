@@ -29,7 +29,7 @@
                     info: "_START_ to _END_ of _TOTAL_"
                 },
                 ajax: {
-                    url: options.url + (options.type !== 'TYPE_1' ? '' : 'list'),
+                    url: options.url + (options.type !== 'TYPE_1' && options.type !== 'TYPE_1A' ? '' : 'list'),
                     data: function ( data ) {
                         //process data before sent to server.
                     },
@@ -41,16 +41,18 @@
                                 if('Y' === value.selectable) {
                                     value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-external-id="' + value.fullId + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
                                 }
-                            } else if(options.type === 'TYPE_1') {
+                            } else if(options.type === 'TYPE_1' || options.type === 'TYPE_1A') {
                                 var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
                                 if('Y' !== value.active) {
                                     icon = 'icon-check';
                                     action = 'Enable';
                                     btnClass = 'btn-success';
                                 }
-                                value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
-                                    '<button type="button" class="btn btn-sm btn-primary js-clone" data-external-id="' + value.externalId + '" title="Clone"><i class="icon-docs"></i></button> ' +
-                                    '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
+                                value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
+                                if(options.type === 'TYPE_1') {
+                                    value.actions += '<button type="button" class="btn btn-sm btn-primary js-clone" data-external-id="' + value.externalId + '" title="Clone"><i class="icon-docs"></i></button> ';
+                                }
+                                value.actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             } else if(options.type === 'TYPE_2') {
                                 value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';

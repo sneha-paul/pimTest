@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.*;
 
 /**
@@ -8,16 +9,18 @@ import java.util.*;
  */
 public class VariantGroup extends ValidatableEntity {
 
-    private String id;
+
+    @NotEmpty(message = "Group name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String name;
+    private String id;
     private String active;
     private int level = 1;
     private long sequenceNum;
     private int subSequenceNum;
     private String familyId;
-    private Map<Integer, List<FamilyAttributeGroup>> variantAxis = new LinkedHashMap<>();
+    private Map<Integer, List<FamilyAttribute>> variantAxis = new LinkedHashMap<>();
 
-    private Map<Integer, List<FamilyAttributeGroup>> variantAttributes = new LinkedHashMap<>();
+    private Map<Integer, List<FamilyAttribute>> variantAttributes = new LinkedHashMap<>();
 
     public VariantGroup() {}
 
@@ -69,19 +72,19 @@ public class VariantGroup extends ValidatableEntity {
         this.subSequenceNum = subSequenceNum;
     }
 
-    public Map<Integer, List<FamilyAttributeGroup>> getVariantAxis() {
+    public Map<Integer, List<FamilyAttribute>> getVariantAxis() {
         return variantAxis;
     }
 
-    public void setVariantAxis(Map<Integer, List<FamilyAttributeGroup>> variantAxis) {
+    public void setVariantAxis(Map<Integer, List<FamilyAttribute>> variantAxis) {
         this.variantAxis = variantAxis;
     }
 
-    public Map<Integer, List<FamilyAttributeGroup>> getVariantAttributes() {
+    public Map<Integer, List<FamilyAttribute>> getVariantAttributes() {
         return variantAttributes;
     }
 
-    public void setVariantAttributes(Map<Integer, List<FamilyAttributeGroup>> variantAttributes) {
+    public void setVariantAttributes(Map<Integer, List<FamilyAttribute>> variantAttributes) {
         this.variantAttributes = variantAttributes;
     }
 
@@ -103,11 +106,27 @@ public class VariantGroup extends ValidatableEntity {
 
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("id", getId());
+        map.put("externalId", getId());
         map.put("name", getName());
-        map.put("variantAxis1", getVariantAxis().containsKey(1) ? "TODO1, TODO2" : "");
-        map.put("variantAxis2", getVariantAxis().containsKey(2) ? "TODO1, TODO2" : "");
+        map.put("active", getActive());
+        map.put("variantAxis", getVariantAxis().containsKey(1) ? "TODO1, TODO2" : "");
+//        map.put("variantAxis2", getVariantAxis().containsKey(2) ? "TODO1, TODO2" : "");
         return map;
+    }
+
+    public VariantGroup merge(VariantGroup variantGroup) {
+        switch(getGroup()) {
+            case "DETAILS":
+                this.setName(variantGroup.getName());
+                break;
+            case "VARIANT_AXIS":
+
+                break;
+            case "VARIANT_ATTRIBUTES":
+
+                break;
+        }
+        return this;
     }
 
     

@@ -35,6 +35,9 @@ public class FamilyAttribute extends ValidatableEntity {
     private Attribute attribute;
 
     @Transient
+    private int level;
+
+    @Transient
     @JsonIgnore
     private FamilyAttributeGroup attributeGroup;
 
@@ -227,6 +230,14 @@ public class FamilyAttribute extends ValidatableEntity {
 
     public void setCollectionId(String collectionId) {
         this.collectionId = collectionId;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public Attribute getAttribute() {

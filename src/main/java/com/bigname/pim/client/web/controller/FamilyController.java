@@ -112,6 +112,117 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return new ModelAndView("settings/familyAttribute", model);
     }
 
+    @RequestMapping("/{familyId}/variantGroups/{variantGroupId}/axisAttributes/available")
+    public ModelAndView availableAxisAttributes(@PathVariable(value = "familyId") String familyId,
+                                                @PathVariable(value = "variantGroupId") String variantGroupId) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("familyId", familyId);
+        model.put("variantGroupId", variantGroupId);
+        return new ModelAndView("settings/availableVariantAxisAttributes", model);
+    }
+
+    @RequestMapping(value = {"/{familyId}/variantGroups/create", "/{familyId}/variantGroups/{variantGroupId}"})
+    public ModelAndView variantGroupDetails(@PathVariable(value = "familyId") String familyId,
+                                            @PathVariable(value = "variantGroupId", required = false) String variantGroupId) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        model.put("active", "FAMILIES");
+        if(variantGroupId == null) {
+            model.put("mode", "CREATE");
+        } else {
+            if(family.isPresent()) {
+                model.put("mode", "DETAILS");
+                model.put("familyId", familyId);
+                model.put("variantGroup", family.get().getVariantGroups().get(variantGroupId));
+                model.put("breadcrumbs", new Breadcrumbs("Families",
+                        "Families", "/pim/families",
+                        family.get().getFamilyName(), "/pim/families/" + family.get().getFamilyId(),
+                        "Variant Groups", "/pim/families/" + family.get().getFamilyId() + "#variantGroups",
+                        family.get().getVariantGroups().get(variantGroupId).getName(), ""));
+            }
+        }
+//        model.put("attribute", new Attribute());
+//        model.put("availableVariantAxisAttributes", familyService.getAvailableVariantAxisAttributes(id, FindBy.EXTERNAL_ID, null));
+        return new ModelAndView("settings/variantGroup", model);
+    }
+
+    @RequestMapping("/{familyId}/variantGroups/{variantGroupId}/axisAttributes")
+    @ResponseBody
+    public Result<Map<String, String>> getVariantAxisAttributes(@PathVariable(value = "familyId") String familyId,
+                                                                @PathVariable(value = "variantGroupId") String variantGroupId,
+                                                                HttpServletRequest request) {
+
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        List<FamilyAttribute> attributes = familyService.getVariantAxisAttributes(familyId, variantGroupId, FindBy.EXTERNAL_ID, sort);
+        attributes.forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(attributes.size()));
+        result.setRecordsFiltered(Long.toString(attributes.size()));
+        return result;
+    }
+
+    @RequestMapping("/{familyId}/variantGroups/{variantGroupId}/axisAttributes/available/list")
+    @ResponseBody
+    public Result<Map<String, String>> getAvailableVariantAxisAttributes(@PathVariable(value = "familyId") String familyId,
+                                                                @PathVariable(value = "variantGroupId") String variantGroupId,
+                                                                HttpServletRequest request) {
+
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        List<FamilyAttribute> attributes = familyService.getAvailableVariantAxisAttributes(familyId, variantGroupId, FindBy.EXTERNAL_ID, sort);
+        attributes.forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(attributes.size()));
+        result.setRecordsFiltered(Long.toString(attributes.size()));
+        return result;
+    }
+
+    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> saveVariantGroup(@PathVariable(value = "familyId") String familyId,
+                                                @PathVariable(value = "variantGroupId") String variantGroupId,
+                                                VariantGroup variantGroup) {
+        Map<String, Object> model = new HashMap<>();
+        if(isValid(variantGroup, model, VariantGroup.DetailsGroup.class)) {
+            Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+            if(family.isPresent()) {
+                family.get().getVariantGroups().get(variantGroupId).merge(variantGroup);
+                familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+                model.put("success", true);
+            }
+        }
+        return model;
+    }
+
+    @RequestMapping(value = "/{familyId}/variantGroups", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> createVariantGroup(@PathVariable(value = "familyId") String familyId, VariantGroup variantGroup) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        if(family.isPresent() && isValid(variantGroup, model, VariantGroup.CreateGroup.class)) { // TODO - check if another group with the same id/name exists
+            variantGroup.setActive("N");
+            family.get().addVariantGroup(variantGroup);
+            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+            model.put("success", true);
+        }
+        return model;
+    }
+
     @RequestMapping(value = "/{familyId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> saveAttribute(@PathVariable(value = "familyId") String id, FamilyAttribute familyAttribute) {
@@ -241,7 +352,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return model;
     }
 
-    @RequestMapping("/{id}/variantGroups")
+    @RequestMapping("/{id}/variantGroups/list")
     @ResponseBody
     public Result<Map<String, String>> getVariantGroups(@PathVariable(value = "id") String id, HttpServletRequest request) {
 

@@ -94,6 +94,7 @@ public class Family extends Entity<Family> {
         this.setFamilyName(family.getFamilyName());
         this.setActive(family.getActive());
         this.setAttributes(family.getAttributes());
+        this.setVariantGroups(family.getVariantGroups());
         return this;
     }
 
@@ -139,5 +140,14 @@ public class Family extends Entity<Family> {
                 .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
                         e.getKey().equals(groupId)).map(Map.Entry::getValue).collect(Collectors.toList());
         return isNotEmpty(list) ? list.get(0) : null;
+    }
+
+    public boolean addVariantGroup(VariantGroup variantGroup) {
+        if(getVariantGroups().containsKey(variantGroup.getId())) {
+            return false;
+        } else {
+            getVariantGroups().put(variantGroup.getId(), variantGroup);
+            return false;
+        }
     }
 }

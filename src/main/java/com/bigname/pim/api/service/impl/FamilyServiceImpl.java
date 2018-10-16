@@ -88,9 +88,52 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
             options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), family.get().getAttributes())
                     .getAttributes()
                     .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
-                    .getOptions().entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
+                    .getOptions().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
             //TODO - sort this based on the requested sort
         }
         return paginate(options, page, size);
+    }
+
+    @Override
+    public List<FamilyAttribute> getVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort) {
+        /*if(sort == null) {
+            sort = Sort.by(Sort.Direction.ASC, "name");
+        }*/
+        List<FamilyAttribute> attributes = new ArrayList<>();
+        Optional<Family> _family = get(familyId, findBy, false);
+        _family.ifPresent(family ->
+                family.getVariantGroups().get(variantGroupId).getVariantAxis().forEach((key, value) -> value
+                        .forEach(attribute -> {
+                            attribute.setLevel(key);
+                            attributes.add(attribute);
+                        }))
+        );
+        return attributes;
+    }
+
+    @Override
+    public List<FamilyAttribute> getAvailableVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort) {
+        /*if(sort == null) {
+            sort = Sort.by(Sort.Direction.ASC, "name");
+        }*/
+        List<FamilyAttribute> attributes = new ArrayList<>();
+        List<FamilyAttribute> setAttributes = new ArrayList<>();
+        Optional<Family> _family = get(familyId, findBy, false);
+
+        //All valid variant axis attributes
+        _family.ifPresent(family -> FamilyAttributeGroup.getAllAttributeGroups(family.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true)
+                .forEach(attributeGroup -> attributeGroup.getAttributes().entrySet().stream()
+                        .filter(e -> e.getValue().getActive().equals("Y") && e.getValue().getSelectable().equals("Y") && e.getValue().getRequired().equals("Y"))
+                        .forEach(entry -> attributes.add(entry.getValue()))));
+
+        //Already set axis attributes
+        _family.ifPresent(family -> family.getVariantGroups().get(variantGroupId).getVariantAxis().forEach((key, value) -> setAttributes.addAll(value)));
+
+
+
+        attributes.removeAll(setAttributes);
+        return attributes;
+
+//        return family.<List<FamilyAttribute>>map(Family::getAttributes).orElse(null);
     }
 }
