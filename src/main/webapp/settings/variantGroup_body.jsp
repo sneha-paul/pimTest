@@ -99,28 +99,91 @@
                         </div>
                     </div>
                     <div class="tab-pane" id="variantAttributes">
-                        <div class="row clearfix">
-                            <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div class="row p-b-25">
-                                            <div class="col-lg-12 col-md-12">
-                                                <div class="pull-right">
-                                                    <button type="button"
-                                                            class="btn btn-success js-add-variantAttribute"><i
-                                                            class="fa fa-plus"></i> <span class="p-l-5">Add Variant Attribute</span>
-                                                    </button>
-                                                </div>
+                        <div class="taskboard">
+                            <div class="row clearfix">
+
+                                <div class="col-lg-4 col-md-12">
+                                    <div class="card bg-dark planned_task">
+                                        <div class="header">
+                                            <h2>Product Level Attributes</h2>
+                                            <ul class="header-dropdown">
+                                                <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="body">
+                                            <div class="dd" data-plugin="nestable">
+                                                <ol class="dd-list">
+                                                    <li class="dd-item" data-id="1">
+                                                        <div class="dd-handle">
+                                                            <h6>Dashbaord</h6>
+                                                        </div>
+                                                    </li>
+                                                    <li class="dd-item" data-id="2">
+                                                        <div class="dd-handle">
+                                                            <h6>New project</h6>
+                                                        </div>
+                                                    </li>
+                                                    <li class="dd-item" data-id="3">
+                                                        <div class="dd-handle">
+                                                            <h6>Feed Details</h6>
+                                                        </div>
+                                                    </li>
+                                                </ol>
                                             </div>
                                         </div>
-                                        <div class="table-responsive">
-                                            <table id="paginatedVariantAttributesTable"
-                                                   class="table table-hover dataTable table-custom" style="width: 100%">
-                                                <thead class="thead-dark">
+                                    </div>
+                                </div>
 
-                                                </thead>
+                                <div class="col-lg-4 col-md-12">
+                                    <div class="card bg-dark progress_task">
+                                        <div class="header">
+                                            <h2>Level 1 Variant Attributes</h2>
+                                            <ul class="header-dropdown">
+                                                <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="body">
+                                            <div class="dd" data-plugin="nestable">
+                                                <ol class="dd-list">
+                                                    <li class="dd-item" data-id="1">
+                                                        <div class="dd-handle">
+                                                            <h6>New Code Update</h6>
+                                                        </div>
+                                                    </li>
+                                                    <li class="dd-item" data-id="2">
+                                                        <div class="dd-handle">
+                                                            <h6>Meeting</h6>
+                                                        </div>
+                                                    </li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                            </table>
+                                <div class="col-lg-4 col-md-12">
+                                    <div class="card bg-dark completed_task">
+                                        <div class="header">
+                                            <h2>Level 2 Variant Attributes</h2>
+                                            <ul class="header-dropdown">
+                                                <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="body">
+                                            <div class="dd" data-plugin="nestable">
+                                                <ol class="dd-list">
+                                                    <li class="dd-item" data-id="1">
+                                                        <div class="dd-handle">
+                                                            <h6>Job title</h6>
+                                                        </div>
+                                                    </li>
+                                                    <li class="dd-item" data-id="2">
+                                                        <div class="dd-handle">
+                                                            <h6>Event Done</h6>
+                                                        </div>
+                                                    </li>
+                                                </ol>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -150,6 +213,22 @@
                 {data: 'actions', name: 'actions', title: 'Actions'}
             ]
         });
+
+        $('.dd').nestable({maxDepth: 1});
+
+        $('.dd').on('change', function () {
+         var $this = $(this);
+         var serializedData = window.JSON.stringify($($this).nestable('serialize'));
+
+         console.log(serializedData);
+         });
+
+        /*$('.dd4').nestable();
+
+         $('.dd4').on('change', function () {
+         var $this = $(this);
+         var serializedData = window.JSON.stringify($($this).nestable('serialize'));
+         });*/
 
         /*$.initDataTable({
             selector: '#paginatedVariantAttributesTable',

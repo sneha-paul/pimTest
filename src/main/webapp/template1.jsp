@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
-
+    <link rel="stylesheet" href="/assets/vendor/nestable/jquery-nestable.css">
     <link rel="stylesheet" href="/assets/vendor/sweetalert/sweetalert.css"/>
     <link rel="stylesheet" href="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.css">
@@ -189,6 +189,7 @@
 <script src="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable-conditional-paging.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable.js"></script>
+<script src="/assets/vendor/nestable/jquery.nestable.js"></script>
 
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
