@@ -157,7 +157,8 @@
                         if (sub.length) {
                             item.children = step(sub, depth + 1);
                         }
-                        array.push(item);
+                        // array.push(item);
+                        array.push(item.id);
                     });
                     return array;
                 };
@@ -165,10 +166,10 @@
             return data;
         },
 
-        serialise: function()
+        /*serialise: function()
         {
             return this.serialize();
-        },
+        },*/
 
         reset: function()
         {
@@ -296,10 +297,9 @@
             this.placeEl.replaceWith(el);
 
             this.dragEl.remove();
-            // this.el.trigger('change');
+            this.el.trigger('change');
             if (this.hasNewRoot) {
                 this.dragRootEl.trigger('change');
-                this.el.trigger('change');
             }
             this.reset();
         },

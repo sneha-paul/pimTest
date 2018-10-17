@@ -117,6 +117,10 @@
             background-color: #f68c1f
         }
 
+        .dd-nodrag {
+            cursor: not-allowed !important;
+        }
+
         /*.js-locked {
             background: url('/assets/img/lock-icon.png') no-repeat right ;
             padding-left: 5px;

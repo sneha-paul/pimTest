@@ -111,7 +111,7 @@
                                             </ul>--%>
                                         </div>
                                         <div class="body">
-                                            <div class="dd" data-plugin="nestable">
+                                            <div id="product" class="dd" data-plugin="nestable">
                                                 <ol class="dd-list">
                                                     <c:forEach var="attribute" items="${variantGroupAttributes['PRODUCT_ATTRIBUTES']}">
                                                     <li class="dd-item" data-id="${attribute.id}">
@@ -135,7 +135,7 @@
                                             </ul>--%>
                                         </div>
                                         <div class="body">
-                                            <div class="dd" data-plugin="nestable">
+                                            <div id="variant" class="dd" data-plugin="nestable">
                                                 <ol class="dd-list">
                                                     <c:forEach var="attribute" items="${variantGroupAttributes['AXIS_ATTRIBUTES_L1']}">
                                                         <li class="dd-item dd-nodrag" data-id="${attribute.id}">
@@ -203,14 +203,28 @@
             ]
         });
 
-        $('.dd').nestable({maxDepth: 1});
 
-        $('.dd').on('change', function () {
+
+        $('#product,#variant').nestable({maxDepth: 1});
+//        $('#variant').nestable({maxDepth: 1});
+
+        $('#product').on('change', function () {
          var $this = $(this);
+         console.log($(this).nestable('serialize'));
          var serializedData = window.JSON.stringify($($this).nestable('serialize'));
 
          console.log(serializedData);
          });
+
+        $('#variant').on('change', function () {
+            console.log($(this).nestable('serialize'));
+            var $this = $(this);
+            var serializedData = window.JSON.stringify($($this).nestable('serialize'));
+
+            console.log(serializedData);
+        });
+
+
 
         /*$('.dd4').nestable();
 
