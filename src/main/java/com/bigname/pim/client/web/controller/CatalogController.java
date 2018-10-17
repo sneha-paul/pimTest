@@ -7,7 +7,6 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
-import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.client.model.Breadcrumbs;
@@ -17,13 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -49,6 +46,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         Map<String, Object> model = new HashMap<>();
         if(isValid(catalog, model, Catalog.CreateGroup.class)) {
             catalog.setActive("N");
+            catalog.setDiscontinued("Y");
             catalogService.create(catalog);
             model.put("success", true);
         }

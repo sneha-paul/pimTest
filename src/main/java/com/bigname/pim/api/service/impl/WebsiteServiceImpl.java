@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> implements WebsiteService {
@@ -60,8 +61,10 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
             List<String> catalogIds = new ArrayList<>();
             websiteCatalogs.forEach(wc -> catalogIds.add(wc.getCatalogId()));
             if(catalogIds.size() > 0) {
-                Map<String, Catalog> catalogsMap = PimUtil.getIdedMap(catalogService.getAll(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                websiteCatalogs.forEach(wc -> wc.init(website, catalogsMap.get(wc.getCatalogId())));
+                Map<String, Catalog> catalogsMap = PimUtil.getIdedMap(catalogService.getAll(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, null), FindBy.INTERNAL_ID);
+                List<WebsiteCatalog> _websiteCatalogs = websiteCatalogs.filter(wc -> catalogsMap.containsKey(wc.getCatalogId())).stream().collect(Collectors.toList());
+                _websiteCatalogs.forEach(wc -> wc.init(website, catalogsMap.get(wc.getCatalogId())));
+                websiteCatalogs = new PageImpl<>(_websiteCatalogs,pageable,_websiteCatalogs.size());//TODO : verify this logic
             }
             return websiteCatalogs;
         }

@@ -1,16 +1,13 @@
 package com.bigname.pim.api.domain;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by Manu on 8/9/2018.
@@ -79,6 +76,15 @@ public class Catalog extends Entity<Catalog> {
     }
 
     @Override
+    public void orchestrate() {
+        super.orchestrate();
+        setDiscontinued(getDiscontinued());
+        if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
+            setActive("N");
+        }
+    }
+
+    @Override
     public Catalog merge(Catalog catalog) {
         switch(catalog.getGroup()) {
             case "DETAILS" :
@@ -86,6 +92,7 @@ public class Catalog extends Entity<Catalog> {
                 this.setCatalogName(catalog.getCatalogName());
                 this.setDescription(catalog.getDescription());
                 this.setActive(catalog.getActive());
+                this.setDiscontinued(catalog.getDiscontinued());
                 break;
         }
 
@@ -96,6 +103,7 @@ public class Catalog extends Entity<Catalog> {
     public Catalog cloneInstance() {
         Catalog clone = new Catalog();
         clone.setActive("N");
+        clone.setDiscontinued("Y");
         clone.setExternalId(cloneValue(getExternalId()));
         clone.setCatalogName(cloneValue(getCatalogName()));
         clone.setDescription(cloneValue(getDescription()));
@@ -108,6 +116,7 @@ public class Catalog extends Entity<Catalog> {
         map.put("externalId", getExternalId());
         map.put("catalogName", getCatalogName());
         map.put("active", getActive());
+        map.put("status", getDiscontinued());
         return map;
     }
 }

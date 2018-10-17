@@ -1,22 +1,11 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.javatuples.Pair;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -31,6 +20,8 @@ abstract public class Entity<T> extends ValidatableEntity implements Serializabl
     private String externalId;
 
     private String active;
+
+    private String discontinued;
 
     protected Entity() {
         this.id = UUID.randomUUID().toString();
@@ -67,7 +58,18 @@ abstract public class Entity<T> extends ValidatableEntity implements Serializabl
         if(active == null) {
             active = "N";
         }
-        this.active = active;
+        this.active = toYesNo(active,"Y");
+    }
+
+    public String getDiscontinued() {
+        return discontinued;
+    }
+
+    public void setDiscontinued(String discontinued) {
+        if(discontinued == null) {
+            discontinued = "N";
+        }
+        this.discontinued = toYesNo(discontinued,"Y");
     }
 
     @Override
