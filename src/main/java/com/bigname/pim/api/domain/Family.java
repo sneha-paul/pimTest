@@ -150,4 +150,25 @@ public class Family extends Entity<Family> {
             return false;
         }
     }
+
+    public Map<String, List<FamilyAttribute>> getVariantGroupAttributes(String variantGroupId) {
+        VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
+        List<FamilyAttribute> familyAttributes = FamilyAttributeGroup.getAllAttributes(getAttributes());
+        Map<String, List<FamilyAttribute>> variantGroupAttributes = new LinkedHashMap<>();
+        List<FamilyAttribute> productAttributes = new ArrayList<>(familyAttributes);
+
+        for (Map.Entry<Integer, List<FamilyAttribute>> entry : variantGroup.getVariantAxis().entrySet()) {
+            variantGroupAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(), entry.getValue());
+            productAttributes.removeAll(entry.getValue());
+        }
+
+        for (Map.Entry<Integer, List<FamilyAttribute>> entry : variantGroup.getVariantAttributes().entrySet()) {
+            variantGroupAttributes.put("VARIANT_ATTRIBUTES_L" + entry.getKey(), entry.getValue());
+            productAttributes.removeAll(entry.getValue());
+        }
+
+        variantGroupAttributes.put("PRODUCT_ATTRIBUTES", productAttributes);
+
+        return variantGroupAttributes;
+    }
 }

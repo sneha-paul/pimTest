@@ -134,6 +134,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                 model.put("mode", "DETAILS");
                 model.put("familyId", familyId);
                 model.put("variantGroup", family.get().getVariantGroups().get(variantGroupId));
+                model.put("variantGroupAttributes", family.get().getVariantGroupAttributes(variantGroupId));
                 model.put("breadcrumbs", new Breadcrumbs("Families",
                         "Families", "/pim/families",
                         family.get().getFamilyName(), "/pim/families/" + family.get().getFamilyId(),
@@ -141,8 +142,6 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                         family.get().getVariantGroups().get(variantGroupId).getName(), ""));
             }
         }
-//        model.put("attribute", new Attribute());
-//        model.put("availableVariantAxisAttributes", familyService.getAvailableVariantAxisAttributes(id, FindBy.EXTERNAL_ID, null));
         return new ModelAndView("settings/variantGroup", model);
     }
 

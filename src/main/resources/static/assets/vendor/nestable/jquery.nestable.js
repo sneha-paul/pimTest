@@ -87,12 +87,16 @@
             var onStartEvent = function(e)
             {
                 var handle = $(e.target);
-                if (!handle.hasClass(list.options.handleClass)) {
-                    if (handle.closest('.' + list.options.noDragClass).length) {
+                // if (!handle.hasClass(list.options.handleClass)) {
+                    if (handle.closest('.' + list.options.noDragClass).length > 0) {
+                        e.stopPropagation();
+                        e.preventDefault();
                         return;
                     }
+                if (!handle.hasClass(list.options.handleClass)) {
                     handle = handle.closest('.' + list.options.handleClass);
                 }
+                // }
 
                 if (!handle.length || list.dragEl) {
                     return;
@@ -292,9 +296,10 @@
             this.placeEl.replaceWith(el);
 
             this.dragEl.remove();
-            this.el.trigger('change');
+            // this.el.trigger('change');
             if (this.hasNewRoot) {
                 this.dragRootEl.trigger('change');
+                this.el.trigger('change');
             }
             this.reset();
         },

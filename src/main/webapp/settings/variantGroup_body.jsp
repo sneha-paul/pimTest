@@ -1,4 +1,5 @@
 <%--@elvariable id="variantGroup" type="com.bigname.pim.api.domain.VariantGroup"--%>
+<%--@elvariable id="variantGroupAttributes" type="java.util.Map<String, java.util.List<com.bigname.pim.api.domain.FamilyAttribute>"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
@@ -7,7 +8,7 @@
                 <h2>${variantGroup.name}
                     <small><code class="highlighter-rouge">${variantGroup.id}</code></small>
                     <%--<small class="pull-right m-t--15"><code style="color:#808080">_id: ${variantGroup.id}</code>--%>
-                    </small>
+                    <%--</small>--%>
                 </h2>
             </div>
             <div class="body">
@@ -101,33 +102,24 @@
                     <div class="tab-pane" id="variantAttributes">
                         <div class="taskboard">
                             <div class="row clearfix">
-
                                 <div class="col-lg-4 col-md-12">
                                     <div class="card bg-dark planned_task">
                                         <div class="header">
                                             <h2>Product Level Attributes</h2>
-                                            <ul class="header-dropdown">
+                                            <%--<ul class="header-dropdown">
                                                 <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
-                                            </ul>
+                                            </ul>--%>
                                         </div>
                                         <div class="body">
                                             <div class="dd" data-plugin="nestable">
                                                 <ol class="dd-list">
-                                                    <li class="dd-item" data-id="1">
+                                                    <c:forEach var="attribute" items="${variantGroupAttributes['PRODUCT_ATTRIBUTES']}">
+                                                    <li class="dd-item" data-id="${attribute.id}">
                                                         <div class="dd-handle">
-                                                            <h6>Dashbaord</h6>
+                                                            <h6>${attribute.name}</h6>
                                                         </div>
                                                     </li>
-                                                    <li class="dd-item" data-id="2">
-                                                        <div class="dd-handle">
-                                                            <h6>New project</h6>
-                                                        </div>
-                                                    </li>
-                                                    <li class="dd-item" data-id="3">
-                                                        <div class="dd-handle">
-                                                            <h6>Feed Details</h6>
-                                                        </div>
-                                                    </li>
+                                                    </c:forEach>
                                                 </ol>
                                             </div>
                                         </div>
@@ -137,31 +129,28 @@
                                 <div class="col-lg-4 col-md-12">
                                     <div class="card bg-dark progress_task">
                                         <div class="header">
-                                            <h2>Level 1 Variant Attributes</h2>
-                                            <ul class="header-dropdown">
+                                            <h2>Variant Attributes</h2>
+                                            <%--<ul class="header-dropdown">
                                                 <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
-                                            </ul>
+                                            </ul>--%>
                                         </div>
                                         <div class="body">
                                             <div class="dd" data-plugin="nestable">
                                                 <ol class="dd-list">
-                                                    <li class="dd-item" data-id="1">
-                                                        <div class="dd-handle">
-                                                            <h6>New Code Update</h6>
-                                                        </div>
-                                                    </li>
-                                                    <li class="dd-item" data-id="2">
-                                                        <div class="dd-handle">
-                                                            <h6>Meeting</h6>
-                                                        </div>
-                                                    </li>
+                                                    <c:forEach var="attribute" items="${variantGroupAttributes['AXIS_ATTRIBUTES_L1']}">
+                                                        <li class="dd-item dd-nodrag" data-id="${attribute.id}">
+                                                            <div class="dd-handle">
+                                                                <h6>${attribute.name}</h6><small class="pull-right m-t--25"><code class="highlighter-rouge">VARIANT AXIS</code></small>
+                                                            </div>
+                                                        </li>
+                                                    </c:forEach>
                                                 </ol>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-12">
+                                <%--<div class="col-lg-4 col-md-12">
                                     <div class="card bg-dark completed_task">
                                         <div class="header">
                                             <h2>Level 2 Variant Attributes</h2>
@@ -186,7 +175,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>--%>
                             </div>
                         </div>
                     </div>
