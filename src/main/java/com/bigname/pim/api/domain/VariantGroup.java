@@ -115,9 +115,11 @@ public class VariantGroup extends ValidatableEntity {
     }
 
     public VariantGroup merge(VariantGroup variantGroup) {
+        this.setGroup(variantGroup.getGroup());
         switch(getGroup()) {
             case "DETAILS":
                 this.setName(variantGroup.getName());
+                this.setActive(variantGroup.getActive());
                 break;
         }
         return this;
