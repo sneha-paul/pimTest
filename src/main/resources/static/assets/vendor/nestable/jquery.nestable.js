@@ -199,6 +199,7 @@
             this.dragDepth  = 0;
             this.hasNewRoot = false;
             this.pointEl    = null;
+            this.state      = [];
         },
 
         expandItem: function(li)
@@ -257,7 +258,7 @@
             var mouse    = this.mouse,
                 target   = $(e.target),
                 dragItem = target.closest(this.options.itemNodeName);
-
+            this.state = this.serialize();
             this.placeEl.css('height', dragItem.height());
 
             mouse.offsetX = e.offsetX !== undefined ? e.offsetX : e.pageX - target.offset().left;
@@ -297,9 +298,11 @@
             this.placeEl.replaceWith(el);
 
             this.dragEl.remove();
-            this.el.trigger('change');
-            if (this.hasNewRoot) {
-                this.dragRootEl.trigger('change');
+            if(!_.isEqual(this.state, this.serialize())) {
+                this.el.trigger('change');
+                /*if (this.hasNewRoot) {
+                    this.dragRootEl.trigger('change');
+                }*/
             }
             this.reset();
         },

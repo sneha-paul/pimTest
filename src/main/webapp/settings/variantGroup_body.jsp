@@ -135,7 +135,7 @@
                                             </ul>--%>
                                         </div>
                                         <div class="body">
-                                            <div id="variant" class="dd" data-plugin="nestable">
+                                            <div id="variantL1" class="dd" data-plugin="nestable">
                                                 <ol class="dd-list">
                                                     <c:forEach var="attribute" items="${variantGroupAttributes['AXIS_ATTRIBUTES_L1']}">
                                                         <li class="dd-item dd-nodrag" data-id="${attribute.id}">
@@ -144,38 +144,19 @@
                                                             </div>
                                                         </li>
                                                     </c:forEach>
+
+                                                    <c:forEach var="attribute" items="${variantGroupAttributes['VARIANT_ATTRIBUTES_L1']}">
+                                                        <li class="dd-item" data-id="${attribute.id}">
+                                                            <div class="dd-handle">
+                                                                <h6>${attribute.name}</h6>
+                                                            </div>
+                                                        </li>
+                                                    </c:forEach>
                                                 </ol>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <%--<div class="col-lg-4 col-md-12">
-                                    <div class="card bg-dark completed_task">
-                                        <div class="header">
-                                            <h2>Level 2 Variant Attributes</h2>
-                                            <ul class="header-dropdown">
-                                                <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="body">
-                                            <div class="dd" data-plugin="nestable">
-                                                <ol class="dd-list">
-                                                    <li class="dd-item" data-id="1">
-                                                        <div class="dd-handle">
-                                                            <h6>Job title</h6>
-                                                        </div>
-                                                    </li>
-                                                    <li class="dd-item" data-id="2">
-                                                        <div class="dd-handle">
-                                                            <h6>Event Done</h6>
-                                                        </div>
-                                                    </li>
-                                                </ol>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>--%>
                             </div>
                         </div>
                     </div>
@@ -202,52 +183,21 @@
                 {data: 'actions', name: 'actions', title: 'Actions'}
             ]
         });
+        function saveVariantGroupAttributes() {
+            var url = '/pim/families/{familyId}/variantGroups/{variantGroupId}/variantAttributes';
+            var data = {
 
+                           'variantLevel1AttributeIds' : $('#variantL1').nestable('serialize')
+                       };
+            $.ajaxSubmit({
+                url: url,
+                data: data,
+                successMessage: ['Updated Variant Group Attributes', 'Successfully updated variant group attributes'],
+                errorMessage: ['Error Updating Variant Group Attributes', 'An error occurred while updating variant group attributes']
+            });
+        }
 
-
-        $('#product,#variant').nestable({maxDepth: 1});
-//        $('#variant').nestable({maxDepth: 1});
-
-        $('#product').on('change', function () {
-         var $this = $(this);
-         console.log($(this).nestable('serialize'));
-         var serializedData = window.JSON.stringify($($this).nestable('serialize'));
-
-         console.log(serializedData);
-         });
-
-        $('#variant').on('change', function () {
-            console.log($(this).nestable('serialize'));
-            var $this = $(this);
-            var serializedData = window.JSON.stringify($($this).nestable('serialize'));
-
-            console.log(serializedData);
-        });
-
-
-
-        /*$('.dd4').nestable();
-
-         $('.dd4').on('change', function () {
-         var $this = $(this);
-         var serializedData = window.JSON.stringify($($this).nestable('serialize'));
-         });*/
-
-        /*$.initDataTable({
-            selector: '#paginatedVariantAttributesTable',
-            name: 'variantAttributes',
-            type: 'TYPE_1A',
-            url: $.getURL('/pim/families/{familyId}/variantGroups/'),
-            columns: [
-                {data: 'name', name: 'name', title: 'Name'},
-                {data: 'externalId', name: 'externalId', title: 'Group ID'},
-                {data: 'variantAxis', name: 'variantAxis', title: 'Variant Axis'},
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-            ]
-        });*/
-
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+        $.initMultiList({ids : '#product,#variantL1', changeCallback : saveVariantGroupAttributes});
     });
 </script>
 <script src="/assets/js/pages/ui/settings/variantGroup.js"></script>

@@ -216,6 +216,23 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return model;
     }
 
+    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/variantAttributes", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> addAxisAttribute(@PathVariable(value = "familyId") String familyId,
+                                                @PathVariable(value = "variantGroupId") String variantGroupId,
+                                                HttpServletRequest request) {
+        Map<String, Object> model = new HashMap<>();
+
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        if(family.isPresent()) {
+            family.get().updateVariantGroupAttributes(variantGroupId, request.getParameterValues("variantLevel1AttributeIds[]"), request.getParameterValues("variantLevel2AttributeIds[]"));
+            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+            model.put("success", true);
+        }
+
+        return model;
+    }
+
     @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> saveVariantGroup(@PathVariable(value = "familyId") String familyId,
@@ -232,6 +249,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         }
         return model;
     }
+
 
     @RequestMapping(value = "/{familyId}/variantGroups", method = RequestMethod.POST)
     @ResponseBody

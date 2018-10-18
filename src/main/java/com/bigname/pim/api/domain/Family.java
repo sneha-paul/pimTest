@@ -171,4 +171,32 @@ public class Family extends Entity<Family> {
 
         return variantGroupAttributes;
     }
+
+    public Family updateVariantGroupAttributes(String variantGroupId, String[] variantLevel1AttributeIds, String[] variantLevel2AttributeIds) {
+        VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
+        String[][] variantAttributeIds = isNotNull(variantLevel2AttributeIds) ? new String[2][] : new String[1][];
+        variantAttributeIds[0] = variantLevel1AttributeIds;
+        if(variantAttributeIds.length > 1) {
+            variantAttributeIds[1] = variantLevel2AttributeIds;
+        }
+        Map<String, FamilyAttribute> familyAttributes = new HashMap<>();
+        FamilyAttributeGroup.getAllAttributes(getAttributes()).forEach(attribute -> familyAttributes.put(attribute.getId(), attribute));
+        int level = 0;
+        for(String[] variantLevelAttributeIds : variantAttributeIds) {
+            level ++;
+            if(!variantGroup.getVariantAttributes().containsKey(level)) {
+                variantGroup.getVariantAttributes().put(level, new ArrayList<>());
+            }
+            List<FamilyAttribute> variantAttributes = variantGroup.getVariantAttributes().get(level);
+            if (isNotEmpty(variantGroup)) {
+                variantAttributes.clear();
+                for (String attributeId : variantLevelAttributeIds) {
+                    if (!variantGroup.getVariantAxis().get(level).contains(familyAttributes.get(attributeId))) {
+                        variantAttributes.add(familyAttributes.get(attributeId));
+                    }
+                }
+            }
+        }
+        return this;
+    }
 }

@@ -41,6 +41,7 @@
     </c:forEach>
 
     <script src="/assets/vendor/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/assets/vendor/underscore/underscore-min.js"></script>
     <script src="/assets/vendor/bootstrap/js/popper.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <%--<script src="/assets/vendor/sweetalert/sweetalert.min.js"></script>--%>

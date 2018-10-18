@@ -151,6 +151,10 @@
             $.getDataTable(name).destroy();
             $.initDataTable($.getDataTableOptions(name));
         },
+
+        initMultiList: function(options) {
+            $(options.ids).nestable({maxDepth: 1, group: 1}).on('change', function(){options.changeCallback()});
+        },
         addModal: function(options) {
             $(options.selector).off().on('click', function() {
                 $.showModal(options);
@@ -246,6 +250,37 @@
                     toastr.error('An error occurred while saving the data', "Error", {timeOut: 3000});
                 }
             });
+        },
+
+        ajaxSubmit: function(options) {
+            var method = options.method;
+            if(typeof method === 'undefined' || method === '') {
+                method = 'POST';
+            }
+
+            $.ajax({
+                url: $.getURL(options.url),
+                data: options.data,
+                method: method,
+                success: function(data) {
+                    if(data.success) {
+                        toastr.success(options.successMessage[1], options.successMessage[0]);
+                        if(options.successCallback) {
+                            options.successCallback(data);
+                        } else {
+                            if(typeof data.path !== 'undefined' && data.path !== '') {
+                                window.location.href = data.path;
+                            }
+                        }
+                    } else {
+                        toastr.error(options.errorMessage[1], options.errorMessage[0], {timeOut: 3000})
+                    }
+                },
+                error: function (resp) {
+                    toastr.error(options.errorMessage[1], options.errorMessage[0], {timeOut: 3000});
+                }
+            });
+
         },
 
         toggleStatus: function(url, entityName, callback, isActive) {
