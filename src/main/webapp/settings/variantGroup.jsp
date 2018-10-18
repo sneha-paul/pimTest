@@ -26,9 +26,10 @@
                                 <input type="text" id="groupId" name="groupId" class="form-control"/>
                             </div>
                             <div class="form-group">
-                                <label for="levels">Variant Levels</label>
-                                <select class="form-control" id="levels" name="levels">
+                                <label for="level">Variant Levels</label>
+                                <select class="form-control" id="level" name="level">
                                     <option value="1">1</option>
+                                    <option value="2">2</option>
                                 </select>
                             </div>
                         </div>

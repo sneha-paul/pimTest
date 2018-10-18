@@ -172,9 +172,27 @@ public class Family extends Entity<Family> {
         return variantGroupAttributes;
     }
 
+    public Map<String, List<FamilyAttribute>> getVariantGroupAxisAttributes(String variantGroupId) {
+        VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
+        List<FamilyAttribute> availableAxisAttributes = new ArrayList<>();
+        FamilyAttributeGroup.getAllAttributes(getAttributes()).stream()
+                .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y") && attribute.getScopable().equals("N"))
+                .forEach(availableAxisAttributes::add);
+        Map<String, List<FamilyAttribute>> variantGroupAxisAttributes = new LinkedHashMap<>();
+
+        for (Map.Entry<Integer, List<FamilyAttribute>> entry : variantGroup.getVariantAxis().entrySet()) {
+            variantGroupAxisAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(), entry.getValue());
+            availableAxisAttributes.removeAll(entry.getValue());
+        }
+
+        variantGroupAxisAttributes.put("AVAILABLE_AXIS_ATTRIBUTES", availableAxisAttributes);
+
+        return variantGroupAxisAttributes;
+    }
+
     public Family updateVariantGroupAttributes(String variantGroupId, String[] variantLevel1AttributeIds, String[] variantLevel2AttributeIds) {
         VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
-        String[][] variantAttributeIds = isNotNull(variantLevel2AttributeIds) ? new String[2][] : new String[1][];
+        String[][] variantAttributeIds = new String[variantGroup.getLevel()][];
         variantAttributeIds[0] = variantLevel1AttributeIds;
         if(variantAttributeIds.length > 1) {
             variantAttributeIds[1] = variantLevel2AttributeIds;
@@ -193,6 +211,42 @@ public class Family extends Entity<Family> {
                 for (String attributeId : variantLevelAttributeIds) {
                     if (!variantGroup.getVariantAxis().get(level).contains(familyAttributes.get(attributeId))) {
                         variantAttributes.add(familyAttributes.get(attributeId));
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    public Family updateVariantGroupAxisAttributes(String variantGroupId, String[] axisLevel1AttributeIds, String[] axisLevel2AttributeIds) {
+        VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
+        String[][] axesAttributeIds = new String[variantGroup.getLevel()][];
+        if(isNull(axisLevel1AttributeIds)) {
+            axisLevel1AttributeIds = new String[0];
+        }
+        axesAttributeIds[0] = axisLevel1AttributeIds;
+        if(axesAttributeIds.length > 1) {
+            if(isNull(axisLevel2AttributeIds)) {
+                axisLevel2AttributeIds = new String[0];
+            }
+            axesAttributeIds[1] = axisLevel2AttributeIds;
+        }
+        Map<String, FamilyAttribute> familyAxisAttributes = new HashMap<>();
+        FamilyAttributeGroup.getAllAttributes(getAttributes()).stream()
+                .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y") && attribute.getScopable().equals("N"))
+                .forEach(attribute -> familyAxisAttributes.put(attribute.getId(), attribute));
+        int level = 0;
+        for(String[] axisAttributeIds : axesAttributeIds) {
+            level ++;
+            if(isNotNull(axisAttributeIds)) {
+                if (!variantGroup.getVariantAxis().containsKey(level)) {
+                    variantGroup.getVariantAxis().put(level, new ArrayList<>());
+                }
+                List<FamilyAttribute> axisAttributes = variantGroup.getVariantAxis().get(level);
+                if (isNotEmpty(variantGroup)) {
+                    axisAttributes.clear();
+                    for (String attributeId : axisAttributeIds) {
+                        axisAttributes.add(familyAxisAttributes.get(attributeId));
                     }
                 }
             }

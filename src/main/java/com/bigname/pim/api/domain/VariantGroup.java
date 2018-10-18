@@ -119,12 +119,6 @@ public class VariantGroup extends ValidatableEntity {
             case "DETAILS":
                 this.setName(variantGroup.getName());
                 break;
-            case "VARIANT_AXIS":
-
-                break;
-            case "VARIANT_ATTRIBUTES":
-
-                break;
         }
         return this;
     }
