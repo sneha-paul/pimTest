@@ -18,4 +18,6 @@ public interface BaseDAO<T> {
 
     Optional<T> findByIdAndActiveIn(String id, String[] active);
     Optional<T> findByExternalIdAndActiveIn(String id, String[] active);
+    long countByIdNotNull();
+
 }

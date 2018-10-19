@@ -19,6 +19,7 @@
             page.setAttributes(attributes);
         },
         initDataTable: function(options) {
+            $.unbindDataTable(options);
             $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
                 serverSide: true,
@@ -185,8 +186,17 @@
             $.setPageAttribute(name + '_datatable', dataTable);
             $.setPageAttribute(name + '_datatable_options', options);
         },
+        unbindDataTable: function(options) {
+            var name = typeof options.names === 'undefined' ? options.name : options.names[0];
+            if($.getDataTable(name)) {
+                $.destroyDataTable(name);
+            }
+        },
         getDataTable: function(name) {
             return $.getPageAttribute(name + '_datatable');
+        },
+        destroyDataTable: function(name) {
+
         },
         getDataTableOptions: function(name) {
             return $.getPageAttribute(name + '_datatable_options');

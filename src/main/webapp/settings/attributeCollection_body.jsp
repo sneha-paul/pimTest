@@ -5,7 +5,7 @@
         <div class="card">
             <div class="header">
                 <h2>${attributeCollection.collectionName}
-                    <small><code class="highlighter-rouge">${attributeCollection.collectionName}</code></small>
+                    <small><code class="highlighter-rouge">${attributeCollection.collectionId}</code></small>
                     <small class="pull-right m-t--15"><code style="color:#808080">_id: ${attributeCollection.id}</code>
                     </small>
                 </h2>

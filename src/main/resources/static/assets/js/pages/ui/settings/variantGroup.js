@@ -28,7 +28,7 @@ $(function(){
         var data = {
 
             'axisLevel1AttributeIds' : $('#axisAttributesL1').nestable('serialize'),
-            'axisLevel2AttributeIds' : $('#axisAttributesL2').nestable('serialize')
+            'axisLevel2AttributeIds' : $('#axisAttributesL2').length > 0 ? $('#axisAttributesL2').nestable('serialize') : []
         };
         $.ajaxSubmit({
             url: url,
@@ -47,7 +47,7 @@ $(function(){
         var data = {
 
             'variantLevel1AttributeIds' : $('#variantL1').nestable('serialize'),
-            'variantLevel2AttributeIds' : $('#variantL2').nestable('serialize'),
+            'variantLevel2AttributeIds' : $('#variantL2').length > 0 ? $('#variantL2').nestable('serialize') : []
         };
         $.ajaxSubmit({
             url: url,
