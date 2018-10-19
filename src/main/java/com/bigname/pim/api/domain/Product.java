@@ -31,6 +31,8 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})
     private String productFamilyId;
 
+    private String variantGroupId;
+
     @Transient
     private Family productFamily;
 
@@ -39,14 +41,6 @@ public class Product extends Entity<Product> {
     public Product() {
         super();
     }
-
-    //TODO - check to see, if we need the overloaded constructor in all entities, since spring and jpa are using reflection to initialize the instance
-   /* public Product(String externalId, String productName, String productFamilyId) {
-        super(externalId);
-        this.productName = productName;
-        this.productFamilyId = productFamilyId;
-
-    }*/
 
     public String getProductId() {
         return getExternalId();
@@ -71,6 +65,14 @@ public class Product extends Entity<Product> {
 
     public void setProductFamilyId(String productFamilyId) {
         this.productFamilyId = productFamilyId;
+    }
+
+    public String getVariantGroupId() {
+        return variantGroupId;
+    }
+
+    public void setVariantGroupId(String variantGroupId) {
+        this.variantGroupId = variantGroupId;
     }
 
     public Family getProductFamily() {

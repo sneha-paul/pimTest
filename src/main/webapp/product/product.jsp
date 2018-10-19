@@ -16,8 +16,8 @@
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <label>Product Name</label>
-                                <input type="text" name="productName" class="form-control"/>
+                                <label for="productName">Product Name</label>
+                                <input type="text" name="productName" id="productName" class="form-control"/>
                             </div>
                             <div class="form-group">
                                 <label for="productId">Product ID</label>

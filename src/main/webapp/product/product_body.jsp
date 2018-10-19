@@ -5,9 +5,9 @@
 <%--@elvariable id="featuresMasterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
 <%--@elvariable id="defaultDetailsAttributeGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:set var="masterGroups" value="${product.productFamily.getAddonMasterGroups(\"PRODUCT\")}"/>
-<c:set var="detailsMasterGroup" value="${product.productFamily.getDetailsMasterGroup(\"PRODUCT\")}"/>
-<c:set var="featuresMasterGroup" value="${product.productFamily.getFeaturesMasterGroup(\"PRODUCT\")}"/>
+<c:set var="masterGroups" value="${product.productFamily.addonMasterGroups}"/>
+<c:set var="detailsMasterGroup" value="${product.productFamily.detailsMasterGroup}"/>
+<c:set var="featuresMasterGroup" value="${product.productFamily.featuresMasterGroup}"/>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
@@ -57,7 +57,7 @@
                                                                                 <option value="">Select One</option>
 
                                                                                 <c:forEach items="${productFamilies}" var="productFamily">
-                                                                                    <option value="${productFamily.id}">${productFamily.productFamilyName}</option>
+                                                                                    <option value="${productFamily.id}">${productFamily.familyName}</option>
                                                                                 </c:forEach>
                                                                             </select>
                                                                         </div>
