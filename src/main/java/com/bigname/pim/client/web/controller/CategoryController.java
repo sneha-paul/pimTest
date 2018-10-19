@@ -47,6 +47,7 @@ public class CategoryController extends BaseController<Category, CategoryService
         Map<String, Object> model = new HashMap<>();
         if(isValid(category, model, Category.CreateGroup.class)) {
             category.setActive("N");
+            category.setDiscontinued("N");
             categoryService.create(category);
             model.put("success", true);
         }

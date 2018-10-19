@@ -103,7 +103,7 @@ public class Catalog extends Entity<Catalog> {
     public Catalog cloneInstance() {
         Catalog clone = new Catalog();
         clone.setActive("N");
-        clone.setDiscontinued("Y");
+        clone.setDiscontinued("N");
         clone.setExternalId(cloneValue(getExternalId()));
         clone.setCatalogName(cloneValue(getCatalogName()));
         clone.setDescription(cloneValue(getDescription()));
@@ -116,7 +116,7 @@ public class Catalog extends Entity<Catalog> {
         map.put("externalId", getExternalId());
         map.put("catalogName", getCatalogName());
         map.put("active", getActive());
-        map.put("status", getDiscontinued());
+        map.put("discontinued", getDiscontinued());
         return map;
     }
 }

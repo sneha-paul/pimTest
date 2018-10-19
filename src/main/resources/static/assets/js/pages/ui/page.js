@@ -63,11 +63,17 @@
                             }
 
                             if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {
-                                if (value.active === 'Y') {
-                                    value.active = '<span class="badge badge-success">Active</span>';
-                                } else {
-                                    value.active = '<span class="badge badge-danger">Inactive</span>';
+                                //alert(value.discontinued)
+                                if(value.discontinued === 'Y'){
+                                    value.active = '<span class="badge badge-warning">Discontinued</span>';
+                                }else{
+                                    if (value.active === 'Y') {
+                                        value.active = '<span class="badge badge-success">Active</span>';
+                                    } else {
+                                        value.active = '<span class="badge badge-danger">Inactive</span>';
+                                    }
                                 }
+
                             }
 
                             if(typeof value.group !== 'undefined') {
@@ -91,7 +97,8 @@
                     $.toggleStatus(
                         $.getURL(options.url + '{externalId}/active/{active}', {
                             externalId: $(this).data('external-id'),
-                            active: $(this).data('active')
+                            active: $(this).data('active'),
+                            discontinued: $(this).data('discontinued')
                         }),
                         typeof options.names !== 'undefined' ? options.names[1] : 'entity',
                         $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));

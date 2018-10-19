@@ -50,6 +50,10 @@
                                                                     <input type="checkbox" id="active" name="active" value="Y" <c:if test="${category.active eq 'Y'}">checked="checked"</c:if>>
                                                                     <span>Active</span>
                                                                 </label>
+                                                                <label for="discontinued" class="fancy-checkbox">
+                                                                    <input type="checkbox" id="discontinued" name="discontinued" value="Y" <c:if test="${category.discontinued eq 'Y'}">checked="checked"</c:if>>
+                                                                    <span>Discontinued</span>
+                                                                </label>
                                                             </div>
                                                         </div>
                                                     </div>

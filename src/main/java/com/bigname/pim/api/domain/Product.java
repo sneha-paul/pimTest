@@ -97,12 +97,22 @@ public class Product extends Entity<Product> {
     }
 
     @Override
+    public void orchestrate() {
+        super.orchestrate();
+        setDiscontinued(getDiscontinued());
+        if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
+            setActive("N");
+        }
+    }
+
+    @Override
     public Product merge(Product product) {
         switch(product.getGroup()) {
             case "DETAILS":
                 this.setExternalId(product.getExternalId());
                 this.setProductName(product.getProductName());
                 this.setActive(product.getActive());
+                this.setDiscontinued(product.getDiscontinued());
                 break;
 
             case "ASSETS":
@@ -119,6 +129,7 @@ public class Product extends Entity<Product> {
     public Product cloneInstance() {
         Product clone = new Product();
         clone.setActive("N");
+        clone.setDiscontinued("N");
         clone.setExternalId(cloneValue(getExternalId()));
         clone.setProductName(cloneValue(getProductName()));
         clone.setProductFamilyId(cloneValue(getProductFamilyId()));
@@ -132,6 +143,7 @@ public class Product extends Entity<Product> {
         map.put("productName", getProductName());
         map.put("productFamilyId", ValidationUtil.isEmpty(getProductFamily()) ? "" : getProductFamily().getExternalId());
         map.put("active", getActive());
+        map.put("discontinued", getDiscontinued());
         return map;
     }
 }

@@ -50,6 +50,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         Map<String, Object> model = new HashMap<>();
         if(isValid(product, model, Product.CreateGroup.class)) {
             product.setActive("N");
+            product.setDiscontinued("N");
             productService.create(product);
             model.put("success", true);
         }

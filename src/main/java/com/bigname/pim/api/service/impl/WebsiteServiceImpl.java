@@ -45,7 +45,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
         Optional<Website> website = get(id, findBy, false);
         Set<String> catalogIds = new HashSet<>();
         website.ifPresent(website1 -> websiteCatalogDAO.findByWebsiteId(website1.getId()).forEach(wc -> catalogIds.add(wc.getCatalogId())));
-        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
+        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
     }
 
     @Override

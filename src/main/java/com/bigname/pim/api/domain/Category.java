@@ -125,11 +125,20 @@ public class Category extends Entity<Category> {
         this.categoryId = getExternalId();
     }
 
+    @Override
+    public void orchestrate() {
+        super.orchestrate();
+        setDiscontinued(getDiscontinued());
+        if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
+            setActive("N");
+        }
+    }
 
     @Override
     public Category cloneInstance() {
         Category clone = new Category();
         clone.setActive("N");
+        clone.setDiscontinued("N");
         clone.setExternalId(cloneValue(getExternalId()));
         clone.setCategoryName(cloneValue(getCategoryName()));
         clone.setDescription(cloneValue(getDescription()));
@@ -145,6 +154,7 @@ public class Category extends Entity<Category> {
                 this.setDescription(category.getDescription());
                 this.setLongDescription(category.getLongDescription());
                 this.setActive(category.getActive());
+                this.setDiscontinued(category.getDiscontinued());
                 break;
             case "SEO":
                 this.setMetaTitle(category.getMetaTitle());
@@ -162,6 +172,7 @@ public class Category extends Entity<Category> {
         map.put("externalId", getExternalId());
         map.put("categoryName", getCategoryName());
         map.put("active", getActive());
+        map.put("discontinued", getDiscontinued());
         return map;
     }
 

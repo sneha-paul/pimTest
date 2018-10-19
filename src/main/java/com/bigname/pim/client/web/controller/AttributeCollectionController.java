@@ -69,13 +69,13 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return model;
     }
 
-    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+   /* @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", attributeCollectionService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
-    }
+    }*/
 
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {

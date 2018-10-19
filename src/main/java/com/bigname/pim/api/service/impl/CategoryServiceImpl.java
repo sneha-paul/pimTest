@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -57,7 +58,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         Set<String> categoryIds = new HashSet<>();
         category.ifPresent(category1 -> relatedCategoryDAO.findByCategoryId(category1.getId()).forEach(rc -> categoryIds.add(rc.getSubCategoryId())));
         categoryIds.add(category.get().getId());
-        return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
+        return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
     }
 
     @Override
@@ -74,7 +75,10 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             relatedCategories.forEach(rc -> subCategoryIds.add(rc.getSubCategoryId()));
             if(subCategoryIds.size() > 0) {
                 Map<String, Category> categoriesMap = PimUtil.getIdedMap(getAll(subCategoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                relatedCategories.forEach(rc -> rc.init(category, categoriesMap.get(rc.getSubCategoryId())));
+                List<RelatedCategory> _relatedCategories = relatedCategories.filter(rc -> categoriesMap.containsKey(rc.getCategoryId())).stream().collect(Collectors.toList());
+                _relatedCategories.forEach(rc -> rc.init(category, categoriesMap.get(rc.getSubCategoryId())));
+                relatedCategories = new PageImpl<>(_relatedCategories,pageable,_relatedCategories.size());//TODO : verify this logic
+
             }
             return relatedCategories;
         }

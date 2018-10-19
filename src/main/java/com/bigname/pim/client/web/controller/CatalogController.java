@@ -4,6 +4,8 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
@@ -46,7 +48,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         Map<String, Object> model = new HashMap<>();
         if(isValid(catalog, model, Catalog.CreateGroup.class)) {
             catalog.setActive("N");
-            catalog.setDiscontinued("Y");
+            catalog.setDiscontinued("N");
             catalogService.create(catalog);
             model.put("success", true);
         }
@@ -64,23 +66,13 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         return model;
     }
 
-    /*@RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public ModelAndView update(@PathVariable(value = "id") String id, @ModelAttribute("catalog") @Valid Catalog catalog, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            return new ModelAndView("catalog/catalog");
-        }
-        catalogService.update(id, FindBy.EXTERNAL_ID, catalog);
-        return new ModelAndView("redirect:/pim/catalogs");
-    }
-*/
-
-    @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+    /* @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", catalogService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
-    }
+    }*/
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
         Map<String, Object> model = new HashMap<>();
