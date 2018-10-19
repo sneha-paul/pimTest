@@ -492,6 +492,22 @@
             el.parentNode.appendChild(script);
             el.parentNode.removeChild(el);
         },
+        linkDropdowns: function(selector) { console.log('in');
+            var dropdown = $(selector);
+            if(dropdown) {
+                var linkedDropdown = $('#' + dropdown.data('link'));
+                dropdown.on('change', function(){
+                    var values = $(this).find('option:selected').data('values');
+                    $.populateDropdown(linkedDropdown, values ? values.split('|') : []);
+                });
+            }
+        },
+        populateDropdown: function(dropdownEl, values) {
+            $(dropdownEl).find('option:gt(0)').remove();
+            for(var i =0; i < values.length; i = i + 2) {
+                $(dropdownEl).append($('<option value="' + values[i] + '">' + values[i + 1] + '</option>'));
+            }
+        },
         initAHAH: function(el) {
             $.each($(el).siblings('script1'), function(i, v) {
                 if($(v).attr('src')) {

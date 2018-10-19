@@ -4,10 +4,12 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by manu on 9/4/18.
@@ -26,4 +28,6 @@ public interface FamilyService extends BaseService<Family, FamilyDAO>  {
     List<FamilyAttribute> getVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort);
 
     List<FamilyAttribute> getAvailableVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort);
+
+    List<Triplet<String, String, String>> getFamilyVariantGroups();
 }

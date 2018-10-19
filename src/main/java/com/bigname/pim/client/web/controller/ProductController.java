@@ -76,7 +76,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("product", new Product());
-            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))).getContent()); //TODO - JIRA BNPIM-6
+            model.put("productFamilyVariantGroups", productFamilyService.getFamilyVariantGroups());
         } else {
             Optional<Product> _product = productService.get(id, FindBy.EXTERNAL_ID, false);
             if(_product.isPresent()) {
@@ -87,7 +87,7 @@ public class ProductController extends BaseController<Product, ProductService>{
                 }
                 model.put("mode", "DETAILS");
                 model.put("product", product);
-                model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "productFamilyName"))).getContent()); //TODO - JIRA BNPIM-6
+                model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))).getContent()); //TODO - JIRA BNPIM-6
                 model.put("breadcrumbs", new Breadcrumbs("Product", "Products", "/pim/products", product.getProductName(), ""));
             } else {
                 throw new EntityNotFoundException("Unable to find Product with Id: " + id);

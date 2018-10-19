@@ -5,6 +5,7 @@ import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -135,5 +136,16 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
         return attributes;
 
 //        return family.<List<FamilyAttribute>>map(Family::getAttributes).orElse(null);
+    }
+
+    @Override
+    public List<Triplet<String, String, String>> getFamilyVariantGroups() {
+        List<Triplet<String, String, String>> familyVariantGroups = new ArrayList<>();
+        getAll(0, 100, null).forEach(family -> { //TODO - JIRA BNPIM-6
+            StringBuilder sb = new StringBuilder();
+            family.getVariantGroups().entrySet().stream().filter(entry -> entry.getValue().getActive().equals("Y")).forEach(entry-> sb.append(sb.length() > 0 ? "|" : "").append(entry.getKey()).append("|").append(entry.getValue().getName()));
+            familyVariantGroups.add(Triplet.with(family.getFamilyId(), family.getFamilyName(), sb.toString()));
+        });
+        return familyVariantGroups;
     }
 }

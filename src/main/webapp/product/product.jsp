@@ -24,20 +24,27 @@
                                 <input type="text" id="productId" name="productId" class="form-control"/>
                             </div>
                             <div class="form-group">
-                                <label for="productFamilyId">ProductFamily</label>
-                                <select class="form-control" id="productFamilyId" name="productFamilyId">
+                                <label for="productFamilyId">Product Family</label>
+                                <select class="form-control js-linked" data-link="variantGroupId" id="productFamilyId" name="productFamilyId">
                                     <option value="">Select One</option>
-                                    <jsp:useBean id="productFamilies" scope="request" type="java.util.List"/>
-                                    <c:forEach items="${productFamilies}" var="productFamily">
-                                        <option value="${productFamily.externalId}">${productFamily.productFamilyName}</option>
+                                    <jsp:useBean id="productFamilyVariantGroups" scope="request" type="java.util.List<org.javatuples.Triplet<java.lang.String, java.lang.String, java.lang.String>>"/>
+                                    <c:forEach items="${productFamilyVariantGroups}" var="productFamily">
+                                        <option value="${productFamily.value0}" data-values="${productFamily.value2}">${productFamily.value1}</option>
                                     </c:forEach>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="variantGroupId">Variant Group</label>
+                                <select class="form-control js-linked" id="variantGroupId" name="variantGroupId">
+                                    <option value="">Select One</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <br>
                     <input type="hidden" name="group" value="CREATE"/>
-                    <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
+                    <img src="/assets/img/tiny.png" onload="$.initAHAH(this);"/>
+                    <script src="/assets/js/pages/ui/product/product.js"></script>
                 </form>
             </div>
         </div>
