@@ -3,6 +3,7 @@ package com.bigname.pim.api.service;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
+import com.bigname.pim.api.domain.FamilyAttribute;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
@@ -25,5 +26,5 @@ public interface AttributeCollectionService extends BaseService<AttributeCollect
 
     Optional<Attribute> findAttribute(String collectionId, FindBy findBy, String attributeFullId);
 
-    Optional<AttributeOption> findAttributeOption(String attributeOptionFullId);
+    Optional<AttributeOption> findAttributeOption(FamilyAttribute familyAttribute, String attributeOptionId);
 }

@@ -20,9 +20,11 @@ public class FamilyAttributeGroup extends ValidatableEntity {
     public static final String DETAILS_GROUP = "Details Group";
     public static final String FEATURES_GROUP = "Features Group";
     public static final String DEFAULT_GROUP = "Default Group";
-    public static final String DETAILS_GROUP_ID = getDetailsMasterGroup(null).getId();
-    public static final String FEATURES_GROUP_ID = getFeaturesMasterGroup(null).getId();
     public static final String DEFAULT_GROUP_ID = "DEFAULT_GROUP";
+    public static final String DETAILS_GROUP_ID = getDetailsMasterGroup(null).getId();
+    public static final String DETAILS_LEAF_GROUP_FULL_ID = DETAILS_GROUP_ID + "|" + DEFAULT_GROUP_ID + "|" + DEFAULT_GROUP_ID;
+    public static final String FEATURES_GROUP_ID = getFeaturesMasterGroup(null).getId();
+    public static final String FEATURES_LEAF_GROUP_FULL_ID = FEATURES_GROUP_ID + "|" + DEFAULT_GROUP_ID + "|" + DEFAULT_GROUP_ID;
     /**
      * Name of the Group
      */

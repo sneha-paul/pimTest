@@ -93,7 +93,7 @@
                 },
                 columns: options.columns
             }));
-            $(options.selector).on('click', '.js-toggle-status', function () {
+            $(options.selector).off().on('click', '.js-toggle-status', function () {
                 if('TYPE_1' === options.type) {
                     $.toggleStatus(
                         $.getURL(options.url + '{externalId}/active/{active}', {
@@ -106,7 +106,7 @@
                 }
             });
 
-            $(options.selector).on('click', '.js-clone', function () {
+            $(options.selector).off().on('click', '.js-clone', function () {
                 if('TYPE_1' === options.type) {
                     $.cloneInstance(
                         $.getURL(options.url + '{externalId}/clone/{cloneType}', {
@@ -118,7 +118,7 @@
                 }
             });
 
-            $(options.selector).on('click', '.js-attribute-options', function(){
+            $(options.selector).off().on('click', '.js-attribute-options', function(){
                 if('GROUP_4' === options.buttonGroup) {
                     $.showModal({
                         url: $.getURL('/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),

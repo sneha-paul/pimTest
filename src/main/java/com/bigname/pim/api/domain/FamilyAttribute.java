@@ -69,6 +69,9 @@ public class FamilyAttribute extends ValidatableEntity {
         this.setRegEx(attributeDTO.getRegEx());
         this.setDataType(attributeDTO.getDataType());
 
+        boolean featuresDefaultGroup = attributeGroupDTO.getFullId().equals(FamilyAttributeGroup.FEATURES_LEAF_GROUP_FULL_ID)
+                || (attributeGroupDTO.getFullId().equals(FamilyAttributeGroup.DEFAULT_GROUP_ID)) && booleanValue(getUiType().isSelectable());
+
         if(isNotEmpty(attributeGroupDTO)) {
             //Available parameters - attribute.name, attribute.attributeGroup.id, attribute.attributeGroup.name, attribute.attributeGroup.masterGroup, attribute.attributeGroup.parentGroup.id
             //attribute.name won't be empty in all the below scenarios
@@ -77,13 +80,13 @@ public class FamilyAttribute extends ValidatableEntity {
                 //Find the leaf group corresponding to the given id
                 attributeGroup = FamilyAttributeGroup.getLeafGroup(attributeGroupDTO.getFullId(), familyGroups);
                 if(isEmpty(attributeGroup)) { // Can't find the leaf group for the given id, so defaulting it to default group
-                    attributeGroup = FamilyAttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
+                    attributeGroup = FamilyAttributeGroup.createDefaultLeafGroup(featuresDefaultGroup);
                 }
             } else { //Creating a new attributeGroup, Scenario 2 - attribute.attributeGroup.name is not empty
                 if(booleanValue(attributeGroupDTO.getMasterGroup())) { // Scenario 3 - attribute.attributeGroup.masterGroup is 'Y'. Creating a new master FamilyAttributeGroup(can ignore attribute.attributeGroup.parentGroup.id, if present)
                     attributeGroup = FamilyAttributeGroup.createLeafGroup(attributeGroupDTO.getName(), null);
                     if(isEmpty(attributeGroup)) { //unable to create the new master group, so defaulting to default group
-                        attributeGroup = FamilyAttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
+                        attributeGroup = FamilyAttributeGroup.createDefaultLeafGroup(featuresDefaultGroup);
                     }
                 } else { //Creating a new non-master attributeGroup
                     if (isEmpty(attributeGroupDTO.getParentGroup().getId())) { // Creating a new level3 group under the default level2 group
@@ -98,7 +101,7 @@ public class FamilyAttribute extends ValidatableEntity {
                 }
             }
         } else { /* This is the case when both attribute.attributeGroup.id and attribute.attributeGroup.name are empty, which won't happen if validation rules are correct */
-            attributeGroup = FamilyAttributeGroup.createDefaultLeafGroup(booleanValue(getUiType().isSelectable()));
+            attributeGroup = FamilyAttributeGroup.createDefaultLeafGroup(featuresDefaultGroup);
         }
 
         setAttributeGroup(attributeGroup);

@@ -402,7 +402,8 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         Map<String, Object> model = new HashMap<>();
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         if(family.isPresent() && isValid(familyAttributeOption, model, FamilyAttributeOption.AddOptionGroup.class)) {
-            Optional<AttributeOption> attributeOption = collectionService.findAttributeOption(familyAttributeOption.getAttributeOptionId());
+            FamilyAttribute familyAttribute = FamilyAttribute.findAttribute(familyAttributeOption.getFamilyAttributeId().substring(familyAttributeOption.getFamilyAttributeId().lastIndexOf("|") + 1), family.get().getAttributes());
+            Optional<AttributeOption> attributeOption = collectionService.findAttributeOption(familyAttribute, familyAttributeOption.getAttributeOptionId());
             if(attributeOption.isPresent()) {
                 family.get().addAttributeOption(familyAttributeOption, attributeOption.get());
                 familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
