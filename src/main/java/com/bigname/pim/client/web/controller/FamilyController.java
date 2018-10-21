@@ -201,6 +201,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         if(family.isPresent()) {
+            family.get().setGroup("VARIANT_GROUPS");
             FamilyAttribute axisAttribute = FamilyAttribute.findAttribute(attributeId, family.get().getAttributes());
             if(ValidationUtil.isNotEmpty(axisAttribute)) {
                 Map<Integer, List<FamilyAttribute>> variantAxis = family.get().getVariantGroups().get(variantGroupId).getVariantAxis();
@@ -226,6 +227,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         if(family.isPresent()) {
+            family.get().setGroup("VARIANT_GROUPS");
             family.get().updateVariantGroupAttributes(variantGroupId, request.getParameterValues("variantLevel1AttributeIds[]"), request.getParameterValues("variantLevel2AttributeIds[]"));
             familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
             model.put("success", true);
@@ -243,6 +245,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         if(family.isPresent()) {
+            family.get().setGroup("VARIANT_GROUPS");
             family.get().updateVariantGroupAxisAttributes(variantGroupId, request.getParameterValues("axisLevel1AttributeIds[]"), request.getParameterValues("axisLevel2AttributeIds[]"));
             familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
             model.put("success", true);
@@ -260,6 +263,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         if(isValid(variantGroup, model, VariantGroup.DetailsGroup.class)) {
             Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
             if(family.isPresent()) {
+                family.get().setGroup("VARIANT_GROUPS");
                 family.get().getVariantGroups().get(variantGroupId).merge(variantGroup);
                 familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
                 model.put("success", true);
@@ -275,6 +279,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         Map<String, Object> model = new HashMap<>();
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         if(family.isPresent() && isValid(variantGroup, model, VariantGroup.CreateGroup.class)) { // TODO - check if another group with the same id/name exists
+            family.get().setGroup("VARIANT_GROUPS");
             variantGroup.setActive("N");
             family.get().addVariantGroup(variantGroup);
             familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
@@ -290,6 +295,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         Optional<Family> family = familyService.get(id, FindBy.EXTERNAL_ID, false);
         // TODO - cross field validation to see if one of attributeGroup ID and FamilyAttributeGroup name is not empty
         if(family.isPresent() /*&& isValid(familyAttribute, model)*/) {
+            family.get().setGroup("ATTRIBUTES");
             Attribute attribute = collectionService.findAttribute(familyAttribute.getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.getAttributeId()).get();
             familyAttribute.setAttribute(attribute);
             family.get().addAttribute(familyAttribute);
@@ -402,6 +408,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         Map<String, Object> model = new HashMap<>();
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         if(family.isPresent() && isValid(familyAttributeOption, model, FamilyAttributeOption.AddOptionGroup.class)) {
+            family.get().setGroup("ATTRIBUTES");
             FamilyAttribute familyAttribute = FamilyAttribute.findAttribute(familyAttributeOption.getFamilyAttributeId().substring(familyAttributeOption.getFamilyAttributeId().lastIndexOf("|") + 1), family.get().getAttributes());
             Optional<AttributeOption> attributeOption = collectionService.findAttributeOption(familyAttribute, familyAttributeOption.getAttributeOptionId());
             if(attributeOption.isPresent()) {

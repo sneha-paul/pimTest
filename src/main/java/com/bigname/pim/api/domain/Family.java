@@ -92,11 +92,19 @@ public class Family extends Entity<Family> {
 
     @Override
     public Family merge(Family family) {
-        this.setExternalId(family.getExternalId());
-        this.setFamilyName(family.getFamilyName());
-        this.setActive(family.getActive());
-        this.setAttributes(family.getAttributes());
-        this.setVariantGroups(family.getVariantGroups());
+        switch(family.getGroup()) {
+            case "DETAILS":
+                this.setExternalId(family.getExternalId());
+                this.setFamilyName(family.getFamilyName());
+                this.setActive(family.getActive());
+            break;
+            case "ATTRIBUTES":
+                this.setAttributes(family.getAttributes());
+                break;
+            case "VARIANT_GROUPS":
+                this.setVariantGroups(family.getVariantGroups());
+                break;
+        }
         return this;
     }
 
