@@ -37,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
     public Jackson2RepositoryPopulatorFactoryBean repositoryPopulator(AttributeCollectionDAO dao) { //TODO - change with a generic app config DAO
         Jackson2RepositoryPopulatorFactoryBean factory = new Jackson2RepositoryPopulatorFactoryBean();
         if(dao.countByIdNotNull() == 0) {
-            factory.setResources(new Resource[]{new ClassPathResource("data1.json")});
+            factory.setResources(new Resource[]{new ClassPathResource("data.json")});
         }
         return factory;
     }
