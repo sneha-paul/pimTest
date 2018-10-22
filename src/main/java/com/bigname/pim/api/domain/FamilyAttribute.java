@@ -39,6 +39,9 @@ public class FamilyAttribute extends ValidatableEntity {
     private int level;
 
     @Transient
+    private Type type = Type.COMMON;
+
+    @Transient
     @JsonIgnore
     private FamilyAttributeGroup attributeGroup;
 
@@ -244,6 +247,14 @@ public class FamilyAttribute extends ValidatableEntity {
         this.level = level;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     public Attribute getAttribute() {
         return attribute;
     }
@@ -337,4 +348,6 @@ public class FamilyAttribute extends ValidatableEntity {
     public int hashCode() {
         return id.hashCode();
     }
+
+    public enum Type {COMMON, AXIS, VARIANT}
 }

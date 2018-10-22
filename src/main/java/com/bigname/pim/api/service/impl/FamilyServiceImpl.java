@@ -148,4 +148,23 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
         });
         return familyVariantGroups;
     }
+
+    @Override
+    public Optional<Family> get(String id, FindBy findBy, boolean... activeRequired) {
+        Optional<Family> family = super.get(id, findBy, activeRequired);
+        family.ifPresent(family1 -> {
+            Map<String, FamilyAttribute> attributeMap = FamilyAttributeGroup.getAllAttributes(family1.getAttributes()).stream().collect(Collectors.toMap(FamilyAttribute::getId, e -> e));
+            family1.getVariantGroups().forEach((k1, variantGroup) -> {
+                variantGroup.getVariantAxis().forEach((k2, axisAttributes) -> axisAttributes.forEach(axisAttribute -> {
+                    attributeMap.get(axisAttribute.getId()).setLevel(k2);
+                    attributeMap.get(axisAttribute.getId()).setType(FamilyAttribute.Type.AXIS);
+                }));
+                variantGroup.getVariantAttributes().forEach((k3, variantAttributes) -> variantAttributes.forEach(variantAttribute -> {
+                    attributeMap.get(variantAttribute.getId()).setLevel(k3);
+                    attributeMap.get(variantAttribute.getId()).setType(FamilyAttribute.Type.VARIANT);
+                }));
+            });
+        });
+        return family;
+    }
 }
