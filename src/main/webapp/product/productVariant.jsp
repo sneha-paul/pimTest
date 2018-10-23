@@ -26,6 +26,18 @@
                                 <label for="productVariantId">Product Variant ID</label>
                                 <input type="text" id="productVariantId" name="productVariantId" class="form-control"/>
                             </div>
+                            <c:forEach var="attribute" items="${axisAttributes}">
+                            <div class="form-group">
+                                <label for="${attribute.id}">${attribute.id}</label>
+                                <select id="${attribute.id}" name="${attribute.id}" class="form-control">
+                                    <option value="">Select One</option>
+                                    <c:forEach items="${attribute.options}" var="optionEntry">
+                                        <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                        <option value="${attributeOption.id}">${attributeOption.value}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            </c:forEach>
 
                         </div>
                     </div>

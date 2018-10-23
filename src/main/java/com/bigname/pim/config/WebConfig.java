@@ -1,6 +1,8 @@
 package com.bigname.pim.config;
 
+import com.bigname.pim.api.domain.Channel;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.ChannelDAO;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
@@ -34,11 +36,16 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public Jackson2RepositoryPopulatorFactoryBean repositoryPopulator(AttributeCollectionDAO dao) { //TODO - change with a generic app config DAO
+    public Jackson2RepositoryPopulatorFactoryBean repositoryPopulator(ChannelDAO dao) { //TODO - change with a generic app config DAO
         Jackson2RepositoryPopulatorFactoryBean factory = new Jackson2RepositoryPopulatorFactoryBean();
-        if(dao.countByIdNotNull() == 0) {
+        /*Channel ecommerce = new Channel();
+        ecommerce.setChannelName("Amazon");
+        ecommerce.setChannelId("AMAZON");
+        ecommerce.setActive("Y");
+        dao.save(ecommerce);*/
+        /*if(dao.countByIdNotNull() == 0) {
             factory.setResources(new Resource[]{new ClassPathResource("data.json")});
-        }
+        }*/
         return factory;
     }
 }

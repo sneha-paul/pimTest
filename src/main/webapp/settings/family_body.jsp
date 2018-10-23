@@ -13,6 +13,7 @@
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#familyAttributes">Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#familyAttributesScope">Scope</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantGroups">Variant Groups</a></li>
                 </ul>
                 <div class="tab-content">
@@ -97,6 +98,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane" id="familyAttributesScope">
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card">
+                                    <div class="body">
+                                        <div class="table-responsive">
+                                            <table id="paginatedFamilyAttributesScopeTable"
+                                                   class="table table-hover dataTable table-custom" style="width: 100%">
+                                                <thead class="thead-dark">
+
+                                                </thead>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="tab-pane" id="variantGroups">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
@@ -132,7 +152,10 @@
     </div>
 </div>
 <script>
+    var channels = JSON.parse('${channels}'); //TODO - get this from controller
+
     $.initPage({
+        'channels': channels,
         'familyId': '${family.familyId}'
     });
     $(document).ready(function () {
@@ -146,9 +169,32 @@
                 {data: 'name', name: 'name', title: 'Attribute Name'},
                 {data: 'id', name: 'id', title: 'Attribute ID'},
                 {data: 'group', name: 'group', title: 'Attribute Group'},
-                {data: 'selectable', name: 'selectable', title: 'Selectable'},
-                {data: 'actions', name: 'actions', title: 'Actions'}
+                {data: 'selectable', name: 'selectable', title: 'Selectable', orderable: false},
+                {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
             ]
+        });
+
+        var columns = [];
+        columns[0] = {data: 'name', name: 'name', title: 'Attribute Name'};
+        var idx = 0;
+        for(var channelId in channels) {
+            if(channels.hasOwnProperty(channelId)) {
+                columns[++idx] = {
+                    data: 'channel_' + channelId,
+                    name: 'channel_' + channelId,
+                    title: channels[channelId],
+                    orderable: false
+                };
+            }
+        }
+
+        $.initDataTable({
+            selector: '#paginatedFamilyAttributesScopeTable',
+            name: 'familyAttributesScope',
+            type: 'TYPE_2',
+            buttonGroup: 'GROUP_4B',
+            url: $.getURL('/pim/families/{familyId}/attributes'),
+            columns: columns
         });
 
         $.initDataTable({

@@ -1,5 +1,8 @@
 package com.bigname.common.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +50,15 @@ abstract public class ConversionUtil {
             }
         }
         return list;
+    }
+
+    public static String toJSONString(Object object) {
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            //TODO - log exception
+            return "";
+        }
     }
 
     public static String toId(String value) {

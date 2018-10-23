@@ -2,6 +2,7 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.pim.api.domain.Family;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -84,8 +85,11 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
             Product product = _product.get();
             if(variantId == null) {
                 ProductVariant productVariant = new ProductVariant(product);
+                Family family = product.getProductFamily();
                 model.put("mode", "CREATE");
                 model.put("productVariant", productVariant);
+                model.put("productFamily", family);
+                model.put("axisAttributes", family.getVariantGroups().get(product.getVariantGroupId()).getVariantAxis().get(1));
             } else {
                 Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
                 if(_productVariant.isPresent()) {

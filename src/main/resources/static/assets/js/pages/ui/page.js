@@ -55,8 +55,23 @@
                                 }
                                 value.actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             } else if(options.type === 'TYPE_2') {
-                                value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
-                                    '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
+
+                                if('GROUP_4B' === options.buttonGroup) {
+                                    for(var channelId in $.getPageAttribute('channels')) {
+                                        if($.getPageAttribute('channels').hasOwnProperty(channelId)) {
+                                            if (_.isEmpty(value.scope[channelId]) || value.scope[channelId] === 'OPTIONAL') {
+                                                value['channel_' + channelId] = '<span class="js-scope-selector" title="Optional" data-channel="' + channelId + '" data-scope="OPTIONAL" data-id="' + value.id + '"><i class="fa fa-square-o"></i></span>';
+                                            } else if (value.scope[channelId] === 'REQUIRED') {
+                                                value['channel_' + channelId] = '<span class="js-scope-selector text-success" title="Required" data-channel="' + channelId + '" data-scope="REQUIRED" data-id="' + value.id + '"><i class="fa fa-check-square-o"></i></span>';
+                                            } else {
+                                                value['channel_' + channelId] = '<span class="js-scope-selector text-danger" title="Not Applicable" data-channel="' + channelId + '" data-scope="NOT_APPLICABLE" data-id="' + value.id + '"><i class="icon-ban" style="font-weight: bold"></i></span>';
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    value.actions = '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ' +
+                                        '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
+                                }
                             } else if(options.type === 'TYPE_3') {
                                 value.actions = '<button type="button" class="btn btn-success js-add" data-external-id="' + value.externalId + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
                             } else if(options.type === 'TYPE_3A') {
@@ -104,6 +119,25 @@
                         typeof options.names !== 'undefined' ? options.names[1] : 'entity',
                         $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
                 }
+            });
+
+            $(options.selector).on('click', '.js-scope-selector', function () {
+                var url = $.getURL(options.url + '/{familyAttributeId}/scope/{scope}', {
+                    familyAttributeId: $(this).data('id'),
+                    scope: $(this).data('scope'),
+
+                });
+                var data = {channelId: $(this).data('channel')};
+                $.ajaxSubmit({
+                    url: url,
+                    data: data,
+                    method: 'PUT',
+                    successMessage: [],
+                    errorMessage: ['Error Setting the Scope', 'An error occurred while setting the attribute scope'],
+                    successCallback: function(data) {
+                        $.refreshDataTable(typeof options.names === 'undefined' ? options.name : options.names[0]);
+                    }
+                });
             });
 
             $(options.selector).on('click', '.js-clone', function () {
@@ -226,7 +260,7 @@
                     url = url.replace(match[1], $.getPageAttribute(match[2]));
                 }
             }
-            return $.getPageAttribute("urlRoot") + url;
+            return (url.startsWith('http') || url.startsWith('www') ? '' : $.getPageAttribute("urlRoot") ) + url;
         },
         bindFormSubmit: function(submitEl) {
             $(submitEl).on('click', function(e) {
@@ -281,7 +315,9 @@
                 method: method,
                 success: function(data) {
                     if(data.success) {
-                        toastr.success(options.successMessage[1], options.successMessage[0]);
+                        if(options.successMessage && options.successMessage.length === 2) {
+                            toastr.success(options.successMessage[1], options.successMessage[0]);
+                        }
                         if(options.successCallback) {
                             options.successCallback(data);
                         } else {

@@ -5,6 +5,7 @@ import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.ConstraintViolation;
@@ -93,6 +94,10 @@ abstract public class ValidatableEntity implements Serializable {
 
     static boolean booleanValue(String value) {
         return "Y".equals(value);
+    }
+
+    static String toJSONString(Object value) {
+        return ConversionUtil.toJSONString(value);
     }
 
     public interface CreateGroup {}

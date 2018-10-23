@@ -122,6 +122,10 @@
             cursor: not-allowed !important;
         }
 
+        .js-scope-selector {
+            cursor: pointer;
+        }
+
         /*.js-locked {
             background: url('/assets/img/lock-icon.png') no-repeat right ;
             padding-left: 5px;

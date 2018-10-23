@@ -3,6 +3,8 @@ package com.bigname.pim.api.domain;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.javatuples.Pair;
 import org.springframework.data.annotation.Transient;
 
@@ -31,6 +33,7 @@ public class FamilyAttribute extends ValidatableEntity {
     private int subSequenceNum;
     private String collectionId;
     private String attributeId;
+    private Map<String, Scope> scope = new HashMap<>();
 
     @Transient @JsonIgnore
     private Attribute attribute;
@@ -255,6 +258,14 @@ public class FamilyAttribute extends ValidatableEntity {
         this.type = type;
     }
 
+    public Map<String, Scope> getScope() {
+        return scope;
+    }
+
+    public void setScope(Map<String, Scope> scope) {
+        this.scope = scope;
+    }
+
     public Attribute getAttribute() {
         return attribute;
     }
@@ -303,8 +314,8 @@ public class FamilyAttribute extends ValidatableEntity {
         }
     }
 
-    public Map<String, String> toMap(String... profile) {
-        Map<String, String> map = new LinkedHashMap<>();
+    public Map<String, Object> toMap(String... profile) {
+        Map<String, Object> map = new LinkedHashMap<>();
         if(isNotEmpty(ConversionUtil.toList(profile)) && "AXIS_ATTRIBUTE".equalsIgnoreCase(profile[0])) {
             map.put("id", getId());
             map.put("name", getName());
@@ -313,6 +324,7 @@ public class FamilyAttribute extends ValidatableEntity {
             map.put("id", getId());
             map.put("fullId", getAttributeGroup().getFullId() + '|' + getId());
             map.put("uiType", getUiType().name());
+            map.put("scope", getScope());
             map.put("dataType", getDataType());
             map.put("name", getName());
             map.put("group", FamilyAttributeGroup.getUniqueLeafGroupLabel(getAttributeGroup(), "|"));
@@ -350,4 +362,29 @@ public class FamilyAttribute extends ValidatableEntity {
     }
 
     public enum Type {COMMON, AXIS, VARIANT}
+
+    public enum Scope {
+        REQUIRED("OPTIONAL"),
+        OPTIONAL("NOT_APPLICABLE"),
+        NOT_APPLICABLE("REQUIRED"),
+        UNKNOWN("NOT_APPLICABLE");
+
+        private String next = "NOT_APPLICABLE";
+        Scope(String next) {
+            this.next = next;
+        }
+
+        public Scope next() {
+            return get(this.next);
+        }
+
+        public static Scope get(String value) {
+            for (Scope scope : values()) {
+                if(scope.name().equals(value)) {
+                    return scope;
+                }
+            }
+            return Scope.UNKNOWN;
+        }
+    }
 }

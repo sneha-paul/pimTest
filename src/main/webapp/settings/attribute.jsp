@@ -52,14 +52,14 @@
                             <option value="YES_NO">Yes/No</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <%--<div class="form-group">
                         <label>Options</label>
                         <br/>
                         <label class="fancy-checkbox">
                             <input type="checkbox" name="required" value="Y" <c:if test="${attribute.required eq 'Y'}">checked="checked"</c:if>>
                             <span>Required</span>
                         </label>
-                    </div>
+                    </div>--%>
                 </div>
             </div>
         </form>

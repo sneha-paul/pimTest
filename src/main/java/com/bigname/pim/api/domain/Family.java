@@ -186,7 +186,7 @@ public class Family extends Entity<Family> {
         VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
         List<FamilyAttribute> availableAxisAttributes = new ArrayList<>();
         FamilyAttributeGroup.getAllAttributes(getAttributes()).stream()
-                .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y") && attribute.getScopable().equals("N"))
+                .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y")/* && attribute.getScopable().equals("N")*/)
                 .forEach(availableAxisAttributes::add);
         Map<String, List<FamilyAttribute>> variantGroupAxisAttributes = new LinkedHashMap<>();
 
@@ -243,7 +243,7 @@ public class Family extends Entity<Family> {
         }
         Map<String, FamilyAttribute> familyAxisAttributes = new HashMap<>();
         FamilyAttributeGroup.getAllAttributes(getAttributes()).stream()
-                .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y") && attribute.getScopable().equals("N"))
+                .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y") /*&& attribute.getScopable().equals("N")*/)
                 .forEach(attribute -> familyAxisAttributes.put(attribute.getId(), attribute));
         int level = 0;
         for(String[] axisAttributeIds : axesAttributeIds) {

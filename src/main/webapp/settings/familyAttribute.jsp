@@ -81,11 +81,11 @@
                             <input type="checkbox" name="required" value="Y" <c:if test="${attribute.required eq 'Y'}">checked="checked"</c:if>>
                             <span>Required</span>
                         </label>
-                        <br/>
+                        <%--<br/>
                         <label class="fancy-checkbox">
                             <input type="checkbox" name="scopable" value="Y" <c:if test="${attribute.required eq 'Y'}">checked="checked"</c:if>>
                             <span>Scopable</span>
-                        </label>
+                        </label>--%>
                     </div>
                 </div>
             </div>

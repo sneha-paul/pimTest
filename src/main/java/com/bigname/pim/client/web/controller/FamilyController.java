@@ -4,10 +4,12 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.AttributeCollectionService;
+import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
@@ -36,11 +38,13 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
     private FamilyService familyService;
     private AttributeCollectionService collectionService;
+    private ChannelService channelService;
 
-    public FamilyController(FamilyService familyService, AttributeCollectionService collectionService) {
+    public FamilyController(FamilyService familyService, AttributeCollectionService collectionService, ChannelService channelService) {
         super(familyService);
         this.familyService = familyService;
         this.collectionService = collectionService;
+        this.channelService = channelService;
     }
 
     @RequestMapping()
@@ -94,6 +98,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
             if(family.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("family", family.get());
+                model.put("channels", ConversionUtil.toJSONString(channelService.getAll(0, 100, null).getContent().stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))));
                 model.put("breadcrumbs", new Breadcrumbs("Families", "Families", "/pim/families", family.get().getFamilyName(), ""));
             } else {
                 throw new EntityNotFoundException("Unable to find Family with Id: " + id);
@@ -307,17 +312,17 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
     @RequestMapping("/{id}/attributes")
     @ResponseBody
-    public Result<Map<String, String>> getFamilyAttributes(@PathVariable(value = "id") String id, HttpServletRequest request) {
+    public Result<Map<String, Object>> getFamilyAttributes(@PathVariable(value = "id") String id, HttpServletRequest request) {
 
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
+        Result<Map<String, Object>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
         Sort sort = null;
         if(pagination.hasSorts()) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
+        List<Map<String, Object>> dataObjects = new ArrayList<>();
         Page<FamilyAttribute> paginatedResult = familyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
@@ -400,6 +405,28 @@ public class FamilyController extends BaseController<Family, FamilyService> {
             }
         }
         return result;
+    }
+
+
+    @RequestMapping(value = "/{familyId}/attributes/{familyAttributeId}/scope/{scope}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> saveAttributeScope(@PathVariable(value = "familyId") String familyId,
+                                                          @PathVariable(value = "familyAttributeId") String familyAttributeId,
+                                                          @PathVariable(value = "scope") String scope,
+                                                          @RequestParam(name = "channelId") String channelId) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        Optional<Channel> channel = channelService.get(channelId, FindBy.EXTERNAL_ID, false);
+        FamilyAttribute.Scope _scope = FamilyAttribute.Scope.get(scope);
+        if(family.isPresent() && channel.isPresent() && _scope != FamilyAttribute.Scope.UNKNOWN) {
+            family.get().setGroup("ATTRIBUTES");
+            FamilyAttribute familyAttribute = FamilyAttribute.findAttribute(familyAttributeId, family.get().getAttributes());
+            familyAttribute.getScope().put(channel.get().getChannelId(), _scope.next());
+            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+            model.put("success", true);
+        }
+
+        return model;
     }
 
     @RequestMapping(value = "/{familyId}/attributes/{familyAttributeId}/options/{attributeOptionId}", method = RequestMethod.POST)
