@@ -24,8 +24,8 @@ $( document ).ready(function() {
     });
 
     $('.js-channel-selector .js-channel').on('click', function(){
-        var channel = $(this).data('channel');
-        $.refreshPage({channel : channel}, $('.nav-link.active').attr('href'));
+        var channelId = $(this).data('channel-id');
+        $.refreshPage({channelId : channelId}, $('.nav-link.active').attr('href'));
     });
 
 

@@ -1,3 +1,4 @@
+<%--@elvariable id="channels" type="java.util.Map"--%>
 <%--@elvariable id="product" type="com.bigname.pim.api.domain.Product"--%>
 <%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.api.domain.ProductFamily>"--%>
 <%--@elvariable id="masterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
@@ -17,11 +18,11 @@
                         <label style="font-weight: 400">Channel:</label>
                         <div class="btn-group m-t--5 m-r-15 js-channel-selector" style="z-index: 98">
                             <button class="btn btn-link btn-sm dropdown-toggle" style="min-width: 110px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span style="font-size: 14px">${channels[channel]}</span>
+                                <span style="font-size: 14px">${channels[product.channelId]}</span>
                             </button>
                             <c:forEach var="channelEntry" items="${channels.entrySet()}" varStatus="s1">
                                 <c:if test="${s1.first}"><div class="dropdown-menu"></c:if>
-                                    <span class="dropdown-item <c:if test='${channelEntry.key ne channel}'>js-channel</c:if>"  data-channel="${channelEntry.key}">${channelEntry.value}</span>
+                                    <span class="dropdown-item <c:choose><c:when test='${channelEntry.key ne product.channelId}'>js-channel</c:when><c:otherwise>bg-primary text-white</c:otherwise></c:choose>"  data-channel-id="${channelEntry.key}">${channelEntry.value}</span>
                                 <c:if test="${s1.last}"></div></c:if>
                             </c:forEach>
                         </div>
@@ -666,7 +667,7 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPage({'productId' : '${product.productId}'});$.initAHAH(this);"/>
+<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}'});$.initAHAH(this);"/>
 <script src="/assets/js/pages/ui/product/product.js"></script>
 
 

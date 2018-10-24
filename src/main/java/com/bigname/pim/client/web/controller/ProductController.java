@@ -68,7 +68,7 @@ public class ProductController extends BaseController<Product, ProductService>{
     public Map<String, Object> update(@PathVariable(value = "id") String id, Product product, HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
         product.setProductId(id);
-        product.setFamilyAttributes(getAttributesMap(request));
+        product.setAttributeValues(getAttributesMap(request));
         if(isValid(product, model, product.getGroup().equals("DETAILS") ? Product.DetailsGroup.class : null)) {
             productService.update(id, FindBy.EXTERNAL_ID, product);
             model.put("success", true);
@@ -77,19 +77,19 @@ public class ProductController extends BaseController<Product, ProductService>{
     }
 
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id, @RequestParam(name = "channel", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channel, @RequestParam(name = "reload", required = false) boolean reload) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id, @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId, @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
-        model.put("channel", channel);
         model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName)));
         if(id == null) {
             model.put("mode", "CREATE");
-            model.put("product", new Product());
+            model.put("product", new Product(channelId));
             model.put("productFamilyVariantGroups", productFamilyService.getFamilyVariantGroups());
         } else {
             Optional<Product> _product = productService.get(id, FindBy.EXTERNAL_ID, false);
             if(_product.isPresent()) {
                 Product product = _product.get();
+                product.setChannelId(channelId);
                 if(ValidationUtil.isNotEmpty(product.getProductFamilyId())) {
                     Optional<Family> productFamily = productFamilyService.get(product.getProductFamilyId(), FindBy.INTERNAL_ID);
                     productFamily.ifPresent(product::setProductFamily);

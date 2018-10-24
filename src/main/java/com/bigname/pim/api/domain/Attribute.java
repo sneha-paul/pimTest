@@ -23,9 +23,7 @@ public class Attribute extends ValidatableEntity {
     private String dataType = "string";  //Initial version only supports String type
     private String id;
     private String regEx;
-    private String required = "N";
     private String selectable = "N";
-    private String scopable = "N";
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
@@ -51,7 +49,6 @@ public class Attribute extends ValidatableEntity {
         this.setUiType(attributeDTO.getUiType());
         AttributeGroup attributeGroup = null;
         AttributeGroup attributeGroupDTO = attributeDTO.getAttributeGroup();
-        this.setRequired(attributeDTO.getRequired());
         orchestrate();
         this.setId(StringUtil.getUniqueName(this.getId(), AttributeGroup.getAllAttributeIds(attributeGroups)));
         this.setRegEx(attributeDTO.getRegEx());
@@ -146,14 +143,6 @@ public class Attribute extends ValidatableEntity {
         this.regEx = regEx;
     }
 
-    public String getRequired() {
-        return required;
-    }
-
-    public void setRequired(String required) {
-        this.required = toYesNo(required, "Y");
-    }
-
     public String getSelectable() {
         setSelectable(_uiType.isSelectable());
         return selectable;
@@ -161,14 +150,6 @@ public class Attribute extends ValidatableEntity {
 
     public void setSelectable(String selectable) {
         this.selectable = toYesNo(selectable, "Y");
-    }
-
-    public String getScopable() {
-        return scopable;
-    }
-
-    public void setScopable(String scopable) {
-        this.scopable = toYesNo(scopable, "Y");
     }
 
     public String getActive() {
@@ -223,24 +204,8 @@ public class Attribute extends ValidatableEntity {
         }
     }
 
-    public Pair<String, Object> validate(Object value) {
-        if(getUiType().isMultiSelect()) {
-            String[] attributeValue = value instanceof String ? new String[] {(String) value} : (String[]) value;
-            if (booleanValue(getRequired()) && (attributeValue.length == 0 || isEmpty(attributeValue[0]))) {
-                return Pair.with(getLabel() + " cannot be empty", attributeValue);
-            }
-        } else {
-            String attributeValue = (String) value;
-            if (booleanValue(getRequired()) && isEmpty(attributeValue)) {
-                return Pair.with(getLabel() + " cannot be empty", attributeValue);
-            }
-        }
-        return null;
-    }
-
     @Override
     public void orchestrate() {
-        setRequired(getRequired());
         setSelectable(getSelectable());
         if(isEmpty(getId())) {
             setId(toId(getName()));
@@ -255,7 +220,6 @@ public class Attribute extends ValidatableEntity {
         map.put("dataType", getDataType());
         map.put("name", getName());
         map.put("group", AttributeGroup.getFullGroupLabel(getAttributeGroup(), "|"));
-        map.put("required", getRequired());
         map.put("selectable", getSelectable());
         map.put("options", Integer.toString(options.size()));
         return map;

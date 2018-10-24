@@ -3,6 +3,8 @@ package com.bigname.pim.api.domain;
 import com.bigname.common.util.BeanUtil;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.pim.util.PIMConstants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -11,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,13 +36,26 @@ public class Product extends Entity<Product> {
 
     private String variantGroupId;
 
+    @Transient @JsonIgnore
+    private String channelId = PIMConstants.DEFAULT_CHANNEL_ID;
+
+//    @Transient
+//    private Channel channel;
+
     @Transient
     private Family productFamily;
 
     private Map<String, Object> familyAttributes = new HashMap<>();
 
+    private Map<String, Map<String, Object>> scopedFamilyAttributes = new HashMap<>();
+
     public Product() {
         super();
+    }
+
+    public Product(String channelId) {
+        this();
+        this.channelId = channelId;
     }
 
     public String getProductId() {
@@ -75,6 +91,22 @@ public class Product extends Entity<Product> {
         this.variantGroupId = variantGroupId;
     }
 
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
+
+    /*public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }*/
+
     public Family getProductFamily() {
         return productFamily;
     }
@@ -90,6 +122,22 @@ public class Product extends Entity<Product> {
 
     public void setFamilyAttributes(Map<String, Object> familyAttributes) {
         this.familyAttributes = CollectionsUtil.filterMap(familyAttributes, BeanUtil.getAllFieldNames(this.getClass()));
+    }
+
+    public Map<String, Map<String, Object>> getScopedFamilyAttributes() {
+        return scopedFamilyAttributes;
+    }
+
+    public void setScopedFamilyAttributes(String channelId, Map<String, Object> familyAttributes) {
+        getScopedFamilyAttributes().put(channelId, CollectionsUtil.filterMap(familyAttributes, BeanUtil.getAllFieldNames(this.getClass())));
+    }
+
+    public Map<String, Object> getChannelFamilyAttributes() {
+        return scopedFamilyAttributes.get(getChannelId());
+    }
+
+    public void setChannelFamilyAttributes(Map<String, Object> familyAttributes) {
+        setScopedFamilyAttributes(getChannelId(), familyAttributes);
     }
 
     void setExternalId() {
@@ -145,5 +193,28 @@ public class Product extends Entity<Product> {
         map.put("active", getActive());
         map.put("discontinued", getDiscontinued());
         return map;
+    }
+
+    public void setAttributeValues(Map<String, Object> attributeValues) {
+        String channelId = getChannelId();
+        Family family = getProductFamily();
+        Map<String, FamilyAttribute> familyAttributesMap = FamilyAttributeGroup.getAllAttributesMap(family.getAttributes());
+        if(!getScopedFamilyAttributes().containsKey(channelId)) {
+            setScopedFamilyAttributes(channelId, new HashMap<>());
+        }
+
+        Map<String, Object> scopedFamilyAttributes = getScopedFamilyAttributes().get(channelId);
+
+        attributeValues.forEach((attributeId, attributeValue) -> {
+            if(familyAttributes.containsKey(attributeId)) {
+                FamilyAttribute familyAttribute = familyAttributesMap.get(attributeId);
+                if(booleanValue(familyAttribute.getScopable())) {
+                    scopedFamilyAttributes.put(attributeId, attributeValue);
+                } else {
+                    scopedFamilyAttributes.remove(attributeId);
+                    familyAttributes.put(attributeId, attributeValue);
+                }
+            }
+        });
     }
 }
