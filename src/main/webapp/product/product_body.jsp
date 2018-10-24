@@ -87,7 +87,7 @@
                                                                             <c:if test="${not empty defaultDetailsAttributeGroup}">
                                                                                 <c:forEach items="${defaultDetailsAttributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON'}">
+                                                                                    <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                         <c:if test="${attribute.uiType ne 'YES_NO'}">
                                                                                             <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
@@ -172,7 +172,7 @@
                                             </div>
                                             <c:forEach items="${detailsMasterGroup.childGroups.get('DEFAULT_GROUP').childGroups}" var="attributeGroupEntry">
                                                 <c:set var="attributeGroup" value="${attributeGroupEntry.value}" />
-                                                <c:if test="${attributeGroup.defaultGroup ne 'Y'}">
+                                                <c:if test="${attributeGroup.defaultGroup ne 'Y' && attributeGroup.isAvailable(product.channelId)}">
                                                     <div class="card inner group overflowhidden">
                                                         <div class="body">
                                                             <fieldset>
@@ -183,7 +183,7 @@
                                                                             <div class="col-md-6 col-sm-12">
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON'}">
+                                                                                    <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                         <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
                                                                                             <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
@@ -405,6 +405,7 @@
                                                   data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
                                                 <c:forEach items="${sectionGroup.childGroups}" var="attributeGroupEntry">
                                                     <c:set var="attributeGroup" value="${attributeGroupEntry.value}" />
+                                                    <c:if test="${attributeGroup.isAvailable(product.channelId)}">
                                                     <div class="card inner group overflowhidden">
                                                         <div class="body">
                                                             <fieldset>
@@ -415,7 +416,7 @@
                                                                             <div class="col-md-6 col-sm-12">
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON'}">
+                                                                                    <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                             <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
                                                                                                 <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
@@ -494,6 +495,7 @@
                                                             </fieldset>
                                                         </div>
                                                     </div>
+                                                    </c:if>
                                                 </c:forEach>
                                                 <div class="form-button-group pull-right">
                                                     <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
@@ -523,6 +525,7 @@
                                                   data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
                                                 <c:forEach items="${sectionGroup.childGroups}" var="attributeGroupEntry">
                                                     <c:set var="attributeGroup" value="${attributeGroupEntry.value}" />
+                                                    <c:if test="${attributeGroup.isAvailable(product.channelId)}">
                                                     <div class="card inner group overflowhidden">
                                                         <div class="body">
                                                             <fieldset>
@@ -533,7 +536,7 @@
                                                                             <div class="col-md-6 col-sm-12">
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON'}">
+                                                                                    <c:if test="${attribute.type eq 'COMMON' && attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                             <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
                                                                                                 <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
@@ -606,6 +609,7 @@
                                                             </fieldset>
                                                         </div>
                                                     </div>
+                                                    </c:if>
                                                 </c:forEach>
                                                 <div class="form-button-group pull-right">
                                                     <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>

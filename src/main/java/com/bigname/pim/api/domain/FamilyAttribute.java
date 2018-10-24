@@ -305,6 +305,10 @@ public class FamilyAttribute extends ValidatableEntity {
         return null;
     }
 
+    public boolean isAvailable(String channelId) {
+        return /*!booleanValue(getScopable()) ||*/ Scope.NOT_APPLICABLE != getScope().get(channelId);
+    }
+
     @Override
     public void orchestrate() {
         setRequired(getRequired());

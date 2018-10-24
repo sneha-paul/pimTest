@@ -209,6 +209,10 @@ public class FamilyAttributeGroup extends ValidatableEntity {
         return getPipedValues(getFullId()).size();
     }
 
+    public boolean isAvailable(String channelId) {
+        return getAttributes().entrySet().stream().anyMatch(e -> FamilyAttribute.Scope.NOT_APPLICABLE != e.getValue().getScope().get(channelId));
+    }
+
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("id", getId());

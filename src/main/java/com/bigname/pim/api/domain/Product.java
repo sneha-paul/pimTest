@@ -208,12 +208,12 @@ public class Product extends Entity<Product> {
         attributeValues.forEach((attributeId, attributeValue) -> {
             if(familyAttributes.containsKey(attributeId)) {
                 FamilyAttribute familyAttribute = familyAttributesMap.get(attributeId);
-                if(booleanValue(familyAttribute.getScopable())) {
+//                if(booleanValue(familyAttribute.getScopable())) {
                     scopedFamilyAttributes.put(attributeId, attributeValue);
-                } else {
+                /*} else {
                     scopedFamilyAttributes.remove(attributeId);
                     familyAttributes.put(attributeId, attributeValue);
-                }
+                }*/
             }
         });
     }
