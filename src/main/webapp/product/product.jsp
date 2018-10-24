@@ -44,7 +44,7 @@
                     <br>
                     <input type="hidden" name="group" value="CREATE"/>
                     <img src="/assets/img/tiny.png" onload="$.initAHAH(this);"/>
-                    <script src="/assets/js/pages/ui/product/product.js"></script>
+                    <script src="/assets/js/pages/ui/product/createProduct.js"></script>
                 </form>
             </div>
         </div>

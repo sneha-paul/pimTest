@@ -83,6 +83,10 @@
             margin: 10px 10px 30px !important;
         }
 
+        .dropdown-menu .dropdown-item {
+            cursor: pointer;
+        }
+
         .parsley-errors-list {
             margin-top: -8px;
             padding-bottom: 8px;
@@ -184,7 +188,9 @@
                     </div>
                 </div>
             </div>
+            <div id="js-body-container">
             <tiles:insertAttribute name="body"/>
+            </div>
         </div>
     </div>
 </div>
@@ -222,9 +228,9 @@
 
 </body>
 
-<script>
+<%--<script>
     $(function(){
             $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
     });
-</script>
+</script>--%>
 </html>

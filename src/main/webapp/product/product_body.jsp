@@ -12,7 +12,24 @@
     <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="header">
-                <h2>${product.productName} <small><code class="highlighter-rouge">${product.productId}</code></small><small class="pull-right" style="margin-top: -15px"><code style="color:#808080">_id: ${product.id}</code></small></h2>
+                <div>
+                    <div class="pull-right">
+                        <label style="font-weight: 400">Channel:</label>
+                        <div class="btn-group m-t--5 m-r-15 js-channel-selector" style="z-index: 98">
+                            <button class="btn btn-link btn-sm dropdown-toggle" style="min-width: 110px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span style="font-size: 14px">${channels[channel]}</span>
+                            </button>
+                            <c:forEach var="channelEntry" items="${channels.entrySet()}" varStatus="s1">
+                                <c:if test="${s1.first}"><div class="dropdown-menu"></c:if>
+                                    <span class="dropdown-item <c:if test='${channelEntry.key ne channel}'>js-channel</c:if>"  data-channel="${channelEntry.key}">${channelEntry.value}</span>
+                                <c:if test="${s1.last}"></div></c:if>
+                            </c:forEach>
+                        </div>
+                    </div>
+                </div>
+                <h2>${product.productName} <small><code class="highlighter-rouge">${product.productId}</code></small>
+                    <small class="pull-right" style="margin-top: -15px;padding-right:10px"><code style="color:#808080">_id: ${product.id}</code></small>
+                </h2>
             </div>
             <div class="body">
                 <ul class="nav nav-tabs-new2">
@@ -649,40 +666,7 @@
         </div>
     </div>
 </div>
-<script>
-    $.initPage({
-        'productId' : '${product.productId}'
-    });
-    $( document ).ready(function() {
-        $.initDataTable({
-            selector: '#paginatedProductVariantsTable',
-            name: 'productVariants',
-            type: 'TYPE_1',
-            url: $.getURL('/pim/products/{productId}/variants/'),
-            columns: [
-                { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name'},
-                { data: 'externalId', name : 'externalId', title : 'Variant ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-            ]
-        });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
-        $.addModal({
-            selector: '#js-create-variant',
-            url: $.getURL('/pim/products/{productId}/variants/create'),
-            name:'create-variant',
-            title:'Create Product Variant',
-            buttons: [
-                {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('productVariants');$.closeModal();});}},
-                {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-            ]
-        });
-        $('.datepicker').datepicker();
-
-        /*$('form').on('click', '.js-checkbox', function() {
-            $(this).parent().find('input').prop('disabled', $(this).prop('checked'));
-        });*/
-    });
-</script>
+<img src="/assets/img/tiny.png" onload="$.initPage({'productId' : '${product.productId}'});$.initAHAH(this);"/>
+<script src="/assets/js/pages/ui/product/product.js"></script>
 
 

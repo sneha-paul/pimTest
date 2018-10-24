@@ -5,14 +5,17 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.pim.api.domain.Channel;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.Family;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.exception.EntityNotFoundException;
+import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Manu on 8/3/2018.
@@ -37,11 +41,13 @@ public class ProductController extends BaseController<Product, ProductService>{
 
     private ProductService productService;
     private FamilyService productFamilyService;
+    private ChannelService channelService;
 
-    public ProductController( ProductService productService,FamilyService productFamilyService){
+    public ProductController( ProductService productService,FamilyService productFamilyService, ChannelService channelService){
         super(productService);
         this.productService = productService;
         this.productFamilyService = productFamilyService;
+        this.channelService = channelService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -71,9 +77,11 @@ public class ProductController extends BaseController<Product, ProductService>{
     }
 
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id, @RequestParam(name = "channel", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channel, @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
+        model.put("channel", channel);
+        model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName)));
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("product", new Product());
@@ -94,7 +102,7 @@ public class ProductController extends BaseController<Product, ProductService>{
                 throw new EntityNotFoundException("Unable to find Product with Id: " + id);
             }
         }
-        return new ModelAndView("product/product", model);
+        return new ModelAndView("product/product" + (reload ? "_body" : ""), model);
     }
 
 

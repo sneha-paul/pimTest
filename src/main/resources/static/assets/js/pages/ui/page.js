@@ -262,6 +262,32 @@
             }
             return (url.startsWith('http') || url.startsWith('www') ? '' : $.getPageAttribute("urlRoot") ) + url;
         },
+        pageURL: function() {
+            return $.getPageAttribute("pageUrl");
+        },
+        refreshPage: function(params, hash) {
+            if(!params) {
+                params = {};
+            }
+            params.reload = true;
+            $.ajax({
+                url: $.pageURL(),
+                data: params,
+                method: 'GET',
+                async: true,
+                success: function (data) {
+                    $('#js-body-container').html(data);
+                    if(hash) {
+                        $('a.nav-link[href*="' + hash + '"]').trigger('click');
+                    } else {
+                        $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
+                    }
+                },
+                error: function (resp) {
+                    window.location.href = $.pageURL();
+                }
+            });
+        },
         bindFormSubmit: function(submitEl) {
             $(submitEl).on('click', function(e) {
                 $.submitAction(this, e);
@@ -574,6 +600,7 @@
     var page = new Page();
     var loc = window.location;
     $.setPageAttribute("urlRoot", loc.protocol + "//" + loc.hostname + ":" + loc.port);
+    $.setPageAttribute("pageUrl", loc.href.replace(/#$/, ''));
     toastr.options.preventDuplicates = true;
     toastr.options.positionClass = 'toast-bottom-right';
 })();
