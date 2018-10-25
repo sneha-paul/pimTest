@@ -290,15 +290,17 @@ public class FamilyAttribute extends ValidatableEntity {
         this.options = options;
     }
 
-    public Pair<String, Object> validate(Object value) {
+    public Pair<String, Object> validate(Object value, String... channelId) {
+//        boolean required = booleanValue(getScopable()) ? isRequired(channelId[0]) : booleanValue(getRequired());
+        boolean required = isRequired(channelId[0]);
         if(getUiType().isMultiSelect()) {
             String[] attributeValue = value instanceof String ? new String[] {(String) value} : (String[]) value;
-            if (booleanValue(getRequired()) && (attributeValue.length == 0 || isEmpty(attributeValue[0]))) {
+            if (required && (attributeValue.length == 0 || isEmpty(attributeValue[0]))) {
                 return Pair.with(getLabel() + " cannot be empty", attributeValue);
             }
         } else {
             String attributeValue = (String) value;
-            if (booleanValue(getRequired()) && isEmpty(attributeValue)) {
+            if (required && isEmpty(attributeValue)) {
                 return Pair.with(getLabel() + " cannot be empty", attributeValue);
             }
         }
@@ -306,7 +308,13 @@ public class FamilyAttribute extends ValidatableEntity {
     }
 
     public boolean isAvailable(String channelId) {
-        return /*!booleanValue(getScopable()) ||*/ Scope.NOT_APPLICABLE != getScope().get(channelId);
+//        return !booleanValue(getScopable()) || Scope.NOT_APPLICABLE != getScope().get(channelId);
+        return Scope.NOT_APPLICABLE != getScope().get(channelId);
+    }
+
+    public boolean isRequired(String channelId) {
+//        return (!booleanValue(getScopable()) && booleanValue(getRequired())) || ((booleanValue(getScopable()) && Scope.REQUIRED != getScope().get(channelId)));
+        return Scope.REQUIRED == getScope().get(channelId);
     }
 
     @Override

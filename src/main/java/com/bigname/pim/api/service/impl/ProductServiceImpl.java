@@ -140,25 +140,34 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
 
     @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, Product product, String group) {
-        if(ValidationUtil.isNotEmpty(product.getFamilyAttributes())) {
-            String attributeId = product.getFamilyAttributes().entrySet().iterator().next().getKey();
-            get(product.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product1 -> {
-                FamilyAttribute _attribute = FamilyAttribute.findAttribute(attributeId, product1.getProductFamily().getAttributes());
-                FamilyAttributeGroup level2Group = _attribute.getAttributeGroup().getParentGroup();
-                level2Group.getChildGroups().forEach((k, attributeGroup) ->
-                    attributeGroup.getAttributes().forEach((k1, attribute) -> {
-                        if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getFamilyAttributes().containsKey(k1)) {
-                            product.getFamilyAttributes().put(k1, new String[0]);
-                        } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !product.getFamilyAttributes().containsKey(k1)) {
-                            product.getFamilyAttributes().put(k1, "N");
-                        }
-                        Pair<String, Object> error = attribute.validate(product.getFamilyAttributes().get(attribute.getId()));
-                        if(ValidationUtil.isNotEmpty(error)) {
-                            fieldErrors.put(attribute.getId(), error);
-                        }
-                    })
-                );
-            });
+        FamilyAttributeGroup masterGroup = product.getProductFamily().getAttributes().get(group + "_GROUP");
+        if(ValidationUtil.isNotEmpty(masterGroup)) {
+            FamilyAttributeGroup sectionGroup = masterGroup.getChildGroups().get(AttributeGroup.DEFAULT_GROUP_ID);
+            sectionGroup.getChildGroups().forEach((k, attributeGroup) ->
+                attributeGroup.getAttributes().forEach((k1, attribute) -> {
+                    /*if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getFamilyAttributes().containsKey(k1)) {
+                        product.getFamilyAttributes().put(k1, new String[0]);
+                    } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !product.getFamilyAttributes().containsKey(k1)) {
+                        product.getFamilyAttributes().put(k1, "N");
+                    }*/
+
+                    if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getChannelFamilyAttributes().containsKey(k1)) {
+                        product.getChannelFamilyAttributes().put(k1, new String[0]);
+                    } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !product.getChannelFamilyAttributes().containsKey(k1)) {
+                        product.getChannelFamilyAttributes().put(k1, "N");
+                    }
+
+                    Pair<String, Object> error = null;
+                    if(product.getFamilyAttributes().containsKey(attribute.getId())) {
+//                        error = attribute.validate(product.getFamilyAttributes().get(attribute.getId()));
+                    } else if(product.getChannelFamilyAttributes().containsKey(attribute.getId())) {
+                        error = attribute.validate(product.getChannelFamilyAttributes().get(attribute.getId()), product.getChannelId());
+                    }
+                    if(ValidationUtil.isNotEmpty(error)) {
+                        fieldErrors.put(attribute.getId(), error);
+                    }
+                })
+            );
         }
         return fieldErrors;
     }

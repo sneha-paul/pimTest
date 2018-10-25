@@ -90,7 +90,7 @@
                                                                                     <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                         <c:if test="${attribute.uiType ne 'YES_NO'}">
-                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                         </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
@@ -186,7 +186,7 @@
                                                                                     <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                         <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
-                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                         </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
@@ -419,7 +419,7 @@
                                                                                     <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                             <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
-                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                             </c:if>
                                                                                             <c:choose>
                                                                                                 <c:when test="${attribute.uiType eq 'DROPDOWN'}">
@@ -539,7 +539,7 @@
                                                                                     <c:if test="${attribute.type eq 'COMMON' && attribute.isAvailable(product.channelId)}">
                                                                                         <div class="form-group">
                                                                                             <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
-                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.required eq 'Y'}">*</c:if></code>
+                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                             </c:if>
                                                                                             <c:choose>
                                                                                                 <c:when test="${attribute.uiType eq 'DROPDOWN'}">

@@ -206,7 +206,7 @@ public class Product extends Entity<Product> {
         Map<String, Object> scopedFamilyAttributes = getScopedFamilyAttributes().get(channelId);
 
         attributeValues.forEach((attributeId, attributeValue) -> {
-            if(familyAttributes.containsKey(attributeId)) {
+            if(familyAttributesMap.containsKey(attributeId)) {
                 FamilyAttribute familyAttribute = familyAttributesMap.get(attributeId);
 //                if(booleanValue(familyAttribute.getScopable())) {
                     scopedFamilyAttributes.put(attributeId, attributeValue);

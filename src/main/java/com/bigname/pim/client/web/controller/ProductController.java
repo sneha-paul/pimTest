@@ -67,10 +67,11 @@ public class ProductController extends BaseController<Product, ProductService>{
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Product product, HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
+        productService.get(id, FindBy.EXTERNAL_ID, false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
         product.setProductId(id);
         product.setAttributeValues(getAttributesMap(request));
         if(isValid(product, model, product.getGroup().equals("DETAILS") ? Product.DetailsGroup.class : null)) {
-            productService.update(id, FindBy.EXTERNAL_ID, product);
+//            productService.update(id, FindBy.EXTERNAL_ID, product);
             model.put("success", true);
         }
         return model;
@@ -90,10 +91,10 @@ public class ProductController extends BaseController<Product, ProductService>{
             if(_product.isPresent()) {
                 Product product = _product.get();
                 product.setChannelId(channelId);
-                if(ValidationUtil.isNotEmpty(product.getProductFamilyId())) {
+                /*if(ValidationUtil.isNotEmpty(product.getProductFamilyId())) {
                     Optional<Family> productFamily = productFamilyService.get(product.getProductFamilyId(), FindBy.INTERNAL_ID);
                     productFamily.ifPresent(product::setProductFamily);
-                }
+                }*/
                 model.put("mode", "DETAILS");
                 model.put("product", product);
                 model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))).getContent()); //TODO - JIRA BNPIM-6
