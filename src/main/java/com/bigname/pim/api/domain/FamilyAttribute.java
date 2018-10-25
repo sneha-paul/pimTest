@@ -336,6 +336,7 @@ public class FamilyAttribute extends ValidatableEntity {
             map.put("id", getId());
             map.put("fullId", getAttributeGroup().getFullId() + '|' + getId());
             map.put("uiType", getUiType().name());
+            map.put("scopable", getScopable());
             map.put("scope", getScope());
             map.put("dataType", getDataType());
             map.put("name", getName());

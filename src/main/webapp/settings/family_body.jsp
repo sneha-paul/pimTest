@@ -166,17 +166,18 @@
             buttonGroup: 'GROUP_4A',
             url: $.getURL('/pim/families/{familyId}/attributes'),
             columns: [
-                {data: 'name', name: 'name', title: 'Attribute Name'},
-                {data: 'id', name: 'id', title: 'Attribute ID'},
+                {data: 'name', name: 'name', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.id + '</code><small>'}},
+                {data: 'uiType', name: 'uiType', title: 'UI Type'},
                 {data: 'group', name: 'group', title: 'Attribute Group'},
-                {data: 'selectable', name: 'selectable', title: 'Selectable', orderable: false},
+                {data: 'scopable', name: 'scopable', title: 'Scopable'},
                 {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
             ]
         });
 
         var columns = [];
         columns[0] = {data: 'name', name: 'name', title: 'Attribute Name'};
-        var idx = 0;
+        columns[1] = {data: 'scopable', name: 'scopable', title: 'Scopable'};
+        var idx = 1;
         for(var channelId in channels) {
             if(channels.hasOwnProperty(channelId)) {
                 columns[++idx] = {

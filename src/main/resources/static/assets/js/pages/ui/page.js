@@ -42,6 +42,13 @@
                                 if('Y' === value.selectable) {
                                     value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-external-id="' + value.fullId + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
                                 }
+                                if('GROUP_4A' === options.buttonGroup) {
+                                    if (value.scopable === 'Y') {
+                                        value.scopable = '<span class="badge badge-success">Yes</span>';
+                                    } else {
+                                        value.scopable = '<span class="badge badge-danger">No</span>';
+                                    }
+                                }
                             } else if(options.type === 'TYPE_1' || options.type === 'TYPE_1A') {
                                 var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
                                 if('Y' !== value.active) {
@@ -57,6 +64,14 @@
                             } else if(options.type === 'TYPE_2') {
 
                                 if('GROUP_4B' === options.buttonGroup) {
+                                    var icon = 'fa-square-o', color = '', title = 'No';
+                                    if('Y' === value.scopable) {
+                                        title = 'Yes';
+                                        icon = 'fa-check-square-o';
+                                        color = ' text-success';
+                                    }
+                                    value.scopable = '<span class="js-scopable' + color + '" title="' + title + '" data-scopable="' + value.scopable + '" data-id="' + value.id + '"><i class="fa ' + icon + '"></i></span>';
+
                                     for(var channelId in $.getPageAttribute('channels')) {
                                         if($.getPageAttribute('channels').hasOwnProperty(channelId)) {
                                             if (_.isEmpty(value.scope[channelId]) || value.scope[channelId] === 'OPTIONAL') {
@@ -128,6 +143,25 @@
 
                 });
                 var data = {channelId: $(this).data('channel')};
+                $.ajaxSubmit({
+                    url: url,
+                    data: data,
+                    method: 'PUT',
+                    successMessage: [],
+                    errorMessage: ['Error Setting the Scope', 'An error occurred while setting the attribute scope'],
+                    successCallback: function(data) {
+                        $.refreshDataTable(typeof options.names === 'undefined' ? options.name : options.names[0]);
+                    }
+                });
+            });
+
+            $(options.selector).on('click', '.js-scopable', function () {
+                var url = $.getURL(options.url + '/{familyAttributeId}/scopable/{scopable}', {
+                    familyAttributeId: $(this).data('id'),
+                    scopable: $(this).data('scopable'),
+
+                });
+                var data = {};
                 $.ajaxSubmit({
                     url: url,
                     data: data,

@@ -126,7 +126,7 @@
             cursor: not-allowed !important;
         }
 
-        .js-scope-selector {
+        .js-scope-selector, .js-scopable {
             cursor: pointer;
         }
 

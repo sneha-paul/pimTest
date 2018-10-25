@@ -429,6 +429,24 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return model;
     }
 
+    @RequestMapping(value = "/{familyId}/attributes/{familyAttributeId}/scopable/{scopable}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> saveAttributeAsScopable(@PathVariable(value = "familyId") String familyId,
+                                                  @PathVariable(value = "familyAttributeId") String familyAttributeId,
+                                                  @PathVariable(value = "scopable") String scopable) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        if(family.isPresent()) {
+            family.get().setGroup("ATTRIBUTES");
+            FamilyAttribute familyAttribute = FamilyAttribute.findAttribute(familyAttributeId, family.get().getAttributes());
+            familyAttribute.setScopable("Y".equals(scopable) ? "N" : "Y");
+            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+            model.put("success", true);
+        }
+
+        return model;
+    }
+
     @RequestMapping(value = "/{familyId}/attributes/{familyAttributeId}/options/{attributeOptionId}", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> saveAttributeOptions(@PathVariable(value = "familyId") String familyId, FamilyAttributeOption familyAttributeOption) {
