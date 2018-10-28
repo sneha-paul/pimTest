@@ -56,13 +56,15 @@ public class Channel extends Entity<Channel> {
 
     @Override
     public Channel merge(Channel channel) {
-        switch(channel.getGroup()) {
-            case "DETAILS" :
-//                this.setExternalId(channel.getExternalId()); - Don't modify the external id after creation
-                this.setChannelName(channel.getChannelName());
-                this.setActive(channel.getActive());
-                this.setDiscontinued(channel.getDiscontinued());
-                break;
+        for (String group : channel.getGroup()) {
+            switch(group) {
+                case "DETAILS" :
+    //                this.setExternalId(channel.getExternalId()); - Don't modify the external id after creation
+                    this.setChannelName(channel.getChannelName());
+                    this.setActive(channel.getActive());
+                    this.setDiscontinued(channel.getDiscontinued());
+                    break;
+            }
         }
 
         return this;

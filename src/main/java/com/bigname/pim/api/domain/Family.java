@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
 import org.javatuples.Tuple;
 import org.springframework.data.annotation.Transient;
@@ -28,14 +29,12 @@ public class Family extends Entity<Family> {
 
     private Map<String, String> channelVariantGroups = new HashMap<>();
 
+    @Transient @JsonIgnore
+    private Map<String, FamilyAttribute> attributesMap = new HashMap<>();
+
     public Family() {
         super();
     }
-
-    /*public Family(String externalId, String familyName) {
-        super(externalId);
-        this.familyName = familyName;
-    }*/
 
     public String getFamilyId() {
         return getExternalId();
@@ -102,6 +101,17 @@ public class Family extends Entity<Family> {
         }
     }*/
 
+    public Map<String, FamilyAttribute> getAllAttributesMap() {
+        if(isNull(attributesMap) || attributesMap.isEmpty()) {
+            attributesMap = FamilyAttributeGroup.getAllAttributesMap(this);
+        }
+        return attributesMap;
+    }
+
+    public Collection<FamilyAttribute> getAllAttributes() {
+        return getAllAttributesMap().values();
+    }
+
     @Override
     void setExternalId() {
         this.familyId = getExternalId();
@@ -109,19 +119,22 @@ public class Family extends Entity<Family> {
 
     @Override
     public Family merge(Family family) {
-        switch(family.getGroup()) {
-            case "DETAILS":
-                this.setExternalId(family.getExternalId());
-                this.setFamilyName(family.getFamilyName());
-                this.setActive(family.getActive());
-            break;
-            case "ATTRIBUTES":
-                this.setAttributes(family.getAttributes());
+        for (String group : family.getGroup()) {
+            switch(group) {
+                case "DETAILS":
+                    this.setExternalId(family.getExternalId());
+                    this.setFamilyName(family.getFamilyName());
+                    this.setActive(family.getActive());
                 break;
-            case "VARIANT_GROUPS":
-                this.setVariantGroups(family.getVariantGroups());
-                this.setChannelVariantGroups(family.getChannelVariantGroups());
+                case "ATTRIBUTES":
+                    this.setAttributes(family.getAttributes());
                 break;
+                case "VARIANT_GROUPS":
+                    this.setVariantGroups(family.getVariantGroups());
+                    this.setChannelVariantGroups(family.getChannelVariantGroups());
+                break;
+
+            }
         }
         return this;
     }
@@ -181,18 +194,18 @@ public class Family extends Entity<Family> {
 
     public Map<String, List<FamilyAttribute>> getVariantGroupAttributes(String variantGroupId) {
         VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
-        List<FamilyAttribute> familyAttributes = FamilyAttributeGroup.getAllAttributes(getAttributes());
+        Map<String, FamilyAttribute> familyAttributes = FamilyAttributeGroup.getAllAttributesMap(variantGroup.getFamily());
         Map<String, List<FamilyAttribute>> variantGroupAttributes = new LinkedHashMap<>();
-        List<FamilyAttribute> productAttributes = new ArrayList<>(familyAttributes);
+        List<FamilyAttribute> productAttributes = new ArrayList<>(familyAttributes.values());
 
-        for (Map.Entry<Integer, List<FamilyAttribute>> entry : variantGroup.getVariantAxis().entrySet()) {
-            variantGroupAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(), entry.getValue());
-            productAttributes.removeAll(entry.getValue());
+        for (Map.Entry<Integer, List<String>> entry : variantGroup.getVariantAxis().entrySet()) {
+            variantGroupAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(), entry.getValue().stream().map(familyAttributes::get).collect(Collectors.toList()));
+            productAttributes.removeAll(variantGroupAttributes.get("AXIS_ATTRIBUTES_L" + entry.getKey()));
         }
 
-        for (Map.Entry<Integer, List<FamilyAttribute>> entry : variantGroup.getVariantAttributes().entrySet()) {
-            variantGroupAttributes.put("VARIANT_ATTRIBUTES_L" + entry.getKey(), entry.getValue());
-            productAttributes.removeAll(entry.getValue());
+        for (Map.Entry<Integer, List<String>> entry : variantGroup.getVariantAttributes().entrySet()) {
+            variantGroupAttributes.put("VARIANT_ATTRIBUTES_L" + entry.getKey(), entry.getValue().stream().map(familyAttributes::get).collect(Collectors.toList()));
+            productAttributes.removeAll(variantGroupAttributes.get("VARIANT_ATTRIBUTES_L" + entry.getKey()));
         }
 
         variantGroupAttributes.put("PRODUCT_ATTRIBUTES", productAttributes);
@@ -202,15 +215,16 @@ public class Family extends Entity<Family> {
 
     public Map<String, List<FamilyAttribute>> getVariantGroupAxisAttributes(String variantGroupId) {
         VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
+        Map<String, FamilyAttribute> familyAttributes = FamilyAttributeGroup.getAllAttributesMap(variantGroup.getFamily());
         List<FamilyAttribute> availableAxisAttributes = new ArrayList<>();
-        FamilyAttributeGroup.getAllAttributes(getAttributes()).stream()
+        familyAttributes.values().stream()
                 .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y")/* && attribute.getScopable().equals("N")*/)
                 .forEach(availableAxisAttributes::add);
         Map<String, List<FamilyAttribute>> variantGroupAxisAttributes = new LinkedHashMap<>();
 
-        for (Map.Entry<Integer, List<FamilyAttribute>> entry : variantGroup.getVariantAxis().entrySet()) {
-            variantGroupAxisAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(), entry.getValue());
-            availableAxisAttributes.removeAll(entry.getValue());
+        for (Map.Entry<Integer, List<String>> entry : variantGroup.getVariantAxis().entrySet()) {
+            variantGroupAxisAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(),entry.getValue().stream().map(familyAttributes::get).collect(Collectors.toList()));
+            availableAxisAttributes.removeAll(variantGroupAxisAttributes.get("AXIS_ATTRIBUTES_L" + entry.getKey()));
         }
 
         variantGroupAxisAttributes.put("AVAILABLE_AXIS_ATTRIBUTES", availableAxisAttributes);
@@ -225,20 +239,18 @@ public class Family extends Entity<Family> {
         if(variantAttributeIds.length > 1) {
             variantAttributeIds[1] = variantLevel2AttributeIds;
         }
-        Map<String, FamilyAttribute> familyAttributes = new HashMap<>();
-        FamilyAttributeGroup.getAllAttributes(getAttributes()).forEach(attribute -> familyAttributes.put(attribute.getId(), attribute));
         int level = 0;
         for(String[] variantLevelAttributeIds : variantAttributeIds) {
             level ++;
             if(!variantGroup.getVariantAttributes().containsKey(level)) {
                 variantGroup.getVariantAttributes().put(level, new ArrayList<>());
             }
-            List<FamilyAttribute> variantAttributes = variantGroup.getVariantAttributes().get(level);
+            List<String> variantAttributes = variantGroup.getVariantAttributes().get(level);
             if (isNotEmpty(variantGroup)) {
                 variantAttributes.clear();
                 for (String attributeId : variantLevelAttributeIds) {
-                    if (!variantGroup.getVariantAxis().get(level).contains(familyAttributes.get(attributeId))) {
-                        variantAttributes.add(familyAttributes.get(attributeId));
+                    if (!variantGroup.getVariantAxis().get(level).contains(attributeId)) {
+                        variantAttributes.add(attributeId);
                     }
                 }
             }
@@ -260,7 +272,7 @@ public class Family extends Entity<Family> {
             axesAttributeIds[1] = axisLevel2AttributeIds;
         }
         Map<String, FamilyAttribute> familyAxisAttributes = new HashMap<>();
-        FamilyAttributeGroup.getAllAttributes(getAttributes()).stream()
+        FamilyAttributeGroup.getAllAttributes(this).stream()
                 .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y") /*&& attribute.getScopable().equals("N")*/)
                 .forEach(attribute -> familyAxisAttributes.put(attribute.getId(), attribute));
         int level = 0;
@@ -270,12 +282,10 @@ public class Family extends Entity<Family> {
                 if (!variantGroup.getVariantAxis().containsKey(level)) {
                     variantGroup.getVariantAxis().put(level, new ArrayList<>());
                 }
-                List<FamilyAttribute> axisAttributes = variantGroup.getVariantAxis().get(level);
+                List<String> axisAttributes = variantGroup.getVariantAxis().get(level);
                 if (isNotEmpty(variantGroup)) {
                     axisAttributes.clear();
-                    for (String attributeId : axisAttributeIds) {
-                        axisAttributes.add(familyAxisAttributes.get(attributeId));
-                    }
+                    axisAttributes.addAll(Arrays.asList(axisAttributeIds));
                 }
             }
         }

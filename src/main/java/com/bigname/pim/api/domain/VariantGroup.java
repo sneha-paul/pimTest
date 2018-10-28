@@ -25,9 +25,9 @@ public class VariantGroup extends ValidatableEntity {
     @Transient @JsonIgnore
     private Family family;
 
-    private Map<Integer, List<FamilyAttribute>> variantAxis = new LinkedHashMap<>();
+    private Map<Integer, List<String>> variantAxis = new LinkedHashMap<>();
 
-    private Map<Integer, List<FamilyAttribute>> variantAttributes = new LinkedHashMap<>();
+    private Map<Integer, List<String>> variantAttributes = new LinkedHashMap<>();
 
     public VariantGroup() {}
 
@@ -79,19 +79,19 @@ public class VariantGroup extends ValidatableEntity {
         this.subSequenceNum = subSequenceNum;
     }
 
-    public Map<Integer, List<FamilyAttribute>> getVariantAxis() {
+    public Map<Integer, List<String>> getVariantAxis() {
         return variantAxis;
     }
 
-    public void setVariantAxis(Map<Integer, List<FamilyAttribute>> variantAxis) {
+    public void setVariantAxis(Map<Integer, List<String>> variantAxis) {
         this.variantAxis = variantAxis;
     }
 
-    public Map<Integer, List<FamilyAttribute>> getVariantAttributes() {
+    public Map<Integer, List<String>> getVariantAttributes() {
         return variantAttributes;
     }
 
-    public void setVariantAttributes(Map<Integer, List<FamilyAttribute>> variantAttributes) {
+    public void setVariantAttributes(Map<Integer, List<String>> variantAttributes) {
         this.variantAttributes = variantAttributes;
     }
 
@@ -132,14 +132,14 @@ public class VariantGroup extends ValidatableEntity {
 
     public VariantGroup merge(VariantGroup variantGroup) {
         this.setGroup(variantGroup.getGroup());
-        switch(getGroup()) {
-            case "DETAILS":
-                this.setName(variantGroup.getName());
-                this.setActive(variantGroup.getActive());
-                break;
+        for (String group : variantGroup.getGroup()) {
+            switch(group) {
+                case "DETAILS":
+                    this.setName(variantGroup.getName());
+                    this.setActive(variantGroup.getActive());
+                    break;
+            }
         }
         return this;
     }
-
-    
 }

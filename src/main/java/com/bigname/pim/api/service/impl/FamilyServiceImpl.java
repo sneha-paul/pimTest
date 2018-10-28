@@ -104,7 +104,8 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
         Optional<Family> _family = get(familyId, findBy, false);
         _family.ifPresent(family ->
                 family.getVariantGroups().get(variantGroupId).getVariantAxis().forEach((key, value) -> value
-                        .forEach(attribute -> {
+                        .forEach(attributeId -> {
+                            FamilyAttribute attribute = family.getAllAttributesMap().get(attributeId);
                             attribute.setLevel(key);
                             attributes.add(attribute);
                         }))
@@ -121,14 +122,14 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
         List<FamilyAttribute> setAttributes = new ArrayList<>();
         Optional<Family> _family = get(familyId, findBy, false);
 
-        //All valid variant axis attributes
+        //All valid variant axis attributes -- TODO refactor using family.getAllAttributes()
         _family.ifPresent(family -> FamilyAttributeGroup.getAllAttributeGroups(family.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true)
                 .forEach(attributeGroup -> attributeGroup.getAttributes().entrySet().stream()
                         .filter(e -> e.getValue().getActive().equals("Y") && e.getValue().getSelectable().equals("Y") && e.getValue().getRequired().equals("Y"))
                         .forEach(entry -> attributes.add(entry.getValue()))));
 
         //Already set axis attributes
-        _family.ifPresent(family -> family.getVariantGroups().get(variantGroupId).getVariantAxis().forEach((key, value) -> setAttributes.addAll(value)));
+        _family.ifPresent(family -> family.getVariantGroups().get(variantGroupId).getVariantAxis().forEach((key, axisAttributeIds) -> setAttributes.addAll(axisAttributeIds.stream().map(axisAttributeId -> family.getAllAttributesMap().get(axisAttributeId)).collect(Collectors.toList()))));
 
 
 
@@ -152,20 +153,7 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
     @Override
     public Optional<Family> get(String id, FindBy findBy, boolean... activeRequired) {
         Optional<Family> family = super.get(id, findBy, activeRequired);
-        family.ifPresent(family1 -> {
-            family1.getVariantGroups().forEach((k, variantGroup) -> variantGroup.setFamily(family1));
-            Map<String, FamilyAttribute> attributeMap = FamilyAttributeGroup.getAllAttributes(family1.getAttributes()).stream().collect(Collectors.toMap(FamilyAttribute::getId, e -> e));
-            family1.getVariantGroups().forEach((k1, variantGroup) -> {
-                variantGroup.getVariantAxis().forEach((k2, axisAttributes) -> axisAttributes.forEach(axisAttribute -> {
-                    attributeMap.get(axisAttribute.getId()).setLevel(k2);
-                    attributeMap.get(axisAttribute.getId()).setType(FamilyAttribute.Type.AXIS);
-                }));
-                variantGroup.getVariantAttributes().forEach((k3, variantAttributes) -> variantAttributes.forEach(variantAttribute -> {
-                    attributeMap.get(variantAttribute.getId()).setLevel(k3);
-                    attributeMap.get(variantAttribute.getId()).setType(FamilyAttribute.Type.VARIANT);
-                }));
-            });
-        });
+        family.ifPresent(family1 -> family1.getVariantGroups().forEach((k1, variantGroup) -> variantGroup.setFamily(family1)));
         return family;
     }
 

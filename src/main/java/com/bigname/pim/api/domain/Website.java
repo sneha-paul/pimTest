@@ -83,13 +83,15 @@ public class Website extends Entity<Website> {
 
     @Override
     public Website merge(Website website) {
-        switch(website.getGroup()) {
-            case "DETAILS":
-                this.setExternalId(website.getExternalId());
-                this.setWebsiteName(website.getWebsiteName());
-                this.setUrl(website.getUrl());
-                this.setActive(website.getActive());
-                break;
+        for (String group : website.getGroup()) {
+            switch(group) {
+                case "DETAILS":
+                    this.setExternalId(website.getExternalId());
+                    this.setWebsiteName(website.getWebsiteName());
+                    this.setUrl(website.getUrl());
+                    this.setActive(website.getActive());
+                    break;
+            }
         }
         return this;
     }

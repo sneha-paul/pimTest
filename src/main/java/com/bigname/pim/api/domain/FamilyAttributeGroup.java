@@ -438,14 +438,14 @@ public class FamilyAttributeGroup extends ValidatableEntity {
         return attributeGroups;
     }
 
-    public static List<FamilyAttribute> getAllAttributes(Map<String, FamilyAttributeGroup> familyGroups) {
+    public static List<FamilyAttribute> getAllAttributes(Family family) {
         List<FamilyAttribute> attributes = new ArrayList<>();
-        getAllAttributeGroups(familyGroups, GetMode.LEAF_ONLY, true).forEach(attributeGroup -> attributeGroup.getAttributes().forEach((s, attribute) -> attributes.add(attribute)));
+        getAllAttributeGroups(family.getAttributes(), GetMode.LEAF_ONLY, true).forEach(attributeGroup -> attributeGroup.getAttributes().forEach((s, attribute) -> attributes.add(attribute.setFamily(family))));
         return attributes;
     }
 
-    public static Map<String, FamilyAttribute> getAllAttributesMap(Map<String, FamilyAttributeGroup> familyGroups) {
-        return getAllAttributes(familyGroups).stream().collect(Collectors.toMap(FamilyAttribute::getId, e -> e));
+    public static Map<String, FamilyAttribute> getAllAttributesMap(Family family) {
+        return getAllAttributes(family).stream().collect(Collectors.toMap(FamilyAttribute::getId, e -> e));
     }
 
     public static List<String> getAllAttributeIds(Map<String, FamilyAttributeGroup> familyGroups) {

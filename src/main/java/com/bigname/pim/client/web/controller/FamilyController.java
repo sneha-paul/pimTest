@@ -323,16 +323,23 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, Object>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, Object>> dataObjects = new ArrayList<>();
-        Page<FamilyAttribute> paginatedResult = familyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        Sort sort = pagination.hasSorts() ? Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName())) : null;
+        familyService.get(id, FindBy.EXTERNAL_ID, false).ifPresent(family -> {
+            List<Map<String, Object>> dataObjects = new ArrayList<>();
+            Page<FamilyAttribute> paginatedResult = familyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+            paginatedResult.getContent().forEach(familyAttribute -> {
+                familyAttribute.getScope().forEach((channelId, scope) -> {
+                    if (family.getChannelVariantGroups().containsKey(channelId)) {
+                        VariantGroup channelVariantGroup = family.getVariantGroups().get(family.getChannelVariantGroups().get(channelId));
+                        channelVariantGroup.getVariantAxis().forEach((level, axisAttributeIds) -> axisAttributeIds.stream().filter(axisAttributeId -> axisAttributeId.equals(familyAttribute.getId())).findFirst().ifPresent(axisAttributeId -> familyAttribute.getScope().put(channelId, FamilyAttribute.Scope.LOCKED)));
+                    }
+                });
+                dataObjects.add(familyAttribute.toMap());
+            });
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        });
         return result;
     }
 
@@ -391,7 +398,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                 sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            List<FamilyAttribute> familyAttribute = FamilyAttributeGroup.getAllAttributes(family.get().getAttributes()).stream().filter(e -> e.getFullId().equals(familyAttributeId)).collect(Collectors.toList());
+            List<FamilyAttribute> familyAttribute = FamilyAttributeGroup.getAllAttributes(family.get()).stream().filter(e -> e.getFullId().equals(familyAttributeId)).collect(Collectors.toList());
             if(ValidationUtil.isNotEmpty(familyAttribute)) {
                 Map<String, FamilyAttributeOption> familyAttributeOptions = familyAttribute.get(0).getOptions();
                 collectionService.findAttribute(familyAttribute.get(0).getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.get(0).getAttributeId()).ifPresent(attribute -> {
@@ -443,7 +450,9 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         Optional<Channel> channel = channelService.get(channelId, FindBy.EXTERNAL_ID, false);
         if(family.isPresent() && channel.isPresent()) {
-            family.get().setGroup("VARIANT_GROUPS");
+            Map<String, FamilyAttribute> familyAttributes = FamilyAttributeGroup.getAllAttributesMap(family.get());
+            family.get().setGroup("ATTRIBUTES", "VARIANT_GROUPS");
+            family.get().getVariantGroups().get(variantGroupId).getVariantAxis().forEach((level, axisAttributeIds) -> axisAttributeIds.forEach(axisAttributeId -> familyAttributes.get(axisAttributeId).getScope().put(channelId, FamilyAttribute.Scope.REQUIRED)));
             //TODO - implement the locking of Variant Group
             family.get().getChannelVariantGroups().put(channelId, variantGroupId);
             familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());

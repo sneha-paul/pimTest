@@ -155,17 +155,19 @@ public class Product extends Entity<Product> {
 
     @Override
     public Product merge(Product product) {
-        switch(product.getGroup()) {
-            case "DETAILS":
-                this.setExternalId(product.getExternalId());
-                this.setProductName(product.getProductName());
-                this.setActive(product.getActive());
-                this.setDiscontinued(product.getDiscontinued());
-                break;
+        for (String group : product.getGroup()) {
+            switch(group) {
+                case "DETAILS":
+                    this.setExternalId(product.getExternalId());
+                    this.setProductName(product.getProductName());
+                    this.setActive(product.getActive());
+                    this.setDiscontinued(product.getDiscontinued());
+                    break;
 
-            case "ASSETS":
-                //TODO
-                break;
+                case "ASSETS":
+                    //TODO
+                    break;
+            }
         }
         if(isNotEmpty(product.getFamilyAttributes())) {
             product.getFamilyAttributes().forEach(this.getFamilyAttributes()::put);
@@ -198,7 +200,7 @@ public class Product extends Entity<Product> {
     public void setAttributeValues(Map<String, Object> attributeValues) {
         String channelId = getChannelId();
         Family family = getProductFamily();
-        Map<String, FamilyAttribute> familyAttributesMap = FamilyAttributeGroup.getAllAttributesMap(family.getAttributes());
+        Map<String, FamilyAttribute> familyAttributesMap = FamilyAttributeGroup.getAllAttributesMap(family);
         if(!getScopedFamilyAttributes().containsKey(channelId)) {
             setScopedFamilyAttributes(channelId, new HashMap<>());
         }

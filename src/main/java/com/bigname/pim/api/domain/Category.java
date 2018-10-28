@@ -147,20 +147,22 @@ public class Category extends Entity<Category> {
 
     @Override
     public Category merge(Category category) {
-        switch(category.getGroup()) {
-            case "DETAILS":
-                this.setExternalId(category.getExternalId());
-                this.setCategoryName(category.getCategoryName());
-                this.setDescription(category.getDescription());
-                this.setLongDescription(category.getLongDescription());
-                this.setActive(category.getActive());
-                this.setDiscontinued(category.getDiscontinued());
-                break;
-            case "SEO":
-                this.setMetaTitle(category.getMetaTitle());
-                this.setMetaDescription(category.getMetaDescription());
-                this.setMetaKeywords(category.getMetaKeywords());
-                break;
+        for (String group : category.getGroup()) {
+            switch(group) {
+                case "DETAILS":
+                    this.setExternalId(category.getExternalId());
+                    this.setCategoryName(category.getCategoryName());
+                    this.setDescription(category.getDescription());
+                    this.setLongDescription(category.getLongDescription());
+                    this.setActive(category.getActive());
+                    this.setDiscontinued(category.getDiscontinued());
+                    break;
+                case "SEO":
+                    this.setMetaTitle(category.getMetaTitle());
+                    this.setMetaDescription(category.getMetaDescription());
+                    this.setMetaKeywords(category.getMetaKeywords());
+                    break;
+            }
         }
 
         return this;

@@ -48,6 +48,9 @@ public class FamilyAttribute extends ValidatableEntity {
     @JsonIgnore
     private FamilyAttributeGroup attributeGroup;
 
+    @Transient @JsonIgnore
+    private Family family;
+
     private Map<String, FamilyAttributeOption> options = new LinkedHashMap<>();
 
     public FamilyAttribute() {}
@@ -266,6 +269,15 @@ public class FamilyAttribute extends ValidatableEntity {
         this.scope = scope;
     }
 
+    public Family getFamily() {
+        return family;
+    }
+
+    public FamilyAttribute setFamily(Family family) {
+        this.family = family;
+        return this;
+    }
+
     public Attribute getAttribute() {
         return attribute;
     }
@@ -380,6 +392,7 @@ public class FamilyAttribute extends ValidatableEntity {
         REQUIRED("OPTIONAL"),
         OPTIONAL("NOT_APPLICABLE"),
         NOT_APPLICABLE("REQUIRED"),
+        LOCKED("LOCKED"),
         UNKNOWN("NOT_APPLICABLE");
 
         private String next = "NOT_APPLICABLE";

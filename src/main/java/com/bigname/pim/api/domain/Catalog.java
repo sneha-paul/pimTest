@@ -86,14 +86,16 @@ public class Catalog extends Entity<Catalog> {
 
     @Override
     public Catalog merge(Catalog catalog) {
-        switch(catalog.getGroup()) {
-            case "DETAILS" :
-                this.setExternalId(catalog.getExternalId());
-                this.setCatalogName(catalog.getCatalogName());
-                this.setDescription(catalog.getDescription());
-                this.setActive(catalog.getActive());
-                this.setDiscontinued(catalog.getDiscontinued());
-                break;
+        for (String group : catalog.getGroup()) {
+            switch(group) {
+                case "DETAILS" :
+                    this.setExternalId(catalog.getExternalId());
+                    this.setCatalogName(catalog.getCatalogName());
+                    this.setDescription(catalog.getDescription());
+                    this.setActive(catalog.getActive());
+                    this.setDiscontinued(catalog.getDiscontinued());
+                    break;
+            }
         }
 
         return this;

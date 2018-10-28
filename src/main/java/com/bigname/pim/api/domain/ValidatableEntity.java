@@ -5,7 +5,6 @@ import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.javatuples.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.ConstraintViolation;
@@ -24,13 +23,13 @@ abstract public class ValidatableEntity implements Serializable {
 
     @Transient
     @JsonIgnore
-    private String group = "";
+    private String[] group = new String[0];
 
-    public String getGroup() {
+    public String[] getGroup() {
         return group;
     }
 
-    public void setGroup(String group) {
+    public void setGroup(String... group) {
         this.group = group;
     }
 

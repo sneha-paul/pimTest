@@ -78,6 +78,8 @@
                                                 value['channel_' + channelId] = '<span class="js-scope-selector" title="Optional" data-channel="' + channelId + '" data-scope="OPTIONAL" data-id="' + value.id + '"><i class="fa fa-square-o"></i></span>';
                                             } else if (value.scope[channelId] === 'REQUIRED') {
                                                 value['channel_' + channelId] = '<span class="js-scope-selector text-success" title="Required" data-channel="' + channelId + '" data-scope="REQUIRED" data-id="' + value.id + '"><i class="fa fa-check-square-o"></i></span>';
+                                            } else if (value.scope[channelId] === 'LOCKED') {
+                                                value['channel_' + channelId] = '<span class="text-primary" title="Variant Axis"><i class="icon-target"></i></span>';
                                             } else {
                                                 value['channel_' + channelId] = '<span class="js-scope-selector text-danger" title="Not Applicable" data-channel="' + channelId + '" data-scope="NOT_APPLICABLE" data-id="' + value.id + '"><i class="icon-ban" style="font-weight: bold"></i></span>';
                                             }
@@ -190,6 +192,7 @@
                     errorMessage: ['Error Setting the Channel Variant Group', 'An error occurred while setting the channel variant group'],
                     successCallback: function(data) {
                         $.refreshDataTable(typeof options.names === 'undefined' ? options.name : options.names[0]);
+                        $.refreshDataTable('familyAttributesScope');
                     }
                 });
             });
