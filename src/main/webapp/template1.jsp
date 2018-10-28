@@ -126,14 +126,18 @@
             cursor: not-allowed !important;
         }
 
-        .js-scope-selector, .js-scopable {
+        .js-scope-selector, .js-scopable, .js-channel-selector {
             cursor: pointer;
         }
 
-        /*.js-locked {
-            background: url('/assets/img/lock-icon.png') no-repeat right ;
-            padding-left: 5px;
-        }*/
+        .js-locked {
+            float: right;
+            margin-right: 12px;
+            margin-top: -24px;
+            position: relative;
+            z-index: 2;
+            color: grey;
+        }
     </style>
 
 </head>
@@ -197,6 +201,8 @@
 <%-- Javascript --%>
 
 <%--<script src="/assets/bundles/libscripts.bundle.js"></script>--%>
+<script src="/assets/js/pages/ui/global.js"></script>
+
 <script src="/assets/bundles/vendorscripts.bundle.js"></script>
 
 <%--<script src="/assets/bundles/datatablescripts.bundle.js"></script>--%>
@@ -218,7 +224,7 @@
 <script src="/assets/js/pages/ui/dialogs.js"></script>
 <script src="/assets/vendor/table-dragger/table-dragger.min.js"></script>
 <script src="/assets/vendor/emodal/eModal.js"></script>
-<script src="/assets/js/pages/ui/website/website.js"></script>
+<%--<script src="/assets/js/pages/ui/website/website.js"></script>--%>
 <%-- PAGE LEVEL JS --%>
 <c:forEach var="customJS" items="${pageBottomScripts}">
     <script src="<c:out value='${customJS}'/>"></script>

@@ -26,6 +26,8 @@ public class Family extends Entity<Family> {
 
     private Map<String, VariantGroup> variantGroups = new LinkedHashMap<>();
 
+    private Map<String, String> channelVariantGroups = new HashMap<>();
+
     public Family() {
         super();
     }
@@ -85,6 +87,21 @@ public class Family extends Entity<Family> {
         this.variantGroups = variantGroups;
     }
 
+    public Map<String, String> getChannelVariantGroups() {
+        return channelVariantGroups;
+    }
+
+    public void setChannelVariantGroups(Map<String, String> channelVariantGroups) {
+        this.channelVariantGroups = channelVariantGroups;
+    }
+
+    //TODO - enable this after implementing the variant group lock functionality
+    /*public void setChannelVariantGroup(String channelId, String variantGroupId) {
+        if(!getChannelVariantGroups().containsKey(channelId)) {
+            this.channelVariantGroups.put(channelId, variantGroupId);
+        }
+    }*/
+
     @Override
     void setExternalId() {
         this.familyId = getExternalId();
@@ -103,6 +120,7 @@ public class Family extends Entity<Family> {
                 break;
             case "VARIANT_GROUPS":
                 this.setVariantGroups(family.getVariantGroups());
+                this.setChannelVariantGroups(family.getChannelVariantGroups());
                 break;
         }
         return this;

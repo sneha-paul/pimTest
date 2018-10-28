@@ -81,7 +81,7 @@ public class ProductController extends BaseController<Product, ProductService>{
     public ModelAndView details(@PathVariable(value = "id", required = false) String id, @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId, @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
-        model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName)));
+        model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - replace with a separate service method
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("product", new Product(channelId));

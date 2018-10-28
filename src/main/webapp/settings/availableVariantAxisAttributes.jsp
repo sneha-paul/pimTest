@@ -1,3 +1,5 @@
+Deprecated
+<%--
 <div class="popup-content" style="padding:20px">
     <div class="body">
         <div class="table-responsive">
@@ -10,4 +12,4 @@
     </div>
 </div>
 <img src="/assets/img/tiny.png" onload="$.setPageAttributes({'familyId': '${familyId}', 'variantGroupId': '${variantGroupId}'});$.initAHAH(this)"/>
-<script src="/assets/js/pages/ui/settings/availableAxisAttributes.js"></script>
+<script src="/assets/js/pages/ui/settings/availableAxisAttributes.js"></script>--%>

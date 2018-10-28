@@ -34,11 +34,11 @@ $(function(){
             url: url,
             data: data,
             successMessage: ['Updated Variant Group Axis Attributes', 'Successfully updated variant group axis attributes'],
-            errorMessage: ['Error Updating Variant Group Axis Attributes', 'An error occurred while updating variant group axis attributes'],
-            successCallback: function(data) {
+            errorMessage: ['Error Updating Variant Group Axis Attributes', 'An error occurred while updating variant group axis attributes']
+            /*successCallback: function(data) {
                 window.location.href = $.getURL('/pim/families/{familyId}/variantGroups/{variantGroupId}#axisAttributes');
                 window.location.reload();
-            }
+            }*/
         });
     }
 

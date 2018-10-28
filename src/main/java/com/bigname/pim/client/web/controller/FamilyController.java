@@ -14,6 +14,7 @@ import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
@@ -128,12 +129,14 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
     @RequestMapping(value = {"/{familyId}/variantGroups/create", "/{familyId}/variantGroups/{variantGroupId}"})
     public ModelAndView variantGroupDetails(@PathVariable(value = "familyId") String familyId,
-                                            @PathVariable(value = "variantGroupId", required = false) String variantGroupId) {
+                                            @PathVariable(value = "variantGroupId", required = false) String variantGroupId,
+                                            @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
         Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
         model.put("active", "FAMILIES");
         if(variantGroupId == null) {
             model.put("mode", "CREATE");
+            model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - replace with a separate service method
         } else {
             if(family.isPresent()) {
                 model.put("mode", "DETAILS");
@@ -148,7 +151,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                         family.get().getVariantGroups().get(variantGroupId).getName(), ""));
             }
         }
-        return new ModelAndView("settings/variantGroup", model);
+        return new ModelAndView("settings/variantGroup" + (reload ? "_body" : ""), model);
     }
 
     /*@RequestMapping("/{familyId}/variantGroups/{variantGroupId}/axisAttributes")
@@ -197,7 +200,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return result;
     }*/
 
-    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/axisAttributes/{attributeId}", method = RequestMethod.POST)
+    /*@RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/axisAttributes/{attributeId}", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> addAxisAttribute(@PathVariable(value = "familyId") String familyId,
                                                 @PathVariable(value = "variantGroupId") String variantGroupId,
@@ -221,7 +224,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         }
 
         return model;
-    }
+    }*/
 
     @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/variantAttributes", method = RequestMethod.POST)
     @ResponseBody
@@ -253,6 +256,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
             family.get().setGroup("VARIANT_GROUPS");
             family.get().updateVariantGroupAxisAttributes(variantGroupId, request.getParameterValues("axisLevel1AttributeIds[]"), request.getParameterValues("axisLevel2AttributeIds[]"));
             familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+            model.put("refresh", true);
             model.put("success", true);
         }
 
@@ -271,6 +275,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                 family.get().setGroup("VARIANT_GROUPS");
                 family.get().getVariantGroups().get(variantGroupId).merge(variantGroup);
                 familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+                model.put("refresh", true);
                 model.put("success", true);
             }
         }
@@ -429,6 +434,26 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return model;
     }
 
+    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/channel/{channelId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> saveVariantGroupScope(@PathVariable(value = "familyId") String familyId,
+                                                  @PathVariable(value = "variantGroupId") String variantGroupId,
+                                                  @PathVariable(value = "channelId") String channelId) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        Optional<Channel> channel = channelService.get(channelId, FindBy.EXTERNAL_ID, false);
+        if(family.isPresent() && channel.isPresent()) {
+            family.get().setGroup("VARIANT_GROUPS");
+            //TODO - implement the locking of Variant Group
+            family.get().getChannelVariantGroups().put(channelId, variantGroupId);
+            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
+            model.put("refresh", true);
+            model.put("success", true);
+        }
+
+        return model;
+    }
+
     @RequestMapping(value = "/{familyId}/attributes/{familyAttributeId}/scopable/{scopable}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> saveAttributeAsScopable(@PathVariable(value = "familyId") String familyId,
@@ -465,19 +490,19 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return model;
     }
 
-    @RequestMapping("/{id}/variantGroups/list")
+    @RequestMapping(value = {"/{id}/variantGroups/list", "/{id}/variantGroups"})
     @ResponseBody
-    public Result<Map<String, String>> getVariantGroups(@PathVariable(value = "id") String id, HttpServletRequest request) {
+    public Result<Map<String, Object>> getVariantGroups(@PathVariable(value = "id") String id, HttpServletRequest request) {
 
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
+        Result<Map<String, Object>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
         Sort sort = null;
         if(pagination.hasSorts()) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
+        List<Map<String, Object>> dataObjects = new ArrayList<>();
         Page<VariantGroup> paginatedResult = familyService.getVariantGroups(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);

@@ -1,5 +1,8 @@
 package com.bigname.pim.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Transient;
+
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
 
@@ -18,6 +21,10 @@ public class VariantGroup extends ValidatableEntity {
     private long sequenceNum;
     private int subSequenceNum;
     private String familyId;
+
+    @Transient @JsonIgnore
+    private Family family;
+
     private Map<Integer, List<FamilyAttribute>> variantAxis = new LinkedHashMap<>();
 
     private Map<Integer, List<FamilyAttribute>> variantAttributes = new LinkedHashMap<>();
@@ -96,6 +103,14 @@ public class VariantGroup extends ValidatableEntity {
         this.familyId = familyId;
     }
 
+    public Family getFamily() {
+        return family;
+    }
+
+    public void setFamily(Family family) {
+        this.family = family;
+    }
+
     @Override
     public void orchestrate() {
         setActive(getActive());
@@ -104,11 +119,12 @@ public class VariantGroup extends ValidatableEntity {
         }
     }
 
-    public Map<String, String> toMap() {
-        Map<String, String> map = new LinkedHashMap<>();
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("externalId", getId());
         map.put("name", getName());
         map.put("active", getActive());
+        map.put("channelVariantGroup", getFamily().getChannelVariantGroups());
         map.put("variantAxis", getVariantAxis().containsKey(1) ? "TODO1, TODO2" : "");
 //        map.put("variantAxis2", getVariantAxis().containsKey(2) ? "TODO1, TODO2" : "");
         return map;

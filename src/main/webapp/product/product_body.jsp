@@ -70,14 +70,15 @@
                                                                             <input type="text" id="productId" name="productId" class="form-control" value="${product.productId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label for="productFamilyId">ProductFamily</label>
-                                                                            <select class="form-control" id="productFamilyId" name="productFamilyId" disabled="disabled">
+                                                                            <label for="productFamilyId" id="productFamilyId">ProductFamily</label>
+                                                                            <input id="productFamilyId" class="form-control" type="text" disabled="disabled" value="${product.productFamily.familyName}"/>
+                                                                            <%--<select class="form-control" id="productFamilyId" name="productFamilyId" disabled="disabled">
                                                                                 <option value="">Select One</option>
 
                                                                                 <c:forEach items="${productFamilies}" var="productFamily">
                                                                                     <option value="${productFamily.id}">${productFamily.familyName}</option>
                                                                                 </c:forEach>
-                                                                            </select>
+                                                                            </select>--%>
                                                                         </div>
                                                                         <script>
                                                                             $('select[name="productFamilyId"]').val('${product.productFamilyId}');
