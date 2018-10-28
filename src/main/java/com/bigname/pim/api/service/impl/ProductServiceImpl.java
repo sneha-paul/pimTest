@@ -123,7 +123,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
     }
 
     private void setProductFamily(Product product, FindBy findBy) {
-        productFamilyService.get(product.getProductFamilyId(), findBy).ifPresent(product::setProductFamily);
+        productFamilyService.get(product.getProductFamilyId(), findBy).ifPresent(productFamily -> product.setProductFamily(productFamily));
     }
 
 

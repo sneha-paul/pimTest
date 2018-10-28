@@ -320,8 +320,28 @@ public class FamilyAttribute extends ValidatableEntity {
     }
 
     public boolean isAvailable(String channelId) {
+        String variantGroupId = getFamily().getChannelVariantGroups().get(channelId);
+        if(isNotEmpty(variantGroupId)) {
+            boolean[] available = {true};
+            VariantGroup variantGroup = getFamily().getVariantGroups().get(variantGroupId);
+            variantGroup.getVariantAxis().forEach((level, attributeIds) -> {
+                if (attributeIds.contains(getId())) {
+                    available[0] = false;
+                }
+            });
+            if(available[0]) {
+                variantGroup.getVariantAttributes().forEach((level, attributeIds) -> {
+                    if(attributeIds.contains(getId())) {
+                        available[0] = false;
+                    }
+                });
+            }
+            return available[0];
+        } else {
+            return Scope.NOT_APPLICABLE != getScope().get(channelId);
+        }
 //        return !booleanValue(getScopable()) || Scope.NOT_APPLICABLE != getScope().get(channelId);
-        return Scope.NOT_APPLICABLE != getScope().get(channelId);
+
     }
 
     public boolean isRequired(String channelId) {

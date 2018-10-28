@@ -70,7 +70,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         productService.get(id, FindBy.EXTERNAL_ID, false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
         product.setProductId(id);
         product.setAttributeValues(getAttributesMap(request));
-        if(isValid(product, model, product.getGroup().equals("DETAILS") ? Product.DetailsGroup.class : null)) {
+        if(isValid(product, model, product.getGroup().length == 1 && product.getGroup()[0].equals("DETAILS") ? Product.DetailsGroup.class : null)) {
 //            productService.update(id, FindBy.EXTERNAL_ID, product);
             model.put("success", true);
         }
@@ -85,7 +85,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("product", new Product(channelId));
-            model.put("productFamilyVariantGroups", productFamilyService.getFamilyVariantGroups());
+            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))).getContent()); //TODO - JIRA BNPIM-6
         } else {
             Optional<Product> _product = productService.get(id, FindBy.EXTERNAL_ID, false);
             if(_product.isPresent()) {

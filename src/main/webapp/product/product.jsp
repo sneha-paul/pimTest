@@ -1,3 +1,4 @@
+<%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.api.domain.Family>"--%>
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:choose>
@@ -25,18 +26,11 @@
                             </div>
                             <div class="form-group">
                                 <label for="productFamilyId">Product Family</label>
-                                <select class="form-control js-linked" data-link="variantGroupId" id="productFamilyId" name="productFamilyId">
+                                <select class="form-control" id="productFamilyId" name="productFamilyId">
                                     <option value="">Select One</option>
-                                    <jsp:useBean id="productFamilyVariantGroups" scope="request" type="java.util.List<org.javatuples.Triplet<java.lang.String, java.lang.String, java.lang.String>>"/>
-                                    <c:forEach items="${productFamilyVariantGroups}" var="productFamily">
-                                        <option value="${productFamily.value0}" data-values="${productFamily.value2}">${productFamily.value1}</option>
+                                    <c:forEach items="${productFamilies}" var="productFamily">
+                                        <option value="${productFamily.familyId}">${productFamily.familyName}</option>
                                     </c:forEach>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="variantGroupId">Variant Group</label>
-                                <select class="form-control js-linked" id="variantGroupId" name="variantGroupId">
-                                    <option value="">Select One</option>
                                 </select>
                             </div>
                         </div>

@@ -93,8 +93,8 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     public <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
         e.orchestrate();
         Set<ConstraintViolation<E>> violations = ConversionUtil.toList(groups).size() > 0 ? validator.validate(e, groups) : validator.validate(e);
-        if(e.getClass().getSuperclass().equals(Entity.class)) {
-            return validate(e.getValidationErrors(violations), (T) e, "DETAILS");
+        if(e.getClass().getSuperclass().equals(Entity.class) && e.getGroup().length != 0 && !"CREATE".equals(e.getGroup()[0])) {
+            return validate(e.getValidationErrors(violations), (T) e, e.getGroup().length != 0 ? e.getGroup()[0] : "DETAILS");
         }
         return e.getValidationErrors(violations);
     }

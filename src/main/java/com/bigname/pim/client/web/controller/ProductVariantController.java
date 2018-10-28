@@ -89,7 +89,7 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
                 model.put("mode", "CREATE");
                 model.put("productVariant", productVariant);
                 model.put("productFamily", family);
-                model.put("axisAttributes", family.getVariantGroups().get(product.getVariantGroupId()).getVariantAxis().get(1));
+//                model.put("axisAttributes", family.getVariantGroups().get(product.getVariantGroupId()).getVariantAxis().get(1));
             } else {
                 Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
                 if(_productVariant.isPresent()) {

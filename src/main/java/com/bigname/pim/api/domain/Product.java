@@ -34,13 +34,8 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})
     private String productFamilyId;
 
-    private String variantGroupId;
-
     @Transient @JsonIgnore
     private String channelId = PIMConstants.DEFAULT_CHANNEL_ID;
-
-//    @Transient
-//    private Channel channel;
 
     @Transient
     private Family productFamily;
@@ -83,14 +78,6 @@ public class Product extends Entity<Product> {
         this.productFamilyId = productFamilyId;
     }
 
-    public String getVariantGroupId() {
-        return variantGroupId;
-    }
-
-    public void setVariantGroupId(String variantGroupId) {
-        this.variantGroupId = variantGroupId;
-    }
-
     public String getChannelId() {
         return channelId;
     }
@@ -98,14 +85,6 @@ public class Product extends Entity<Product> {
     public void setChannelId(String channelId) {
         this.channelId = channelId;
     }
-
-    /*public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }*/
 
     public Family getProductFamily() {
         return productFamily;

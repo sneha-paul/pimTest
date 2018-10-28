@@ -70,19 +70,9 @@
                                                                             <input type="text" id="productId" name="productId" class="form-control" value="${product.productId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label for="productFamilyId" id="productFamilyId">ProductFamily</label>
+                                                                            <label for="productFamilyId">ProductFamily</label>
                                                                             <input id="productFamilyId" class="form-control" type="text" disabled="disabled" value="${product.productFamily.familyName}"/>
-                                                                            <%--<select class="form-control" id="productFamilyId" name="productFamilyId" disabled="disabled">
-                                                                                <option value="">Select One</option>
-
-                                                                                <c:forEach items="${productFamilies}" var="productFamily">
-                                                                                    <option value="${productFamily.id}">${productFamily.familyName}</option>
-                                                                                </c:forEach>
-                                                                            </select>--%>
                                                                         </div>
-                                                                        <script>
-                                                                            $('select[name="productFamilyId"]').val('${product.productFamilyId}');
-                                                                        </script>
                                                                         <c:if test="${not empty detailsMasterGroup}">
                                                                             <c:set var="defaultDetailsAttributeGroup" value="${detailsMasterGroup.childGroups.get('DEFAULT_GROUP').childGroups.get('DEFAULT_GROUP')}"/>
                                                                             <c:if test="${not empty defaultDetailsAttributeGroup}">
@@ -613,6 +603,7 @@
                                                     </c:if>
                                                 </c:forEach>
                                                 <div class="form-button-group pull-right">
+                                                    <input type="hidden" name="group" value="FEATURES"/>
                                                     <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                                                     <a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>
                                                 </div>

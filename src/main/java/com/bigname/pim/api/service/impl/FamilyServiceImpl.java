@@ -153,7 +153,10 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> imp
     @Override
     public Optional<Family> get(String id, FindBy findBy, boolean... activeRequired) {
         Optional<Family> family = super.get(id, findBy, activeRequired);
-        family.ifPresent(family1 -> family1.getVariantGroups().forEach((k1, variantGroup) -> variantGroup.setFamily(family1)));
+        family.ifPresent(family1 -> {
+            family1.getAllAttributes();
+            family1.getVariantGroups().forEach((k1, variantGroup) -> variantGroup.setFamily(family1));
+        });
         return family;
     }
 
