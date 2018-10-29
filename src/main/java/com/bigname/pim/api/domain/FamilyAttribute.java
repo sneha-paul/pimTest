@@ -42,9 +42,6 @@ public class FamilyAttribute extends ValidatableEntity {
     private int level;
 
     @Transient
-    private Type type = Type.COMMON;
-
-    @Transient
     @JsonIgnore
     private FamilyAttributeGroup attributeGroup;
 
@@ -253,14 +250,6 @@ public class FamilyAttribute extends ValidatableEntity {
         this.level = level;
     }
 
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
     public Map<String, Scope> getScope() {
         return scope;
     }
@@ -302,9 +291,9 @@ public class FamilyAttribute extends ValidatableEntity {
         this.options = options;
     }
 
-    public Pair<String, Object> validate(Object value, String... channelId) {
-//        boolean required = booleanValue(getScopable()) ? isRequired(channelId[0]) : booleanValue(getRequired());
-        boolean required = isRequired(channelId[0]);
+    public Pair<String, Object> validate(Object value, String channelId, int level) {
+        Type type = getType(channelId);
+        boolean required = level == 0 ? type == Type.COMMON && isRequired(channelId) : type == Type.VARIANT && isRequired(channelId);
         if(getUiType().isMultiSelect()) {
             String[] attributeValue = value instanceof String ? new String[] {(String) value} : (String[]) value;
             if (required && (attributeValue.length == 0 || isEmpty(attributeValue[0]))) {
@@ -319,33 +308,65 @@ public class FamilyAttribute extends ValidatableEntity {
         return null;
     }
 
-    public boolean isAvailable(String channelId) {
+    /*public boolean isAvailable(String channelId, int attributeLevel) {
         String variantGroupId = getFamily().getChannelVariantGroups().get(channelId);
+
         if(isNotEmpty(variantGroupId)) {
             boolean[] available = {true};
             VariantGroup variantGroup = getFamily().getVariantGroups().get(variantGroupId);
-            variantGroup.getVariantAxis().forEach((level, attributeIds) -> {
+            variantGroup.getVariantAxis().forEach((variantLevel, attributeIds) -> {
                 if (attributeIds.contains(getId())) {
                     available[0] = false;
                 }
             });
             if(available[0]) {
-                variantGroup.getVariantAttributes().forEach((level, attributeIds) -> {
+                variantGroup.getVariantAttributes().forEach((variantLevel, attributeIds) -> {
                     if(attributeIds.contains(getId())) {
                         available[0] = false;
                     }
                 });
             }
+            if(available[0]) {
+                available[0] = Scope.NOT_APPLICABLE != getScope().get(channelId);
+            }
             return available[0];
         } else {
             return Scope.NOT_APPLICABLE != getScope().get(channelId);
         }
-//        return !booleanValue(getScopable()) || Scope.NOT_APPLICABLE != getScope().get(channelId);
 
+    }*/
+
+    public Type getType(String channelId) {
+        Type[] type = {Type.NOT_APPLICABLE};
+        if(Scope.NOT_APPLICABLE == getScope().get(channelId)) {
+            return type[0];
+        }
+        String variantGroupId = getFamily().getChannelVariantGroups().get(channelId);
+        if(isNotEmpty(variantGroupId)) {
+            VariantGroup variantGroup = getFamily().getVariantGroups().get(variantGroupId);
+            variantGroup.getVariantAxis().forEach((variantLevel, attributeIds) -> {
+                if (attributeIds.contains(getId())) {
+                    type[0] = Type.AXIS;
+                }
+            });
+            if(type[0] == Type.NOT_APPLICABLE) {
+                variantGroup.getVariantAttributes().forEach((variantLevel, attributeIds) -> {
+                    if(attributeIds.contains(getId())) {
+                        type[0] = Type.VARIANT;
+                    }
+                });
+            }
+        }
+        if(type[0] == Type.NOT_APPLICABLE) {
+            type[0] = Type.COMMON;
+        }
+        return type[0];
     }
 
+    /*public boolean isAvailable(Type type, int level) {
+
+    }*/
     public boolean isRequired(String channelId) {
-//        return (!booleanValue(getScopable()) && booleanValue(getRequired())) || ((booleanValue(getScopable()) && Scope.REQUIRED != getScope().get(channelId)));
         return Scope.REQUIRED == getScope().get(channelId);
     }
 
@@ -406,7 +427,7 @@ public class FamilyAttribute extends ValidatableEntity {
         return id.hashCode();
     }
 
-    public enum Type {COMMON, AXIS, VARIANT}
+    public enum Type {COMMON, AXIS, VARIANT, NOT_APPLICABLE}
 
     public enum Scope {
         REQUIRED("OPTIONAL"),

@@ -40,8 +40,6 @@ public class Product extends Entity<Product> {
     @Transient
     private Family productFamily;
 
-    private Map<String, Object> familyAttributes = new HashMap<>();
-
     private Map<String, Map<String, Object>> scopedFamilyAttributes = new HashMap<>();
 
     public Product() {
@@ -95,14 +93,6 @@ public class Product extends Entity<Product> {
         setProductFamilyId(productFamily.getId());
     }
 
-    public Map<String, Object> getFamilyAttributes() {
-        return familyAttributes;
-    }
-
-    public void setFamilyAttributes(Map<String, Object> familyAttributes) {
-        this.familyAttributes = CollectionsUtil.filterMap(familyAttributes, BeanUtil.getAllFieldNames(this.getClass()));
-    }
-
     public Map<String, Map<String, Object>> getScopedFamilyAttributes() {
         return scopedFamilyAttributes;
     }
@@ -148,8 +138,12 @@ public class Product extends Entity<Product> {
                     break;
             }
         }
-        if(isNotEmpty(product.getFamilyAttributes())) {
-            product.getFamilyAttributes().forEach(this.getFamilyAttributes()::put);
+        if(isNotEmpty(product.getChannelFamilyAttributes())) {
+            if(!this.getScopedFamilyAttributes().containsKey(product.getChannelId())) {
+                this.getScopedFamilyAttributes().put(product.getChannelId(), new HashMap<>());
+            }
+            Map<String, Object> channelFamilyAttributes = this.getChannelFamilyAttributes();
+            product.getChannelFamilyAttributes().forEach(channelFamilyAttributes::put);
         }
         return this;
     }

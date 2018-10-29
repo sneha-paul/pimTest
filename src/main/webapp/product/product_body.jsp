@@ -78,10 +78,11 @@
                                                                             <c:if test="${not empty defaultDetailsAttributeGroup}">
                                                                                 <c:forEach items="${defaultDetailsAttributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
+                                                                                    <c:set var="attributeType" value="${attribute.getType(product.channelId)}"/>
+                                                                                    <c:if test="${attributeType eq 'COMMON'}">
                                                                                         <div class="form-group">
                                                                                         <c:if test="${attribute.uiType ne 'YES_NO'}">
-                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attributeType eq 'COMMON' and attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                         </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
@@ -89,19 +90,19 @@
                                                                                                     <option value="">Select One</option>
                                                                                                     <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                         <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                        <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                        <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.channelFamilyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
                                                                                                     </c:forEach>
                                                                                                 </select>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.familyAttributes[attribute.id]}</textarea>
+                                                                                                <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                 <br/>
                                                                                                 <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                     <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                     <label class="fancy-checkbox">
-                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.familyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.channelFamilyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                         <span>${attributeOption.value}</span>
                                                                                                     </label>
                                                                                                     <c:if test="${not s1.end}">
@@ -114,7 +115,7 @@
                                                                                                 <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                     <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                     <label class="fancy-radio">
-                                                                                                        <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.familyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                        <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.channelFamilyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                         <span><i></i>${attributeOption.value}</span>
                                                                                                     </label>
                                                                                                     <c:if test="${not s1.end}">
@@ -125,20 +126,20 @@
                                                                                             <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                 <br/>
                                                                                                 <label class="fancy-checkbox">
-                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.channelFamilyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
                                                                                                     <span>${attribute.label}</span>
                                                                                                 </label>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                 <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control datepicker">
+                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control datepicker">
                                                                                                     <div class="input-group-append">
                                                                                                         <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </c:when>
                                                                                             <c:otherwise>
-                                                                                                <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                                                <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control"/>
                                                                                             </c:otherwise>
                                                                                         </c:choose>
                                                                                     </div>
@@ -174,10 +175,11 @@
                                                                             <div class="col-md-6 col-sm-12">
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
+                                                                                    <c:set var="attributeType" value="${attribute.getType(product.channelId)}"/>
+                                                                                    <c:if test="${attributeType eq 'COMMON'}">
                                                                                         <div class="form-group">
                                                                                         <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
-                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
+                                                                                            <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attributeType eq 'COMMON' and attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                         </c:if>
                                                                                         <c:choose>
                                                                                             <c:when test="${attribute.uiType eq 'DROPDOWN'}">
@@ -185,19 +187,19 @@
                                                                                                     <option value="">Select One</option>
                                                                                                     <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                         <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                        <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                        <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.channelFamilyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
                                                                                                     </c:forEach>
                                                                                                 </select>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.familyAttributes[attribute.id]}</textarea>
+                                                                                                <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                 <br/>
                                                                                                 <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                     <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                     <label class="fancy-checkbox">
-                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.familyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.channelFamilyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                         <span>${attributeOption.value}</span>
                                                                                                     </label>
                                                                                                     <c:if test="${not s1.end}">
@@ -210,7 +212,7 @@
                                                                                                 <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                     <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                     <label class="fancy-radio">
-                                                                                                        <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.familyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                        <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.channelFamilyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                         <span><i></i>${attributeOption.value}</span>
                                                                                                     </label>
                                                                                                     <c:if test="${not s1.end}">
@@ -221,20 +223,20 @@
                                                                                             <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                 <br/>
                                                                                                 <label class="fancy-checkbox">
-                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.channelFamilyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
                                                                                                     <span>${attribute.label}</span>
                                                                                                 </label>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                 <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control datepicker">
+                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control datepicker">
                                                                                                     <div class="input-group-append">
                                                                                                         <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </c:when>
                                                                                             <c:otherwise>
-                                                                                                <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                                                <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control"/>
                                                                                             </c:otherwise>
                                                                                         </c:choose>
                                                                                     </div>
@@ -407,10 +409,11 @@
                                                                             <div class="col-md-6 col-sm-12">
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON' and attribute.isAvailable(product.channelId)}">
+                                                                                    <c:set var="attributeType" value="${attribute.getType(product.channelId)}"/>
+                                                                                    <c:if test="${attributeType eq 'COMMON'}">
                                                                                         <div class="form-group">
                                                                                             <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
-                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
+                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attributeType eq 'COMMON' and attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                             </c:if>
                                                                                             <c:choose>
                                                                                                 <c:when test="${attribute.uiType eq 'DROPDOWN'}">
@@ -418,19 +421,19 @@
                                                                                                         <option value="">Select One</option>
                                                                                                         <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                             <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.channelFamilyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
                                                                                                         </c:forEach>
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.familyAttributes[attribute.id]}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <c:set var="checked" value="${false}"/>
-                                                                                                        <c:forEach items="${product.familyAttributes[attribute.id]}" var="value">
+                                                                                                        <c:forEach items="${product.channelFamilyAttributes[attribute.id]}" var="value">
                                                                                                             <c:if test="${value eq attributeOption.id}">
                                                                                                                 <c:set var="checked" value="${true}"/>
                                                                                                             </c:if>
@@ -449,7 +452,7 @@
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <label class="fancy-radio">
-                                                                                                            <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.familyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                            <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.channelFamilyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span><i></i>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -460,20 +463,20 @@
                                                                                                 <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                     <br/>
                                                                                                     <label class="fancy-checkbox">
-                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.channelFamilyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
                                                                                                         <span>${attribute.label}</span>
                                                                                                     </label>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                     <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control datepicker">
+                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control datepicker">
                                                                                                         <div class="input-group-append">
                                                                                                             <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </c:when>
                                                                                                 <c:otherwise>
-                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control"/>
                                                                                                 </c:otherwise>
                                                                                             </c:choose>
                                                                                         </div>
@@ -527,10 +530,11 @@
                                                                             <div class="col-md-6 col-sm-12">
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
-                                                                                    <c:if test="${attribute.type eq 'COMMON' && attribute.isAvailable(product.channelId)}">
+                                                                                    <c:set var="attributeType" value="${attribute.getType(product.channelId)}"/>
+                                                                                    <c:if test="${attributeType eq 'COMMON'}">
                                                                                         <div class="form-group">
                                                                                             <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
-                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attribute.isRequired(product.channelId)}">*</c:if></code>
+                                                                                                <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attributeType eq 'COMMON' and attribute.isRequired(product.channelId)}">*</c:if></code>
                                                                                             </c:if>
                                                                                             <c:choose>
                                                                                                 <c:when test="${attribute.uiType eq 'DROPDOWN'}">
@@ -538,19 +542,19 @@
                                                                                                         <option value="">Select One</option>
                                                                                                         <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                             <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.familyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.channelFamilyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
                                                                                                         </c:forEach>
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.familyAttributes[attribute.id]}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <label class="fancy-checkbox">
-                                                                                                            <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.familyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                            <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.channelFamilyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -563,7 +567,7 @@
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <label class="fancy-radio">
-                                                                                                            <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.familyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                            <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${product.channelFamilyAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span><i></i>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -574,20 +578,20 @@
                                                                                                 <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                     <br/>
                                                                                                     <label class="fancy-checkbox">
-                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.familyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${product.channelFamilyAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
                                                                                                         <span>${attribute.label}</span>
                                                                                                     </label>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                     <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control datepicker">
+                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control datepicker">
                                                                                                         <div class="input-group-append">
                                                                                                             <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </c:when>
                                                                                                 <c:otherwise>
-                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.familyAttributes[attribute.id]}" class="form-control"/>
+                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${product.channelFamilyAttributes[attribute.id]}" class="form-control"/>
                                                                                                 </c:otherwise>
                                                                                             </c:choose>
                                                                                         </div>

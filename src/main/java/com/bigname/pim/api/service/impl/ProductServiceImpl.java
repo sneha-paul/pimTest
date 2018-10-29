@@ -157,12 +157,14 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                         product.getChannelFamilyAttributes().put(k1, "N");
                     }
 
-                    Pair<String, Object> error = null;
+                    /*Pair<String, Object> error = null;
                     if(product.getFamilyAttributes().containsKey(attribute.getId())) {
 //                        error = attribute.validate(product.getFamilyAttributes().get(attribute.getId()));
                     } else if(product.getChannelFamilyAttributes().containsKey(attribute.getId())) {
-                        error = attribute.validate(product.getChannelFamilyAttributes().get(attribute.getId()), product.getChannelId());
-                    }
+                        error = attribute.validate(product.getChannelFamilyAttributes().get(attribute.getId()), product.getChannelId(), 0);
+                    }*/
+
+                    Pair<String, Object> error = attribute.validate(product.getChannelFamilyAttributes().get(attribute.getId()), product.getChannelId(), 0);//TODO - check if the above commented out logic is required
                     if(ValidationUtil.isNotEmpty(error)) {
                         fieldErrors.put(attribute.getId(), error);
                     }

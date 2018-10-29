@@ -71,7 +71,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         product.setProductId(id);
         product.setAttributeValues(getAttributesMap(request));
         if(isValid(product, model, product.getGroup().length == 1 && product.getGroup()[0].equals("DETAILS") ? Product.DetailsGroup.class : null)) {
-//            productService.update(id, FindBy.EXTERNAL_ID, product);
+            productService.update(id, FindBy.EXTERNAL_ID, product);
             model.put("success", true);
         }
         return model;
@@ -115,7 +115,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         return new ModelAndView("product/products", model);
     }
 
-    @RequestMapping(value = "/{id}/familyAttributes", method = RequestMethod.PUT)
+    /*@RequestMapping(value = "/{id}/familyAttributes", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, @RequestParam Map<String, Object> attributes) {
         Map<String, Object> model = new HashMap<>();
@@ -127,7 +127,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         });
         model.put("success", true);
         return model;
-    }
+    }*/
 
     @RequestMapping("/{id}/variants")
     @ResponseBody
