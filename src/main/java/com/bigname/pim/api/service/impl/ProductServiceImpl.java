@@ -8,6 +8,7 @@ import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.bigname.common.util.ValidationUtil.*;
 
 /**
  * Created by sruthi on 19-09-2018.
@@ -69,7 +73,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
          */
 
         setProductFamily(product, FindBy.EXTERNAL_ID);
-        if(ValidationUtil.isEmpty(product.getProductFamily())) {
+        if(isEmpty(product.getProductFamily())) {
             throw new GenericEntityException("Unable to create product, invalid product family id : " + product.getProductFamilyId());
         } else {
             return super.create(product);
@@ -139,9 +143,61 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
     }
 
     @Override
+    public Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort) {
+        int page = isNull(pageNumber) ? 0 : pageNumber;
+        int size = isNull(pageSize) ? 25 : pageSize;
+        int level = 1;
+        List<List<Pair<String, String>>> variantMatrix = new ArrayList<>();
+        String _channelId = isEmpty(channelId) ? PIMConstants.DEFAULT_CHANNEL_ID : channelId;
+        get(productId, findBy, false).ifPresent(product -> {
+            product.setChannelId(_channelId);
+            Family productFamily = product.getProductFamily();
+            String variantGroupId = productFamily.getChannelVariantGroups().get(channelId);
+            Map<String, FamilyAttribute> familyAttributesMap = productFamily.getAllAttributesMap();
+            if(isNotEmpty(variantGroupId)) {
+                VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
+                if(isNotEmpty(variantGroup)) {
+//                    List<String> axisAttributeIds = variantGroup.getVariantAxis().get(level);
+//                    List<FamilyAttribute> axisAttributes = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(Collectors.toList());
+//                    List<List<FamilyAttributeOption>> axisAttributesOptions = axisAttributes.stream().map(axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())).collect(Collectors.toList());
+                    List<List<FamilyAttributeOption>> axisAttributesOptions = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).map(axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())).collect(Collectors.toList());
+
+                    int counters = axisAttributesOptions.size();
+                    int[] idx = new int[counters];
+                    int[] max = new int[counters];
+                    for(int i = 0; i < counters; i ++) {
+                        idx[i] = 0;
+                        max[i] = axisAttributesOptions.get(i).size();
+                    }
+
+                    while(idx[0] < max[0]) {
+                        List<Pair<String, String>> variantAttributes = new ArrayList<>();
+                        for(int i = 0; i < counters; i ++) {
+                            variantAttributes.add(Pair.with(axisAttributesOptions.get(i).get(idx[i]).getId(), axisAttributesOptions.get(i).get(idx[i]).getValue()));
+                        }
+                        idx[counters - 1] ++;
+                        for(int i = counters - 1; i >= 0; i --) {
+                            if(idx[i] >= max[i]) {
+                                if(i > 0) {
+                                    idx[i] = 0;
+                                    idx[i - 1] ++;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                        variantMatrix.add(variantAttributes);
+                    }
+                }
+            }
+        });
+        return paginate(variantMatrix, page, size);
+    }
+
+    @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, Product product, String group) {
         FamilyAttributeGroup masterGroup = product.getProductFamily().getAttributes().get(group + "_GROUP");
-        if(ValidationUtil.isNotEmpty(masterGroup)) {
+        if(isNotEmpty(masterGroup)) {
             FamilyAttributeGroup sectionGroup = masterGroup.getChildGroups().get(AttributeGroup.DEFAULT_GROUP_ID);
             sectionGroup.getChildGroups().forEach((k, attributeGroup) ->
                 attributeGroup.getAttributes().forEach((k1, attribute) -> {
@@ -165,7 +221,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                     }*/
 
                     Pair<String, Object> error = attribute.validate(product.getChannelFamilyAttributes().get(attribute.getId()), product.getChannelId(), 0);//TODO - check if the above commented out logic is required
-                    if(ValidationUtil.isNotEmpty(error)) {
+                    if(isNotEmpty(error)) {
                         fieldErrors.put(attribute.getId(), error);
                     }
                 })

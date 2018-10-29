@@ -8,6 +8,7 @@ import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,4 +17,6 @@ import java.util.Map;
 public interface ProductService extends BaseService<Product, ProductDAO> {
     Page<ProductVariant> getProductVariants(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+
+    Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
 }

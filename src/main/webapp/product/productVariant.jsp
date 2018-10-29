@@ -13,38 +13,16 @@
         <%--@elvariable id="productVariant" type="com.bigname.pim.api.domain.ProductVariant"--%>
         <div class="popup-content" style="padding:20px">
             <div class="body">
-                <form method="post" action="/pim/products/${productVariant.product.productId}/variants" data-method="POST"
-                      data-success-message='["Successfully created the product variant", "Product Variant Created"]'
-                      data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
-                    <div class="row">
-                        <div class="col-md-6 col-sm-12">
-                            <div class="form-group">
-                                <label for="productVariantName">Product Variant Name</label>
-                                <input type="text" id="productVariantName" name="productVariantName" class="form-control"/>
-                            </div>
-                            <div class="form-group">
-                                <label for="productVariantId">Product Variant ID</label>
-                                <input type="text" id="productVariantId" name="productVariantId" class="form-control"/>
-                            </div>
-                            <c:forEach var="attribute" items="${axisAttributes}">
-                            <div class="form-group">
-                                <label for="${attribute.id}">${attribute.id}</label>
-                                <select id="${attribute.id}" name="${attribute.id}" class="form-control">
-                                    <option value="">Select One</option>
-                                    <c:forEach items="${attribute.options}" var="optionEntry">
-                                        <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                        <option value="${attributeOption.id}">${attributeOption.value}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            </c:forEach>
+                <div class="table-responsive">
+                    <table id="paginatedAvailableProductVariantsTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                        <thead class="thead-dark">
 
-                        </div>
-                    </div>
-                    <br>
-                    <input type="hidden" name="group" value="CREATE"/>
-                    <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
-                </form>
+                        </thead>
+                    </table>
+                </div>
+                <br>
+                <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
+                <script src="/assets/js/pages/ui/product/createProductVariant.js"></script>
             </div>
         </div>
     </c:otherwise>

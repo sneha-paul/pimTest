@@ -1,6 +1,9 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.common.datatable.model.Pagination;
+import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
+import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Family;
 import com.bigname.pim.api.domain.Product;
@@ -11,6 +14,8 @@ import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
+import org.javatuples.Pair;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by sruthi on 20-09-2018.
@@ -40,6 +43,27 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         super(productVariantService);
         this.productVariantService = productVariantService;
         this.productService = productService;
+    }
+
+    @RequestMapping("/{productId}/channel/{channelId}/variants/available/list")
+    @ResponseBody
+    public Result<List<Pair<String, String>>> getAvailableVariants(@PathVariable(value = "productId") String productId, @PathVariable(value = "channelId") String channelId, HttpServletRequest request) {
+
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<List<Pair<String, String>>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        /*Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }*/
+        List<List<Pair<String, String>>> dataObjects = new ArrayList<>();
+        Page<List<Pair<String, String>>> paginatedResult = productService.getAvailableVariants(productId, FindBy.EXTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), null);
+        dataObjects.addAll(paginatedResult.getContent());
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
     }
 
 
