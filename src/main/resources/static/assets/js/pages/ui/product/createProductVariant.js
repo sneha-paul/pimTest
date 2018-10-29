@@ -1,14 +1,19 @@
 $( document ).ready(function() {
+    var columns = [];
+    var i = 0;
+    var axisAttributes = $.getPageAttribute('axisAttributes');
+    for(var prop in axisAttributes) {
+        if(axisAttributes.hasOwnProperty(prop)) {
+            columns[i++] = {data: prop, name: prop, title: axisAttributes[prop]};
+        }
+    }
+    columns[i] = { data: 'actions', name : 'actions' , title : 'Actions', orderable: false};
     $.initDataTable({
         selector: '#paginatedAvailableProductVariantsTable',
         name: 'availableProductVariants',
         type: 'TYPE_3A',
         url: $.getURL('/pim/products/{productId}/channel/{channelId}/variants/available/list'),
-        columns: [
-            { data: 'value', name : 'value' , title : 'Value'},
-            { data: 'id', name : 'id', title : 'ID' },
-            { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
+        columns: columns
     });
 
     /*$('#paginatedAvailableAttributeOptionsTable').on('click', '.js-add', function(){

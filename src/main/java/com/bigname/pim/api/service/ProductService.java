@@ -18,5 +18,6 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
     Page<ProductVariant> getProductVariants(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
-    Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
+//    Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
+    Page<Map<String, String>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
 }

@@ -14,7 +14,8 @@ $( document ).ready(function() {
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
     $.addModal({
         selector: '#js-create-variant',
-        url: $.getURL('/pim/products/{productId}/variants/create'),
+        url: $.getURL('/pim/products/{productId}/variants/create?ts=' + new Date().getTime()),
+        data: {channelId: $.getPageAttribute('channelId')},
         name:'create-variant',
         title:'Create Product Variant',
         buttons: [

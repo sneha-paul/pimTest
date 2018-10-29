@@ -21,7 +21,7 @@
                     </table>
                 </div>
                 <br>
-                <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
+                <img src="/assets/img/tiny.png" id="js-tiny" data-obj='${axisAttributes}' onload="$.setPageAttribute('axisAttributes', $(this).data('obj'));$.initAHAH(this)"/>
                 <script src="/assets/js/pages/ui/product/createProductVariant.js"></script>
             </div>
         </div>

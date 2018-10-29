@@ -16,10 +16,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.*;
@@ -142,7 +139,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         return products;
     }
 
-    @Override
+    /*@Override
     public Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort) {
         int page = isNull(pageNumber) ? 0 : pageNumber;
         int size = isNull(pageSize) ? 25 : pageSize;
@@ -175,6 +172,65 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                         for(int i = 0; i < counters; i ++) {
                             variantAttributes.add(Pair.with(axisAttributesOptions.get(i).get(idx[i]).getId(), axisAttributesOptions.get(i).get(idx[i]).getValue()));
                         }
+                        idx[counters - 1] ++;
+                        for(int i = counters - 1; i >= 0; i --) {
+                            if(idx[i] >= max[i]) {
+                                if(i > 0) {
+                                    idx[i] = 0;
+                                    idx[i - 1] ++;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                        variantMatrix.add(variantAttributes);
+                    }
+                }
+            }
+        });
+        return paginate(variantMatrix, page, size);
+    }*/
+
+    @Override
+    public Page<Map<String, String>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort) {
+        int page = isNull(pageNumber) ? 0 : pageNumber;
+        int size = isNull(pageSize) ? 25 : pageSize;
+        int level = 1;
+        List<Map<String, String>> variantMatrix = new ArrayList<>();
+        String _channelId = isEmpty(channelId) ? PIMConstants.DEFAULT_CHANNEL_ID : channelId;
+        get(productId, findBy, false).ifPresent((Product product) -> {
+            product.setChannelId(_channelId);
+            Family productFamily = product.getProductFamily();
+            String variantGroupId = productFamily.getChannelVariantGroups().get(channelId);
+            Map<String, FamilyAttribute> familyAttributesMap = productFamily.getAllAttributesMap();
+            if(isNotEmpty(variantGroupId)) {
+                VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
+                if(isNotEmpty(variantGroup)) {
+//                    List<String> axisAttributeIds = variantGroup.getVariantAxis().get(level);
+//                    List<FamilyAttribute> axisAttributes = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(Collectors.toList());
+//                    List<List<FamilyAttributeOption>> axisAttributesOptions = axisAttributes.stream().map(axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())).collect(Collectors.toList());
+                    Map<String, List<FamilyAttributeOption>> axisAttributesOptions = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(Collectors.toMap(FamilyAttribute::getId, axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())));
+
+                    int counters = axisAttributesOptions.size();
+                    int[] idx = new int[counters];
+                    int[] max = new int[counters];
+
+                    int j = 0;
+                    for (Map.Entry<String, List<FamilyAttributeOption>> entry : axisAttributesOptions.entrySet()) {
+                        idx[j] = 0;
+                        max[j++] = entry.getValue().size();
+                    }
+
+                    while(idx[0] < max[0]) {
+                        Map<String, String> variantAttributes = new HashMap<>();
+                        StringBuilder variantId = new StringBuilder();
+                        int x = 0;
+                        for (Map.Entry<String, List<FamilyAttributeOption>> entry : axisAttributesOptions.entrySet()) {
+                            variantId.append(variantId.length() > 0 ? "|" : "").append(entry.getValue().get(idx[x]).getId());
+                            variantAttributes.put(entry.getKey(), entry.getValue().get(idx[x++]).getValue());
+                        }
+                        variantAttributes.put("id", variantId.toString());
+
                         idx[counters - 1] ++;
                         for(int i = counters - 1; i >= 0; i --) {
                             if(idx[i] >= max[i]) {

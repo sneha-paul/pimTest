@@ -3,7 +3,7 @@
         var attributes = {};
 
         this.setAttributes = function(data) {
-            $.extend(true, attributes, data);
+            attributes = Object.assign({}, attributes, data);
         };
 
         this.getAttributes = function() {
