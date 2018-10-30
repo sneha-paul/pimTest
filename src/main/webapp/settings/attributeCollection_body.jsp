@@ -22,7 +22,7 @@
                                 <div class="card">
                                     <div class="body">
                                         <form method="post"
-                                              action="/pim/attributeCollection/${attributeCollection.collectionId}"
+                                              action="/pim/attributeCollections/${attributeCollection.collectionId}"
                                               data-method="PUT"
                                               data-success-message='["Successfully updated the attribute collection", "Collection Updated"]'
                                               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
