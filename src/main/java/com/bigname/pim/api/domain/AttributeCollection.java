@@ -88,10 +88,20 @@ public class AttributeCollection extends Entity<AttributeCollection> {
 
     @Override
     public AttributeCollection merge(AttributeCollection collection) {
-        this.setExternalId(collection.getExternalId());
-        this.setCollectionName(collection.getCollectionName());
-        this.setActive(collection.getActive());
-        this.setAttributes(collection.getAttributes());
+        for (String group : collection.getGroup()) {
+            switch (group){
+                case "DETAILS":
+                    this.setExternalId(collection.getExternalId());
+                    this.setCollectionName(collection.getCollectionName());
+                    this.setActive(collection.getActive());
+                 break;
+                case "ATTRIBUTES":
+                    this.setAttributes(collection.getAttributes());
+                break;
+                case "VARIANT_GROUPS":
+                break;
+            }
+        }
         return this;
     }
 

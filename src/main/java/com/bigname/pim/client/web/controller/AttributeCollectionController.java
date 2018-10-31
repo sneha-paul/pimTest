@@ -113,6 +113,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false);
         // TODO - cross field validation to see if one of attributeGroup ID and attributeGroup name is not empty
         if(attributeCollection.isPresent() && isValid(attribute, model)) {
+            attributeCollection.get().setGroup(attribute.getGroup());
             attributeCollection.get().addAttribute(attribute);
             attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection.get());
             model.put("success", true);
