@@ -19,7 +19,7 @@ $( document ).ready(function() {
         name:'create-variant',
         title:'Create Product Variant',
         buttons: [
-            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('productVariants');$.closeModal();});}},
+           // {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('productVariants');$.closeModal();});}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });
