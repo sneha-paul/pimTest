@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 /**
  * Created by manu on 9/4/18.
  */
-public interface FamilyDAO extends BaseDAO<Family>, MongoRepository<Family, String> {
+public interface FamilyDAO extends BaseDAO<Family>, MongoRepository<Family, String>, FamilyRepository {
 }
