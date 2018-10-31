@@ -6,4 +6,6 @@ package com.bigname.pim.util;
  */
 public class PIMConstants {
     public static final String DEFAULT_CHANNEL_ID = "ECOMMERCE";
+
+    public static final int MAX_FETCH_SIZE = 300;
 }

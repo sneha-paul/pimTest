@@ -19,7 +19,7 @@ public class ProductVariant extends Entity<ProductVariant> {
     @NotEmpty(message = "ProductVariant Id cannot be empty", groups = {CreateGroup.class})
     String productVariantId;
 
-    @Indexed(unique = true)
+//    @Indexed(unique = true)
     @NotEmpty(message = "ProductVariant Name cannot be empty", groups = {CreateGroup.class})
     private String productVariantName;
 
@@ -29,7 +29,11 @@ public class ProductVariant extends Entity<ProductVariant> {
     @Transient
     private Product product;
 
-    private Map<String, Object> familyAttributes = new HashMap<>();
+    private Map<String, String> axisAttributes = new HashMap<>();
+
+    private Map<String, Object> variantAttributes = new HashMap<>();
+
+    private String channelId;
 
     public ProductVariant() {
         super();
@@ -81,12 +85,28 @@ public class ProductVariant extends Entity<ProductVariant> {
         }
     }
 
-    public Map<String, Object> getFamilyAttributes() {
-        return familyAttributes;
+    public String getChannelId() {
+        return channelId;
     }
 
-    public void setFamilyAttributes(Map<String, Object> familyAttributes) {
-        this.familyAttributes = familyAttributes;
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
+
+    public Map<String, String> getAxisAttributes() {
+        return axisAttributes;
+    }
+
+    public void setAxisAttributes(Map<String, String> axisAttributes) {
+        this.axisAttributes = axisAttributes;
+    }
+
+    public Map<String, Object> getVariantAttributes() {
+        return variantAttributes;
+    }
+
+    public void setVariantAttributes(Map<String, Object> variantAttributes) {
+        this.variantAttributes = variantAttributes;
     }
 
 
@@ -99,7 +119,7 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.setExternalId(productVariant.getExternalId());
         this.setProductVariantName(productVariant.getProductVariantName());
         this.setActive(productVariant.getActive());
-        this.setFamilyAttributes(productVariant.getFamilyAttributes());
+        this.setVariantAttributes(productVariant.getVariantAttributes());
         return this;
     }
 

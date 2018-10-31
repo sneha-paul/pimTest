@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.GenericEntityException;
@@ -7,6 +8,7 @@ import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
+import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
@@ -28,15 +30,15 @@ import static com.bigname.common.util.ValidationUtil.*;
 public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> implements ProductService {
 
     private ProductDAO productDAO;
-    private ProductVariantDAO productVariantDAO;
+    private ProductVariantService productVariantService;
     private FamilyService productFamilyService;
 
 
     @Autowired
-    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantDAO productVariantDAO, FamilyService productFamilyService) {
+    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService) {
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
-        this.productVariantDAO = productVariantDAO;
+        this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;
     }
 
@@ -45,15 +47,31 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         return productDAO.save(product);
     }
 
+    /**
+     * Use this method to get variants of a product with activeRequired options for both product and variants. Otherwise use productVariantService.getAll().
+     *
+     * See JIRA ticket BNPIM-7 for more details
+     *
+     * @param productId
+     * @param findBy
+     * @param channelId
+     * @param page
+     * @param size
+     * @param sort
+     * @param activeRequired
+     * @return
+     */
     @Override
-    public Page<ProductVariant> getProductVariants(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        if(sort == null) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
-        }
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Product> product = get(productId, findBy, false); //TODO - JIRA BNPIM-7
+    public Page<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, int page, int size, Sort sort, boolean... activeRequired) {
+        final Sort _sort = sort == null ? Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")) : sort;
+        return get(productId, findBy, ConversionUtil.toList(activeRequired).size() == 2 && activeRequired[1])
+                .map(product -> productVariantService.getAll(product.getId(), channelId, page, size, sort, activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>(), PageRequest.of(page, size, _sort), 0));
+    }
 
-        return product.map(product1 -> productVariantDAO.findByProductIdAndActiveIn(product1.getId(), PimUtil.getActiveOptions(activeRequired), pageable)).orElseGet(() -> new PageImpl<>(new ArrayList<>(), pageable, 0));
+    @Override
+    public List<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, Sort sort, boolean... activeRequired) {
+        return getProductVariants(productId, findBy, channelId, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
     /**
@@ -199,6 +217,8 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         List<Map<String, String>> variantMatrix = new ArrayList<>();
         String _channelId = isEmpty(channelId) ? PIMConstants.DEFAULT_CHANNEL_ID : channelId;
         get(productId, findBy, false).ifPresent((Product product) -> {
+            List<ProductVariant> existingVariants = productVariantService.getAll(product.getId(), channelId, null, false );
+            List<String> existingVariantsAxisAttributeIds = new ArrayList<>();
             product.setChannelId(_channelId);
             Family productFamily = product.getProductFamily();
             String variantGroupId = productFamily.getChannelVariantGroups().get(channelId);
@@ -206,11 +226,14 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
             if(isNotEmpty(variantGroupId)) {
                 VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
                 if(isNotEmpty(variantGroup)) {
-//                    List<String> axisAttributeIds = variantGroup.getVariantAxis().get(level);
-//                    List<FamilyAttribute> axisAttributes = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(Collectors.toList());
-//                    List<List<FamilyAttributeOption>> axisAttributesOptions = axisAttributes.stream().map(axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())).collect(Collectors.toList());
                     Map<String, List<FamilyAttributeOption>> axisAttributesOptions = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(Collectors.toMap(FamilyAttribute::getId, axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())));
-
+                    existingVariants.forEach(productVariant -> {
+                        StringBuilder axisAttributeIds = new StringBuilder();
+                        for (Map.Entry<String, List<FamilyAttributeOption>> entry : axisAttributesOptions.entrySet()) {
+                            axisAttributeIds.append(axisAttributeIds.length() > 0 ? "|" : "").append(productVariant.getAxisAttributes().get(entry.getKey()));
+                        }
+                        existingVariantsAxisAttributeIds.add(axisAttributeIds.toString());
+                    });
                     int counters = axisAttributesOptions.size();
                     int[] idx = new int[counters];
                     int[] max = new int[counters];
@@ -224,9 +247,11 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                     while(idx[0] < max[0]) {
                         Map<String, String> variantAttributes = new HashMap<>();
                         StringBuilder variantId = new StringBuilder();
+                        StringBuilder axisAttributeIds = new StringBuilder();
                         int x = 0;
                         for (Map.Entry<String, List<FamilyAttributeOption>> entry : axisAttributesOptions.entrySet()) {
-                            variantId.append(variantId.length() > 0 ? "|" : "").append(entry.getValue().get(idx[x]).getId());
+                            axisAttributeIds.append(axisAttributeIds.length() > 0 ? "|" : "").append(entry.getValue().get(idx[x]).getId());
+                            variantId.append(variantId.length() > 0 ? "|" : "").append(entry.getKey()).append("|").append(entry.getValue().get(idx[x]).getId());
                             variantAttributes.put(entry.getKey(), entry.getValue().get(idx[x++]).getValue());
                         }
                         variantAttributes.put("id", variantId.toString());
@@ -242,7 +267,9 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                                 break;
                             }
                         }
-                        variantMatrix.add(variantAttributes);
+                        if(!existingVariantsAxisAttributeIds.contains(axisAttributeIds.toString())) {
+                            variantMatrix.add(variantAttributes);
+                        }
                     }
                 }
             }

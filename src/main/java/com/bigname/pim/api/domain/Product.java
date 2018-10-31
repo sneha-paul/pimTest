@@ -27,7 +27,7 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     String productId;
 
-    @Indexed(unique = true)
+//    @Indexed(unique = true)
     @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productName;
 

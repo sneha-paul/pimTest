@@ -129,7 +129,8 @@ public class ProductController extends BaseController<Product, ProductService>{
         return model;
     }*/
 
-    @RequestMapping("/{id}/variants")
+    //Deprecated, use the corresponding method in variant controller
+    /*@RequestMapping("/{id}/variants")
     @ResponseBody
     public Result<Map<String, String>> getProductVariants(@PathVariable(value = "id") String id, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
@@ -147,7 +148,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
         return result;
-    }
+    }*/
 
 
 

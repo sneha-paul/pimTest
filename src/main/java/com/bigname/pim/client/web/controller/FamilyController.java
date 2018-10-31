@@ -441,7 +441,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return model;
     }
 
-    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/channel/{channelId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/channels/{channelId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> saveVariantGroupScope(@PathVariable(value = "familyId") String familyId,
                                                   @PathVariable(value = "variantGroupId") String variantGroupId,

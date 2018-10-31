@@ -3,7 +3,7 @@ $( document ).ready(function() {
         selector: '#paginatedProductVariantsTable',
         name: 'productVariants',
         type: 'TYPE_1',
-        url: $.getURL('/pim/products/{productId}/variants/'),
+        url: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/'),
         columns: [
             { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name'},
             { data: 'externalId', name : 'externalId', title : 'Variant ID' },

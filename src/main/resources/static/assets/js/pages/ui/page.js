@@ -178,7 +178,7 @@
             });
 
             $(options.selector).on('click', '.js-channel-selector', function () {
-                var url = $.getURL(options.url + '/{variantGroupId}/channel/{channelId}', {
+                var url = $.getURL(options.url + '/{variantGroupId}/channels/{channelId}', {
                     variantGroupId: $(this).data('id'),
                     channelId: $(this).data('channel'),
 
@@ -263,7 +263,7 @@
             });*/
         },
         refreshDataTable: function(name) {
-            $.getDataTable(name).ajax.reload();
+            $.getDataTable(name).ajax.reload(null, false);
         },
         reloadDataTable: function(name) {
             $.getDataTable(name).destroy();

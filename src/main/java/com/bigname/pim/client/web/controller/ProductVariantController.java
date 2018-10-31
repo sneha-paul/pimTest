@@ -5,6 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Channel;
 import com.bigname.pim.api.domain.Family;
@@ -33,6 +34,8 @@ import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.bigname.common.util.ValidationUtil.*;
+
 /**
  * Created by sruthi on 20-09-2018.
  */
@@ -53,7 +56,7 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         this.channelService = channelService;
     }
 
-    @RequestMapping("/{productId}/channel/{channelId}/variants/available/list")
+    @RequestMapping("/{productId}/channels/{channelId}/variants/available/list")
     @ResponseBody
     public Result<Map<String, String>> getAvailableVariants(@PathVariable(value = "productId") String productId, @PathVariable(value = "channelId") String channelId, HttpServletRequest request) {
 
@@ -76,15 +79,30 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
 
 
 
-    @RequestMapping(value = "/{productId}/variants", method = RequestMethod.POST)
+    @RequestMapping(value = "/{productId}/channels/{channelId}/variants/{variantIdentifier}", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> create(@PathVariable(value = "productId") String productId, ProductVariant productVariant) {
+    public Map<String, Object> create(@PathVariable(value = "productId") String productId,
+                                      @PathVariable(value = "channelId") String channelId,
+                                      @PathVariable(value = "variantIdentifier") String variantIdentifier) {
         Map<String, Object> model = new HashMap<>();
-        productVariant.setProductId(productId);
-        if(isValid(productVariant, model, ProductVariant.CreateGroup.class)) {
-            productVariant.setActive("N");
-            productVariantService.create(productVariant);
-            model.put("success", true);
+        if(isNotEmpty(productId) && isNotEmpty(channelId) && isNotEmpty(variantIdentifier)) {
+            productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                List<String> axisAttributeTokens = StringUtil.splitPipeDelimitedAsList(variantIdentifier);
+                Map<String, String> axisAttributes = new HashMap<>();
+                StringBuilder tempId = new StringBuilder();
+                for (int i = 0; i < axisAttributeTokens.size(); i = i + 2) {
+                    axisAttributes.put(axisAttributeTokens.get(i), axisAttributeTokens.get(i + 1));
+                    tempId.append("_").append(axisAttributeTokens.get(i + 1));
+                }
+                ProductVariant productVariant = new ProductVariant(product);
+                productVariant.setProductVariantName(product.getProductName());
+                productVariant.setProductVariantId(tempId.toString());
+                productVariant.setChannelId(channelId);
+                productVariant.setAxisAttributes(axisAttributes);
+                productVariant.setActive("N");
+                productVariantService.create(productVariant);
+                model.put("success", true);
+            });
         }
         return model;
     }
@@ -105,7 +123,35 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
     @ResponseBody
     @Override
     public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
-        return super.all(request, response, model);
+        return null;
+    }
+
+    @RequestMapping("/{productId}/channels/{channelId}/variants/list")
+    @ResponseBody
+    public Result<Map<String, String>> allChannelVariants(@PathVariable(name = "productId") String productId, @PathVariable(name = "channelId") String channelId, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        if(isNotEmpty(productId) && isNotEmpty(channelId)) {
+            productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                Sort sort = null;
+                if (pagination.hasSorts()) {
+                    sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+                } else {
+                    sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+                }
+                Page<ProductVariant> paginatedResult = productVariantService.getAll(product.getId(), channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+                List<Map<String, String>> dataObjects = new ArrayList<>();
+                paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+                result.setDataObjects(dataObjects);
+                result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+                result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+            });
+        } else {
+            //TODO - send error message
+        }
+        return result;
     }
 
     @RequestMapping(value = {"/{productId}/variants/{variantId}", "/{productId}/variants/create"})
