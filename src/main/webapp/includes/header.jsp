@@ -91,7 +91,7 @@
                         <li><a href="javascript:void(0);"><i class="icon-refresh"></i> <span>Renewals</span></a></li>
                     </ul>
                 </li>
-                <li><a href="page-login.html" class="icon-menu"><i class="icon-login"></i></a></li>
+                <li><a href="/logout" class="icon-menu"><i class="icon-login"></i></a></li>
             </ul>
         </div>
     </div>

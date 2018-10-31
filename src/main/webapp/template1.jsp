@@ -16,8 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="description" content="<tiles:insertAttribute name="metaDescription" ignore="true"/>">
     <meta name="keyword" content="<tiles:insertAttribute name="metaKeyword" ignore="true"/>">
-    <meta name="author" content="WrapTheme, design by: ThemeMakker.com">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="/assets/img/favicon.png" rel="shortcut icon" type="image/x-icon">
 
     <%-- VENDOR CSS --%>
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css">
@@ -169,7 +168,7 @@
                         <li><a href="app-inbox.html"><i class="icon-envelope-open"></i>Messages</a></li>
                         <li><a href="javascript:void(0);"><i class="icon-settings"></i>Settings</a></li>
                         <li class="divider"></li>
-                        <li><a href="page-login.html"><i class="icon-power"></i>Logout</a></li>
+                        <li><a href="/logout"><i class="icon-power"></i>Logout</a></li>
                     </ul>
                 </div>
                 <hr>

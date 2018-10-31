@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.repository.init.Jackson2RepositoryPopulatorFactoryBean;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -23,6 +24,14 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/*.jpg/**").addResourceLocations("/static/");
         registry.addResourceHandler("/*.gif/**").addResourceLocations("/static/");
         registry.addResourceHandler("/*.png/**").addResourceLocations("/static/");
+    }
+
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("login").setViewName("login");
+        registry.addViewController("register").setViewName("register");
+        registry.addViewController("forgotPassword").setViewName("forgotPassword");
+        registry.addViewController("/pim/dashboard").setViewName("dashboard");
+        registry.addViewController("/").setViewName("redirect:/pim/dashboard");
     }
 
     @Bean("cacheKeyGenerator")

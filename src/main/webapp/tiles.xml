@@ -16,6 +16,10 @@
         <put-attribute name="body" value="" />
     </definition>
 
+    <definition name="headlessLayout" template="/headlessTemplate.jsp">
+        <put-attribute name="body" value="" />
+    </definition>
+
     <!--<definition name="gridPopup" extends="mainPopupLayout">
         <put-attribute name="title" value="PIM - Products" />
         <put-attribute name="body" value="/product/products.jsp" />

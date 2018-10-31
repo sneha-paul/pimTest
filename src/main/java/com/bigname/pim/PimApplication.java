@@ -1,6 +1,7 @@
 package com.bigname.pim;
 
 import com.bigname.pim.api.persistence.dao.BaseDAO;
+import com.bigname.pim.config.SecurityConfig;
 import com.bigname.pim.config.TilesConfig;
 import com.bigname.pim.config.WebConfig;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +19,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 //@EnableCaching
 @Import({
 		WebConfig.class,
-		TilesConfig.class
+		TilesConfig.class,
+		SecurityConfig.class
 })
 public class PimApplication extends SpringBootServletInitializer {
 
