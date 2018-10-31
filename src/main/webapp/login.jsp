@@ -4,54 +4,45 @@
     <tiles:putAttribute name="title" value="BIGNAME - PIM"/>
     <tiles:putAttribute name="body">
         <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
-        <div class="vertical-align-wrap">
-            <div class="vertical-align-middle auth-main">
-                <div class="auth-box">
-                    <div class="top">
-                        <img src="/assets/img/logo-white.svg" alt="Lucid">
-                    </div>
-                    <div class="card">
-                        <div class="header">
-                            <p class="lead">Login to your account</p>
-                        </div>
-                        <div class="body">
-                            <form class="form-auth-small" method="POST" action=""${contextPath}/login">
-                            <c:if test="${param.error ne null}">
-                                <span class="text-danger">Invalid username or password</span>
-                            </c:if>
+            <div class="card">
+                <div class="header">
+                    <p class="lead">Login to your account</p>
+                </div>
+                <div class="body">
+                    <form class="form-auth-small" method="POST" action=""${contextPath}/login">
+                    <c:if test="${param.error ne null}">
+                        <span class="text-danger">Invalid username or password</span>
+                    </c:if>
 
-                            <c:if test="${param.logout ne null}">
-                                <span class="text-success">Logged out Successfully</span>
-                            </c:if>
+                    <c:if test="${param.logout ne null}">
+                        <span class="text-success">Logged out Successfully</span>
+                    </c:if>
 
-                            <div class="form-group">
-                                <label for="username" class="control-label sr-only">Email</label>
-                                <input type="text" class="form-control" id="username" name="username" value="user" placeholder="User Name">
-                            </div>
-                            <div class="form-group">
-                                <label for="password" class="control-label sr-only">Password</label>
-                                <input type="password" class="form-control" name="password" id="password" value="password" placeholder="Password">
-                            </div>
-                                <%--<div class="form-group clearfix">
-                                    <label class="fancy-checkbox element-left">
-                                        <input type="checkbox">
-                                        <span>Remember me</span>
-                                    </label>
-                                </div>--%>
-                            <button type="submit" class="btn btn-primary btn-lg btn-block">LOGIN</button>
-                            <div class="bottom">
-                                <span class="helper-text m-b-10"><i class="fa fa-lock"></i> <a href="forgotPassword">Forgot password?</a></span>
-                                <span>Don't have an account? <a href="register">Register</a></span>
-                            </div>
-                                <%--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>--%>
-                            </form>
-                            <div class="separator-linethrough"><span>OR</span></div>
-                            <button class="btn btn-signin-social"><i class="fa fa-google google-color"></i> Sign in with Google</button>
-                            <button class="btn btn-signin-social"><i class="fa fa-facebook-official facebook-color"></i> Sign in with Facebook</button>
-                        </div>
+                    <div class="form-group">
+                        <label for="username" class="control-label sr-only">Email</label>
+                        <input type="text" class="form-control" id="username" name="username" value="user" placeholder="User Name">
                     </div>
+                    <div class="form-group">
+                        <label for="password" class="control-label sr-only">Password</label>
+                        <input type="password" class="form-control" name="password" id="password" value="password" placeholder="Password">
+                    </div>
+                        <%--<div class="form-group clearfix">
+                            <label class="fancy-checkbox element-left">
+                                <input type="checkbox">
+                                <span>Remember me</span>
+                            </label>
+                        </div>--%>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">LOGIN</button>
+                    <div class="bottom">
+                        <span class="helper-text m-b-10"><i class="fa fa-lock"></i> <a href="forgotPassword">Forgot password?</a></span>
+                        <span>Don't have an account? <a href="register">Register</a></span>
+                    </div>
+                        <%--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>--%>
+                    </form>
+                    <div class="separator-linethrough"><span>OR</span></div>
+                    <button class="btn btn-signin-social"><i class="fa fa-google google-color"></i> Sign in with Google</button>
+                    <button class="btn btn-signin-social"><i class="fa fa-facebook-official facebook-color"></i> Sign in with Facebook</button>
                 </div>
             </div>
-        </div>
     </tiles:putAttribute>
 </tiles:insertDefinition>

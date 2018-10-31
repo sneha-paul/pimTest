@@ -28,8 +28,17 @@
 <body class="theme-orange">
     <!-- WRAPPER -->
     <div id="wrapper">
-        <div id="js-body-container">
-            <tiles:insertAttribute name="body"/>
+        <div class="vertical-align-wrap">
+            <div class="vertical-align-middle auth-main">
+                <div class="auth-box">
+                    <div class="top">
+                        <img style="margin:0 0 -7px 11px" src="/assets/img/bnlogo-white.png" alt="BIGNAME">
+                    </div>
+                    <div id="js-body-container">
+                        <tiles:insertAttribute name="body"/>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </body>
