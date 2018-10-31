@@ -73,7 +73,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
             rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
             if(categoryIds.size() > 0) {
                 Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                List<RootCategory> _rootCategories = rootCategories.filter(rc -> categoriesMap.containsKey(rc.getCatalogId())).stream().collect(Collectors.toList());
+                List<RootCategory> _rootCategories = rootCategories.filter(rc -> categoriesMap.containsKey(rc.getRootCategoryId())).stream().collect(Collectors.toList());
                 _rootCategories.forEach(rc -> rc.init(catalog, categoriesMap.get(rc.getRootCategoryId())));
                 rootCategories = new PageImpl<>(_rootCategories,pageable,_rootCategories.size());//TODO : verify this logic
             }

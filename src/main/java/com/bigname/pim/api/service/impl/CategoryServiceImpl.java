@@ -75,7 +75,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             relatedCategories.forEach(rc -> subCategoryIds.add(rc.getSubCategoryId()));
             if(subCategoryIds.size() > 0) {
                 Map<String, Category> categoriesMap = PimUtil.getIdedMap(getAll(subCategoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                List<RelatedCategory> _relatedCategories = relatedCategories.filter(rc -> categoriesMap.containsKey(rc.getCategoryId())).stream().collect(Collectors.toList());
+                List<RelatedCategory> _relatedCategories = relatedCategories.filter(rc -> categoriesMap.containsKey(rc.getSubCategoryId())).stream().collect(Collectors.toList());
                 _relatedCategories.forEach(rc -> rc.init(category, categoriesMap.get(rc.getSubCategoryId())));
                 relatedCategories = new PageImpl<>(_relatedCategories,pageable,_relatedCategories.size());//TODO : verify this logic
 
