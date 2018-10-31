@@ -355,12 +355,27 @@
                 method: 'GET',
                 async: true,
                 success: function (data) {
-                    $('#js-body-container').html(data);
+                    /*$('#js-body-container').html(data);
                     if(hash) {
                         $('a.nav-link[href*="' + hash + '"]').trigger('click');
                     } else {
                         $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
-                    }
+                    }*/
+
+                    $('#js-body-container').fadeOut('fast', function(){
+                        $('#js-body-container').html(data);
+                        if(hash) {
+                            $('a.nav-link[href*="' + hash + '"]').trigger('click');
+                        } else {
+                            $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
+                        }
+                        $('#js-body-container').fadeIn('fast', function(){
+
+                        });
+                    });
+
+
+
                 },
                 error: function (resp) {
                     window.location.href = $.pageURL();
