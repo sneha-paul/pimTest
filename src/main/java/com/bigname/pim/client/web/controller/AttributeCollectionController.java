@@ -62,7 +62,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, AttributeCollection attributeCollection) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(attributeCollection, model, attributeCollection.getGroup().equals("DETAILS") ? AttributeCollection.DetailsGroup.class : null)) {
+        if(isValid(attributeCollection, model, attributeCollection.getGroup().length == 1 && attributeCollection.getGroup()[0].equals("DETAILS") ? AttributeCollection.DetailsGroup.class : null)) {
             attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection);
             model.put("success", true);
         }

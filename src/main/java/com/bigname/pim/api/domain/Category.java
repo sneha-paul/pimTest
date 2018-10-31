@@ -11,10 +11,13 @@ import org.springframework.validation.Errors;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.bigname.common.util.RegExBuilder.*;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -25,10 +28,12 @@ public class Category extends Entity<Category> {
 
     @Transient
     @NotEmpty(message = "Category Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+   // @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "category.categoryId.invalid")
     private String categoryId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Category Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+   // @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "category.categoryName.invalid")
     private String categoryName;
 
     private String description;

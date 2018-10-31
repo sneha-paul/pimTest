@@ -58,7 +58,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Category category) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(category, model, category.getGroup().equals("DETAILS") ? Category.DetailsGroup.class : category.getGroup().equals("SEO") ? Category.SeoGroup.class : null)) {
+        if(isValid(category, model, category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup().equals("SEO") ? Category.SeoGroup.class : null)) {
             categoryService.update(id, FindBy.EXTERNAL_ID, category);
             model.put("success", true);
         }

@@ -59,7 +59,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Catalog catalog) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(catalog, model, catalog.getGroup().equals("DETAILS") ? Catalog.DetailsGroup.class : null)) {
+        if(isValid(catalog, model, catalog.getGroup().length == 1 && catalog.getGroup()[0].equals("DETAILS") ? Catalog.DetailsGroup.class : null)) {
             catalogService.update(id, FindBy.EXTERNAL_ID, catalog);
             model.put("success", true);
         }

@@ -71,7 +71,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Family family) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(family, model, family.getGroup().equals("DETAILS") ? Family.DetailsGroup.class : null)) {
+        if(isValid(family, model, family.getGroup().length == 1 && family.getGroup()[0].equals("DETAILS") ? Family.DetailsGroup.class : null)) {
             familyService.update(id, FindBy.EXTERNAL_ID, family);
             model.put("success", true);
         }

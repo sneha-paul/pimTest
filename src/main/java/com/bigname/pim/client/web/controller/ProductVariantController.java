@@ -112,7 +112,7 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
     public Map<String, Object> update(@PathVariable(value = "productId") String productId, @PathVariable(value = "variantId") String variantId, ProductVariant productVariant) {
         Map<String, Object> model = new HashMap<>();
         productVariant.setProductId(productId);
-        if(isValid(productVariant, model, productVariant.getGroup().equals("DETAILS") ? ProductVariant.DetailsGroup.class : productVariant.getGroup().equals("SEO") ? ProductVariant.SeoGroup.class : null)) {
+        if(isValid(productVariant, model, productVariant.getGroup().length == 1 && productVariant.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : productVariant.getGroup().equals("SEO") ? ProductVariant.SeoGroup.class : null)) {
             productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
             model.put("success", true);
         }

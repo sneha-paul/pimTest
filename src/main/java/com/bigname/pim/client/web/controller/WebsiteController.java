@@ -5,6 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.pim.api.domain.Catalog;
+import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -76,7 +77,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Website website) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(website, model, website.getGroup().equals("DETAILS") ? Website.DetailsGroup.class : null)) {
+        if(isValid(website, model, website.getGroup().length == 1 && website.getGroup()[0].equals("DETAILS") ? Website.DetailsGroup.class : null)) {
             websiteService.update(id, FindBy.EXTERNAL_ID, website);
             model.put("success", true);
         }
