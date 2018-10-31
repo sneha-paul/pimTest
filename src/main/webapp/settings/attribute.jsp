@@ -64,7 +64,6 @@
             </div>
             <br>
             <input type="hidden" name="group" value="ATTRIBUTES"/>
-            <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
         </form>
     </div>
 </div>
