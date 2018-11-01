@@ -264,7 +264,35 @@
                         </div>
                     </div>
                     <div class="tab-pane" id="digitalAssets">
-                        <div class="row clearfix m-t-20">
+                        <div class="row clearfix">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="header">
+                                        <h2>Light Gallery <small>All pictures taken from pexels.com</small></h2>
+                                    </div>
+                                    <div class="body">
+                                        <div id="aniimated-thumbnials" class="list-unstyled row clearfix">
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1"> <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <%--<div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card inner overflowhidden">
                                     <div class="body">
@@ -379,7 +407,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>--%>
                     </div>
                     <c:forEach var="masterGroup" items="${masterGroups}" >
                         <div class="tab-pane" id="${masterGroup.id}">

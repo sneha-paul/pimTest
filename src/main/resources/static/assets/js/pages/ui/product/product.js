@@ -29,6 +29,11 @@ $( document ).ready(function() {
         $.refreshPage({channelId : channelId});
     });
 
+    $('#aniimated-thumbnials').lightGallery({
+        thumbnail: true,
+        selector: 'a'
+    });
+
 
     $('.datepicker').datepicker();
     // $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');

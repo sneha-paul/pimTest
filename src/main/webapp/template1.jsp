@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" href="/assets/vendor/light-gallery/css/lightgallery.css">
     <link rel="stylesheet" href="/assets/vendor/nestable/jquery-nestable.css">
     <link rel="stylesheet" href="/assets/vendor/sweetalert/sweetalert.css"/>
     <link rel="stylesheet" href="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css">
@@ -223,6 +224,7 @@
 <script src="/assets/js/pages/ui/dialogs.js"></script>
 <script src="/assets/vendor/table-dragger/table-dragger.min.js"></script>
 <script src="/assets/vendor/emodal/eModal.js"></script>
+<script src="/assets/vendor/light-gallery/js/lightgallery-all.min.js"></script>
 <%--<script src="/assets/js/pages/ui/website/website.js"></script>--%>
 <%-- PAGE LEVEL JS --%>
 <c:forEach var="customJS" items="${pageBottomScripts}">
