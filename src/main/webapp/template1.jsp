@@ -158,7 +158,7 @@
         .js-locked.js-checkbox, .js-level-locked.js-checkbox, .js-axis-locked.js-checkbox {
             float: left;
             margin-left: 5px;
-            margin-top: -32px;
+            margin-top: -31px;
             position: absolute;
         }
 
