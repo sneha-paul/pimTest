@@ -270,9 +270,9 @@
 
 </body>
 
-<%--<script>
+<script>
     $(function(){
             $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
     });
-</script>--%>
+</script>
 </html>

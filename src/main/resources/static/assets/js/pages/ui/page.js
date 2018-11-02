@@ -56,7 +56,7 @@
                                     action = 'Enable';
                                     btnClass = 'btn-success';
                                 }
-                                value.actions = '<a href="' + options.url + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
+                                value.actions = '<a href="' + (options.url2 ? options.url2 : options.url) + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
                                 if(options.type === 'TYPE_1') {
                                     value.actions += '<button type="button" class="btn btn-sm btn-primary js-clone" data-external-id="' + value.externalId + '" title="Clone"><i class="icon-docs"></i></button> ';
                                 }

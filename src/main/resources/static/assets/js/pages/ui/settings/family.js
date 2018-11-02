@@ -12,7 +12,7 @@ $(function(){
     /*$('.js-add-variantGroup').on('click', function() {
         window.location.href = $.getURL('/pim/families/{familyId}/variantGroups');
     });*/
-    $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
+    // $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
     $.addModal({
         selector: '.js-add-variantGroup',
         url: $.getURL('/pim/families/{familyId}/variantGroups/create'),
