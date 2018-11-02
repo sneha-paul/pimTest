@@ -1,4 +1,5 @@
-<%--@elvariable id="productVariant" type="com.bigname.pim.api.domain.ProductVariant"--%>
+<%--
+&lt;%&ndash;@elvariable id="productVariant" type="com.bigname.pim.api.domain.ProductVariant"&ndash;%&gt;
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
@@ -44,3 +45,4 @@
 
     });
 </script>
+--%>

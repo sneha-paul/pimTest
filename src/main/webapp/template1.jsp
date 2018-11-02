@@ -92,6 +92,11 @@
             padding-bottom: 8px;
         }
 
+        .fancy-checkbox.js-disabled input[type="checkbox"]+span:before {
+            opacity: .4;
+            background-color: #e9ecef;
+        }
+
         .fancy-checkbox input.parsley-error[type="checkbox"]+span:before {
             border-color: #efd8d8;
             background-color: #fbf5f5;
@@ -130,13 +135,43 @@
             cursor: pointer;
         }
 
-        .js-locked {
+        .js-locked, .js-level-locked, .js-axis-locked {
             float: right;
             margin-right: 12px;
             margin-top: -24px;
             position: relative;
             z-index: 2;
-            color: grey;
+            color: #dc3545;
+            cursor: pointer;
+        }
+
+        select[disabled="disabled"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+        }
+
+        select[disabled="disabled"]::-ms-expand {
+            display: none;
+        }
+
+        .js-locked.js-checkbox, .js-level-locked.js-checkbox, .js-axis-locked.js-checkbox {
+            float: left;
+            margin-left: 5px;
+            margin-top: -32px;
+            position: absolute;
+        }
+
+        .js-level-locked {
+            color: #007bff;
+        }
+
+        .js-axis-locked {
+            color: #fd7e14;
+        }
+
+        textarea {
+            min-height: 54px !important;
         }
     </style>
 

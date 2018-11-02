@@ -1,3 +1,4 @@
+<%--
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 
 <tiles:insertDefinition name="mainLayout">
@@ -15,11 +16,11 @@
         <tiles:addAttribute>/assets/js/f1.js</tiles:addAttribute>
         <tiles:addAttribute>/assets/js/f2.js</tiles:addAttribute>
     </tiles:putListAttribute>
-    <%-- <tiles:putAttribute name="pageBottomScripts">
+    &lt;%&ndash; <tiles:putAttribute name="pageBottomScripts">
          <script type="javascript" src="/assets/js/f1/js"></script>
          <script type="javascript" src="/assets/js/f2/js"></script>
-     </tiles:putAttribute>--%>
+     </tiles:putAttribute>&ndash;%&gt;
     <tiles:putAttribute name="script">
         <script>console.log('hi');</script>
     </tiles:putAttribute>
-</tiles:insertDefinition>
+</tiles:insertDefinition>--%>

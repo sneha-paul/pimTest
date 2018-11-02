@@ -154,39 +154,29 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         return result;
     }
 
-    @RequestMapping(value = {"/{productId}/variants/{variantId}", "/{productId}/variants/create"})
+    @RequestMapping(value = {"/{productId}/variants/{variantId}"})
     public ModelAndView variantDetails(@PathVariable(value = "productId") String productId,
-                                       @PathVariable(value = "variantId", required = false) String variantId,
-                                       @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId) {
+                                       @PathVariable(value = "variantId", required = false) String variantId) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
         Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
         if(_product.isPresent()) {
             Product product = _product.get();
-            if(variantId == null) {
-                ProductVariant productVariant = new ProductVariant(product);
-                Family family = product.getProductFamily();
-                String variantGroupId = family.getChannelVariantGroups().get(channelId);
-                model.put("mode", "CREATE");
+            Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
+            if(_productVariant.isPresent()) {
+                ProductVariant productVariant = _productVariant.get();
+                productVariant.setProduct(product);
+                model.put("mode", "DETAILS");
+                model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - JIRA BNPIM-6
                 model.put("productVariant", productVariant);
-                model.put("axisAttributes", ConversionUtil.toJSONString(family.getVariantGroups().get(variantGroupId).getVariantAxis().get(1).stream().collect(Collectors.toMap(id -> id, id -> product.getProductFamily().getAllAttributesMap().get(id).getName()))));
+                model.put("productFamily", productVariant.getProduct().getProductFamily());
+                model.put("breadcrumbs", new Breadcrumbs("Product",
+                        "Products", "/pim/products",
+                        product.getProductName(), "/pim/products/" + productId,
+                        "Product Variants", "/pim/products/" + productId + "#productVariants",
+                        productVariant.getProductVariantName(), ""));
             } else {
-                Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
-                if(_productVariant.isPresent()) {
-                    ProductVariant productVariant = _productVariant.get();
-                    productVariant.setProduct(product);
-                    model.put("mode", "DETAILS");
-                    model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - JIRA BNPIM-6
-                    model.put("productVariant", productVariant);
-                    model.put("productFamily", productVariant.getProduct().getProductFamily());
-                    model.put("breadcrumbs", new Breadcrumbs("Product",
-                            "Products", "/pim/products",
-                            product.getProductName(), "/pim/products/" + productId,
-                            "Product Variants", "/pim/products/" + productId + "#productVariants",
-                            productVariant.getProductVariantName(), ""));
-                } else {
-                    throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
-                }
+                throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
             }
         } else {
             throw new EntityNotFoundException("Unable to find Product with Id: " + productId);
