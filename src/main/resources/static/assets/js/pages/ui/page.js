@@ -40,7 +40,7 @@
                             if('GROUP_4' === options.buttonGroup || 'GROUP_4A' === options.buttonGroup) {
                                 value.actions = '';
                                 if('Y' === value.selectable) {
-                                    value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-external-id="' + value.fullId + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
+                                    value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-name="' + value.name + '" data-external-id="' + value.fullId + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
                                 }
                                 if('GROUP_4A' === options.buttonGroup) {
                                     if (value.scopable === 'Y') {
@@ -233,7 +233,7 @@
                     $.showModal({
                         url: $.getURL('/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
                         name:'attribute-options',
-                        title:'Attribute Options',
+                        title: $(this).data('name') + ' Options',
                         buttons: [
                             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
                         ]
@@ -242,7 +242,7 @@
                     $.showModal({
                         url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
                         name:'attribute-options',
-                        title:'Attribute Options',
+                        title:$(this).data('name') + ' Options',
                         buttons: [
                             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
                         ]
