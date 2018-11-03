@@ -18,7 +18,7 @@ import java.util.Set;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-abstract public class ValidatableEntity implements Serializable {
+abstract public class ValidatableEntity<T> implements Serializable {
 
 
     @Transient
@@ -50,6 +50,10 @@ abstract public class ValidatableEntity implements Serializable {
             });
         }
         return errors;
+    }
+
+    public int compare(T t, String property, String direction) {
+        return 0;
     }
 
     static boolean isEmpty(Object object) {
@@ -101,4 +105,16 @@ abstract public class ValidatableEntity implements Serializable {
 
     public interface CreateGroup {}
     public interface DetailsGroup {}
+
+    protected enum Direction {
+        ASC(1), DESC(-1);
+        private int direction = 1;
+        Direction(int direction) {
+            this.direction = direction;
+        }
+
+        public static int getDirection(String direction) {
+            return valueOf(direction).direction;
+        }
+    }
 }

@@ -7,10 +7,7 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.Channel;
-import com.bigname.pim.api.domain.Family;
-import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.ProductVariant;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.ProductService;
@@ -107,16 +104,39 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         return model;
     }
 
-    @RequestMapping(value = "/{productId}/variants/{variantId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{productId}/channels/{channelId}/variants/{variantId}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "productId") String productId, @PathVariable(value = "variantId") String variantId, ProductVariant productVariant) {
+    public Map<String, Object> update(@PathVariable(value = "productId") String productId,
+                                      @PathVariable(value = "variantId") String variantId,
+                                      ProductVariant productVariantDTO,
+                                      HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        productVariant.setProductId(productId);
-        if(isValid(productVariant, model, productVariant.getGroup().length == 1 && productVariant.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : productVariant.getGroup().equals("SEO") ? ProductVariant.SeoGroup.class : null)) {
-            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+        productVariantDTO.setLevel(1); //TODO - make this dynamic
+        setVariantAttributeValues(productVariantDTO, request);
+        if(isValid(productVariantDTO, model, productVariantDTO.getGroup().length == 1 && productVariantDTO.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : null)) {
+//            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
             model.put("success", true);
         }
         return model;
+    }
+
+    private void setVariantAttributeValues(ProductVariant productVariantDTO, HttpServletRequest request) {
+        productService.get(productVariantDTO.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+            product.setChannelId(productVariantDTO.getChannelId());
+            productVariantDTO.setProduct(product);
+            Family productFamily = product.getProductFamily();
+            String variantGroupId = productFamily.getChannelVariantGroups().get(productVariantDTO.getChannelId());
+            VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
+            if(isNotEmpty(variantGroup)) {
+                Map<String, Object> attributesMap = getAttributesMap(request);
+                List<String> variantAttributeIds = variantGroup.getVariantAttributes().get(productVariantDTO.getLevel());
+                variantAttributeIds.forEach(attributeId -> {
+                    if(attributesMap.containsKey(attributeId)) {
+                        productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
+                    }
+                });
+            }
+        });
     }
 
     @RequestMapping("/{productId}/variants/list")
@@ -167,7 +187,7 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
                 ProductVariant productVariant = _productVariant.get();
                 productVariant.setProduct(product);
                 model.put("mode", "DETAILS");
-                model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - JIRA BNPIM-6
+//                model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - JIRA BNPIM-6
                 model.put("productVariant", productVariant);
                 model.put("productFamily", productVariant.getProduct().getProductFamily());
                 model.put("breadcrumbs", new Breadcrumbs("Product",

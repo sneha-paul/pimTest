@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.bigname.pim.util.FindBy.EXTERNAL_ID;
 import static com.bigname.pim.util.FindBy.INTERNAL_ID;
@@ -133,6 +134,17 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         return findBy == INTERNAL_ID ? dao.findByIdAndActiveIn(id, PimUtil.getActiveOptions(activeRequired)) :  dao.findByExternalIdAndActiveIn(id, PimUtil.getActiveOptions(activeRequired));
     }
 
+    @SuppressWarnings("uncheched")
+    protected static <E extends ValidatableEntity> Page<E> paginate(List<E> list, int page, int size, Sort sort) {
+        if(sort != null) {
+            List<Sort.Order> orders = sort.stream().collect(Collectors.toList());
+            if(!orders.isEmpty()) {
+                list.sort((e1, e2) -> e1.compare(e2, orders.get(0).getProperty(), orders.get(0).getDirection().name()));
+            }
+        }
+        return paginate(list, page, size);
+    }
+
     protected static <E> Page<E> paginate(List<E> list, int page, int size) {
         List<E> sublist = new ArrayList<>();
         int from = page * size, to = from + size;
@@ -144,7 +156,6 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         }
         return new PageImpl<>(sublist, PageRequest.of(page, size), list.size());
     }
-
     protected T cloneInstance(T t, Entity.CloneType type) {
         return create(t);
     }

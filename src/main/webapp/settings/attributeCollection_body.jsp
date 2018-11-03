@@ -117,7 +117,7 @@
                 {data: 'id', name: 'id', title: 'Attribute ID'},
                 {data: 'group', name: 'group', title: 'Attribute Group'},
                 {data: 'selectable', name: 'selectable', title: 'Selectable'},
-                {data: 'actions', name: 'actions', title: 'Actions'}
+                {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
             ]
         });
 

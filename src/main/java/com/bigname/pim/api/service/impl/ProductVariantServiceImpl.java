@@ -1,11 +1,15 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.pim.api.domain.Attribute;
+import com.bigname.pim.api.domain.AttributeGroup;
+import com.bigname.pim.api.domain.FamilyAttributeGroup;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +18,10 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * Created by sruthi on 20-09-2018.
@@ -47,5 +55,32 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     @Override
     public List<ProductVariant> getAll(String productId, String channelId, Sort sort, boolean... activeRequired) {
         return getAll(productId, channelId, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
+    }
+
+    @Override
+    public Optional<ProductVariant> get(String productId, String channelId, String productVariantId, boolean... activeRequired) {
+        return productVariantDAO.findByProductIdAndChannelIdAndProductVariantIdAndActiveIn(productId, channelId, productVariantId, PimUtil.getActiveOptions(activeRequired));
+    }
+
+    @Override
+    public Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, ProductVariant productVariant, String group) {
+        FamilyAttributeGroup masterGroup = productVariant.getProduct().getProductFamily().getAttributes().get(group + "_GROUP");
+        if(isNotEmpty(masterGroup)) {
+            FamilyAttributeGroup sectionGroup = masterGroup.getChildGroups().get(AttributeGroup.DEFAULT_GROUP_ID);
+            sectionGroup.getChildGroups().forEach((k, attributeGroup) ->
+                attributeGroup.getAttributes().forEach((k1, attribute) -> {
+                    if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !productVariant.getVariantAttributes().containsKey(k1)) {
+                        productVariant.getVariantAttributes().put(k1, new String[0]);
+                    } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !productVariant.getVariantAttributes().containsKey(k1)) {
+                        productVariant.getVariantAttributes().put(k1, "N");
+                    }
+                    Pair<String, Object> error = attribute.validate(productVariant.getVariantAttributes().get(attribute.getId()), productVariant.getChannelId(), productVariant.getLevel());
+                    if(isNotEmpty(error)) {
+                        fieldErrors.put(attribute.getId(), error);
+                    }
+                })
+            );
+        }
+        return fieldErrors;
     }
 }

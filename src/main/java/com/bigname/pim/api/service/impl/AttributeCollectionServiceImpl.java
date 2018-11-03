@@ -2,6 +2,7 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
@@ -57,15 +58,14 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
 
     @Override
     public Page<Attribute> getAttributes(String collectionId, FindBy findBy, int page, int size, Sort sort) {
-        /*if(sort == null) {
+        if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
-        }*/
+        }
         final Map<String, AttributeGroup> attributeGroups = new HashMap<>();
         List<Attribute> attributes = new ArrayList<>();
         get(collectionId, findBy, false).ifPresent(attributeCollection -> attributeGroups.putAll(attributeCollection.getAttributes()));
         AttributeGroup.getAllAttributeGroups(attributeGroups, AttributeGroup.GetMode.ALL, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
-        //            TODO - sort this based on the requested sort
-        return paginate(attributes, page, size);
+        return paginate(attributes, page, size, sort);
     }
 
     @Override

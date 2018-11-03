@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class Attribute extends ValidatableEntity {
+public class Attribute extends ValidatableEntity<Attribute> {
 
     @NotEmpty(message = "Attribute name cannot be empty")
     private String name;
@@ -223,6 +223,20 @@ public class Attribute extends ValidatableEntity {
         map.put("selectable", getSelectable());
         map.put("options", Integer.toString(options.size()));
         return map;
+    }
+
+    public int compare(Attribute attribute, String property, String direction) {
+        property = isEmpty(property) ? "" : property.trim();
+        switch (property) {
+            case "id":
+                return Direction.getDirection(direction) * getId().compareTo(attribute.getId());
+            case "group":
+                return Direction.getDirection(direction) * AttributeGroup.getFullGroupLabel(getAttributeGroup(), "|").compareTo(AttributeGroup.getFullGroupLabel(attribute.getAttributeGroup(), "|"));
+            case "selectable":
+                return Direction.getDirection(direction) * getSelectable().compareTo(attribute.getSelectable());
+            default:
+                return Direction.getDirection(direction) * getName().compareTo(attribute.getName());
+        }
     }
 
     /*public static Attribute findAttribute(String attributeId, Map<String, AttributeGroup> familyAttributeGroups) {

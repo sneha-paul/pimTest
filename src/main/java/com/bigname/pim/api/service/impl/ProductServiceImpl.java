@@ -74,6 +74,15 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         return getProductVariants(productId, findBy, channelId, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
+
+
+    @Override
+    public Optional<ProductVariant> getProductVariant(String productId, FindBy findBy, String channelId, String productVariantId, boolean... activeRequired) {
+        return get(productId, findBy, ConversionUtil.toList(activeRequired).size() == 2 && activeRequired[1])
+                .map(product -> productVariantService.get(product.getId(), channelId, productVariantId, activeRequired))
+                .orElse(Optional.empty());
+    }
+
     /**
      * Override the crete method to replace the passed in productFamily EXTERNAL_ID to a valid INTERNAL_ID
      *

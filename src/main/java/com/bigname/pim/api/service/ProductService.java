@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by sruthi on 19-09-2018.
@@ -17,6 +18,7 @@ import java.util.Map;
 public interface ProductService extends BaseService<Product, ProductDAO> {
     Page<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, int page, int size, Sort sort, boolean... activeRequired);
     List<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, Sort sort, boolean... activeRequired);
+    Optional<ProductVariant> getProductVariant(String productId, FindBy findBy, String channelId, String productVariantId, boolean... activeRequired);
     Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
 //    Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);

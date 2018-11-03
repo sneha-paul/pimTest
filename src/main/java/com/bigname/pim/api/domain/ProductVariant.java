@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -28,6 +29,9 @@ public class ProductVariant extends Entity<ProductVariant> {
 
     @Transient
     private Product product;
+
+    @Transient @JsonIgnore
+    private int level;
 
     private Map<String, String> axisAttributes = new HashMap<>();
 
@@ -85,6 +89,14 @@ public class ProductVariant extends Entity<ProductVariant> {
         }
     }
 
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
     public String getChannelId() {
         return channelId;
     }
@@ -116,10 +128,24 @@ public class ProductVariant extends Entity<ProductVariant> {
 
     @Override
     public ProductVariant merge(ProductVariant productVariant) {
-        this.setExternalId(productVariant.getExternalId());
-        this.setProductVariantName(productVariant.getProductVariantName());
-        this.setActive(productVariant.getActive());
-        this.setVariantAttributes(productVariant.getVariantAttributes());
+        for(String group : productVariant.getGroup()) {
+            switch(group) {
+                case "DETAILS":
+                    this.setExternalId(productVariant.getExternalId());
+                    this.setProductVariantName(productVariant.getProductVariantName());
+                    this.setActive(productVariant.getActive());
+                break;
+
+                case "ASSETS":
+
+                break;
+            }
+
+            if(isNotEmpty(productVariant.getVariantAttributes())) {
+                productVariant.getVariantAttributes().forEach(variantAttributes::put);
+            }
+        }
+
         return this;
     }
 
@@ -128,7 +154,6 @@ public class ProductVariant extends Entity<ProductVariant> {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
         map.put("productVariantName", getProductVariantName());
-//        map.put("productFamilyId",getProductFamilyId());
         map.put("active", getActive());
         return map;
     }

@@ -1,4 +1,3 @@
-<%--@elvariable id="channels" type="java.util.Map"--%>
 <%--@elvariable id="product" type="com.bigname.pim.api.domain.Product"--%>
 <%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.api.domain.ProductFamily>"--%>
 <%--@elvariable id="masterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
@@ -35,7 +34,7 @@
 
                                 <div class="card inner overflowhidden">
                                     <div class="body">
-                                        <form method="post" action="/pim/products/${product.productId}/variants/${productVariant.productVariantId}" data-method="PUT"
+                                        <form method="post" action="/pim/products/${product.productId}/channels/${productVariant.channelId}/variants/${productVariant.productVariantId}" data-method="PUT"
                                               data-success-message='["Successfully updated the product variant", "Product Variant Updated"]'
                                               data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
 
@@ -283,7 +282,7 @@
                                             <div class="form-button-group pull-right">
                                                 <input type="hidden" name="group" value="DETAILS"/>
                                                 <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
-                                                <a href="/pim/products"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                                <a href="/pim/products/channels/{${productVariant.channelId}/#productVariants"><button type="button" class="btn btn-danger">Cancel</button></a>
                                             </div>
                                         </form>
                                     </div>
