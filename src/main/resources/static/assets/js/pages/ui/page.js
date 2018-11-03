@@ -141,6 +141,11 @@
 
                         });
                         return json.data;
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $.ajaxError(jqXHR, function(){
+                            toastr.error('An error occurred while loading the data, try refreshing the page', "Error", {timeOut: 3000});
+                        });
                     }
                 },
                 columns: options.columns
@@ -283,9 +288,13 @@
                 loadingHtml: '<span class="fa fa-circle-o-notch fa-spin fa-3x text-primary"></span><span class="h4">Loading</span>',
                 size: eModal.size.lg,
                 name:'Modal',
-                title: 'Modal'
-            };
+                title: 'Modal',
+                error: function(jqXHR) {
+                    $.ajaxError(jqXHR, function(){
 
+                    });
+                }
+            };
             eModal.ajax(Object.assign({},defaultOptions, options));
         },
         closeModal: function() {
@@ -377,8 +386,10 @@
 
 
                 },
-                error: function (resp) {
-                    window.location.href = $.pageURL();
+                error: function (jqXHR) {
+                    $.ajaxError(jqXHR, function(){
+                        window.location.href = $.pageURL();
+                    });
                 }
             });
         },
@@ -419,10 +430,43 @@
                         toastr.error($(formEl).data('error-message')[0], $(formEl).data('error-message')[1], {timeOut: 3000})
                     }
                 },
-                error: function (resp) {
-                    toastr.error('An error occurred while saving the data', "Error", {timeOut: 3000});
+                error: function (jqXHR) {
+                    $.ajaxError(jqXHR, function(){
+                        toastr.error('An error occurred while saving the data', "Error", {timeOut: 3000});
+                    });
                 }
             });
+        },
+
+        sessionExpired: function() {
+            swal({
+                title: 'Session Expired',
+                text: "Due to inactivity, your session has been expired. Do you want to login?",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, login',
+                cancelButtonText: 'No, logout',
+                allowOutsideClick: false,
+                animation: false
+            }).then((result) => {
+                if (result.value) {
+                    window.location.reload();
+                } else if (result.dismiss === swal.DismissReason.cancel) {
+                    window.location.href = "/logout"
+                }
+            });
+            setTimeout(function(){$.closeModal();}, 1000);
+        },
+
+        ajaxError: function(jqXHR, errorCallback) {
+            var responseJSON = jqXHR.responseJSON ? jqXHR.responseJSON : JSON.parse(jqXHR.responseText);
+            if(403 === responseJSON.status && 'Session Expired' === responseJSON.message) {
+                $.sessionExpired();
+            } else {
+                errorCallback();
+            }
         },
 
         ajaxSubmit: function(options) {
@@ -453,8 +497,10 @@
                         toastr.error(options.errorMessage[1], options.errorMessage[0], {timeOut: 3000})
                     }
                 },
-                error: function (resp) {
-                    toastr.error(options.errorMessage[1], options.errorMessage[0], {timeOut: 3000});
+                error: function (jqXHR) {
+                    $.ajaxError(jqXHR, function(){
+                        toastr.error(options.errorMessage[1], options.errorMessage[0], {timeOut: 3000});
+                    });
                 }
             });
 
