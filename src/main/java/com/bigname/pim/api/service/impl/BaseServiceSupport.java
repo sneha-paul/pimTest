@@ -134,7 +134,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         return findBy == INTERNAL_ID ? dao.findByIdAndActiveIn(id, PimUtil.getActiveOptions(activeRequired)) :  dao.findByExternalIdAndActiveIn(id, PimUtil.getActiveOptions(activeRequired));
     }
 
-    @SuppressWarnings("uncheched")
+    @SuppressWarnings("unchecked")
     protected static <E extends ValidatableEntity> Page<E> paginate(List<E> list, int page, int size, Sort sort) {
         if(sort != null) {
             List<Sort.Order> orders = sort.stream().collect(Collectors.toList());
