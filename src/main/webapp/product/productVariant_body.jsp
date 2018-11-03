@@ -69,6 +69,7 @@
                                                                                     <c:set var="attributeType" value="${attribute.getType(productVariant.channelId)}"/>
                                                                                     <c:set var="disabled" value="${attributeType eq 'COMMON'}"/>
                                                                                     <c:set var="disabledClass" value="${attributeType eq 'COMMON' ? ' js-parent-level' : ''}"/>
+                                                                                    <c:set var="attributeValue" value="${productVariant.variantAttributes[attribute.id]}"/>
                                                                                     <c:choose>
                                                                                         <c:when test="${attributeType eq 'COMMON'}">
                                                                                             <c:choose>
@@ -79,12 +80,13 @@
                                                                                                     <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                                 </c:otherwise>
                                                                                             </c:choose>
-
+                                                                                            <c:set var="attributeValue" value="${product.scopedFamilyAttributes[productVariant.channelId][attribute.id]}"/>
                                                                                             <c:set var="disabledClass" value=" js-parent-level"/>
                                                                                         </c:when>
                                                                                         <c:when test="${attributeType eq 'AXIS'}">
                                                                                             <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                             <c:set var="disabledClass" value=" js-variant-axis"/>
+                                                                                            <c:set var="attributeValue" value="${productVariant.axisAttributes[attribute.id]}"/>
                                                                                         </c:when>
                                                                                     </c:choose>
                                                                                     <c:if test="${attributeType ne 'NOT_APPLICABLE'}">
@@ -98,19 +100,19 @@
                                                                                                         <option value="">Select One</option>
                                                                                                         <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                             <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq productVariant.axisAttributes[attribute.id] or attributeOption.id eq productVariant.variantAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq attributeValue}">selected</c:if>>${attributeOption.value}</option>
                                                                                                         </c:forEach>
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${productVariant.variantAttributes[attribute.id]}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <label class="fancy-checkbox">
-                                                                                                            <input type="checkbox" class="js-checkbox${disabledClass}" ${disabled} name="${attribute.id}" value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                            <input type="checkbox" class="js-checkbox${disabledClass}" ${disabled} name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -123,7 +125,7 @@
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <label class="fancy-radio">
-                                                                                                            <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                            <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span><i></i>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -134,20 +136,20 @@
                                                                                                 <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                     <br/>
                                                                                                     <label class="fancy-checkbox${disabledClass}">
-                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${productVariant.variantAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${attributeValue eq 'Y'}">checked="checked"</c:if>>
                                                                                                         <span>${attribute.label}</span>
                                                                                                     </label>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                     <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control datepicker${disabledClass}">
+                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control datepicker${disabledClass}">
                                                                                                         <div class="input-group-append">
                                                                                                             <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </c:when>
                                                                                                 <c:otherwise>
-                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control${disabledClass}"/>
+                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control${disabledClass}"/>
                                                                                                 </c:otherwise>
                                                                                             </c:choose>
                                                                                         </div>
@@ -186,6 +188,7 @@
                                                                                     <c:set var="attributeType" value="${attribute.getType(productVariant.channelId)}"/>
                                                                                     <c:set var="disabled" value=""/>
                                                                                     <c:set var="disabledClass" value=""/>
+                                                                                    <c:set var="attributeValue" value="${productVariant.variantAttributes[attribute.id]}"/>
                                                                                     <c:choose>
                                                                                         <c:when test="${attributeType eq 'COMMON'}">
                                                                                             <c:choose>
@@ -196,11 +199,13 @@
                                                                                                     <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                                 </c:otherwise>
                                                                                             </c:choose>
+                                                                                            <c:set var="attributeValue" value="${product.scopedFamilyAttributes[productVariant.channelId][attribute.id]}"/>
                                                                                             <c:set var="disabledClass" value=" js-parent-level"/>
                                                                                         </c:when>
                                                                                         <c:when test="${attributeType eq 'AXIS'}">
                                                                                             <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                             <c:set var="disabledClass" value=" js-variant-axis"/>
+                                                                                            <c:set var="attributeValue" value="${productVariant.axisAttributes[attribute.id]}"/>
                                                                                         </c:when>
                                                                                     </c:choose>
 
@@ -215,19 +220,19 @@
                                                                                                         <option value="">Select One</option>
                                                                                                         <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                             <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq productVariant.axisAttributes[attribute.id] or attributeOption.id eq productVariant.variantAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                            <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq attributeValue}">selected</c:if>>${attributeOption.value}</option>
                                                                                                         </c:forEach>
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${productVariant.variantAttributes[attribute.id]}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <label class="fancy-checkbox${disabled}${disabledClass}">
-                                                                                                            <input type="checkbox" class="js-checkbox"  name="${attribute.id}" value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                            <input type="checkbox" class="js-checkbox"  name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -240,7 +245,7 @@
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                         <label class="fancy-radio">
-                                                                                                            <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                            <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span><i></i>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -251,20 +256,20 @@
                                                                                                 <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                     <br/>
                                                                                                     <label class="fancy-checkbox ${disabled}${disabledClass}">
-                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${productVariant.variantAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                        <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${attributeValue eq 'Y'}">checked="checked"</c:if>>
                                                                                                         <span>${attribute.label}</span>
                                                                                                     </label>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                     <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control datepicker${disabledClass}">
+                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control datepicker${disabledClass}">
                                                                                                         <div class="input-group-append">
                                                                                                             <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </c:when>
                                                                                                 <c:otherwise>
-                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control${disabledClass}"/>
+                                                                                                    <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control${disabledClass}"/>
                                                                                                 </c:otherwise>
                                                                                             </c:choose>
                                                                                         </div>
@@ -352,6 +357,7 @@
                                                                                             <c:set var="attributeType" value="${attribute.getType(productVariant.channelId)}"/>
                                                                                             <c:set var="disabled" value=""/>
                                                                                             <c:set var="disabledClass" value=""/>
+                                                                                            <c:set var="attributeValue" value="${productVariant.variantAttributes[attribute.id]}"/>
                                                                                             <c:choose>
                                                                                                 <c:when test="${attributeType eq 'COMMON'}">
                                                                                                     <c:choose>
@@ -362,11 +368,13 @@
                                                                                                             <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                                         </c:otherwise>
                                                                                                     </c:choose>
+                                                                                                    <c:set var="attributeValue" value="${product.scopedFamilyAttributes[productVariant.channelId][attribute.id]}"/>
                                                                                                     <c:set var="disabledClass" value=" js-parent-level"/>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attributeType eq 'AXIS'}">
                                                                                                     <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                                     <c:set var="disabledClass" value=" js-variant-axis"/>
+                                                                                                    <c:set var="attributeValue" value="${productVariant.axisAttributes[attribute.id]}"/>
                                                                                                 </c:when>
                                                                                             </c:choose>
 
@@ -381,19 +389,19 @@
                                                                                                                 <option value="">Select One</option>
                                                                                                                 <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                                     <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                                    <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq productVariant.axisAttributes[attribute.id] or attributeOption.id eq productVariant.variantAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                                    <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq attributeValue}">selected</c:if>>${attributeOption.value}</option>
                                                                                                                 </c:forEach>
                                                                                                             </select>
                                                                                                         </c:when>
                                                                                                         <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                            <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${productVariant.variantAttributes[attribute.id]}</textarea>
+                                                                                                            <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                         </c:when>
                                                                                                         <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                             <br/>
                                                                                                             <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                                 <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                                 <label class="fancy-checkbox${disabled}${disabledClass}">
-                                                                                                                    <input type="checkbox" class="js-checkbox"  name="${attribute.id}" value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                                    <input type="checkbox" class="js-checkbox"  name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                                     <span>${attributeOption.value}</span>
                                                                                                                 </label>
                                                                                                                 <c:if test="${not s1.end}">
@@ -406,7 +414,7 @@
                                                                                                             <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                                 <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                                 <label class="fancy-radio">
-                                                                                                                    <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                                    <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                                     <span><i></i>${attributeOption.value}</span>
                                                                                                                 </label>
                                                                                                                 <c:if test="${not s1.end}">
@@ -417,20 +425,20 @@
                                                                                                         <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                             <br/>
                                                                                                             <label class="fancy-checkbox ${disabled}${disabledClass}">
-                                                                                                                <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${productVariant.variantAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                                <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${attributeValue eq 'Y'}">checked="checked"</c:if>>
                                                                                                                 <span>${attribute.label}</span>
                                                                                                             </label>
                                                                                                         </c:when>
                                                                                                         <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                             <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                                <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control datepicker${disabledClass}">
+                                                                                                                <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control datepicker${disabledClass}">
                                                                                                                 <div class="input-group-append">
                                                                                                                     <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                         </c:when>
                                                                                                         <c:otherwise>
-                                                                                                            <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control${disabledClass}"/>
+                                                                                                            <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control${disabledClass}"/>
                                                                                                         </c:otherwise>
                                                                                                     </c:choose>
                                                                                                 </div>
@@ -487,6 +495,7 @@
                                                                                         <c:set var="attributeType" value="${attribute.getType(productVariant.channelId)}"/>
                                                                                         <c:set var="disabled" value=""/>
                                                                                         <c:set var="disabledClass" value=""/>
+                                                                                        <c:set var="attributeValue" value="${productVariant.variantAttributes[attribute.id]}"/>
                                                                                         <c:choose>
                                                                                             <c:when test="${attributeType eq 'COMMON'}">
                                                                                                 <c:choose>
@@ -497,11 +506,13 @@
                                                                                                         <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                                     </c:otherwise>
                                                                                                 </c:choose>
+                                                                                                <c:set var="attributeValue" value="${product.scopedFamilyAttributes[productVariant.channelId][attribute.id]}"/>
                                                                                                 <c:set var="disabledClass" value=" js-parent-level"/>
                                                                                             </c:when>
                                                                                             <c:when test="${attributeType eq 'AXIS'}">
                                                                                                 <c:set var="disabled" value=' disabled="disabled"'/>
                                                                                                 <c:set var="disabledClass" value=" js-variant-axis"/>
+                                                                                                <c:set var="attributeValue" value="${productVariant.axisAttributes[attribute.id]}"/>
                                                                                             </c:when>
                                                                                         </c:choose>
 
@@ -516,19 +527,19 @@
                                                                                                             <option value="">Select One</option>
                                                                                                             <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                                 <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                                <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq productVariant.axisAttributes[attribute.id] or attributeOption.id eq productVariant.variantAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                                <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq attributeValue}">selected</c:if>>${attributeOption.value}</option>
                                                                                                             </c:forEach>
                                                                                                         </select>
                                                                                                     </c:when>
                                                                                                     <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                        <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${productVariant.variantAttributes[attribute.id]}</textarea>
+                                                                                                        <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                     </c:when>
                                                                                                     <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                         <br/>
                                                                                                         <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                             <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                             <label class="fancy-checkbox${disabled}${disabledClass}">
-                                                                                                                <input type="checkbox" class="js-checkbox"  name="${attribute.id}" value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                                <input type="checkbox" class="js-checkbox"  name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                                 <span>${attributeOption.value}</span>
                                                                                                             </label>
                                                                                                             <c:if test="${not s1.end}">
@@ -541,7 +552,7 @@
                                                                                                         <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                             <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
                                                                                                             <label class="fancy-radio">
-                                                                                                                <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${productVariant.variantAttributes[attribute.id] eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                                <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                                 <span><i></i>${attributeOption.value}</span>
                                                                                                             </label>
                                                                                                             <c:if test="${not s1.end}">
@@ -552,20 +563,20 @@
                                                                                                     <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                         <br/>
                                                                                                         <label class="fancy-checkbox ${disabled}${disabledClass}">
-                                                                                                            <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${productVariant.variantAttributes[attribute.id] eq 'Y'}">checked="checked"</c:if>>
+                                                                                                            <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${attributeValue eq 'Y'}">checked="checked"</c:if>>
                                                                                                             <span>${attribute.label}</span>
                                                                                                         </label>
                                                                                                     </c:when>
                                                                                                     <c:when test="${attribute.uiType eq 'DATE_PICKER'}">
                                                                                                         <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                                            <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control datepicker${disabledClass}">
+                                                                                                            <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control datepicker${disabledClass}">
                                                                                                             <div class="input-group-append">
                                                                                                                 <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     </c:when>
                                                                                                     <c:otherwise>
-                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${productVariant.variantAttributes[attribute.id]}" ${disabled} class="form-control${disabledClass}"/>
+                                                                                                        <input type="text" id="${attribute.id}" name="${attribute.id}" value="${attributeValue}" ${disabled} class="form-control${disabledClass}"/>
                                                                                                     </c:otherwise>
                                                                                                 </c:choose>
                                                                                             </div>

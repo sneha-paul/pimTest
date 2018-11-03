@@ -114,7 +114,7 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         productVariantDTO.setLevel(1); //TODO - make this dynamic
         setVariantAttributeValues(productVariantDTO, request);
         if(isValid(productVariantDTO, model, productVariantDTO.getGroup().length == 1 && productVariantDTO.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : null)) {
-//            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariantDTO);
             model.put("success", true);
         }
         return model;
