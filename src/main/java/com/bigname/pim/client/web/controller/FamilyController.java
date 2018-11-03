@@ -368,7 +368,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     public ModelAndView attributeOptions(@PathVariable(value = "familyId") String familyId,
                                          @PathVariable(value = "attributeId") String attributeId) {
         Map<String, Object> model = new HashMap<>();
-//        model.put("familyId", familyId);
+        familyService.get(familyId, FindBy.EXTERNAL_ID, false).ifPresent(family -> model.put("attributeName", family.getAllAttributesMap().get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getName()));
         model.put("attributeId", attributeId);
         return new ModelAndView("settings/familyAttributeOptions", model);
     }
@@ -377,7 +377,6 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     public ModelAndView availableAttributeOptions(@PathVariable(value = "familyId") String familyId,
                                          @PathVariable(value = "attributeId") String attributeId) {
         Map<String, Object> model = new HashMap<>();
-//        model.put("familyId", familyId);
         model.put("attributeId", attributeId);
         return new ModelAndView("settings/availableFamilyAttributeOptions", model);
     }

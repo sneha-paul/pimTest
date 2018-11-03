@@ -31,5 +31,5 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.setPageAttributes({'attributeId': '${attributeId}'});$.initAHAH(this)"/>
+<img src="/assets/img/tiny.png" onload="$.setPageAttributes({'attributeId': '${attributeId}', 'attributeName': '${attributeName}'});$.initAHAH(this)"/>
 <script src="/assets/js/pages/ui/settings/familyAttributeOptions.js"></script>

@@ -43,13 +43,13 @@ $(function(){
         $.showModal({
             url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/available'),
             name:'available-attribute-options',
-            title:'Available Attribute Options',
+            title:'Available ' + $.getPageAttribute('attributeName') + ' Options',
             buttons: [
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){
                     $.showModal({
                         url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options'),
                         name:'attribute-options',
-                        title:'Attribute Options',
+                        title:$.getPageAttribute('attributeName') + ' Options',
                         buttons: [
                             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
                         ]
