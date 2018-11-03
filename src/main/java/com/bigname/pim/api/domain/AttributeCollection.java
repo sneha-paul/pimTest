@@ -98,8 +98,6 @@ public class AttributeCollection extends Entity<AttributeCollection> {
                 case "ATTRIBUTES":
                     this.setAttributes(collection.getAttributes());
                 break;
-                case "VARIANT_GROUPS":
-                break;
             }
         }
         return this;

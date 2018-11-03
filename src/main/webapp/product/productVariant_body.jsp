@@ -338,7 +338,7 @@
                                                     <fieldset><legend>${sectionGroup.label}</legend></fieldset>
                                                     <hr style="border:0; margin-top: -5px;border-bottom: 1rem; border-top:1px solid rgba(0,0,0,.1)"/>
                                                 </c:if>
-                                                <form method="post" action="/pim/products/${product.productId}/variants/${productVariant.productVariantId}" data-method="PUT"
+                                                <form method="post" action="/pim/products/${product.productId}/channels/${productVariant.channelId}/variants/${productVariant.productVariantId}" data-method="PUT"
                                                       data-success-message='["Successfully updated the product", "Product Updated"]'
                                                       data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
                                                     <c:forEach items="${sectionGroup.childGroups}" var="attributeGroupEntry">
@@ -476,7 +476,7 @@
                                                 <fieldset><legend>${sectionGroup.label}</legend></fieldset>
                                                 <hr style="border:0; margin-top: -5px;border-bottom: 1rem; border-top:1px solid rgba(0,0,0,.1)"/>
                                             </c:if>
-                                            <form method="post" action="/pim/products/${product.productId}/variants/${productVariant.productVariantId}" data-method="PUT"
+                                            <form method="post" action="/pim/products/${product.productId}/channels/${productVariant.channelId}/variants/${productVariant.productVariantId}" data-method="PUT"
                                                   data-success-message='["Successfully updated the product", "Product Updated"]'
                                                   data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
                                                 <c:forEach items="${sectionGroup.childGroups}" var="attributeGroupEntry">
