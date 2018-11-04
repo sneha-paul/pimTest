@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
@@ -235,7 +236,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
             if(isNotEmpty(variantGroupId)) {
                 VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
                 if(isNotEmpty(variantGroup)) {
-                    Map<String, List<FamilyAttributeOption>> axisAttributesOptions = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(Collectors.toMap(FamilyAttribute::getId, axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())));
+                    Map<String, List<FamilyAttributeOption>> axisAttributesOptions = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(CollectionsUtil.toLinkedMap(FamilyAttribute::getId, axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())));
                     existingVariants.forEach(productVariant -> {
                         StringBuilder axisAttributeIds = new StringBuilder();
                         for (Map.Entry<String, List<FamilyAttributeOption>> entry : axisAttributesOptions.entrySet()) {
@@ -283,6 +284,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                 }
             }
         });
+        sort(variantMatrix, sort);
         return paginate(variantMatrix, page, size);
     }
 

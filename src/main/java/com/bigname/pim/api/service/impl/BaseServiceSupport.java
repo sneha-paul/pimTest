@@ -145,6 +145,15 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         return paginate(list, page, size);
     }
 
+    protected static void sort(List<Map<String, String>> list, Sort sort) {
+        if(sort != null) {
+            List<Sort.Order> orders = sort.stream().collect(Collectors.toList());
+            if(!orders.isEmpty()) {
+                list.sort((e1, e2) -> (orders.get(0).getDirection() == Sort.Direction.ASC ? 1 : -1) * (e1.containsKey(orders.get(0).getProperty()) ? e1.get(orders.get(0).getProperty()).compareTo(e2.get(orders.get(0).getProperty())) : 0));
+            }
+        }
+    }
+
     protected static <E> Page<E> paginate(List<E> list, int page, int size) {
         List<E> sublist = new ArrayList<>();
         int from = page * size, to = from + size;

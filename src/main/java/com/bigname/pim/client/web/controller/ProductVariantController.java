@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
@@ -61,12 +62,12 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
-        /*Sort sort = null;
+        Sort sort = null;
         if(pagination.hasSorts()) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }*/
+        }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Map<String, String>> paginatedResult = productService.getAvailableVariants(productId, FindBy.EXTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), null);
+        Page<Map<String, String>> paginatedResult = productService.getAvailableVariants(productId, FindBy.EXTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), sort);
         dataObjects.addAll(paginatedResult.getContent());
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -82,25 +83,39 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
                                       @PathVariable(value = "channelId") String channelId,
                                       @PathVariable(value = "variantIdentifier") String variantIdentifier) {
         Map<String, Object> model = new HashMap<>();
+        boolean[] success = {false};
         if(isNotEmpty(productId) && isNotEmpty(channelId) && isNotEmpty(variantIdentifier)) {
             productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
-                List<String> axisAttributeTokens = StringUtil.splitPipeDelimitedAsList(variantIdentifier);
-                Map<String, String> axisAttributes = new HashMap<>();
-                StringBuilder tempId = new StringBuilder();
-                for (int i = 0; i < axisAttributeTokens.size(); i = i + 2) {
-                    axisAttributes.put(axisAttributeTokens.get(i), axisAttributeTokens.get(i + 1));
-                    tempId.append("_").append(axisAttributeTokens.get(i + 1));
+                Family productFamily = product.getProductFamily();
+                String variantGroupId = productFamily.getChannelVariantGroups().get(channelId);
+                VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
+                if(isNotEmpty(variantGroup) && isNotEmpty(variantGroup.getVariantAxis().get(1))) {
+                    List<String> axisAttributeTokens = StringUtil.splitPipeDelimitedAsList(variantIdentifier);
+                    Map<String, String> axisAttributes = new HashMap<>();
+                    StringBuilder tempId = new StringBuilder();
+                    StringBuilder tempName = new StringBuilder();
+                    for (int i = 0; i < axisAttributeTokens.size(); i = i + 2) {
+                        axisAttributes.put(axisAttributeTokens.get(i), axisAttributeTokens.get(i + 1));
+                        tempId.append("_").append(axisAttributeTokens.get(i + 1));
+                        String nameToken = axisAttributeTokens.get(i + 1);
+                        FamilyAttribute axisAttribute = productFamily.getAllAttributesMap().get(axisAttributeTokens.get(i));
+                        if(isNotEmpty(axisAttribute) && axisAttribute.getOptions().containsKey(axisAttributeTokens.get(i + 1))) {
+                            nameToken = axisAttribute.getOptions().get(axisAttributeTokens.get(i + 1)).getValue();
+                        }
+                        tempName.append(tempName.length() > 0 ? " - " : "").append(nameToken);
+                    }
+                    ProductVariant productVariant = new ProductVariant(product);
+                    productVariant.setProductVariantName(product.getProductName() + " - " + tempName.toString());
+                    productVariant.setProductVariantId(tempId.toString());
+                    productVariant.setChannelId(channelId);
+                    productVariant.setAxisAttributes(axisAttributes);
+                    productVariant.setActive("N");
+                    productVariantService.create(productVariant);
+                    success[0] = true;
                 }
-                ProductVariant productVariant = new ProductVariant(product);
-                productVariant.setProductVariantName(product.getProductName());
-                productVariant.setProductVariantId(tempId.toString());
-                productVariant.setChannelId(channelId);
-                productVariant.setAxisAttributes(axisAttributes);
-                productVariant.setActive("N");
-                productVariantService.create(productVariant);
-                model.put("success", true);
             });
         }
+        model.put("success", success[0]);
         return model;
     }
 
@@ -174,29 +189,38 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         return result;
     }
 
-    @RequestMapping(value = {"/{productId}/variants/{variantId}"})
+    @RequestMapping(value = {"/{productId}/variants/{variantId}", "/{productId}/variants/create"})
     public ModelAndView variantDetails(@PathVariable(value = "productId") String productId,
-                                       @PathVariable(value = "variantId", required = false) String variantId) {
+                                       @PathVariable(value = "variantId", required = false) String variantId,
+                                       @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
         Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
         if(_product.isPresent()) {
             Product product = _product.get();
-            Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
-            if(_productVariant.isPresent()) {
-                ProductVariant productVariant = _productVariant.get();
-                productVariant.setProduct(product);
-                model.put("mode", "DETAILS");
-//                model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - JIRA BNPIM-6
+            if(variantId == null) {
+                ProductVariant productVariant = new ProductVariant(product);
+                Family family = product.getProductFamily();
+                String variantGroupId = family.getChannelVariantGroups().get(channelId);
+                model.put("mode", "CREATE");
                 model.put("productVariant", productVariant);
-                model.put("productFamily", productVariant.getProduct().getProductFamily());
-                model.put("breadcrumbs", new Breadcrumbs("Product",
-                        "Products", "/pim/products",
-                        product.getProductName(), "/pim/products/" + productId,
-                        "Product Variants", "/pim/products/" + productId + "#productVariants",
-                        productVariant.getProductVariantName(), ""));
+                model.put("axisAttributes", ConversionUtil.toJSONString(family.getVariantGroups().get(variantGroupId).getVariantAxis().get(1).stream().collect(CollectionsUtil.toLinkedMap(id -> id, id -> product.getProductFamily().getAllAttributesMap().get(id).getName()))));
             } else {
-                throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
+                Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
+                if(_productVariant.isPresent()) {
+                    ProductVariant productVariant = _productVariant.get();
+                    productVariant.setProduct(product);
+                    model.put("mode", "DETAILS");
+                    model.put("productVariant", productVariant);
+                    model.put("productFamily", productVariant.getProduct().getProductFamily());
+                    model.put("breadcrumbs", new Breadcrumbs("Product",
+                            "Products", "/pim/products",
+                            product.getProductName(), "/pim/products/" + productId,
+                            "Product Variants", "/pim/products/" + productId + "#productVariants",
+                            productVariant.getProductVariantName(), ""));
+                } else {
+                    throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
+                }
             }
         } else {
             throw new EntityNotFoundException("Unable to find Product with Id: " + productId);
