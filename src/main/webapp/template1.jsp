@@ -172,6 +172,7 @@
 
         textarea {
             min-height: 54px !important;
+            max-height: 260px !important;
         }
 
         .tab_btn {
@@ -301,7 +302,7 @@
 <%-- Javascript --%>
 
 <%--<script src="/assets/bundles/libscripts.bundle.js"></script>--%>
-<script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js">
+<script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
 <script src="/assets/js/pages/ui/global.js"></script>
 
 <script src="/assets/bundles/vendorscripts.bundle.js"></script>

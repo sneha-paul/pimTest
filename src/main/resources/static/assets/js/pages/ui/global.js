@@ -44,4 +44,13 @@ $(function(){
             return false;
         });
     });
+
+    $('textarea.auto-resize').on('keydown', function(e){
+        $.resizeTextArea($(this));
+    });
+
+    $('textarea.auto-resize').each(function() {
+        $(this).height( $(this)[0].scrollHeight );
+    })
+
 });

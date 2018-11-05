@@ -350,6 +350,13 @@
         pageURL: function() {
             return $.getPageAttribute("pageUrl");
         },
+        resizeTextArea: function(el) {
+            if ($(el).scrollTop()) {
+                $(el).height(function(i,h){
+                    return h + 20;
+                });
+            }
+        },
         refreshPage: function(params, hash) {
             if(!params) {
                 params = {};

@@ -95,7 +95,7 @@
                                                                                                 </select>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
+                                                                                                <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                 <br/>
@@ -192,7 +192,7 @@
                                                                                                 </select>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
+                                                                                                <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                 <br/>
@@ -626,7 +626,7 @@
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>
@@ -747,7 +747,7 @@
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>

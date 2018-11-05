@@ -105,7 +105,7 @@
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control auto-resize${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>
@@ -225,7 +225,7 @@
                                                                                                     </select>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                    <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
+                                                                                                    <textarea id="${attribute.id}" class="form-control auto-resize${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                     <br/>
@@ -683,7 +683,7 @@
                                                                                                             </select>
                                                                                                         </c:when>
                                                                                                         <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                            <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
+                                                                                                            <textarea id="${attribute.id}" class="form-control auto-resize${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                         </c:when>
                                                                                                         <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                             <br/>
@@ -821,7 +821,7 @@
                                                                                                         </select>
                                                                                                     </c:when>
                                                                                                     <c:when test="${attribute.uiType eq 'TEXTAREA'}">
-                                                                                                        <textarea id="${attribute.id}" class="form-control${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
+                                                                                                        <textarea id="${attribute.id}" class="form-control auto-resize${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>
                                                                                                     </c:when>
                                                                                                     <c:when test="${attribute.uiType eq 'CHECKBOX'}">
                                                                                                         <br/>
