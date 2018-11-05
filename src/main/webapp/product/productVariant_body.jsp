@@ -299,32 +299,321 @@
                     <div class="tab-pane" id="variantAssets">
                         <div class="row clearfix">
                             <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="header">
-                                        <h2>Light Gallery <small>All pictures taken from pexels.com</small></h2>
+                                <div class="card inner overflowhidden">
+                                    <div class="header" style="padding-bottom: 30px">
+                                        <div class="pull-right">
+                                            <button id="js-add-asset" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Add an Asset</span></button>
+                                        </div>
                                     </div>
                                     <div class="body">
                                         <div id="aniimated-thumbnials" class="list-unstyled row clearfix">
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1"> <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30"> <a href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" > <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt=""> </a> </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
+                                                <div class="digital-asset-container front card overflowhidden">
+                                                    <div class="header">
+                                                        <h2>10-RW-front<small style="position:absolute;top:15px;left:3px"><code class="highlighter-rouge">DEFAULT</code></small></h2>
+                                                        <ul class="header-dropdown">
+                                                            <li><span class="tab_btn active bg-success">1</span></li>
+                                                            <li class="dropdown">
+                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                                    <li><a href="javascript:void(0);" onclick="$(this).closest('.digital-asset-container').flip(true)">Edit</a></li>
+                                                                    <li><a href="javascript:void(0);">Delete</a></li>
+                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="body">
+                                                        <div class="digital-asset">
+                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
+                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <ul class="stats">
+                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
+                                                <div class="digital-asset-container card overflowhidden">
+                                                    <div class="header">
+                                                        <h2>10-RW-front</h2>
+                                                        <ul class="header-dropdown">
+                                                            <li><span class="tab_btn active">2</span></li>
+                                                            <li class="dropdown">
+                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                                    <li><a href="javascript:void(0);">Edit</a></li>
+                                                                    <li><a href="javascript:void(0);">Delete</a></li>
+                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="body">
+                                                        <div class="digital-asset">
+                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
+                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <ul class="stats">
+                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
+                                                <div class="digital-asset-container card overflowhidden">
+                                                    <div class="header">
+                                                        <h2>10-RW-front</h2>
+                                                        <ul class="header-dropdown">
+                                                            <li><span class="tab_btn active">3</span></li>
+                                                            <li class="dropdown">
+                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                                    <li><a href="javascript:void(0);">Edit</a></li>
+                                                                    <li><a href="javascript:void(0);">Delete</a></li>
+                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="body">
+                                                        <div class="digital-asset">
+                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
+                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <ul class="stats">
+                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
+                                                <div class="digital-asset-container card overflowhidden">
+                                                    <div class="header">
+                                                        <h2>10-RW-front</h2>
+                                                        <ul class="header-dropdown">
+                                                            <li><span class="tab_btn active">4</span></li>
+                                                            <li class="dropdown">
+                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                                    <li><a href="javascript:void(0);">Edit</a></li>
+                                                                    <li><a href="javascript:void(0);">Delete</a></li>
+                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="body">
+                                                        <div class="digital-asset">
+                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
+                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <ul class="stats">
+                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
+                                                <div class="digital-asset-container card overflowhidden">
+                                                    <div class="header">
+                                                        <h2>10-RW-front</h2>
+                                                        <ul class="header-dropdown">
+                                                            <li><span class="tab_btn active">5</span></li>
+                                                            <li class="dropdown">
+                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                                    <li><a href="javascript:void(0);">Edit</a></li>
+                                                                    <li><a href="javascript:void(0);">Delete</a></li>
+                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="body">
+                                                        <div class="digital-asset">
+                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
+                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <ul class="stats">
+                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
+                                                <div class="digital-asset-container card overflowhidden">
+                                                    <div class="header">
+                                                        <h2>10-RW-front</h2>
+                                                        <ul class="header-dropdown">
+                                                            <li><span class="tab_btn active">6</span></li>
+                                                            <li class="dropdown">
+                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                                    <li><a href="javascript:void(0);">Edit</a></li>
+                                                                    <li><a href="javascript:void(0);">Delete</a></li>
+                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="body">
+                                                        <div class="digital-asset">
+                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
+                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="footer">
+                                                        <ul class="stats">
+                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <%--<div class="row clearfix m-t-20">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card inner overflowhidden">
+                                    <div class="body">
+                                        <form method="post">
+                                            <div class="card inner group overflowhidden">
+                                                <div class="body">
+                                                        <fieldset>
+                                                            <legend>Fieldset Title</legend>
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-body">
+                                                                    <div class="row">
+                                                                        <div class="col-md-6 col-sm-12">
+                                                                            <div class="form-group">
+                                                                                <label>Product Name</label><code
+                                                                                    class="highlighter-rouge m-l-10">*</code>
+                                                                                <input type="text"
+                                                                                       name="productName" value=""
+                                                                                       class="form-control"
+                                                                                       required="true"/>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Product Name</label><code
+                                                                                    class="highlighter-rouge m-l-10">*</code>
+                                                                                <input type="text"
+                                                                                       name="productName" value=""
+                                                                                       class="form-control"
+                                                                                       required="true"/>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                                <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label for="metaKeywords">Meta Keywords</label>
+                                                                                <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                            <label>ProductFamily</label>
+
+                                                                            <select class="form-control" name="productFamilyId">
+                                                                                <option value="">Select One</option>
+                                                                            </select>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Status</label>
+                                                                                <br/>
+                                                                                <label class="fancy-checkbox">
+                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <span>Active</span>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Status</label>
+                                                                                <br/>
+                                                                                <label class="fancy-checkbox custom-color-blue">
+                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <span>Active</span>
+                                                                                </label>
+                                                                                <br/>
+                                                                                <label class="fancy-checkbox">
+                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
+                                                                                    <span>Active</span>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Status</label>
+                                                                                <br/>
+                                                                                <label class="fancy-radio"><input name="gender3" value="male" type="radio" checked=""><span><i></i>Male</span></label>
+                                                                                <label class="fancy-radio"><input name="gender3" value="male" type="radio" checked=""><span><i></i>Female</span></label>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Date</label>
+                                                                                <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
+                                                                                    <input type="text" class="form-control datepicker">
+                                                                                    <div class="input-group-append">
+                                                                                        <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="form-group">
+                                                                                <label>Date Range</label>
+                                                                                <div class="input-daterange input-group" data-provide="datepicker">
+                                                                                    <input type="text" class="input-sm form-control datepicker" name="start">
+                                                                                    <div class="input-group-append">
+                                                                                        <button class="btn btn-secondary" style="border-bottom-right-radius: 0.25rem;border-top-right-radius: 0.25rem;" type="button"><i class="fa fa-calendar"></i></button>
+                                                                                    </div>
+                                                                                    <span class="input-group-addon text-center" style="width: 40px;">to</span>
+                                                                                    <input type="text" class="input-sm form-control datepicker" name="end">
+                                                                                    <div class="input-group-append">
+                                                                                        <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </div>
+                                            </div>
+                                            <br>
+                                            <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
+                                            <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>--%>
                     </div>
                     <c:forEach var="masterGroup" items="${masterGroups}" >
                         <div class="tab-pane" id="${masterGroup.id}">

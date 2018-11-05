@@ -32,9 +32,12 @@ $( document ).ready(function() {
 
     $('#aniimated-thumbnials').lightGallery({
         thumbnail: true,
-        selector: 'a'
+        selector: 'a.js-asset'
     });
 
+   /* $('.digital-asset-container').flip({
+        trigger: 'manual'
+    });*/
 
     $('.datepicker').datepicker();
     // $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');

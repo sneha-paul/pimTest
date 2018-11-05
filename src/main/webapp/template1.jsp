@@ -173,6 +173,71 @@
         textarea {
             min-height: 54px !important;
         }
+
+        .tab_btn {
+            height: 32px;
+            width: 32px;
+            border-radius: 32px;
+            line-height: 32px;
+            background: #01b2c6;
+            color: #fff;
+            font-weight: 700;
+            text-align: center;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .digital-asset-container {
+            max-height:520px;
+        }
+
+        .digital-asset {
+            padding-bottom: 20px;
+        }
+            .digital-asset .asset-type {
+                position:absolute;
+                top:86px;
+                right:30px;
+            }
+            .digital-asset .js-asset img {
+                width:100%;
+            }
+        .card .footer .stats {
+            cursor: default;
+            list-style: none;
+            padding: 0;
+            display: inline-block;
+            float: right;
+            margin: 0;
+            line-height: 35px;
+        }
+
+        .card .footer .stats li:first-child {
+            border-left: 0;
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        .card .footer .stats li {
+            border-left: solid 1px rgba(160, 160, 160, 0.3);
+            display: inline-block;
+            font-weight: 400;
+            letter-spacing: 0.25em;
+            line-height: 1;
+            margin: 0 0 0 2em;
+            padding: 0 0 0 2em;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .card .footer .stats li a {
+            color: #777;
+        }
+
+        .card .footer {
+            padding: 0 30px 50px 30px;
+        }
+
+
     </style>
 
 </head>
@@ -236,6 +301,7 @@
 <%-- Javascript --%>
 
 <%--<script src="/assets/bundles/libscripts.bundle.js"></script>--%>
+<script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js">
 <script src="/assets/js/pages/ui/global.js"></script>
 
 <script src="/assets/bundles/vendorscripts.bundle.js"></script>
