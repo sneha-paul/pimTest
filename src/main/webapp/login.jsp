@@ -9,7 +9,7 @@
                     <p class="lead">Login to your account</p>
                 </div>
                 <div class="body">
-                    <form class="form-auth-small" method="POST" action=""${contextPath}/login">
+                    <form class="form-auth-small" method="POST" action="${contextPath}/login">
                     <c:if test="${param.error ne null}">
                         <span class="text-danger">Invalid username or password</span>
                     </c:if>
@@ -35,7 +35,7 @@
                     <button type="submit" class="btn btn-primary btn-lg btn-block">LOGIN</button>
                     <div class="bottom">
                         <span class="helper-text m-b-10"><i class="fa fa-lock"></i> <a href="forgotPassword">Forgot password?</a></span>
-                        <span>Don't have an account? <a href="register">Register</a></span>
+                        <span>Don't have an account? <a href="pim/user/create">Register</a></span>
                     </div>
                         <%--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>--%>
                     </form>
