@@ -34,8 +34,9 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})
     private String productFamilyId;
 
+    //@NotEmpty(message = "ChannelId is required", groups = {CreateGroup.class, DetailsGroup.class})
     @Transient @JsonIgnore
-    private String channelId = PIMConstants.DEFAULT_CHANNEL_ID;
+    private String channelId = PIMConstants.DEFAULT_CHANNEL_ID; //TODO - should remove this default and make sure channelId is passed correctly whenever required.
 
     @Transient
     private Family productFamily;
@@ -124,6 +125,7 @@ public class Product extends Entity<Product> {
 
     @Override
     public Product merge(Product product) {
+        this.setChannelId(product.getChannelId());
         for (String group : product.getGroup()) {
             switch(group) {
                 case "DETAILS":
@@ -182,7 +184,7 @@ public class Product extends Entity<Product> {
 
         attributeValues.forEach((attributeId, attributeValue) -> {
             if(familyAttributesMap.containsKey(attributeId)) {
-                FamilyAttribute familyAttribute = familyAttributesMap.get(attributeId);
+//                FamilyAttribute familyAttribute = familyAttributesMap.get(attributeId);
 //                if(booleanValue(familyAttribute.getScopable())) {
                     scopedFamilyAttributes.put(attributeId, attributeValue);
                 /*} else {

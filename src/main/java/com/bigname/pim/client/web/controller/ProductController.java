@@ -63,7 +63,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         return model;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/channels/{channelId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Product product, HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
