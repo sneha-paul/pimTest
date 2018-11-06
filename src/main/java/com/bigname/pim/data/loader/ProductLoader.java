@@ -3,6 +3,7 @@ package com.bigname.pim.data.loader;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeGroup;
+import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
@@ -34,6 +35,8 @@ public class ProductLoader {
     @Autowired
     private ProductService productService;
 
+    private String attributeCollectionId = "TEST";
+
     public boolean load(String filePath) {
         List<List<String>> data = POIUtil.readData(filePath);
         System.out.println("size-------------->"+data.size());
@@ -47,7 +50,7 @@ public class ProductLoader {
                 continue;
             }
             Attribute attribute = new Attribute();
-            attribute.setAttributeGroup(defaultGroup);
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
             attribute.setUiType(Attribute.UIType.get(data.get(0).get(i)));
             attribute.setName(data.get(1).get(i));
             System.out.println("Attribute---> "+attribute.toString());
@@ -66,16 +69,15 @@ public class ProductLoader {
 
     public Map<String,Object> createAttribute(Attribute attribute){
         //AttributeCollection attributeCollection = new AttributeCollection();
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get("Collection_Test", FindBy.EXTERNAL_ID, false);
-
-        //if(attributeCollection.isPresent() && isValid(attribute, model)) {
-            attributeCollection.get().setGroup("ATTRIBUTES");
-            attributeCollection.get().setGroup(attribute.getGroup());
-            attributeCollection.get().addAttribute(attribute);
-            attributeCollectionService.update("Collection_Test", FindBy.EXTERNAL_ID, attributeCollection.get());
-
-       // }
-
+        attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).ifPresent(attributeCollection -> {
+            attributeCollection.setGroup("ATTRIBUTES");
+            if(!attributeCollection.getAttributes().containsKey(AttributeGroup.DEFAULT_GROUP_ID)
+                    || attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().isEmpty()
+                    || !attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().containsKey(ValidatableEntity.toId(attribute.getName()))) {
+                attributeCollection.addAttribute(attribute);
+            }
+            attributeCollectionService.update(attributeCollectionId, FindBy.EXTERNAL_ID, attributeCollection);
+        });
         return null;
     }
 

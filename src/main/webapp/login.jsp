@@ -20,11 +20,11 @@
 
                     <div class="form-group">
                         <label for="username" class="control-label sr-only">Email</label>
-                        <input type="text" class="form-control" id="username" name="username" value="user" placeholder="User Name">
+                        <input type="text" class="form-control" id="username" name="username" value="manu@blacwood.com" placeholder="User Name">
                     </div>
                     <div class="form-group">
                         <label for="password" class="control-label sr-only">Password</label>
-                        <input type="password" class="form-control" name="password" id="password" value="password" placeholder="Password">
+                        <input type="password" class="form-control" name="password" id="password" value="temppass" placeholder="Password">
                     </div>
                         <%--<div class="form-group clearfix">
                             <label class="fancy-checkbox element-left">

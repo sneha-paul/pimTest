@@ -72,7 +72,7 @@ abstract public class ValidatableEntity<T> implements Serializable {
         return ValidationUtil.isNotNull(object);
     }
 
-    static String toId(String value) {
+    public static String toId(String value) {
         return ConversionUtil.toId(value);
     }
 

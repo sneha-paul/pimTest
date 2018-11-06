@@ -325,6 +325,10 @@ public class AttributeGroup extends ValidatableEntity {
         return fullLabel;
     }
 
+    public static AttributeGroup getDefaultGroup() {
+        return new AttributeGroup(DEFAULT_GROUP, null);
+    }
+
     public enum GetMode {
         TOP_LEVEL,
         LEVEL,
