@@ -14,7 +14,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client"})
+@SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader"})
 @EnableMongoRepositories(basePackages = {"com.bigname.pim.api.persistence"})
 //@EnableCaching
 @Import({
