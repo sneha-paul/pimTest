@@ -295,4 +295,13 @@ public class Attribute extends ValidatableEntity<Attribute> {
 
         }
     }
+
+    @Override
+    public String toString() {
+        return "Attribute{" +
+                "name='" + name + '\'' +
+                ", dataType='" + dataType + '\'' +
+                ", attributeGroup=" + attributeGroup +
+                '}';
+    }
 }

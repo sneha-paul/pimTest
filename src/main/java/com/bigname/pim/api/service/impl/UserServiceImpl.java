@@ -45,9 +45,9 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO> implement
 
 //        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(), true, true, true, true, getAuthorities("ROLE_USER"));
     }
-
+/*
     private Collection< ?extends GrantedAuthority> getAuthorities(String role){
         return Arrays.asList(new SimpleGrantedAuthority(role));
-    }
+    }*/
 }
 
