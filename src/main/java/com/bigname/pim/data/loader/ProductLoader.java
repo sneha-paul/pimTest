@@ -66,46 +66,53 @@ public class ProductLoader {
             List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
 
             //Step 1
-            //Go through each column first, ignoring the first metadata column
-            for (int i = 1; i < attributeNamesMetadata.size(); i++) {
-                //check to see if the metadata attribute type is one of the known types
-                boolean isAttribute = availableAttributeTypes.contains(attributeTypesMetadata.get(i));
+            //Go through each variant rows
+            for (int row = 0; row < variantsData.size(); row++) {
 
-                Attribute attribute = null;
+                //Go through each column starting from the second column and add the attribute to the collection, if it is of known type and won't already exists
+                for (int col = 1; col < attributeNamesMetadata.size(); col++) {
+                    //check to see if the metadata attribute type is one of the known types
+                    boolean isAttribute = availableAttributeTypes.contains(attributeTypesMetadata.get(col));
 
-                if (isAttribute) {
-                    String attributeName = attributeNamesMetadata.get(i);
-                    attribute = new Attribute();
-                    attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
-                    attribute.setUiType(Attribute.UIType.get(attributeTypesMetadata.get(i)));
-                    attribute.setName(attributeName);
-                    System.out.println("Attribute---> " + attribute.toString());
+                    Attribute attribute = null;
 
-                    if(!attributeCollection.getAttributes().containsKey(AttributeGroup.DEFAULT_GROUP_ID)
-                            || attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().isEmpty()
-                            || !attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().containsKey(ValidatableEntity.toId(attribute.getName()))) {
-                        attributeCollection.addAttribute(attribute);
-                    }
-                    attribute = attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().get(ValidatableEntity.toId(attribute.getName()));
-                }
+                    if (isAttribute) {
+                        String attributeName = attributeNamesMetadata.get(col);
+                        attribute = new Attribute();
+                        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                        attribute.setUiType(Attribute.UIType.get(attributeTypesMetadata.get(col)));
+                        attribute.setName(attributeName);
+                        System.out.println("Attribute---> " + attribute.toString());
 
-                //Add attribute options for the current attribute
-                for (int j = 0; j < variantsData.size(); j++) {
-                    //Add the attribute option only if the current attribute is of known type and is also selectable
-                    if(isAttribute && ConvertUtil.toBoolean(attribute.getSelectable())) {
-                        String attributeOptionValue = variantsData.get(j).get(i);
-
-                        // If the attribute option won't exist already for the attribute, add the attribute option
-                        if (ValidationUtil.isNotEmpty(attributeOptionValue) && !attribute.getOptions().containsKey(ValidatableEntity.toId(attributeOptionValue))) {
-                            AttributeOption attributeOption = new AttributeOption();
-                            attributeOption.setCollectionId(attributeCollectionId);
-                            attributeOption.setAttributeId(attribute.getFullId());
-                            attributeOption.setValue(attributeOptionValue);
-                            attributeOption.setActive("Y");
-                            attributeOption.orchestrate();
-                            attribute.getOptions().put(ValidatableEntity.toId(attributeOptionValue), attributeOption);
+                        //Add the attribute, if it won't exists already in the collection
+                        if(!attributeCollection.getAttributes().containsKey(AttributeGroup.DEFAULT_GROUP_ID)
+                                || attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().isEmpty()
+                                || !attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().containsKey(ValidatableEntity.toId(attribute.getName()))) {
+                            attributeCollection.addAttribute(attribute);
                         }
+                        //Get the fully orchestrated attribute corresponding to the attribute name
+                        attribute = attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().get(ValidatableEntity.toId(attribute.getName()));
+
+                        //If the current attribute is selectable, add any new attribute options, if any
+                        if(ConvertUtil.toBoolean(attribute.getSelectable())) {
+                            String attributeOptionValue = variantsData.get(row).get(col);
+
+                            // If the attribute option won't exist already for the attribute, add the attribute option
+                            if (ValidationUtil.isNotEmpty(attributeOptionValue) && !attribute.getOptions().containsKey(ValidatableEntity.toId(attributeOptionValue))) {
+                                AttributeOption attributeOption = new AttributeOption();
+                                attributeOption.setCollectionId(attributeCollectionId);
+                                attributeOption.setAttributeId(attribute.getFullId());
+                                attributeOption.setValue(attributeOptionValue);
+                                attributeOption.setActive("Y");
+                                attributeOption.orchestrate();
+                                attribute.getOptions().put(ValidatableEntity.toId(attributeOptionValue), attributeOption);
+                            }
+                        }
+
                     }
+
+                    //Add the attribute option only if the current attribute is of known type and is also selectable
+
                 }
             }
             //Update attribute collection with the newly added attributes and corresponding attribute options
