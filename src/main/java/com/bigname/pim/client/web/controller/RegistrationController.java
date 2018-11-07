@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by sruthi on 05-11-2018.
  */
 @Controller
-@RequestMapping("pim/user")
+@RequestMapping("pim/users")
 public class RegistrationController extends BaseController<User, UserService> {
 
     private UserService userService;
@@ -51,6 +51,16 @@ public class RegistrationController extends BaseController<User, UserService> {
         }
         return new ModelAndView("/register", model);
     }
-
+    /**
+     * Handler method to load the list users page
+     *
+     * @return The ModelAndView instance for the list users page
+     */
+    @RequestMapping()
+    public ModelAndView all() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "USERS");
+        return new ModelAndView("user/users", model);
+    }
 
 }
