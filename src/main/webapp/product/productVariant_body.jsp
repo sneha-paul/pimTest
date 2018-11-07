@@ -669,13 +669,13 @@
                                                     <tbody>
                                                     <tr>
                                                         <td>Plain</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
+                                                        <td>11.950</td>
+                                                        <td>38.950</td>
+                                                        <td>62.950</td>
+                                                        <td>128.950</td>
+                                                        <td>254.950</td>
+                                                        <td>665.950</td>
+                                                        <td>1204.950</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
                                                             <button type="button" class="btn btn-sm btn-outline-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
@@ -683,13 +683,13 @@
                                                     </tr>
                                                     <tr>
                                                         <td>1 Color</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
+                                                        <td>48.950</td>
+                                                        <td>96.950</td>
+                                                        <td>129.950</td>
+                                                        <td>201.950</td>
+                                                        <td>369.950</td>
+                                                        <td>847.950</td>
+                                                        <td>1462.950</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
                                                             <button type="button" class="btn btn-sm btn-outline-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
@@ -697,13 +697,13 @@
                                                     </tr>
                                                     <tr>
                                                         <td>2 Color</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
+                                                        <td>49.950</td>
+                                                        <td>118.950</td>
+                                                        <td>157.950</td>
+                                                        <td>227.950</td>
+                                                        <td>423.950</td>
+                                                        <td>922.950</td>
+                                                        <td>1577.950</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
                                                             <button type="button" class="btn btn-sm btn-outline-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
@@ -711,13 +711,13 @@
                                                     </tr>
                                                     <tr>
                                                         <td>4 Color</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
-                                                        <td>0.00</td>
+                                                        <td>52.950</td>
+                                                        <td>135.950</td>
+                                                        <td>325.950</td>
+                                                        <td>451.950</td>
+                                                        <td>712.950</td>
+                                                        <td>1238.950</td>
+                                                        <td>1907.950</td>
                                                         <td>
                                                             <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
                                                             <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
