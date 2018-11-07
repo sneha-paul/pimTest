@@ -5,6 +5,7 @@ import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.data.loader.ProductLoader;
 import com.bigname.pim.util.FindBy;
 import org.apache.commons.collections.map.AbstractHashedMap;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,9 @@ public class FeedController {
 
     private ProductLoader productLoader;
 
+    @Value("${loader.productFeed.path}")
+    private String feedPath = "C:\\DevStudio\\Projects\\PIM\\src\\10_REGULAR.xlsx";
+
     public FeedController(ProductLoader productLoader) {
         this.productLoader = productLoader;
     }
@@ -33,7 +37,7 @@ public class FeedController {
     @RequestMapping(value = "load", method = RequestMethod.GET)
     public Map<String, Object> loadData(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        productLoader.load("C:\\DevStudio\\Projects\\Bigname\\PIM\\src\\10_REGULAR.xlsx");
+        productLoader.load(feedPath);
         return model;
     }
 
