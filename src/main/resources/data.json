@@ -1,4 +1,6 @@
 [
   {"id":"a56442d0-f7e8-41d7-aa74-4229867ede59","channelName":"Ecommerce","externalId":"ECOMMERCE","active":"Y","_class":"com.bigname.pim.api.domain.Channel"},
-  {"id":"71aa899a-f7a8-45b7-900c-54cae8af15db","channelName":"Amazon","externalId":"AMAZON","active":"Y","_class":"com.bigname.pim.api.domain.Channel"}
+  {"id":"71aa899a-f7a8-45b7-900c-54cae8af15db","channelName":"Amazon","externalId":"AMAZON","active":"Y","_class":"com.bigname.pim.api.domain.Channel"},
+  {"id":"8f9eef8e-9bf2-437b-9d34-2109607f1dc6","email":"manu@blacwood.com","userName":"Manu Prasad","password":"temppass","avathar":"avatar.png","externalId":"manu@blacwood.com","active":"Y","_class":"com.bigname.pim.api.domain.User"},
+  {"_id":"05797b6e-1e9c-42a3-88f9-3197005b3f39","email":"seth@bigname.com","userName":"Seth Newman","password":"temppass","avathar":"seth.jpg","externalId":"seth@bigname.com","active":"N","_class":"com.bigname.pim.api.domain.User"}
  ]
