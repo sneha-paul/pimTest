@@ -4,10 +4,7 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.api.service.ProductService;
-import com.bigname.pim.api.service.ProductVariantService;
+import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.POIUtil;
@@ -35,6 +32,9 @@ public class ProductLoader {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     private String attributeCollectionId = "ENVELOPES";
 
@@ -113,12 +113,25 @@ public class ProductLoader {
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
                 String variantId = variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID"));
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
+                String categoryId = variantsData.get(row).get(attributeNamesMetadata.indexOf("Category"));
+                String style = variantsData.get(row).get(attributeNamesMetadata.indexOf("Style"));
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
                 }
                 resetLookupMap();
                 familyService.getAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
                 familyService.getParentAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
+
+
+                if(isNotEmpty(categoryId) && !categoryService.get(categoryId, FindBy.EXTERNAL_ID, false).isPresent()) {
+                    Category categoryDTO = new Category();
+                    categoryDTO.setActive("Y");
+                    categoryDTO.setCategoryId(categoryId);
+                    categoryDTO.setCategoryName(categoryId);
+                    categoryDTO.setGroup("CREATE");
+                    categoryService.create(categoryDTO);
+                }
+
 
 
                 Family family = null;
@@ -305,6 +318,8 @@ public class ProductLoader {
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
                 String variantId = variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID"));
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
+                String categoryId = variantsData.get(row).get(attributeNamesMetadata.indexOf("Category"));
+                String style = variantsData.get(row).get(attributeNamesMetadata.indexOf("Style"));
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
                 }
@@ -363,7 +378,14 @@ public class ProductLoader {
                     product = _product.get();
                     product.setChannelId(channelId);
                 }
-
+                String idOfProduct = product.getId();
+                Category category = categoryService.get(categoryId, FindBy.EXTERNAL_ID, false).get();
+                List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(categoryId, FindBy.EXTERNAL_ID, 0, 300, null, false).getContent();
+                CategoryProduct categoryProduct = categoryProducts.stream().filter(categoryProduct1 -> categoryProduct1.getProductId().equals(idOfProduct)).findFirst().orElse(null);
+                if(isNull(categoryProduct)) {
+                    CategoryProduct categoryProduct1 = new CategoryProduct(category.getId(), product.getId(), 0);
+                    categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
+                }
                 String variantIdentifier = "COLOR_NAME|" + (String)variantAttributesMap.get("COLOR_NAME"); //TODO - change this to support multiple axis atribute values
                 Family productVariantFamily = product.getProductFamily();
                 String variantGroupId = productVariantFamily.getChannelVariantGroups().get(channelId);

@@ -16,7 +16,7 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
     Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     RelatedCategory addSubCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
-    Page<CategoryProduct> getCategoryProducts(String websiteId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<CategoryProduct> getCategoryProducts(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
     Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort);
     CategoryProduct addProduct(String id, FindBy findBy1, String productId, FindBy findBy2);
 
