@@ -76,8 +76,8 @@ public class FamilyAttribute extends ValidatableEntity {
         this.setRegEx(attributeDTO.getRegEx());
         this.setDataType(attributeDTO.getDataType());
 
-        boolean featuresDefaultGroup = attributeGroupDTO.getFullId().equals(FamilyAttributeGroup.FEATURES_LEAF_GROUP_FULL_ID)
-                || (attributeGroupDTO.getFullId().equals(FamilyAttributeGroup.DEFAULT_GROUP_ID)) && booleanValue(getUiType().isSelectable());
+        boolean featuresDefaultGroup = isNotEmpty(attributeGroupDTO.getFullId()) && (attributeGroupDTO.getFullId().equals(FamilyAttributeGroup.FEATURES_LEAF_GROUP_FULL_ID)
+                || (attributeGroupDTO.getFullId().equals(FamilyAttributeGroup.DEFAULT_GROUP_ID)) && booleanValue(getUiType().isSelectable()));
 
         if(isNotEmpty(attributeGroupDTO)) {
             //Available parameters - attribute.name, attribute.attributeGroup.id, attribute.attributeGroup.name, attribute.attributeGroup.masterGroup, attribute.attributeGroup.parentGroup.id

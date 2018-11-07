@@ -230,9 +230,24 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
     }
 
     @RequestMapping(value = "/{productId}/variants/{variantId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
     @Override
     public Map<String, Object> toggle(@PathVariable(value = "variantId") String id, @PathVariable(value = "active") String active) {
-        return super.toggle(id, active);
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", productVariantService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
+    }
+
+    @RequestMapping(value = "/{productId}/channels/{channelId}/variants/{variantId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> customToggle(@PathVariable(value = "productId") String productId,
+                                            @PathVariable(value = "channelId") String channelId,
+                                            @PathVariable(value = "variantId") String variantId,
+                                            @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product ->
+                model.put("success", productVariantService.toggle(product.getId(), channelId, variantId, Toggle.get(active))));
+        return model;
     }
 
     @RequestMapping(value = "/{productId}/variants/{variantId}/clone/{cloneType}", method = RequestMethod.PUT)

@@ -12,5 +12,5 @@ import java.util.Optional;
  */
 public interface ProductVariantDAO extends BaseDAO<ProductVariant>, MongoRepository<ProductVariant, String>, ProductVariantRepository {
     Page<ProductVariant> findAllByProductIdAndChannelIdAndActiveIn(String productId, String channelId, String active[], Pageable pageable);
-    Optional<ProductVariant> findByProductIdAndChannelIdAndProductVariantIdAndActiveIn(String productId, String channelId, String productVariantId, String active[]);
+    Optional<ProductVariant> findByProductIdAndChannelIdAndExternalIdAndActiveIn(String productId, String channelId, String productVariantId, String active[]);
 }

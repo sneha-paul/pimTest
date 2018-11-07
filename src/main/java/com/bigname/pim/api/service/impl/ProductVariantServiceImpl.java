@@ -6,6 +6,7 @@ import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -55,8 +56,22 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
+    public boolean toggle(String productId, String channelId, String productVariantId, Toggle active) {
+        Optional<ProductVariant> _variant = get(productId, channelId, productVariantId, false);
+
+        if(_variant.isPresent()) {
+            ProductVariant variant = _variant.get();
+            variant.setActive(active.state());
+            createOrUpdate(variant);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public Optional<ProductVariant> get(String productId, String channelId, String productVariantId, boolean... activeRequired) {
-        return productVariantDAO.findByProductIdAndChannelIdAndProductVariantIdAndActiveIn(productId, channelId, productVariantId, PimUtil.getActiveOptions(activeRequired));
+        return productVariantDAO.findByProductIdAndChannelIdAndExternalIdAndActiveIn(productId, channelId, productVariantId, PimUtil.getActiveOptions(activeRequired));
     }
 
     @Override
