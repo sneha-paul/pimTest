@@ -28,7 +28,7 @@ public class User extends Entity<User> implements UserDetails{
     @NotEmpty(message = "{user.password.empty}", groups = {CreateGroup.class})
     private String password;
 
-    private String avathar = "empty.png";
+    private String avatar = "avatar.png";
 
     public User() {
         super();
@@ -56,12 +56,12 @@ public class User extends Entity<User> implements UserDetails{
         this.password = password;
     }
 
-    public String getAvathar() {
-        return avathar;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setAvathar(String avathar) {
-        this.avathar = avathar;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class User extends Entity<User> implements UserDetails{
                     this.setEmail(user.getEmail());
                     this.setPassword(user.getPassword());
                     this.setActive(user.getActive());
-                    this.setAvathar(user.getAvathar());
+                    this.setAvatar(user.getAvatar());
                     break;
             }
         }

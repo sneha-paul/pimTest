@@ -27,8 +27,8 @@ public class FeedController {
 
     private ProductLoader productLoader;
 
-    @Value("${loader.productFeed.path}")
-    private String feedPath = "C:\\DevStudio\\Projects\\PIM\\src\\10_REGULAR.xlsx";
+    @Value("${loader.productFeed.path:C:\\DevStudio\\Projects\\PIM\\src\\10_REGULAR.xlsx}")
+    private String feedPath;
 
     public FeedController(ProductLoader productLoader) {
         this.productLoader = productLoader;

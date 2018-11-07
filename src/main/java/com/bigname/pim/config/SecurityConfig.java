@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/assets/**").permitAll()
-                .antMatchers("/forgotPassword", "/pim/user/create", "/register").permitAll()
+                .antMatchers("/forgotPassword", "/pim/users/**").permitAll()
                 .antMatchers("/pim/feeds/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
