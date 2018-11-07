@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.persistence.dao.UserDAO;
 import com.bigname.pim.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,11 +36,14 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO> implement
     }
 
     @Override
-    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException, DisabledException {
         final User user = userDAO.findByEmail(email);
 
         if(user == null){
             throw new UsernameNotFoundException("No user found with userName  " + email);
+        }
+        if(user.getActive().equals("N")){
+            throw new DisabledException("User Inactive");
         }
         return user;
 

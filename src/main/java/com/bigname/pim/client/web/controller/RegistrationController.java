@@ -3,6 +3,8 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.service.UserService;
 import com.bigname.pim.client.model.Breadcrumbs;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,12 +30,16 @@ public class RegistrationController extends BaseController<User, UserService> {
         this.userService = userService;
     }
 
+    @Autowired
+    public PasswordEncoder passwordEncoder;
+
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public ModelAndView create(User user) {
         Map<String, Object> model = new HashMap<>();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         if(isValid(user, model, User.CreateGroup.class)) {
-            user.setActive("N");
+            user.setActive("Y");  //ToDo : setActive N and do authentication for activating user
             userService.create(user);
             model.put("success", true);
         }
