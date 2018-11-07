@@ -33,7 +33,7 @@ public class FeedController {
     @RequestMapping(value = "load", method = RequestMethod.GET)
     public Map<String, Object> loadData(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        productLoader.load("C:\\DevStudio\\Projects\\Bigname\\PIM\\src\\main\\resources\\feed\\10_REGULAR.xlsx");
+        productLoader.load("C:\\DevStudio\\Projects\\Bigname\\PIM\\src\\10_REGULAR.xlsx");
         return model;
     }
 

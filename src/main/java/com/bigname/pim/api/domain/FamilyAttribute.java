@@ -61,6 +61,7 @@ public class FamilyAttribute extends ValidatableEntity {
         this.setUiType(attributeDTO.getAttribute().getUiType());
         this.setRequired(attributeDTO.getRequired());
         this.setScopable(attributeDTO.getScopable());
+        this.setScope(attributeDTO.getScope());
         FamilyAttributeGroup attributeGroup = null;
         FamilyAttributeGroup attributeGroupDTO = attributeDTO.getAttributeGroup();
         this.setRequired(attributeDTO.getRequired());

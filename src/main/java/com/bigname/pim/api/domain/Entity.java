@@ -19,7 +19,7 @@ abstract public class Entity<T> extends ValidatableEntity implements Serializabl
     @Indexed(unique = true)
     private String externalId;
 
-    private String active;
+    private String active = "N";
 
     private String discontinued;
 
