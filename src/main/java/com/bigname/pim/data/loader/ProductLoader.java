@@ -391,6 +391,7 @@ public class ProductLoader {
                     productVariant.setLevel(1); //TODO - change for multi level variants support
                     setVariantAttributeValues(productVariant, variantAttributesMap);
                     if(productVariantService.validate(productVariant, ProductVariant.DetailsGroup.class).isEmpty()) {
+                        productVariant.setGroup("DETAILS");
                         productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                     }
                 }
@@ -405,7 +406,7 @@ public class ProductLoader {
     }
 
     private void setVariantAttributeValues(ProductVariant productVariantDTO, Map<String, Object> attributesMap) {
-        productService.get(productVariantDTO.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+        productService.get(productVariantDTO.getProduct().getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
             product.setChannelId(productVariantDTO.getChannelId());
             productVariantDTO.setProduct(product);
             Family productFamily = product.getProductFamily();
