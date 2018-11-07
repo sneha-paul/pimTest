@@ -1,6 +1,7 @@
 package com.bigname.pim.data.loader;
 
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.AttributeCollectionService;
@@ -93,10 +94,12 @@ public class ProductLoader {
             List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
             Map<String, Set<String>> familyAttributes = getFamilyAttributes(data);
 
+            List<List<FamilyAttribute>> familyAttributesGrid = new ArrayList<>();
+
             //Step 1
             //Go through each variant rows
             for (int row = 0; row < variantsData.size(); row++) {
-
+                familyAttributesGrid.add(new ArrayList<>());
                 String productId = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID"));
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
                 String variantId = variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID"));
@@ -124,10 +127,13 @@ public class ProductLoader {
                     family = _family.get();
                 }
 
+                familyAttributesGrid.get(row).add(null);//for the first empty column
                 //Go through each column starting from the second column and add the attribute to the collection, if it is of known type and won't already exists
                 for (int col = 1; col < attributeNamesMetadata.size(); col++) {
+                    familyAttributesGrid.get(row).add(null);
                     String cellValue = variantsData.get(row).get(col);
                     String attributeName = attributeNamesMetadata.get(col);
+                    int attributeLevel = (int)Double.parseDouble(attributeLevelMetadata.get(col));
                     if(!familyAttributes.get(familyId).contains(attributeName)) {
                         continue;
                     }
@@ -208,10 +214,11 @@ public class ProductLoader {
                         }
 
                         FamilyAttribute familyAttribute = family.getAllAttributesMap().get(attribute.getId());
+                        familyAttributesGrid.get(row).set(col, familyAttribute);
                         if(!familyVariantGroups.containsKey(familyId)) {
                             familyVariantGroups.put(familyId, new HashSet<>());
                         }
-                        if(Double.parseDouble(attributeLevelMetadata.get(col)) == 1) {
+                        if(attributeLevel == 1) {
                             familyVariantGroups.get(familyId).add(familyAttribute.getId());
                         }
                         //########################################################################################################################
@@ -249,12 +256,7 @@ public class ProductLoader {
                         }
 
                     }
-
-                    //Add the attribute option only if the current attribute is of known type and is also selectable
-
                 }
-
-
             }
             //Update attribute collection with the newly added attributes and corresponding attribute options
             attributeCollectionService.update(attributeCollectionId, FindBy.EXTERNAL_ID, attributeCollection);
@@ -282,12 +284,124 @@ public class ProductLoader {
                         familyService.update(family1.getFamilyId(), FindBy.EXTERNAL_ID, family1);
                     })
             );
+
+            final int[] $row = {0}, $col = {0};
+            for (int row = 0; row < variantsData.size(); row++) {
+                $row[0] = row;
+                String productId = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID"));
+                String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
+                String variantId = variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID"));
+                String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
+
+                Optional<Product> _product = productService.get(productId, FindBy.EXTERNAL_ID, false);
+
+
+                Map<String, Object> productAttributesMap = new HashMap<>();
+
+                Map<String, Object> variantAttributesMap = new HashMap<>();
+                for (int col = 1; col < attributeNamesMetadata.size(); col++) {
+                    $col[0] = col;
+                    String cellValue = variantsData.get(row).get(col);
+                    if(cellValue == null) {
+                        cellValue = "";
+                    }
+                    String attributeName = attributeNamesMetadata.get(col);
+                    int attributeLevel = (int) Double.parseDouble(attributeLevelMetadata.get(col));
+
+                    if(familyAttributes.get(familyId).contains(attributeName)) {
+                        FamilyAttribute familyAttribute = familyAttributesGrid.get(row).get(col);
+                        if(ConvertUtil.toBoolean(familyAttribute.getSelectable())) {
+                            Optional<FamilyAttributeOption> cellValueOption = familyAttributesGrid.get(row).get(col).getOptions().values().stream().filter(e -> e.getValue().equals(variantsData.get($row[0]).get($col[0]))).findFirst();
+                            if(cellValueOption.isPresent()) {
+                                cellValue = cellValueOption.get().getId();
+                            }
+                        }
+                        if(attributeLevel == 0) {
+                            productAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
+                        } else {
+                            variantAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
+
+                        }
+                    }
+                }
+                Product product = null;
+                if(!_product.isPresent()) {
+                    Product productDTO = new Product();
+                    productDTO.setProductId(productId);
+                    productDTO.setProductName(productName);
+                    productDTO.setProductFamilyId(familyId);
+                    productService.create(productDTO);
+                    product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                    product.setProductId(productId);
+                    product.setChannelId(channelId);
+                    product.setGroup("DETAILS");
+                    product.setAttributeValues(productAttributesMap);
+                    if(productService.validate(product, Product.DetailsGroup.class).isEmpty()) {
+                        productService.update(productId, FindBy.EXTERNAL_ID, product);
+                        product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                        product.setProductId(productId);
+                    }
+                } else {
+                    product = _product.get();
+                    product.setChannelId(channelId);
+                }
+
+                String variantIdentifier = "COLOR_NAME|" + (String)variantAttributesMap.get("COLOR_NAME"); //TODO - change this to support multiple axis atribute values
+                Family productVariantFamily = product.getProductFamily();
+                String variantGroupId = productVariantFamily.getChannelVariantGroups().get(channelId);
+                VariantGroup variantGroup = productVariantFamily.getVariantGroups().get(variantGroupId);
+                if(isNotEmpty(variantGroup) && isNotEmpty(variantGroup.getVariantAxis().get(1))) {
+                    List<String> axisAttributeTokens = StringUtil.splitPipeDelimitedAsList(variantIdentifier);
+                    Map<String, String> axisAttributes = new HashMap<>();
+                    StringBuilder tempName = new StringBuilder();
+                    for (int i = 0; i < axisAttributeTokens.size(); i = i + 2) {
+                        axisAttributes.put(axisAttributeTokens.get(i), axisAttributeTokens.get(i + 1));
+                        String nameToken = axisAttributeTokens.get(i + 1);
+                        FamilyAttribute axisAttribute = productVariantFamily.getAllAttributesMap().get(axisAttributeTokens.get(i));
+                        if(isNotEmpty(axisAttribute) && axisAttribute.getOptions().containsKey(axisAttributeTokens.get(i + 1))) {
+                            nameToken = axisAttribute.getOptions().get(axisAttributeTokens.get(i + 1)).getValue();
+                        }
+                        tempName.append(tempName.length() > 0 ? " - " : "").append(nameToken);
+                    }
+                    ProductVariant productVariant = new ProductVariant(product);
+                    productVariant.setProductVariantName(product.getProductName() + " - " + tempName.toString());
+                    productVariant.setProductVariantId(variantId);
+                    productVariant.setChannelId(channelId);
+                    productVariant.setAxisAttributes(axisAttributes);
+                    productVariant.setActive("N");
+                    productVariantService.create(productVariant);
+                    productVariant.setLevel(1); //TODO - change for multi level variants support
+                    setVariantAttributeValues(productVariant, variantAttributesMap);
+                    if(productVariantService.validate(productVariant, ProductVariant.DetailsGroup.class).isEmpty()) {
+                        productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+                    }
+                }
+
+            }
         });
 
 
 
         
         return true;
+    }
+
+    private void setVariantAttributeValues(ProductVariant productVariantDTO, Map<String, Object> attributesMap) {
+        productService.get(productVariantDTO.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+            product.setChannelId(productVariantDTO.getChannelId());
+            productVariantDTO.setProduct(product);
+            Family productFamily = product.getProductFamily();
+            String variantGroupId = productFamily.getChannelVariantGroups().get(productVariantDTO.getChannelId());
+            VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
+            if(isNotEmpty(variantGroup)) {
+                List<String> variantAttributeIds = variantGroup.getVariantAttributes().get(productVariantDTO.getLevel());
+                variantAttributeIds.forEach(attributeId -> {
+                    if(attributesMap.containsKey(attributeId)) {
+                        productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
+                    }
+                });
+            }
+        });
     }
 
     private Map<String, Set<String>> getFamilyAttributes(List<List<String>> data) {
@@ -304,7 +418,7 @@ public class ProductLoader {
             for(int col = 1; col < attributeNamesMetadata.size(); col ++) {
                 String attributeName = attributeNamesMetadata.get(col);
                 String attributeValue = variantsData.get(row).get(col);
-                if(isNotEmpty(attributeValue)) {
+                if(isNotEmpty(attributeValue) && availableAttributeTypes.contains(attributeTypesMetadata.get(col))) {
                     if(!familyAttributes.containsKey(familyId)) {
                         familyAttributes.put(familyId, new HashSet<>());
                     }

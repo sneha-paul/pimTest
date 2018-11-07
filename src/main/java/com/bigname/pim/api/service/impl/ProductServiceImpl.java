@@ -300,11 +300,12 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                     } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !product.getFamilyAttributes().containsKey(k1)) {
                         product.getFamilyAttributes().put(k1, "N");
                     }*/
-
-                    if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getChannelFamilyAttributes().containsKey(k1)) {
-                        product.getChannelFamilyAttributes().put(k1, new String[0]);
-                    } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !product.getChannelFamilyAttributes().containsKey(k1)) {
-                        product.getChannelFamilyAttributes().put(k1, "N");
+                    if(attribute.getType(product.getChannelId()) == FamilyAttribute.Type.COMMON) {
+                        if (attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getChannelFamilyAttributes().containsKey(k1)) {
+                            product.getChannelFamilyAttributes().put(k1, new String[0]);
+                        } else if (attribute.getUiType() == Attribute.UIType.YES_NO && !product.getChannelFamilyAttributes().containsKey(k1)) {
+                            product.getChannelFamilyAttributes().put(k1, "N");
+                        }
                     }
 
                     /*Pair<String, Object> error = null;

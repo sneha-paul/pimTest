@@ -1,9 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.pim.api.domain.Attribute;
-import com.bigname.pim.api.domain.AttributeGroup;
-import com.bigname.pim.api.domain.FamilyAttributeGroup;
-import com.bigname.pim.api.domain.ProductVariant;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.util.FindBy;
@@ -69,10 +66,12 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             FamilyAttributeGroup sectionGroup = masterGroup.getChildGroups().get(AttributeGroup.DEFAULT_GROUP_ID);
             sectionGroup.getChildGroups().forEach((k, attributeGroup) ->
                 attributeGroup.getAttributes().forEach((k1, attribute) -> {
-                    if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !productVariant.getVariantAttributes().containsKey(k1)) {
-                        productVariant.getVariantAttributes().put(k1, new String[0]);
-                    } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !productVariant.getVariantAttributes().containsKey(k1)) {
-                        productVariant.getVariantAttributes().put(k1, "N");
+                    if(attribute.getType(productVariant.getChannelId()) == FamilyAttribute.Type.VARIANT) {
+                        if (attribute.getUiType() == Attribute.UIType.CHECKBOX && !productVariant.getVariantAttributes().containsKey(k1)) {
+                            productVariant.getVariantAttributes().put(k1, new String[0]);
+                        } else if (attribute.getUiType() == Attribute.UIType.YES_NO && !productVariant.getVariantAttributes().containsKey(k1)) {
+                            productVariant.getVariantAttributes().put(k1, "N");
+                        }
                     }
                     Pair<String, Object> error = attribute.validate(productVariant.getVariantAttributes().get(attribute.getId()), productVariant.getChannelId(), productVariant.getLevel());
                     if(isNotEmpty(error)) {
