@@ -40,7 +40,7 @@ public class ProductLoader {
 
     private List<String> availableAttributeTypes = Arrays.asList("INPUTBOX", "TEXTAREA", "DROPDOWN", "YES_NO");
 
-    private Map<String, Object> familyAttributeGroupLookUp = new HashMap<>();
+    private Map<String, Object> familyAttributeGroupLookUp = new LinkedHashMap<>();
     {
         /*Map<String, String> map = new HashMap<>();
         map.put("id", "DETAILS_GROUP");
@@ -54,6 +54,15 @@ public class ProductLoader {
         familyAttributeGroupLookUp.put("Product Features^", "FEATURES_GROUP");
 //        familyAttributeGroupLookUp.put("Details > General Options", "DETAILS_GROUP|DEFAULT_GROUP|GENERAL_OPTIONS");
 //        familyAttributeGroupLookUp.put("Details > Product Lead Time", "DETAILS_GROUP|DEFAULT_GROUP|PRODUCT_LEAD_TIME");
+    }
+
+    private void resetLookupMap() {
+        familyAttributeGroupLookUp = new LinkedHashMap<>();
+        familyAttributeGroupLookUp.put("", "DEFAULT_GROUP");
+        familyAttributeGroupLookUp.put("Details", "DETAILS_GROUP|DEFAULT_GROUP|DEFAULT_GROUP");
+        familyAttributeGroupLookUp.put("Product Features", "FEATURES_GROUP|DEFAULT_GROUP|DEFAULT_GROUP");
+        familyAttributeGroupLookUp.put("Details^", "DETAILS_GROUP");
+        familyAttributeGroupLookUp.put("Product Features^", "FEATURES_GROUP");
     }
 
     public boolean load(String filePath) {
@@ -104,7 +113,10 @@ public class ProductLoader {
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
                 String variantId = variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID"));
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
-
+                if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
+                    continue;
+                }
+                resetLookupMap();
                 familyService.getAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
                 familyService.getParentAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
 
@@ -149,7 +161,7 @@ public class ProductLoader {
                         attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
                         attribute.setUiType(Attribute.UIType.get(attributeTypesMetadata.get(col)));
                         attribute.setName(attributeName);
-                        System.out.println("Attribute---> " + attribute.toString());
+                        System.out.println(row + " :: Attribute---> " + attribute.toString());
 
                         //Add the attribute, if it won't exists already in the collection
                         if(!attributeCollection.getAttributes().containsKey(AttributeGroup.DEFAULT_GROUP_ID)
@@ -208,6 +220,7 @@ public class ProductLoader {
                             familyService.update(familyId, FindBy.EXTERNAL_ID, family);
                             family = familyService.get(familyId, FindBy.EXTERNAL_ID, false).get();
                             if(updateLookup) {//TODO
+                                resetLookupMap();
                                 familyService.getAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
                                 familyService.getParentAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
                             }
@@ -292,7 +305,9 @@ public class ProductLoader {
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
                 String variantId = variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID"));
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
-
+                if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
+                    continue;
+                }
                 Optional<Product> _product = productService.get(productId, FindBy.EXTERNAL_ID, false);
 
 
@@ -323,6 +338,9 @@ public class ProductLoader {
 
                         }
                     }
+                }
+                if(isEmpty(variantAttributesMap.get("COLOR_NAME"))) {
+                    continue;
                 }
                 Product product = null;
                 if(!_product.isPresent()) {

@@ -45,7 +45,7 @@ public class POIUtil {
                         //getCellTypeEnum shown as deprecated for version 3.15
                         //getCellTypeEnum ill be renamed to getCellType starting from version 4.0
                         if (currentCell.getCellTypeEnum() == CellType.STRING) {
-                            String cellData = currentCell.getStringCellValue().replaceAll("┬«", "®");
+                            String cellData = currentCell.getStringCellValue().replaceAll("┬«", "®").replaceAll("Γäó", "™").replaceAll("ΓÇ¥", "”");
                             rowData.add(cellData);
 //                            System.out.print(currentCell.getStringCellValue().replaceAll("┬«", "®") + "--");
                         } else if (currentCell.getCellTypeEnum() == CellType.NUMERIC) {
