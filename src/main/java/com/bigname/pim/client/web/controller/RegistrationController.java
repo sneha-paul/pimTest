@@ -72,24 +72,30 @@ public class RegistrationController extends BaseController<User, UserService> {
 
 
 
-    @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    @RequestMapping(value = {"/{id}", "/create", "/create/{type}"})
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id, @PathVariable(value = "type", required = false) String type) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "USER");
-        if (id == null) {
+        if (id == null &&  !"inside".equals(type)) {
             model.put("mode", "CREATE");
             model.put("user", new User());
-            model.put("breadcrumbs", new Breadcrumbs("User", "User", "/pim/login", "Create Website", ""));
+            model.put("breadcrumbs", new Breadcrumbs("User", "User", "/pim/login", "Create User", ""));
             return new ModelAndView("/register", model);
-        }else{
-                Optional<User> user = userService.get(id, FindBy.EXTERNAL_ID, false);
-                if (user.isPresent()) {
-                    model.put("mode", "DETAILS");
-                    model.put("user", user.get());
-                    model.put("breadcrumbs", new Breadcrumbs("Users", "Users", "/pim/users", user.get().getUserName(), ""));
-                } else {
-                    throw new EntityNotFoundException("Unable to find User with Id: " + id);
-                }
+        }else if (id == null && "inside".equals(type)){
+            model.put("mode", "CREATE");
+            model.put("user", new User());
+            model.put("breadcrumbs", new Breadcrumbs("User", "User", "/pim/users", "Create User", ""));
+            return new ModelAndView("user/user", model);
+        }
+        else{
+            Optional<User> user = userService.get(id, FindBy.EXTERNAL_ID, false);
+            if (user.isPresent()) {
+                model.put("mode", "DETAILS");
+                model.put("user", user.get());
+                model.put("breadcrumbs", new Breadcrumbs("Users", "Users", "/pim/users", user.get().getUserName(), ""));
+            } else {
+                throw new EntityNotFoundException("Unable to find User with Id: " + id);
+            }
             return new ModelAndView("user/user", model);
         }
 
