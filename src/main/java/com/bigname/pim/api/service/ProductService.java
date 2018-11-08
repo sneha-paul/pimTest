@@ -1,6 +1,8 @@
 package com.bigname.pim.api.service;
 
+import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.ProductCategory;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.util.FindBy;
@@ -23,4 +25,9 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
 
 //    Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
     Page<Map<String, String>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
+
+    Page<ProductCategory> getProductCategories(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+
+    Page<Category> getAvailableCategoriesForProduct(String id, FindBy findBy, int page, int size, Sort sort);
+    ProductCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
 }

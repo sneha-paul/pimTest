@@ -43,7 +43,7 @@
                     </c:forEach>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productVariants">Product Variants</a></li>
-                    <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productCategories">Categories</a></li>--%>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productCategories">Categories</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">
@@ -843,7 +843,7 @@
                             </div>
                         </div>
                     </div>
-                    <%--<div class="tab-pane" id="productCategories">
+                    <div class="tab-pane" id="productCategories">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -851,12 +851,12 @@
                                         <div class="row p-b-25">
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
-                                                    <button type="button" class="btn btn-success js-add-subCategory"><i class="fa fa-plus"></i> <span class="p-l-5">Add SubCategories</span></button>
+                                                    <button type="button" class="btn btn-success js-add-categories"><i class="fa fa-plus"></i> <span class="p-l-5">Add Categories</span></button>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="paginatedProductCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                            <table id="paginatedCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark"></thead>
                                             </table>
                                         </div>
@@ -864,13 +864,34 @@
                                 </div>
                             </div>
                         </div>
-                    </div>--%>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}'});$.getScript('/assets/js/pages/ui/product/product.js');"/>
+
 <%--<script src="/assets/js/pages/ui/product/product.js"></script>--%>
+<script>
+    $.initPage({
+        'productId' : '${product.productId}'
+    });
+    $( document ).ready(function() {
+        $.initDataTable({
+            selector: '#paginatedCategoriesTable',
+            name: 'categories',
+            type: 'TYPE_2',
+            url: $.getURL('/pim/products/{productId}/categories'),
+            columns: [
+                { data: 'CategoryName', name : 'CategoryName' , title : 'Category Name'},
+                { data: 'CategoryId', name : 'CategoryId', title : 'Category ID' },
+                { data: 'active', name : 'active' , title : 'Status', orderable: false},
+                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+            ]
+        });
+//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+    });
+</script>
 
 

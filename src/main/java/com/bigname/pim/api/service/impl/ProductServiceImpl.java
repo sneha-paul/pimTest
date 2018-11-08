@@ -5,8 +5,10 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.GenericEntityException;
+import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
+import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
@@ -15,7 +17,9 @@ import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
@@ -33,14 +37,18 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
     private ProductDAO productDAO;
     private ProductVariantService productVariantService;
     private FamilyService productFamilyService;
+    private ProductCategoryDAO productCategoryDAO;
+    private CategoryService categoryService;
 
 
     @Autowired
-    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService) {
+    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, ProductCategoryDAO productCategoryDAO,@Lazy CategoryService categoryService) {
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
         this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;
+        this.productCategoryDAO = productCategoryDAO;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -323,5 +331,48 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
             );
         }
         return fieldErrors;
+    }
+
+    @Override
+    public Page<ProductCategory> getProductCategories(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Optional<Product> _product = get(productId, findBy, false);
+        if(_product.isPresent()) {
+            Product product = _product.get();
+            Page<ProductCategory> productCategories = productCategoryDAO.findByProductIdAndActiveIn(product.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            List<String> categoryIds = new ArrayList<>();
+            productCategories.forEach(pc -> categoryIds.add(pc.getCategoryId()));
+            if(categoryIds.size() > 0) {
+                Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                productCategories.forEach(pc -> pc.init(product, categoriesMap.get(pc.getCategoryId())));
+            }
+            return productCategories;
+        }
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);
+    }
+
+    @Override
+    public Page<Category> getAvailableCategoriesForProduct(String id, FindBy findBy, int page, int size, Sort sort) {
+        Optional<Product> product = get(id, findBy, false);
+        Set<String> categoryIds = new HashSet<>();
+        product.ifPresent(product1 -> productCategoryDAO.findByProductId(product1.getId()).forEach(pc -> categoryIds.add(pc.getCategoryId())));
+        return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
+
+    }
+
+    @Override
+    public ProductCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2) {
+        Optional<Product> product = get(id, findBy1, false);
+        if(product.isPresent()) {
+            Optional<Category> category = categoryService.get(categoryId, findBy2, false);
+            if(category.isPresent()) {
+                Optional<ProductCategory> top = productCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return productCategoryDAO.save(new ProductCategory(product.get().getId(), category.get().getId(), top.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+            }
+        }
+        return null;
     }
 }

@@ -5,10 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.Channel;
-import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.Family;
-import com.bigname.pim.api.domain.ProductVariant;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
@@ -150,6 +147,61 @@ public class ProductController extends BaseController<Product, ProductService>{
         return result;
     }*/
 
+    @RequestMapping("/{id}/categories")
+    @ResponseBody
+    public Result<Map<String, String>> getProductCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<ProductCategory> paginatedResult = productService.getProductCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
 
+        return result;
+    }
 
+    @RequestMapping(value = "/{id}/categories/available")
+    public ModelAndView availableCategories(@PathVariable(value = "id") String id) {
+        Map<String, Object> model = new HashMap<>();
+        return new ModelAndView("category/availableCategories", model);
+    }
+
+    @RequestMapping("/{id}/categories/available/list")
+    @ResponseBody
+    public Result<Map<String, String>> getAvailableCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        } else {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<Category> paginatedResult = productService.getAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/{id}/categories/{categoryId}", method = RequestMethod.POST)
+    public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "categoryId") String categoryId) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = productService.addCategory(id, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID) != null;
+        model.put("success", success);
+        return model;
+    }
 }
