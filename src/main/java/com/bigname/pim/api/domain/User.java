@@ -76,7 +76,7 @@ public class User extends Entity<User> implements UserDetails{
                 case "DETAILS":
                     this.setExternalId(user.getExternalId());
                     this.setEmail(user.getEmail());
-                    this.setPassword(user.getPassword());
+                    this.setUserName(user.getUserName());
                     this.setActive(user.getActive());
                     this.setAvatar(user.getAvatar());
                     break;
