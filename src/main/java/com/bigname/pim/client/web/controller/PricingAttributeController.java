@@ -61,8 +61,8 @@ public class PricingAttributeController extends  BaseController<PricingAttribute
     /**
      * Handler method to update a pricingAttribute instance
      *
-     * @param id pricingId of the pricingAttribute instance that needs to be updated
-     * @param pricingAttribute The modified pricingAttribute instance corresponding to the given pricingId
+     * @param id pricingAttributeId of the pricingAttribute instance that needs to be updated
+     * @param pricingAttribute The modified pricingAttribute instance corresponding to the given pricingAttributeId
      *
      * @return a map of model attributes
      */
@@ -81,7 +81,7 @@ public class PricingAttributeController extends  BaseController<PricingAttribute
     /**
      * Handler method to load the pricingAttribute details page or the create new pricingAttribute page
      *
-     * @param id pricingId of the pricingAttribute instance that needs to be loaded
+     * @param id pricingAttributeId of the pricingAttribute instance that needs to be loaded
      *
      * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
      */
@@ -98,7 +98,7 @@ public class PricingAttributeController extends  BaseController<PricingAttribute
             if(pricingAttribute.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("pricingAttribute", pricingAttribute.get());
-                model.put("breadcrumbs", new Breadcrumbs("PricingAttributes", "PricingAttributes", "/pim/pricingAttributes", pricingAttribute.get().getPricingName(), ""));
+                model.put("breadcrumbs", new Breadcrumbs("PricingAttributes", "PricingAttributes", "/pim/pricingAttributes", pricingAttribute.get().getPricingAttributeName(), ""));
             } else {
                 throw new EntityNotFoundException("Unable to find PricingAttribute with Id: " + id);
             }

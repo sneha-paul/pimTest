@@ -18,7 +18,7 @@ public class ProductVariant extends Entity<ProductVariant> {
 
     @Transient
     @NotEmpty(message = "ProductVariant Id cannot be empty", groups = {CreateGroup.class})
-    String productVariantId;
+    private String productVariantId;
 
 //    @Indexed(unique = true)
     @NotEmpty(message = "ProductVariant Name cannot be empty", groups = {CreateGroup.class})

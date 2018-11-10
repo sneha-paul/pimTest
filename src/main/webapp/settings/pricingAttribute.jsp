@@ -16,12 +16,12 @@
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group">
-                                        <label>Pricing Name</label>
-                                        <input type="text" name="pricingName" class="form-control" />
+                                        <label>Pricing Attribute Name</label>
+                                        <input type="text" name="pricingAttributeName" class="form-control" />
                                     </div>
                                     <div class="form-group">
-                                        <label>Pricing ID</label>
-                                        <input type="text" name="pricingId" class="form-control" />
+                                        <label>Pricing Attribute ID</label>
+                                        <input type="text" name="pricingAttributeId" class="form-control" />
                                     </div>
                                 </div>
                             </div>

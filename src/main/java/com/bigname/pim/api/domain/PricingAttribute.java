@@ -14,12 +14,12 @@ import java.util.Map;
 public class PricingAttribute extends Entity<PricingAttribute> {
 
     @Transient
-    @NotEmpty(message = "Pricing Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    private String pricingId;
+    @NotEmpty(message = "Pricing Attribute Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    private String pricingAttributeId;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Pricing name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    private String pricingName;
+    @NotEmpty(message = "Pricing Attribute Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    private String pricingAttributeName;
 
 
 
@@ -28,26 +28,26 @@ public class PricingAttribute extends Entity<PricingAttribute> {
     }
 
 
-    public String getPricingId() {return getExternalId();}
+    public String getPricingAttributeId() {return getExternalId();}
 
-    public void setPricingId(String pricingId) {
-        this.pricingId = pricingId;
-        setExternalId(pricingId);
+    public void setPricingAttributeId(String pricingAttributeId) {
+        this.pricingAttributeId = pricingAttributeId;
+        setExternalId(pricingAttributeId);
     }
 
-    public String getPricingName() {return pricingName;}
+    public String getPricingAttributeName() {return pricingAttributeName;}
 
-    public void setPricingName(String pricingName) {this.pricingName = pricingName;}
+    public void setPricingAttributeName(String pricingAttributeName) {this.pricingAttributeName = pricingAttributeName;}
 
     @Override
-    void setExternalId() {this.pricingId=getExternalId();}
+    void setExternalId() {this.pricingAttributeId=getExternalId();}
 
     @Override
     public PricingAttribute cloneInstance() {
         PricingAttribute clone = new PricingAttribute();
         clone.setActive("N");
         clone.setExternalId(cloneValue(getExternalId()));
-        clone.setPricingName(cloneValue(getPricingName()));
+        clone.setPricingAttributeName(cloneValue(getPricingAttributeName()));
         return clone;
     }
 
@@ -57,7 +57,7 @@ public class PricingAttribute extends Entity<PricingAttribute> {
             switch(group) {
                 case "DETAILS":
                     this.setExternalId(pricingAttribute.getExternalId());
-                    this.setPricingName(pricingAttribute.getPricingName());
+                    this.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
                     this.setActive(pricingAttribute.getActive());
                     break;
             }
@@ -69,7 +69,7 @@ public class PricingAttribute extends Entity<PricingAttribute> {
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
-        map.put("pricingName", getPricingName());
+        map.put("pricingAttributeName", getPricingAttributeName());
         map.put("active", getActive());
         return map;
     }

@@ -30,8 +30,8 @@
             type: 'TYPE_1',
             url: '/pim/pricingAttributes/',
             columns: [
-                { data: 'pricingName', name : 'pricingName' , title : 'Pricing Name'},
-                { data: 'externalId', name : 'externalId', title : 'Pricing ID' },
+                { data: 'pricingAttributeName', name : 'pricingAttributeName' , title : 'Pricing Attribute Name'},
+                { data: 'externalId', name : 'externalId', title : 'Pricing Attribute ID' },
                 { data: 'active', name : 'active' , title : 'Status', orderable: false},
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
