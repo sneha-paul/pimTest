@@ -49,6 +49,18 @@ public class RegistrationController extends BaseController<User, UserService> {
         return new ModelAndView("redirect:/login");
     }
 
+    @RequestMapping(value = "/inside", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> createInside(User user) {
+        Map<String, Object> model = new HashMap<>();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if(isValid(user, model, User.CreateGroup.class)) {
+            user.setActive("Y");  //ToDo : setActive N and do authentication for activating user
+            userService.create(user);
+            model.put("success", true);
+        }
+        return model;
+    }
 
     /**
      * Handler method to update a user instance
