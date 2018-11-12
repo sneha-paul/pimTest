@@ -42,14 +42,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
     }
 
 
-    @Override
-    public Page<Catalog> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        if(sort == null) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "catalogId"));
-        }
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return findBy == FindBy.INTERNAL_ID ? catalogDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : catalogDAO.findByCatalogIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
-    }
+
 
     @Override
     public Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort) {

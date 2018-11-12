@@ -11,6 +11,4 @@ import java.util.List;
  * Created by sruthi on 29-08-2018.
  */
 public interface CategoryDAO extends BaseDAO<Category>, MongoRepository<Category, String> {
-    Page<Category> findByIdNotInAndActiveIn(String[] excludedIds, String active[], Pageable pageable);
-    Page<Category> findByCategoryIdNotInAndActiveIn(String[] excludedIds, String active[], Pageable pageable);
 }

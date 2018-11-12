@@ -239,6 +239,15 @@
             padding: 0 30px 50px 30px;
         }
 
+        .js-pricing span.input-group-text {
+            min-width: 88px;
+        }
+
+        .js-pricing span.input-group-text>div {
+            width: 100%;
+            text-align: right;
+        }
+
 
     </style>
 

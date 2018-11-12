@@ -9,7 +9,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * Created by sruthi on 19-09-2018.
  */
 public interface ProductDAO extends BaseDAO<Product>, MongoRepository<Product, String>, ProductRepository {
-    Page<Product> findByIdNotInAndActiveIn(String[] excludedIds, String active[], Pageable pageable);
-    Page<Product> findByProductIdNotInAndActiveIn(String[] excludedIds, String active[], Pageable pageable);
 }
 

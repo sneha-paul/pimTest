@@ -7,16 +7,14 @@ import com.bigname.pim.api.exception.EntityCreateException;
 import com.bigname.pim.api.persistence.dao.BaseDAO;
 import com.bigname.pim.api.service.BaseService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -31,7 +29,6 @@ import static com.bigname.pim.util.FindBy.INTERNAL_ID;
  */
 abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> implements BaseService<T, DAO > {
 
-    public static final int MAX_PAGE_SIZE = 200;
     protected DAO dao;
     protected String entityName;
     protected Validator validator;
@@ -114,15 +111,36 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
 
     @Override
-    public List<T> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired) {
+    public List<T> getAll(Sort sort, boolean... activeRequired) {
+        return getAll(0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
+    }
+
+    @Override
+    public Page<T> getAll(String[] ids, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
 
         //TODO - Implement sorting, if sort is not null
 
-        if(ids.length > MAX_PAGE_SIZE) {
-            ids = Arrays.copyOfRange(ids, 0, MAX_PAGE_SIZE);
-        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return findBy == INTERNAL_ID ? dao.findAllByIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired), pageable) : dao.findAllByExternalIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired), pageable);
+    }
 
-        return findBy == INTERNAL_ID ? dao.findAllByIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired)) : dao.findAllByExternalIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired));
+    @Override
+    public List<T> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired) {
+        return getAll(ids, findBy, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
+    }
+
+    @Override
+    public Page<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "catalogId"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return findBy == FindBy.INTERNAL_ID ? dao.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : dao.findByExternalIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
+    }
+
+    @Override
+    public List<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, Sort sort, boolean... activeRequired) {
+        return getAllWithExclusions(excludedIds, findBy, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,6 +37,8 @@ public class ProductVariant extends Entity<ProductVariant> {
     private Map<String, String> axisAttributes = new HashMap<>();
 
     private Map<String, Object> variantAttributes = new HashMap<>();
+
+    private Map<String, Map<String, BigDecimal>> pricingDetails = new HashMap<>();
 
     private String channelId;
 
@@ -121,6 +124,13 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.variantAttributes = variantAttributes;
     }
 
+    public Map<String, Map<String, BigDecimal>> getPricingDetails() {
+        return pricingDetails;
+    }
+
+    public void setPricingDetails(Map<String, Map<String, BigDecimal>> pricingDetails) {
+        this.pricingDetails = pricingDetails;
+    }
 
     void setExternalId() {
         this.productVariantId = getExternalId();
@@ -135,9 +145,13 @@ public class ProductVariant extends Entity<ProductVariant> {
                     this.setProductVariantName(productVariant.getProductVariantName());
                     this.setActive(productVariant.getActive());
                 break;
-
                 case "ASSETS":
 
+                break;
+                case "PRICING":
+                    if(isNotEmpty(productVariant.getPricingDetails())) {
+                        productVariant.getPricingDetails().forEach(pricingDetails::put);
+                    }
                 break;
             }
 

@@ -164,16 +164,16 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
     }
 
 
-    @Override
+    /*@Override
     public Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "productId"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Product> products =  findBy == FindBy.INTERNAL_ID ? productDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : productDAO.findByProductIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
+        Page<Product> products =  findBy == FindBy.INTERNAL_ID ? productDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : productDAO.findByExternalIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
         products.forEach(product -> setProductFamily(product, FindBy.INTERNAL_ID));
         return products;
-    }
+    }*/
 
     /*@Override
     public Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort) {

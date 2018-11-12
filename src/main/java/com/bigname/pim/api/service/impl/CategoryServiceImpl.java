@@ -43,14 +43,14 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
 
-    @Override
+    /*@Override
     public Page<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "categoryId"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
         return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : categoryDAO.findByCategoryIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
-    }
+    }*/
 
     @Override
     public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {

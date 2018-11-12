@@ -647,7 +647,7 @@
                                             <div class="row p-b-25">
                                                 <div class="col-lg-12 col-md-12">
                                                     <div class="pull-right">
-                                                        <button id="js-create-family" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Add Pricing</span></button>
+                                                        <button id="js-add-pricing-details" type="button" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Add Pricing</span></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -677,8 +677,8 @@
                                                         <td>665.950</td>
                                                         <td>1204.950</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -691,8 +691,8 @@
                                                         <td>847.950</td>
                                                         <td>1462.950</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -705,8 +705,8 @@
                                                         <td>922.950</td>
                                                         <td>1577.950</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -719,8 +719,8 @@
                                                         <td>1238.950</td>
                                                         <td>1907.950</td>
                                                         <td>
-                                                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-danger" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -876,6 +876,6 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${productVariant.productId}', 'productVariantId' : '${productVariant.productVariantId}', channelId : '${productVariant.channelId}'});$.getScript('/assets/js/pages/ui/product/productVariant.js');"/>
+<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${productVariant.product.productId}', 'productVariantId' : '${productVariant.productVariantId}', channelId : '${productVariant.channelId}'});$.getScript('/assets/js/pages/ui/product/productVariant.js');"/>
 
 

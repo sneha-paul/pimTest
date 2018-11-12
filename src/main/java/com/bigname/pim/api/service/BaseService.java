@@ -29,7 +29,15 @@ public interface BaseService<T, DAO> {
 
     Page<T> getAll(int page, int size, Sort sort, boolean... activeRequired);
 
+    List<T> getAll(Sort sort, boolean... activeRequired);
+
+    Page<T> getAll(String[] ids, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+
     List<T> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired);
+
+    Page<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+
+    List<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, Sort sort, boolean... activeRequired);
 
     Optional<T> get(String id, FindBy findBy, boolean... activeRequired);
 

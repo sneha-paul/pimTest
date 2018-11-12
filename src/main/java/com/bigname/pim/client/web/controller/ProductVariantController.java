@@ -11,6 +11,7 @@ import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.ChannelService;
+import com.bigname.pim.api.service.PricingAttributeService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.client.model.Breadcrumbs;
@@ -43,15 +44,21 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
 
     private ProductVariantService productVariantService;
 
+    private PricingAttributeService pricingAttributeService;
+
     private ProductService productService;
 
     private ChannelService channelService;
 
-    public ProductVariantController( ProductVariantService productVariantService, ProductService productService, ChannelService channelService){
+    public ProductVariantController( ProductVariantService productVariantService,
+                                     ProductService productService,
+                                     ChannelService channelService,
+                                     PricingAttributeService pricingAttributeService){
         super(productVariantService);
         this.productVariantService = productVariantService;
         this.productService = productService;
         this.channelService = channelService;
+        this.pricingAttributeService = pricingAttributeService;
     }
 
     @RequestMapping("/{productId}/channels/{channelId}/variants/available/list")
@@ -189,6 +196,84 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
         return result;
     }
 
+    @RequestMapping(value = {"/{productId}/variants/{variantId}/pricingDetails/{pricingAttributeId}", "/{productId}/variants/{variantId}/pricingDetails"})
+    public ModelAndView variantPricingDetails(@PathVariable(value = "productId") String productId,
+                                       @PathVariable(value = "variantId") String variantId,
+                                       @PathVariable(value = "pricingAttributeId", required = false) String pricingAttributeId,
+                                       @RequestParam(name = "channelId") String channelId) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "PRODUCTS");
+        Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
+        if(_product.isPresent()) {
+            Product product = _product.get();
+            Optional<ProductVariant> _productVariant = productVariantService.get(product.getId(), channelId, variantId, false);
+            if(_productVariant.isPresent()) {
+                ProductVariant productVariant = _productVariant.get();
+                productVariant.setProduct(product);
+                model.put("productVariant", productVariant);
+                model.put("availablePricingAttributes", pricingAttributeService.getAllWithExclusions(new ArrayList<>(productVariant.getPricingDetails().keySet()).toArray(new String[0]), FindBy.EXTERNAL_ID, null));
+                if (isEmpty(pricingAttributeId)) {    //Editing pricing attribute
+//                    model.put("quantityBreaks", productVariant.getPricingDetails().isEmpty() ? new ArrayList<>() : Arrays.asList("50", "250", "500", "1000", "5000", "10000"));//TODO
+                    Map<String, String> pricingDetails = new LinkedHashMap<>();
+                    pricingDetails.put("50", "");
+                    pricingDetails.put("250", "");
+                    pricingDetails.put("500", "");
+                    pricingDetails.put("1000", "");
+                    pricingDetails.put("5000", "");
+                    pricingDetails.put("10000", "");
+                    model.put("pricingDetails", pricingDetails);//TODO
+                } else {
+                    model.put("pricingDetails", productVariant.getPricingDetails().get(pricingAttributeId));
+                }
+            } else {
+                throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
+            }
+        } else {
+            throw new EntityNotFoundException("Unable to find Product with Id: " + productId);
+        }
+        return new ModelAndView("product/pricingDetails", model);
+    }
+
+    @RequestMapping(value = "/{productId}/variants/{variantId}/pricingDetails", method = RequestMethod.PUT)
+    public Map<String, Object> savePricingDetails(@PathVariable(value = "productId") String productId,
+                                                  @PathVariable(value = "variantId") String variantId,
+                                                  @RequestParam Map<String, Object> pricingDetails) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
+
+        /*if(_product.isPresent()) {
+            String channelId = (String)pricingDetails.get("channelId");
+            Product product = _product.get();
+            Optional<Channel> _channel = channelService.get(channelId, FindBy.EXTERNAL_ID);
+            if(_channel.isPresent()) {
+                Optional<ProductVariant> _productVariant = productVariantService.get(product.getId(), channelId, variantId, false);
+                if (_productVariant.isPresent()) {
+                    ProductVariant productVariant = _productVariant.get();
+                    productVariant.setProduct(product);
+                    String pricingAttributeId =
+                    if(isEmpty(productVariant.getPricingDetails().containsKey((String)pricingDetails.get("pricingAttributeId"))) {
+
+                    } else {
+
+                    }
+                } else {
+                    throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
+                }
+            } else {
+                throw new EntityNotFoundException("Unable to find Channel with Id: " + channelId);
+            }
+        } else {
+            throw new EntityNotFoundException("Unable to find Product with Id: " + productId);
+        }*/
+        /*productVariantDTO.setLevel(1); //TODO - make this dynamic
+        setVariantAttributeValues(productVariantDTO, request);
+        if(isValid(productVariantDTO, model, productVariantDTO.getGroup().length == 1 && productVariantDTO.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : null)) {
+            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariantDTO);
+            model.put("success", true);
+        }*/
+        return model;
+    }
+
     @RequestMapping(value = {"/{productId}/variants/{variantId}", "/{productId}/variants/create"})
     public ModelAndView variantDetails(@PathVariable(value = "productId") String productId,
                                        @PathVariable(value = "variantId", required = false) String variantId,
@@ -206,7 +291,7 @@ public class ProductVariantController extends BaseController<ProductVariant, Pro
                 model.put("productVariant", productVariant);
                 model.put("axisAttributes", ConversionUtil.toJSONString(family.getVariantGroups().get(variantGroupId).getVariantAxis().get(1).stream().collect(CollectionsUtil.toLinkedMap(id -> id, id -> product.getProductFamily().getAllAttributesMap().get(id).getName()))));
             } else {
-                Optional<ProductVariant> _productVariant = productVariantService.get(variantId, FindBy.EXTERNAL_ID, false);
+                Optional<ProductVariant> _productVariant = productVariantService.get(product.getId(), channelId, variantId, false);
                 if(_productVariant.isPresent()) {
                     ProductVariant productVariant = _productVariant.get();
                     productVariant.setProduct(product);
