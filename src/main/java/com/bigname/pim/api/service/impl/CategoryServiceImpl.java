@@ -52,6 +52,16 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : categoryDAO.findByCategoryIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
     }*/
 
+    /**
+     * Method to get available subCategories of a category in paginated format.
+     *
+     * @param id Internal or External id of the Category
+     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort object
+     * @return
+     */
     @Override
     public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         Optional<Category> category = get(id, findBy, false);
@@ -61,6 +71,17 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
     }
 
+    /**
+     * Method to get subCategories of a Category in paginated format.
+     *
+     * @param categoryId Internal or External id of the Category
+     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort Object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
     @Override
     public Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
@@ -85,6 +106,15 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 
+    /**
+     * Method to add subCategory for a category.
+     *
+     * @param id Internal or External id of the Category
+     * @param findBy1 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param categoryId Internal or External id of the Category
+     * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @return
+     */
     @Override
     public RelatedCategory addSubCategory(String id, FindBy findBy1, String subCategoryId, FindBy findBy2) {
         Optional<Category> category = get(id, findBy1, false);
@@ -98,6 +128,17 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return null;
     }
 
+    /**
+     * Method to get products of a Category in paginated format.
+     *
+     * @param categoryId Internal or External id of the Category
+     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort Object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
     @Override
     public Page<CategoryProduct> getCategoryProducts(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
@@ -119,6 +160,16 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 
+    /**
+     * Method to get available products of a category in paginated format.
+     *
+     * @param id Internal or External id of the Category
+     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort object
+     * @return
+     */
     @Override
     public Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Category> category = get(id, findBy, false);
@@ -127,6 +178,15 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return productService.getAllWithExclusions(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
     }
 
+    /**
+     * Method to add product for a category.
+     *
+     * @param id Internal or External id of the Category
+     * @param findBy1 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param productId Internal or External id of the Product
+     * @param findBy2 Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @return
+     */
     @Override
     public CategoryProduct addProduct(String id, FindBy findBy1, String productId, FindBy findBy2) {
         Optional<Category> category = get(id, findBy1, false);

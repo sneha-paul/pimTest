@@ -40,6 +40,16 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
         return websiteDAO.save(website);
     }
 
+    /**
+     * Method to get available catalogs of a website in paginated format.
+     *
+     * @param id Internal or External id of the Website
+     * @param findBy Type of the website id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort object
+     * @return
+     */
     @Override
     public Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Website> website = get(id, findBy, false);
@@ -48,6 +58,17 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
         return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
     }
 
+    /**
+     * Method to get catalogs of a website in paginated format.
+     *
+     * @param websiteId Internal or External id of the Website
+     * @param findBy Type of the website id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort Object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
     @Override
     public Page<WebsiteCatalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
@@ -71,6 +92,15 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 
+    /**
+     * Method to add catalog for a website.
+     *
+     * @param id Internal or External id of the Website
+     * @param findBy1 Type of the website id, INTERNAL_ID or EXTERNAL_ID
+     * @param catalogId Internal or External id of the Catalog
+     * @param findBy2 Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
+     * @return
+     */
     @Override
     public WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2) {
         Optional<Website> website = get(id, findBy1, false);

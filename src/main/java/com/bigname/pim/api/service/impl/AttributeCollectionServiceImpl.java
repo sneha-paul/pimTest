@@ -55,7 +55,16 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         collection.setAllAttributes(AttributeGroup.getAllAttributes(collection.getMappedAttributes()));
     }
 
-
+    /**
+     * Method to get attributes of an attributeCollection in paginated format.
+     *
+     * @param collectionId Internal or External id of the AttributeCollection
+     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort Object
+     * @return
+     */
     @Override
     public Page<Attribute> getAttributes(String collectionId, FindBy findBy, int page, int size, Sort sort) {
         if(sort == null) {
@@ -68,6 +77,14 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         return paginate(attributes, page, size, sort);
     }
 
+    /**
+     * Method to get attributeGroups of an attributeCollection in list format.
+     *
+     * @param collectionId Internal or External id of the AttributeCollection
+     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
+     * @param sort sort Object
+     * @return
+     */
     @Override
     public List<Pair<String, String>> getAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
@@ -77,6 +94,17 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         return idNamePairs;
     }
 
+    /**
+     * Method to get attributeOptions of an attribute in paginated format.
+     *
+     * @param collectionId Internal or External id of the AttributeCollection
+     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
+     * @param attributeId Internal or External id of the Attribute
+     * @param page page number
+     * @param size page size
+     * @param sort sort Object
+     * @return
+     */
     @Override
     public Page<AttributeOption> getAttributeOptions(String collectionId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
          /*if(sort == null) {
@@ -94,6 +122,14 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         return paginate(options, page, size);
     }
 
+    /**
+     * Method to find an attribute from an attributeCollection.
+     *
+     * @param collectionId Internal or External id of the AttributeCollection
+     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
+     * @param attributeFullId Internal or External id of the Attribute
+     * @return
+     */
     @Override
     public Optional<Attribute> findAttribute(String collectionId, FindBy findBy, String attributeFullId) {
         List<Attribute> attributes = new ArrayList<>();
@@ -101,6 +137,13 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         return attributes.isEmpty() ? Optional.empty() : Optional.of(attributes.get(0));
     }
 
+    /**
+     * Method to find attributeOptions of an attribute.
+     *
+     * @param familyAttribute familyAttribute Object
+     * @param attributeOptionId Internal or External id of the attributeOption
+     * @return
+     */
     @Override
     public Optional<AttributeOption> findAttributeOption(FamilyAttribute familyAttribute, String attributeOptionId) {
         Optional<Attribute> attribute = findAttribute(familyAttribute.getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.getAttributeId());

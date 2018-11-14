@@ -43,7 +43,16 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
 
 
 
-
+    /**
+     * Method to get available categories of a catalog in paginated format.
+     *
+     * @param id Internal or External id of the Catalog
+     * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort object
+     * @return
+     */
     @Override
     public Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Catalog> catalog = get(id, findBy, false);
@@ -52,6 +61,17 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
         return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
     }
 
+    /**
+     * Method to get categories of a Catalog in paginated format.
+     *
+     * @param catalogId Internal or External id of the Catalog
+     * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort Object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
     @Override
     public Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
         if(sort == null) {
@@ -76,6 +96,15 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> 
 
     }
 
+    /**
+     * Method to add category for a catalog.
+     *
+     * @param id Internal or External id of the Catalog
+     * @param findBy1 Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
+     * @param rootCategoryId Internal or External id of the Category
+     * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @return
+     */
     @Override
     public RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2) {
         Optional<Catalog> catalog = get(id, findBy1, false);

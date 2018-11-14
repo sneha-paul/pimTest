@@ -15,6 +15,8 @@ import java.util.Map;
  * Created by manu on 9/4/18.
  */
 public interface FamilyService extends BaseService<Family, FamilyDAO>  {
+
+
     Page<FamilyAttribute> getFamilyAttributes(String familyId, FindBy findBy, int page, int size, Sort sort);
 
     Page<VariantGroup> getVariantGroups(String familyId, FindBy findBy, int page, int size, Sort sort);

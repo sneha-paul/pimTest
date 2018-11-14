@@ -78,12 +78,33 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
+    /**
+     * Method to get variants of a product in list format.
+     *
+     * @param productId Internal or External id of the Product
+     * @param productIdFindBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param channelId Internal or External id of the Channel to which the product belongs
+     * @param sort sort Object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
     @Override
     public List<ProductVariant> getProductVariants(String productId, FindBy productIdFindBy, String channelId, Sort sort, boolean... activeRequired) {
         return getProductVariants(productId, productIdFindBy, channelId, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
 
+    /**
+     * Method to get variant of a product
+     *
+     * @param productId Internal or External id of the Product
+     * @param productIdFindBy
+     * @param channelId Internal or External id of the Channel to which the product belongs
+     * @param productVariantId Internal or External id of the ProductVariant of the product
+     * @param variantIdFindBy
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
 
     @Override
     public Optional<ProductVariant> getProductVariant(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired) {
@@ -95,7 +116,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
     /**
      * Override the crete method to replace the passed in productFamily EXTERNAL_ID to a valid INTERNAL_ID
      *
-     * @param product
+     * @param product details of Product as Object
      * @return
      */
     @Override
@@ -227,6 +248,17 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         return paginate(variantMatrix, page, size);
     }*/
 
+    /**
+     * Method to get available variants of a product in paginated format.
+     *
+     * @param productId Internal or External id of the Product
+     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param channelId Internal or External id of the Channel to which the product belongs
+     * @param pageNumber page number
+     * @param pageSize page size
+     * @param sort sort Object
+     * @return
+     */
     @Override
     public Page<Map<String, String>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort) {
         int page = isNull(pageNumber) ? 0 : pageNumber;
@@ -333,6 +365,17 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         return fieldErrors;
     }
 
+    /**
+     * Method to get categories of a product in paginated format.
+     *
+     * @param productId Internal or External id of the Product
+     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort Object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
     @Override
     public Page<ProductCategory> getProductCategories(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
@@ -354,6 +397,16 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 
+    /**
+     * Method to get available categories of a product in paginated format.
+     *
+     * @param id Internal or External id of the Product
+     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param page page number
+     * @param size page size
+     * @param sort sort object
+     * @return
+     */
     @Override
     public Page<Category> getAvailableCategoriesForProduct(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Product> product = get(id, findBy, false);
@@ -363,6 +416,15 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
 
     }
 
+    /**
+     * Method to add category for a product.
+     *
+     * @param id Internal or External id of the Product
+     * @param findBy1 Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param categoryId Internal or External id of the Category
+     * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @return
+     */
     @Override
     public ProductCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2) {
         Optional<Product> product = get(id, findBy1, false);
