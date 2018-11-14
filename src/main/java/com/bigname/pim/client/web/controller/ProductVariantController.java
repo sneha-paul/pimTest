@@ -7,7 +7,6 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.ChannelService;
@@ -23,18 +22,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.bigname.common.util.ValidationUtil.isEmpty;
+import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * Created by sruthi on 20-09-2018.
@@ -329,6 +326,24 @@ public class ProductVariantController extends ControllerSupport {
     }*/
 
 
-
+    @RequestMapping("/{productId}/{productVariantId}/{channelId}/pricing")
+    @ResponseBody
+    public Result<Map<String, String>> getProductVariantPricing(@PathVariable(value = "productId") String productId, @PathVariable(value = "productVariantId") String productVariantId, @PathVariable(value = "channelId") String channelId,  HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<ProductVariant> paginatedResult = productVariantService.getProductVariantPricing(productId, FindBy.EXTERNAL_ID, channelId, productVariantId, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
+    }
 
 }

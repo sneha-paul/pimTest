@@ -247,4 +247,20 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         }
         return fieldErrors;
     }
+
+    @Override
+    public Page<ProductVariant> getProductVariantPricing(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired) {
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Optional<ProductVariant> _productVariant = get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false);
+        if(_productVariant.isPresent()) {
+            ProductVariant productVariant = _productVariant.get();
+            Page<ProductVariant> productVariants = productVariantDAO.findByProductIdAndChannelIdAndProductVariantIdAndActiveIn(productVariant.getProductId(), productVariant.getChannelId(), productVariant.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+
+            return productVariants;
+        }
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);
+    }
 }
