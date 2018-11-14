@@ -18,14 +18,14 @@ import java.util.Map;
 public class ProductVariant extends Entity<ProductVariant> {
 
     @Transient
-    @NotEmpty(message = "ProductVariant Id cannot be empty", groups = {CreateGroup.class})
+    @NotEmpty(message = "ProductVariant Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productVariantId;
 
 //    @Indexed(unique = true)
-    @NotEmpty(message = "ProductVariant Name cannot be empty", groups = {CreateGroup.class})
+    @NotEmpty(message = "ProductVariant Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productVariantName;
 
-    @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class})
+    @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productId;
 
     @Transient
@@ -38,8 +38,9 @@ public class ProductVariant extends Entity<ProductVariant> {
 
     private Map<String, Object> variantAttributes = new HashMap<>();
 
-    private Map<String, Map<String, BigDecimal>> pricingDetails = new HashMap<>();
+    private Map<String, Map<Integer, BigDecimal>> pricingDetails = new HashMap<>();
 
+    @NotEmpty(message = "Channel Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String channelId;
 
     public ProductVariant() {
@@ -124,11 +125,11 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.variantAttributes = variantAttributes;
     }
 
-    public Map<String, Map<String, BigDecimal>> getPricingDetails() {
+    public Map<String, Map<Integer, BigDecimal>> getPricingDetails() {
         return pricingDetails;
     }
 
-    public void setPricingDetails(Map<String, Map<String, BigDecimal>> pricingDetails) {
+    public void setPricingDetails(Map<String, Map<Integer, BigDecimal>> pricingDetails) {
         this.pricingDetails = pricingDetails;
     }
 
@@ -148,7 +149,7 @@ public class ProductVariant extends Entity<ProductVariant> {
                 case "ASSETS":
 
                 break;
-                case "PRICING":
+                case "PRICING_DETAILS":
                     if(isNotEmpty(productVariant.getPricingDetails())) {
                         productVariant.getPricingDetails().forEach(pricingDetails::put);
                     }

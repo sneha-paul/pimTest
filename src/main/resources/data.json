@@ -1,6 +1,10 @@
 [
   {"id":"a56442d0-f7e8-41d7-aa74-4229867ede59","channelName":"Ecommerce","externalId":"ECOMMERCE","active":"Y","_class":"com.bigname.pim.api.domain.Channel"},
   {"id":"71aa899a-f7a8-45b7-900c-54cae8af15db","channelName":"Amazon","externalId":"AMAZON","active":"Y","_class":"com.bigname.pim.api.domain.Channel"},
+  {"id":"70b239e0-6b10-4275-8257-5c398d20ad66","pricingAttributeName":"Plain","externalId":"PLAIN","active":"Y","_class":"com.bigname.pim.api.domain.PricingAttribute"},
+  {"id":"4ffb1861-1ac8-4849-853f-90c1023ab20a","pricingAttributeName":"1 Color","externalId":"1_COLOR","active":"Y","_class":"com.bigname.pim.api.domain.PricingAttribute"},
+  {"id":"e12ff7cb-4f81-4813-b419-94def11b6c8e","pricingAttributeName":"2 Color","externalId":"2_COLOR","active":"Y","_class":"com.bigname.pim.api.domain.PricingAttribute"},
+  {"id":"27b8b66b-aff3-4970-be2f-7e1ecb968f73","pricingAttributeName":"4 Color","externalId":"4_COLOR","active":"Y","_class":"com.bigname.pim.api.domain.PricingAttribute"},
   {"id":"8f9eef8e-9bf2-437b-9d34-2109607f1dc6","email":"manu@blacwood.com","userName":"Manu Prasad","password":"$2a$10$M7/ONda3/I3sQiS.OwKi1O97fKKFzAZUEzsDY.STju4XCHOA934Ni","avathar":"avatar.png","externalId":"manu@blacwood.com","active":"Y","_class":"com.bigname.pim.api.domain.User"},
   {"id":"05797b6e-1e9c-42a3-88f9-3197005b3f39","email":"seth@bigname.com","userName":"Seth Newman","password":"$2a$10$M7/ONda3/I3sQiS.OwKi1O97fKKFzAZUEzsDY.STju4XCHOA934Ni","avathar":"seth.jpg","externalId":"seth@bigname.com","active":"N","_class":"com.bigname.pim.api.domain.User"}
  ]

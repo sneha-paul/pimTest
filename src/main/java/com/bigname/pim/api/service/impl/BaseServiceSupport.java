@@ -40,7 +40,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
 
 //    @CachePut(value = "entities", keyGenerator = "cacheKeyGenerator")
-    abstract public T createOrUpdate(T t);
+    abstract protected T createOrUpdate(T t);
 
     @Override
     public T create(T t) {
@@ -107,7 +107,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         if(sort == null) {
             sort = new Sort(Sort.Direction.ASC, "externalId");
         }
-        return dao.findAllByActiveIn(PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
+        return dao.findByActiveIn(PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
     }
 
     @Override
@@ -117,11 +117,11 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
 
     @Override
     public Page<T> getAll(String[] ids, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-
-        //TODO - Implement sorting, if sort is not null
-
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+        }
         Pageable pageable = PageRequest.of(page, size, sort);
-        return findBy == INTERNAL_ID ? dao.findAllByIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired), pageable) : dao.findAllByExternalIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired), pageable);
+        return findBy == INTERNAL_ID ? dao.findByIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired), pageable) : dao.findByExternalIdInAndActiveIn(ids, PimUtil.getActiveOptions(activeRequired), pageable);
     }
 
     @Override
@@ -132,7 +132,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     @Override
     public Page<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "catalogId"));
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
         return findBy == FindBy.INTERNAL_ID ? dao.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : dao.findByExternalIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);

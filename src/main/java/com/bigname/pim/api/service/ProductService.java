@@ -20,14 +20,9 @@ import java.util.Optional;
 public interface ProductService extends BaseService<Product, ProductDAO> {
     Page<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, int page, int size, Sort sort, boolean... activeRequired);
     List<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, Sort sort, boolean... activeRequired);
-    Optional<ProductVariant> getProductVariant(String productId, FindBy findBy, String channelId, String productVariantId, boolean... activeRequired);
-    Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
-
-//    Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
-    Page<Map<String, String>> getAvailableVariants(String productId, FindBy externalId, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
-
+    Optional<ProductVariant> getProductVariant(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
+    Page<Map<String, String>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
     Page<ProductCategory> getProductCategories(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
-
-    Page<Category> getAvailableCategoriesForProduct(String id, FindBy findBy, int page, int size, Sort sort);
-    ProductCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
+    Page<Category> getAvailableCategoriesForProduct(String productId, FindBy findBy, int page, int size, Sort sort);
+    ProductCategory addCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy);
 }

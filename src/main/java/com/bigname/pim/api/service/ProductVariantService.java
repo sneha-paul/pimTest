@@ -1,7 +1,9 @@
 package com.bigname.pim.api.service;
 
+import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
+import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -14,12 +16,22 @@ import java.util.Optional;
  */
 public interface ProductVariantService extends BaseService<ProductVariant, ProductVariantDAO> {
 
-    Page<ProductVariant> getAll(String productId, String channelId, int page, int size, Sort sort, boolean... activeRequired);
+    boolean toggle(String productId, FindBy productIdFindBy,  String channelId, String productVariantId, FindBy variantIdFindBy, Toggle active);
 
-    List<ProductVariant> getAll(String productId, String channelId, Sort sort, boolean... activeRequired);
+    ProductVariant cloneInstance(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, Entity.CloneType type);
 
-    Optional<ProductVariant> get(String productId, String channelId, String productVariantId, boolean... activeRequired);
+    Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, int page, int size, Sort sort, boolean... activeRequired);
 
-    boolean toggle(String productId, String channelId, String productVariantId, Toggle active);
-    
+    List<ProductVariant> getAll(String productId, FindBy productIdFindBy, String channelId, Sort sort, boolean... activeRequired);
+
+    Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, String[] variantIds, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired);
+
+    List<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, String[] variantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired);
+
+    Page<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy,  String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired);
+
+    List<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy,  String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired);
+
+    Optional<ProductVariant> get(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
+
 }

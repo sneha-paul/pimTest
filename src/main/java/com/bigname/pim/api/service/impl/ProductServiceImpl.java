@@ -34,11 +34,11 @@ import static com.bigname.common.util.ValidationUtil.*;
 @Service
 public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> implements ProductService {
 
-    private ProductDAO productDAO;
     private ProductVariantService productVariantService;
-    private FamilyService productFamilyService;
     private ProductCategoryDAO productCategoryDAO;
     private CategoryService categoryService;
+    private FamilyService familyService;
+    private ProductDAO productDAO;
 
 
     @Autowired
@@ -46,7 +46,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
         this.productVariantService = productVariantService;
-        this.productFamilyService = productFamilyService;
+        this.familyService = productFamilyService;
         this.productCategoryDAO = productCategoryDAO;
         this.categoryService = categoryService;
     }
@@ -61,34 +61,34 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
      *
      * See JIRA ticket BNPIM-7 for more details
      *
-     * @param productId
-     * @param findBy
-     * @param channelId
-     * @param page
-     * @param size
-     * @param sort
-     * @param activeRequired
+     * @param productId internal or external id of the product
+     * @param findBy productId type (INTERNAL_ID or EXTERNAL_ID)
+     * @param channelId external id of the channel
+     * @param page page number
+     * @param size page size
+     * @param sort sort object
+     * @param activeRequired - activeRequired[0] - activeRequired boolean flag for ProductVariant,  activeRequired[1] - activeRequired boolean flag for Product
      * @return
      */
     @Override
     public Page<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, int page, int size, Sort sort, boolean... activeRequired) {
         final Sort _sort = sort == null ? Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")) : sort;
         return get(productId, findBy, ConversionUtil.toList(activeRequired).size() == 2 && activeRequired[1])
-                .map(product -> productVariantService.getAll(product.getId(), channelId, page, size, sort, activeRequired))
-                .orElse(new PageImpl<>(new ArrayList<>(), PageRequest.of(page, size, _sort), 0));
+                .map(product -> productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channelId, page, size, _sort, activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public List<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, Sort sort, boolean... activeRequired) {
-        return getProductVariants(productId, findBy, channelId, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
+    public List<ProductVariant> getProductVariants(String productId, FindBy productIdFindBy, String channelId, Sort sort, boolean... activeRequired) {
+        return getProductVariants(productId, productIdFindBy, channelId, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
 
 
     @Override
-    public Optional<ProductVariant> getProductVariant(String productId, FindBy findBy, String channelId, String productVariantId, boolean... activeRequired) {
-        return get(productId, findBy, ConversionUtil.toList(activeRequired).size() == 2 && activeRequired[1])
-                .map(product -> productVariantService.get(product.getId(), channelId, productVariantId, activeRequired))
+    public Optional<ProductVariant> getProductVariant(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired) {
+        return get(productId, productIdFindBy, ConversionUtil.toList(activeRequired).size() == 2 && activeRequired[1])
+                .map(product -> productVariantService.get(product.getId(), FindBy.INTERNAL_ID, channelId, productVariantId, variantIdFindBy, activeRequired))
                 .orElse(Optional.empty());
     }
 
@@ -160,7 +160,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
     }
 
     private void setProductFamily(Product product, FindBy findBy) {
-        productFamilyService.get(product.getProductFamilyId(), findBy).ifPresent(productFamily -> product.setProductFamily(productFamily));
+        familyService.get(product.getProductFamilyId(), findBy).ifPresent(productFamily -> product.setProductFamily(productFamily));
     }
 
 
@@ -235,7 +235,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> 
         List<Map<String, String>> variantMatrix = new ArrayList<>();
         String _channelId = isEmpty(channelId) ? PIMConstants.DEFAULT_CHANNEL_ID : channelId;
         get(productId, findBy, false).ifPresent((Product product) -> {
-            List<ProductVariant> existingVariants = productVariantService.getAll(product.getId(), channelId, null, false );
+            List<ProductVariant> existingVariants = productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channelId, null, false );
             List<String> existingVariantsAxisAttributeIds = new ArrayList<>();
             product.setChannelId(_channelId);
             Family productFamily = product.getProductFamily();

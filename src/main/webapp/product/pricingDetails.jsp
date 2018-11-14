@@ -6,39 +6,45 @@
                 data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
             <div class="row">
                 <div class="col-md-12 col-sm-12">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="pricingAttribute">Pricing Attribute</label>
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="pricingAttribute">Pricing Attribute</label>
+                            </div>
+                            <select class="custom-select" id="pricingAttribute" name="pricingAttributeId">
+                                <option value="">Select One</option>
+                                <%--@elvariable id="availablePricingAttributes" type="java.util.List<com.bigname.pim.api.domain.PricingAttribute>"--%>
+                                <c:forEach var="pricingAttribute" items="${availablePricingAttributes}">
+                                    <option value="${pricingAttribute.pricingAttributeId}">${pricingAttribute.pricingAttributeName}</option>
+                                </c:forEach>
+                            </select>
                         </div>
-                        <select class="custom-select" id="pricingAttribute" name="pricingAttributeId">
-                            <option selected="">Select One</option>
-                            <%--@elvariable id="availablePricingAttributes" type="java.util.List<com.bigname.pim.api.domain.PricingAttribute>"--%>
-                            <c:forEach var="pricingAttribute" items="${availablePricingAttributes}">
-                                <option value="${pricingAttribute.pricingAttributeId}">${pricingAttribute.pricingAttributeName}</option>
-                            </c:forEach>
-                        </select>
                     </div>
                 </div>
             </div>
             <div class="row js-qty-breaks">
                 <c:forEach var="pricingDetail" items="${pricingDetails}">
                     <div class="js-pricing col-md-4 col-sm-6 col-xs-12">
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><div class="js-qty" contenteditable="true">${pricingDetail.key} Qty</div></span>
+                        <div class="form-group">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><div class="js-qty" contenteditable="true">${pricingDetail.key} Qty</div></span>
+                                </div>
+                                <input type="text" name="q.${pricingDetail.key}" value="${pricingDetail.value}" class="form-control">
                             </div>
-                            <input type="text" name="q${pricingDetail.key}" value="${pricingDetail.value}" class="form-control">
                         </div>
                     </div>
                 </c:forEach>
                 <div class="col-md-4 col-sm-6 col-xs-12">
                     <button class="btn btn-sm btn-outline-success js-add-qty-break"><i class="fa fa-plus"></i> <span class="p-l-5">Add Quantity Break</span></button>
                     <div class="js-pricing col-md-4 col-sm-6 col-xs-12 displaynone">
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><div class="js-qty" contenteditable="true">Qty</div></span>
+                        <div class="form-group">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><div class="js-qty" contenteditable="true">Qty</div></span>
+                                </div>
+                                <input type="text" name="q" value="" class="js-name form-control">
                             </div>
-                            <input type="text" name="q" value="" class="js-name form-control">
                         </div>
                     </div>
                 </div>

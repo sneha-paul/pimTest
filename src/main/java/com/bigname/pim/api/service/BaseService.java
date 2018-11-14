@@ -23,6 +23,8 @@ public interface BaseService<T, DAO> {
 
     T update(String id, FindBy findBy, T t);
 
+    Optional<T> get(String id, FindBy findBy, boolean... activeRequired);
+
     boolean toggle(String id, FindBy findBy, Toggle active);
 
     T cloneInstance(String id, FindBy findBy, Entity.CloneType type);
@@ -38,8 +40,6 @@ public interface BaseService<T, DAO> {
     Page<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     List<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, Sort sort, boolean... activeRequired);
-
-    Optional<T> get(String id, FindBy findBy, boolean... activeRequired);
 
     <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups);
 

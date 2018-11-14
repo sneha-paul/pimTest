@@ -15,6 +15,7 @@ import static com.bigname.common.util.ValidationUtil.*;
 abstract public class ConversionUtil {
 
     public static final String ID_REG_EX_PATTERN = "[^a-zA-Z0-9]+";
+    @SuppressWarnings("unchecked")
     public static <T> List<T> toList(T... varArgs) {
 
         return toObjectList(true, varArgs).stream().map(e -> (T)e).collect(Collectors.toList());

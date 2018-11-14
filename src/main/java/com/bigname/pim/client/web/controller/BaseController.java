@@ -36,7 +36,7 @@ import java.util.Map;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class BaseController<T extends Entity, Service extends BaseService<T, ?>> {
+public class BaseController<T extends Entity, Service extends BaseService<T, ?>> extends ControllerSupport {
     private Service service;
 
     protected BaseController(Service service) {
@@ -45,6 +45,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
 
     @RequestMapping("/list")
     @ResponseBody
+    @SuppressWarnings("unchecked")
     public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
@@ -81,31 +82,9 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return model;
     }
 
-    private <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
+    @Override
+    protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
         return service.validate(e, groups);
-    }
-
-    protected <E extends ValidatableEntity> boolean isValid(E e, Map<String, Object> model, Class<?>... groups) {
-        model.put("fieldErrors", validate(e, groups));
-        model.put("group", e.getGroup());
-        return isEmpty(model.get("fieldErrors"));
-    }
-
-    protected Map<String, Object> getAttributesMap(HttpServletRequest request) {
-        Map<String, Object> attributesMap = new HashMap<>();
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        if(isNotEmpty(request)) {
-            parameterMap.forEach((param, value) -> {
-                if(value.length == 0) {
-                    attributesMap.put(param, "");
-                } else if(value.length == 1) {
-                    attributesMap.put(param, value[0]);
-                } else {
-                    attributesMap.put(param, value);
-                }
-            });
-        }
-        return attributesMap;
     }
 
 

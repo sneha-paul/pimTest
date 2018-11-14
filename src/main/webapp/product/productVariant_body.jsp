@@ -25,6 +25,7 @@
                     <c:forEach var="masterGroup" items="${masterGroups}">
                         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#${masterGroup.id}">${masterGroup.name}</a></li>
                     </c:forEach>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantPricing">Pricing</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantFeatures">Variant Features</a></li>
                 </ul>
                 <div class="tab-content">
@@ -641,98 +642,99 @@
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <div class="tab-pane" id="PRICING">
-                                    <div class="row clearfix">
-                                        <div class="col-lg-12 col-md-12">
-                                            <div class="row p-b-25">
-                                                <div class="col-lg-12 col-md-12">
-                                                    <div class="pull-right">
-                                                        <button id="js-add-pricing-details" type="button" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Add Pricing</span></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="table-responsive">
-                                                <table class="table center-aligned-table">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>Attribute</th>
-                                                        <th>50</th>
-                                                        <th>250</th>
-                                                        <th>500</th>
-                                                        <th>1000</th>
-                                                        <th>2000</th>
-                                                        <th>5000</th>
-                                                        <th>10000</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr>
-                                                        <td>Plain</td>
-                                                        <td>11.950</td>
-                                                        <td>38.950</td>
-                                                        <td>62.950</td>
-                                                        <td>128.950</td>
-                                                        <td>254.950</td>
-                                                        <td>665.950</td>
-                                                        <td>1204.950</td>
-                                                        <td>
-                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>1 Color</td>
-                                                        <td>48.950</td>
-                                                        <td>96.950</td>
-                                                        <td>129.950</td>
-                                                        <td>201.950</td>
-                                                        <td>369.950</td>
-                                                        <td>847.950</td>
-                                                        <td>1462.950</td>
-                                                        <td>
-                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>2 Color</td>
-                                                        <td>49.950</td>
-                                                        <td>118.950</td>
-                                                        <td>157.950</td>
-                                                        <td>227.950</td>
-                                                        <td>423.950</td>
-                                                        <td>922.950</td>
-                                                        <td>1577.950</td>
-                                                        <td>
-                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>4 Color</td>
-                                                        <td>52.950</td>
-                                                        <td>135.950</td>
-                                                        <td>325.950</td>
-                                                        <td>451.950</td>
-                                                        <td>712.950</td>
-                                                        <td>1238.950</td>
-                                                        <td>1907.950</td>
-                                                        <td>
-                                                            <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-sm btn-danger" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </c:otherwise>
                         </c:choose>
 
                     </c:forEach>
+                    <div class="tab-pane" id="variantPricing">
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="row p-b-25">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="pull-right">
+                                            <button id="js-add-pricing-details" type="button" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Add Pricing</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table center-aligned-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Attribute</th>
+                                            <th>50</th>
+                                            <th>250</th>
+                                            <th>500</th>
+                                            <th>1000</th>
+                                            <th>2000</th>
+                                            <th>5000</th>
+                                            <th>10000</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>Plain</td>
+                                            <td>11.950</td>
+                                            <td>38.950</td>
+                                            <td>62.950</td>
+                                            <td>128.950</td>
+                                            <td>254.950</td>
+                                            <td>665.950</td>
+                                            <td>1204.950</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>1 Color</td>
+                                            <td>48.950</td>
+                                            <td>96.950</td>
+                                            <td>129.950</td>
+                                            <td>201.950</td>
+                                            <td>369.950</td>
+                                            <td>847.950</td>
+                                            <td>1462.950</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2 Color</td>
+                                            <td>49.950</td>
+                                            <td>118.950</td>
+                                            <td>157.950</td>
+                                            <td>227.950</td>
+                                            <td>423.950</td>
+                                            <td>922.950</td>
+                                            <td>1577.950</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>4 Color</td>
+                                            <td>52.950</td>
+                                            <td>135.950</td>
+                                            <td>325.950</td>
+                                            <td>451.950</td>
+                                            <td>712.950</td>
+                                            <td>1238.950</td>
+                                            <td>1907.950</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-secondary" title="Edit"><i class="fa fa-edit"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="tab-pane" id="variantFeatures">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">

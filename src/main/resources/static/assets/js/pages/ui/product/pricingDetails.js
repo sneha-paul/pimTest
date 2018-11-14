@@ -22,10 +22,16 @@ $( document ).ready(function() {
         .on('blur','.js-qty', function(){
             var qtyBreak = $(this).text().replace(/\D/g,'');
             if(qtyBreak === '') {
-                qtyBreak = '0';
+                if($(this).closest('.js-pricing').find('input').val() !== '') {
+                    qtyBreak = $(this).closest('.js-pricing').find('input').attr('name');
+                } else {
+                    $(this).closest('.js-pricing').remove();
+                    return false;
+                }
             }
             $(this).text($.formatNumber(qtyBreak) + ' Qty');
-            $(this).closest('.js-pricing').find('input.js-name').attr('name', 'q' + qtyBreak);
+            $(this).closest('.js-pricing').find('input.js-name').attr('name', 'q.' + qtyBreak);
+
         });
 
     function setEndOfContenteditable(contentEditableElement)
