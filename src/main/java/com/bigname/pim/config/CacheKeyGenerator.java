@@ -1,6 +1,7 @@
 package com.bigname.pim.config;
 
 import com.bigname.pim.api.domain.Entity;
+import com.bigname.pim.api.service.BaseService;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.util.StringUtils;
 
@@ -13,9 +14,10 @@ import java.lang.reflect.Method;
 public class CacheKeyGenerator implements KeyGenerator {
     @Override
     public Object generate(Object target, Method method, Object... objects) {
-        if(target.getClass().isAssignableFrom(Entity.class)) {
-            Entity entity = (Entity) target;
-            return target.getClass().getSimpleName() + "_" + entity.getId();
+        if(target instanceof BaseService) {
+            BaseService service = (BaseService) target;
+
+            return service.getEntityName() + "_" + StringUtils.arrayToDelimitedString(objects, "_");
         } else {
             return target.getClass().getSimpleName() + "_"
                     + StringUtils.arrayToDelimitedString(objects, "_");

@@ -45,4 +45,6 @@ public interface BaseService<T, DAO> {
 
     Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, T t, String group);
 
+    String getEntityName();
+
 }

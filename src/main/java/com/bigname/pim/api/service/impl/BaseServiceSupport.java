@@ -12,8 +12,10 @@ import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.*;
 
 import javax.validation.ConstraintViolation;
@@ -39,6 +41,10 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
         this.entityName = entityName;
     }
 
+    public String getEntityName() {
+        return entityName;
+    }
+
 //    @CachePut(value = "entities", keyGenerator = "cacheKeyGenerator")
     abstract protected T createOrUpdate(T t);
 
@@ -53,6 +59,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
 
     @Override
     @SuppressWarnings("unchecked")
+//    @Caching(put = {@CachePut(value = "entities", key = "#findBy.INTERNAL_ID+#id"), @CachePut(value = "entities", key = "#findBy.EXTERNAL_ID+#id")})
     public T update(String id, FindBy findBy, T t) {
         Optional<T> _t1 = get(id, findBy, false);
         if(!_t1.isPresent()) {
@@ -68,6 +75,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
 
     @Override
+//    @Caching(evict = {@CacheEvict(value = "entities", key = "#findBy.INTERNAL_ID+#id"), @CacheEvict(value = "entities", key = "#findBy.EXTERNAL_ID+#id")})
     public boolean toggle(String id, FindBy findBy, Toggle active) {
         Optional<T> _t = get(id, findBy, false);
         if(_t.isPresent()) {

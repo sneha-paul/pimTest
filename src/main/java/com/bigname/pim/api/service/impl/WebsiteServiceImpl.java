@@ -9,15 +9,24 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.Toggle;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import javax.jws.WebService;
 import javax.validation.Validator;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+//@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> implements WebsiteService {
 
 
@@ -112,5 +121,28 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean toggle(String id, FindBy findBy, Toggle active) {
+        return get(id, findBy, false).map(website -> {
+            website.setGroup("DETAILS");
+            website.setActive(active.state());
+//            ((WebsiteService) AopContext.currentProxy()).update(id, findBy, website);
+            update(id, findBy, website);
+            return true;
+        }).orElse( false);
+    }
+
+    @Override
+    @Caching(put = {@CachePut(value = "websites", key = "#findBy.INTERNAL_ID+\"|\"+#website.id"), @CachePut(value = "websites", key = "#findBy.EXTERNAL_ID+\"|\"+#website.externalId")})
+    public Website update(String id, FindBy findBy, Website website) {
+        return super.update(id, findBy, website);
+    }
+
+    @Override
+    @Cacheable(value = "websites", key = "#findBy+\"|\"+#id")
+    public Optional<Website> get(String id, FindBy findBy, boolean... activeRequired) {
+        return super.get(id, findBy, activeRequired);
     }
 }
