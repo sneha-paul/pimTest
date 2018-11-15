@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-@EnableCaching(mode= AdviceMode.ASPECTJ)
+@EnableCaching(/*mode= AdviceMode.ASPECTJ*/)
 public class CacheConfig extends CachingConfigurerSupport {
     @Bean
     public CacheManager cacheManager() {

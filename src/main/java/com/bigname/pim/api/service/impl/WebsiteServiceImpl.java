@@ -12,6 +12,7 @@ import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -125,17 +126,16 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
 
     @Override
     public boolean toggle(String id, FindBy findBy, Toggle active) {
-        return get(id, findBy, false).map(website -> {
+        return proxy().get(id, findBy, false).map(website -> {
             website.setGroup("DETAILS");
             website.setActive(active.state());
-//            ((WebsiteService) AopContext.currentProxy()).update(id, findBy, website);
-            update(id, findBy, website);
+            proxy().update(id, findBy, website);
             return true;
         }).orElse( false);
     }
 
     @Override
-    @Caching(put = {@CachePut(value = "websites", key = "#findBy.INTERNAL_ID+\"|\"+#website.id"), @CachePut(value = "websites", key = "#findBy.EXTERNAL_ID+\"|\"+#website.externalId")})
+    @Caching(evict = {@CacheEvict(value = "websites", key = "#findBy.INTERNAL_ID+\"|\"+#website.id"), @CacheEvict(value = "websites", key = "#findBy.EXTERNAL_ID+\"|\"+#website.externalId")})
     public Website update(String id, FindBy findBy, Website website) {
         return super.update(id, findBy, website);
     }
@@ -144,5 +144,9 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
     @Cacheable(value = "websites", key = "#findBy+\"|\"+#id")
     public Optional<Website> get(String id, FindBy findBy, boolean... activeRequired) {
         return super.get(id, findBy, activeRequired);
+    }
+
+    private WebsiteService proxy() {
+        return (WebsiteService) AopContext.currentProxy();
     }
 }

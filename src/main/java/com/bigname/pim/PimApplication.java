@@ -13,7 +13,7 @@ import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver
 
 @SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader"})
 @EnableMongoRepositories(basePackages = {"com.bigname.pim.api.persistence"})
-@EnableAspectJAutoProxy()
+@EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass = true)
 //@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)
 //@EnableLoadTimeWeaving
 //
@@ -22,7 +22,7 @@ import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver
 
 
 @Import({
-		AppConfig.class,
+//		AppConfig.class,
 		WebConfig.class,
 		CacheConfig.class,
 		TilesConfig.class,
