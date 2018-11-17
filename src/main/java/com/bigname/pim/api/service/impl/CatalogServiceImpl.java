@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO> implements CatalogService {
+public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, CatalogService> implements CatalogService {
 
     private CatalogDAO catalogDAO;
     private WebsiteCatalogDAO websiteCatalogDAO;

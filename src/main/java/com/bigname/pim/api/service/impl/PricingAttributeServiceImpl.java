@@ -13,7 +13,7 @@ import javax.validation.Validator;
  */
 
 @Service
-public class PricingAttributeServiceImpl extends BaseServiceSupport<PricingAttribute, PricingAttributeDAO> implements PricingAttributeService {
+public class PricingAttributeServiceImpl extends BaseServiceSupport<PricingAttribute, PricingAttributeDAO, PricingAttributeService> implements PricingAttributeService {
 
     private  PricingAttributeDAO pricingAttributeDAO;
 

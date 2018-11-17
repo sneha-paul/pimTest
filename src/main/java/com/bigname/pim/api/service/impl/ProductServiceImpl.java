@@ -32,7 +32,7 @@ import static com.bigname.common.util.ValidationUtil.*;
  * Created by sruthi on 19-09-2018.
  */
 @Service
-public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO> implements ProductService {
+public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, ProductService> implements ProductService {
 
     private ProductVariantService productVariantService;
     private ProductCategoryDAO productCategoryDAO;

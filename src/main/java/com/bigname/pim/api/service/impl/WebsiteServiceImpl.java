@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 //@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> implements WebsiteService {
+public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, WebsiteService> implements WebsiteService {
 
 
     private WebsiteDAO websiteDAO;
@@ -62,10 +62,12 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
      */
     @Override
     public Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort) {
-        Optional<Website> website = get(id, findBy, false);
-        Set<String> catalogIds = new HashSet<>();
-        website.ifPresent(website1 -> websiteCatalogDAO.findByWebsiteId(website1.getId()).forEach(wc -> catalogIds.add(wc.getCatalogId())));
-        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
+        return proxy().get(id, findBy, false)
+                .map(website -> {
+                    Set<String> catalogIds = new HashSet<>();
+                    websiteCatalogDAO.findByWebsiteId(website.getId()).forEach(wc -> catalogIds.add(wc.getCatalogId()));
+                    return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
+                }).orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     /**
@@ -85,7 +87,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Website> _website = get(websiteId, findBy, false);
+        Optional<Website> _website = proxy().get(websiteId, findBy, false);
         if(_website.isPresent()) {
             Website website = _website.get();
             Page<WebsiteCatalog> websiteCatalogs = websiteCatalogDAO.findByWebsiteIdAndActiveIn(website.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
@@ -113,7 +115,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
      */
     @Override
     public WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2) {
-        Optional<Website> website = get(id, findBy1, false);
+        Optional<Website> website = proxy().get(id, findBy1, false);
         if(website.isPresent()) {
             Optional<Catalog> catalog = catalogService.get(catalogId, findBy2, false);
             if(catalog.isPresent()) {
@@ -122,16 +124,6 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
             }
         }
         return null;
-    }
-
-    @Override
-    public boolean toggle(String id, FindBy findBy, Toggle active) {
-        return proxy().get(id, findBy, false).map(website -> {
-            website.setGroup("DETAILS");
-            website.setActive(active.state());
-            proxy().update(id, findBy, website);
-            return true;
-        }).orElse( false);
     }
 
     @Override
@@ -146,7 +138,5 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO> 
         return super.get(id, findBy, activeRequired);
     }
 
-    private WebsiteService proxy() {
-        return (WebsiteService) AopContext.currentProxy();
-    }
+
 }

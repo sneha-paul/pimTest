@@ -27,7 +27,7 @@ import static com.bigname.common.util.ValidationUtil.isNotEmpty;
  */
 
 @Service
-public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant, ProductVariantDAO> implements ProductVariantService {
+public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant, ProductVariantDAO, ProductVariantService> implements ProductVariantService {
 
     private ProductVariantDAO productVariantDAO;
     private ProductDAO productDAO;

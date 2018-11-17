@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Created by sruthi on 29-08-2018.
  */
 @Service
-public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDAO> implements CategoryService{
+public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDAO, CategoryService> implements CategoryService{
 
     private CategoryDAO categoryDAO;
     private RelatedCategoryDAO relatedCategoryDAO;

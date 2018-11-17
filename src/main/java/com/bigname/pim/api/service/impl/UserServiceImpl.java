@@ -20,7 +20,7 @@ import java.util.Collection;
  * Created by sruthi on 05-11-2018.
  */
 @Service("customUserService")
-public class UserServiceImpl extends BaseServiceSupport<User, UserDAO> implements UserService, UserDetailsService {
+public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserService> implements UserService, UserDetailsService {
 
     private UserDAO userDAO;
 

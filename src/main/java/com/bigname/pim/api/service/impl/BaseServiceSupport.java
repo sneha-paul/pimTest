@@ -12,6 +12,7 @@ import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,11 +30,12 @@ import static com.bigname.pim.util.FindBy.INTERNAL_ID;
 /**
  * Created by manu on 8/18/18.
  */
-abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> implements BaseService<T, DAO > {
+abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Service extends BaseService<T, DAO>> implements BaseService<T, DAO > {
 
     protected DAO dao;
     protected String entityName;
     protected Validator validator;
+    protected Service service;
 
     protected BaseServiceSupport(DAO dao, String entityName, Validator validator) {
         this.validator = validator;
@@ -61,7 +63,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     @SuppressWarnings("unchecked")
 //    @Caching(put = {@CachePut(value = "entities", key = "#findBy.INTERNAL_ID+#id"), @CachePut(value = "entities", key = "#findBy.EXTERNAL_ID+#id")})
     public T update(String id, FindBy findBy, T t) {
-        Optional<T> _t1 = get(id, findBy, false);
+        Optional<T> _t1 = proxy().get(id, findBy, false);
         if(!_t1.isPresent()) {
             throw new IllegalStateException("Illegal operation");
         } else {
@@ -75,23 +77,19 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
 
     @Override
-//    @Caching(evict = {@CacheEvict(value = "entities", key = "#findBy.INTERNAL_ID+#id"), @CacheEvict(value = "entities", key = "#findBy.EXTERNAL_ID+#id")})
     public boolean toggle(String id, FindBy findBy, Toggle active) {
-        Optional<T> _t = get(id, findBy, false);
-        if(_t.isPresent()) {
-            T t = _t.get();
-            t.setActive(active.state());
-            createOrUpdate(t);
+        return proxy().get(id, findBy, false).map(entity -> {
+            entity.setGroup("DETAILS");
+            entity.setActive(active.state());
+            proxy().update(id, findBy, entity);
             return true;
-        } else {
-            return false;
-        }
+        }).orElse(false);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T cloneInstance(String id, FindBy findBy, Entity.CloneType type) {
-        Optional<T> _t =get(id, findBy, false);
+        Optional<T> _t = proxy().get(id, findBy, false);
         return _t.map(t -> cloneInstance((T) t.cloneInstance(), type)).orElse(null);
     }
 
@@ -193,5 +191,9 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>> impl
     }
     protected T cloneInstance(T t, Entity.CloneType type) {
         return create(t);
+    }
+
+    protected Service proxy() {
+        return (Service) AopContext.currentProxy();
     }
 }

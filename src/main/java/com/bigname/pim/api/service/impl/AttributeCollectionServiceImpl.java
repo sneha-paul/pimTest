@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @Service
-public class AttributeCollectionServiceImpl extends BaseServiceSupport<AttributeCollection, AttributeCollectionDAO> implements AttributeCollectionService {
+public class AttributeCollectionServiceImpl extends BaseServiceSupport<AttributeCollection, AttributeCollectionDAO, AttributeCollectionService> implements AttributeCollectionService {
 
     private AttributeCollectionDAO attributeCollectionDAO;
 

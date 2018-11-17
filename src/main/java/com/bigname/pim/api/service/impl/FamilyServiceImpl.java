@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Created by manu on 9/4/18.
  */
 @Service
-public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO> implements FamilyService {
+public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, FamilyService> implements FamilyService {
 
     private FamilyDAO familyDAO;
 

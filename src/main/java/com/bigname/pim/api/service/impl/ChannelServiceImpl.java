@@ -14,7 +14,7 @@ import javax.validation.Validator;
  */
 
 @Service
-public class ChannelServiceImpl extends BaseServiceSupport<Channel, ChannelDAO> implements ChannelService {
+public class ChannelServiceImpl extends BaseServiceSupport<Channel, ChannelDAO, ChannelService> implements ChannelService {
 
 
     private ChannelDAO channelDAO;
