@@ -14,9 +14,11 @@ import com.bigname.pim.api.service.PricingAttributeService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.Toggle;
+import org.apache.commons.collections4.MapUtils;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isEmpty;
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
@@ -204,17 +207,10 @@ public class ProductVariantController extends ControllerSupport {
                 productVariant.setProduct(product);
                 model.put("productVariant", productVariant);
                 model.put("availablePricingAttributes", pricingAttributeService.getAllWithExclusions(new ArrayList<>(productVariant.getPricingDetails().keySet()).toArray(new String[0]), FindBy.EXTERNAL_ID, null));
-                if (isEmpty(pricingAttributeId)) {    //Editing pricing attribute
-                    Map<String, String> pricingDetails = new LinkedHashMap<>();
-                    pricingDetails.put("50", "");
-                    pricingDetails.put("250", "");
-                    pricingDetails.put("500", "");
-                    pricingDetails.put("1000", "");
-                    pricingDetails.put("5000", "");
-                    pricingDetails.put("10000", "");
-                    model.put("pricingDetails", pricingDetails);//TODO
-                } else {
-                    model.put("pricingDetails", productVariant.getPricingDetails().get(pricingAttributeId));
+                PricingAttribute pricingAttribute = isEmpty(pricingAttributeId) ? null : pricingAttributeService.get(pricingAttributeId, FindBy.EXTERNAL_ID, false).orElse(null);
+                model.put("pricingDetails", getAttributePricingDetails(productVariant.getPricingDetails(), pricingAttribute));
+                if(isNotEmpty(pricingAttributeId)) {
+                    model.put("pricingAttribute", pricingAttribute);
                 }
             } else {
                 throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
@@ -246,6 +242,7 @@ public class ProductVariantController extends ControllerSupport {
                         ProductVariant productVariant = _productVariant.get();
                         productVariant.setProduct(product);
                         productVariant.setGroup("PRICING_DETAILS");
+                        model.put("refreshPage", !getQuantityBreaks(productVariant.getPricingDetails()).containsAll(pricingDetail.getPricing().keySet()));
                         productVariant.getPricingDetails().put(pricingDetail.getPricingAttributeId(), pricingDetail.getPricing());
                         productVariantService.update(productVariant.getId(), FindBy.INTERNAL_ID, productVariant);
                         success = true;
@@ -266,7 +263,8 @@ public class ProductVariantController extends ControllerSupport {
     @RequestMapping(value = {"/{productId}/variants/{variantId}", "/{productId}/variants/create"})
     public ModelAndView variantDetails(@PathVariable(value = "productId") String productId,
                                        @PathVariable(value = "variantId", required = false) String variantId,
-                                       @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId) {
+                                       @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId,
+                                       @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
         Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
@@ -287,6 +285,7 @@ public class ProductVariantController extends ControllerSupport {
                     model.put("mode", "DETAILS");
                     model.put("productVariant", productVariant);
                     model.put("productFamily", productVariant.getProduct().getProductFamily());
+                    model.put("pricingGridColumns", ConversionUtil.toJSONString(getPricingGridColumns(productVariant.getPricingDetails())));
                     model.put("breadcrumbs", new Breadcrumbs("Product",
                             "Products", "/pim/products",
                             product.getProductName(), "/pim/products/" + productId,
@@ -300,7 +299,7 @@ public class ProductVariantController extends ControllerSupport {
             throw new EntityNotFoundException("Unable to find Product with Id: " + productId);
         }
 
-        return new ModelAndView("product/productVariant", model);
+        return new ModelAndView("product/productVariant" + (reload ? "_body" : ""), model);
     }
 
     @RequestMapping(value = "/{productId}/channels/{channelId}/variants/{variantId}/active/{active}", method = RequestMethod.PUT)
@@ -326,9 +325,12 @@ public class ProductVariantController extends ControllerSupport {
     }*/
 
 
-    @RequestMapping("/{productId}/{productVariantId}/{channelId}/pricing")
+    @RequestMapping("/{productId}/channels/{channelId}/variants/{variantId}/pricing")
     @ResponseBody
-    public Result<Map<String, String>> getProductVariantPricing(@PathVariable(value = "productId") String productId, @PathVariable(value = "productVariantId") String productVariantId, @PathVariable(value = "channelId") String channelId,  HttpServletRequest request, HttpServletResponse response, Model model) {
+    public Result<Map<String, String>> getProductVariantPricing(@PathVariable(value = "productId") String productId,
+                                                                @PathVariable(value = "channelId") String channelId,
+                                                                @PathVariable(value = "variantId") String variantId,
+                                                                HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
@@ -338,12 +340,62 @@ public class ProductVariantController extends ControllerSupport {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<ProductVariant> paginatedResult = productVariantService.getProductVariantPricing(productId, FindBy.EXTERNAL_ID, channelId, productVariantId, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        productService.get(productId, FindBy.EXTERNAL_ID, false)
+                .ifPresent(product -> productVariantService.get(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, false)
+                        .ifPresent(productVariant -> dataObjects.addAll(getPricingGridData(productVariant.getPricingDetails(), pricingAttributeService.getAll(null, false)))));
+
         result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        result.setRecordsTotal(Long.toString(dataObjects.size()));
+        result.setRecordsFiltered(Long.toString(dataObjects.size())); //TODO - verify this logic
         return result;
+    }
+
+    private static Set<Integer> getQuantityBreaks(Map<String, Map<Integer, BigDecimal>> pricingDetails) {
+        Set<Integer> qtyBreaks = new TreeSet<>();
+        pricingDetails.forEach((a, pd) -> pd.forEach((q, p) -> qtyBreaks.add(q)));
+        return qtyBreaks;
+    }
+
+    private static Map<String, String> getAttributePricingDetails(Map<String, Map<Integer, BigDecimal>> pricingDetails, PricingAttribute pricingAttribute) {
+        Map<String, String> consolidatedAttributePricingDetails = new LinkedHashMap<>();
+        Map<Integer, BigDecimal> attributePricingDetails = isNotEmpty(pricingAttribute) && pricingDetails.containsKey(pricingAttribute.getPricingAttributeId()) ? pricingDetails.get(pricingAttribute.getPricingAttributeId()) : new HashMap<>();
+        getQuantityBreaks(pricingDetails).forEach(qty -> {
+            if (attributePricingDetails.containsKey(qty)) {
+                consolidatedAttributePricingDetails.put(Integer.toString(qty), attributePricingDetails.get(qty).setScale(3, BigDecimal.ROUND_HALF_UP).toString());
+            } else {
+                consolidatedAttributePricingDetails.put(Integer.toString(qty), "");
+            }
+        });
+        return consolidatedAttributePricingDetails;
+    }
+
+    private static List<Map<String, Object>> getPricingGridColumns(Map<String, Map<Integer, BigDecimal>> pricingDetails) {
+        List<Map<String, Object>> columnMetadata = new ArrayList<>();
+        columnMetadata.add(MapUtils.putAll(new HashMap<>(), new Object[][] {{"data", "name"}, {"name", "name"}, {"title", "Attribute"}}));
+        int[] i = {1};
+        getQuantityBreaks(pricingDetails).forEach(q -> columnMetadata.add(MapUtils.putAll(new HashMap<>(), new Object[][] {{"data", "C_" + i[0]}, {"name", "C_" + i[0]++}, {"title", q.toString()}, {"orderable", false}})));
+        return columnMetadata;
+    }
+
+    private static List<Map<String, String>> getPricingGridData(Map<String, Map<Integer, BigDecimal>> pricingDetails, List<PricingAttribute> pricingAttributes) {
+        List<Map<String, String>> data = new ArrayList<>();
+        Map<String, PricingAttribute> pricingAttributesMap = pricingAttributes.stream().collect(Collectors.toMap(Entity::getExternalId, pricingAttribute -> pricingAttribute));
+        pricingDetails.forEach((attributeId, attributeDetails) -> {
+            Map<String, String> attributeDetailsMap = new LinkedHashMap<>();
+            attributeDetailsMap.put("externalId", attributeId);
+            attributeDetailsMap.put("name", pricingAttributesMap.containsKey(attributeId) ? pricingAttributesMap.get(attributeId).getPricingAttributeName() : attributeId);
+            int[] i = {1};
+            getQuantityBreaks(pricingDetails).forEach(q -> {
+                if(attributeDetails.containsKey(q)) {
+                    attributeDetailsMap.put("C_" + i[0]++, attributeDetails.get(q).setScale(3, BigDecimal.ROUND_HALF_UP).toString());
+                } else {
+                    attributeDetailsMap.put("C_" + i[0]++, "");
+                }
+            });
+            data.add(attributeDetailsMap);
+        });
+        data.sort(Comparator.comparing(o -> o.get("name")));
+        return data;
     }
 
 }

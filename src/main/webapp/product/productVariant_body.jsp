@@ -658,7 +658,7 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <table class="table center-aligned-table" id="paginatedPricingTable">
+                                    <table  class="table table-hover dataTable table-custom" style="width: 100% !important;" id="paginatedPricingTable">
                                         <thead class="thead-dark">
 
                                         </thead>
@@ -810,28 +810,18 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${productVariant.product.productId}', 'productVariantId' : '${productVariant.productVariantId}', channelId : '${productVariant.channelId}'});$.getScript('/assets/js/pages/ui/product/productVariant.js');"/>
+<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${productVariant.product.productId}', productVariantId : '${productVariant.productVariantId}', channelId : '${productVariant.channelId}'});$.getScript('/assets/js/pages/ui/product/productVariant.js');"/>
 
 <script>
-
+    var cols = JSON.parse('${pricingGridColumns}');
+    cols[cols.length] = {  data : 'actions' , title : 'Actions', orderable: false };
     $( document ).ready(function() {
         $.initDataTable({
             selector: '#paginatedPricingTable',
-            name: 'catalogs',
-            type: 'TYPE_2',
-            url: $.getURL('/pim/products/{productId}/{productVariantId}/{channelId}/pricing'),
-            columns: [
-                {  name : 'pricingAttributeName' , title : 'Attribute'},
-                {  name : 'catalogId', title : '50' },
-                {  name : 'pricingAttributeName' , title : '250'},
-                {  name : 'catalogId', title : '500' },
-                {  name : 'pricingAttributeName' , title : '1000'},
-                {  name : 'catalogId', title : '2000' },
-                {  name : 'catalogId', title : '5000' },
-                {  name : 'catalogId', title : '100000' },
-                {  name : 'active' , title : 'Status', orderable: false},
-                {  name : 'actions' , title : 'Actions', orderable: false}
-            ]
+            name: 'variantPricing',
+            type: 'TYPE_4',
+            url: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{productVariantId}/pricing'),
+            columns: cols
         });
 //        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
     });

@@ -194,6 +194,10 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
     }
 
     protected Service proxy() {
-        return (Service) AopContext.currentProxy();
+        try {
+            return (Service) AopContext.currentProxy();
+        } catch (IllegalStateException e) {
+            return (Service) this;
+        }
     }
 }

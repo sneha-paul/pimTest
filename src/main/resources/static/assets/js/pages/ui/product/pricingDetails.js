@@ -34,8 +34,7 @@ $( document ).ready(function() {
 
         });
 
-    function setEndOfContenteditable(contentEditableElement)
-    {
+    function setEndOfContenteditable(contentEditableElement) {
         var range,selection;
         if(document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
         {
@@ -54,5 +53,7 @@ $( document ).ready(function() {
             range.select();//Select the range (make it the visible selection
         }
     }
+
+    // $.lockInput('.popup-content');
 });
 //# sourceURL=/assets/js/pages/ui/product/pricingDetails.js

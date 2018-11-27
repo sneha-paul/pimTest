@@ -35,8 +35,7 @@
                         //process data before sent to server.
                     },
                     dataSrc: function(json) {
-                        $.each(json.data, function(index, value) {
-
+                       $.each(json.data, function(index, value) {
                             if('GROUP_4' === options.buttonGroup || 'GROUP_4A' === options.buttonGroup) {
                                 value.actions = '';
                                 if('Y' === value.selectable) {
@@ -49,6 +48,9 @@
                                         value.scopable = '<span class="badge badge-danger">No</span>';
                                     }
                                 }
+                            } else if('TYPE_4' === options.type) {
+                                value.actions = '<button type="button" class="btn btn-sm btn-secondary js-edit-pricing-attribute-data" data-external-id="' + value.externalId + '" title="Edit"><i class="fa fa-edit"></i></button> '/* +
+                                                '<button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button> '*/;
                             } else if(options.type === 'TYPE_1' || options.type === 'TYPE_1A') {
                                 var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
                                 if('Y' !== value.active) {
@@ -254,6 +256,18 @@
                     });
                 }
             });
+            $(options.selector).on('click', '.js-edit-pricing-attribute-data', function(){
+                $.showModal({
+                    url: $.getURL('/pim/products/{productId}/variants/{productVariantId}/pricingDetails/{pricingAttributeId}?ts=' + new Date().getTime(), {'pricingAttributeId': $(this).data('external-id')}),
+                    data: {channelId: $.getPageAttribute('channelId')},
+                    name:'edit-pricing-details',
+                    title:'Edit Pricing Details',
+                    buttons: [
+                        {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(data){data.refreshPage ? $.refreshPage() : $.reloadDataTable('variantPricing');$.closeModal();});}},
+                        {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                    ]
+                });
+            });
             /*$(options.selector).on('click', '.js-attribute-options', function(){
                 if('GROUP_4' === options.buttonGroup) {
                     $.showModal({
@@ -325,6 +339,27 @@
         },
         getPageAttributes: function() {
             return page.getAttributes();
+        },
+        lockInput: function(parent) {
+            $('input[disabled="disabled"],select[disabled="disabled"],textarea[disabled="disabled"]', parent || 'body').each(function () {
+                var msg = '';
+                if ($(this).hasClass('js-parent-level')) {
+                    msg = 'This property can only be modified at the product level';
+                    $(this).after($('<span class="js-level-locked icon-arrow-up" title="' + msg + '"></span>').on('click', function () {
+                        toastr.info(msg, 'Readonly Property');
+                    }));
+                } else if ($(this).hasClass('js-variant-axis')) {
+                    msg = 'This is the variant axis and is not editable';
+                    $(this).after($('<span class="js-axis-locked icon-target" title="' + msg + '"></span>').on('click', function () {
+                        toastr.info(msg, 'Readonly Property');
+                    }));
+                } else {
+                    msg = 'This property is not editable';
+                    $(this).after($('<span class="js-locked icon-lock" title="' + msg + '"></span>').on('click', function () {
+                        toastr.info(msg, 'Readonly Property');
+                    }));
+                }
+            });
         },
         formatNumber: function(nStr) {
             nStr = nStr.replace(/\D/g,'');
@@ -436,7 +471,7 @@
                     if(data.success) {
                         toastr.success($(formEl).data('success-message')[0], $(formEl).data('success-message')[1]);
                         if(successCallback) {
-                            successCallback();
+                            successCallback(data);
                         } else {
                             if(data.refresh) {
                                 $.refreshPage();

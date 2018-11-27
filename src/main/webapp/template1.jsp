@@ -248,6 +248,25 @@
             text-align: right;
         }
 
+        /*table#paginatedPricingTable thead th {
+            text-align: right;
+            padding-right: 30px;
+        }
+
+        table#paginatedPricingTable thead th:first-child {
+            text-align: left;
+        }
+
+        table#paginatedPricingTable tbody td {
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        table#paginatedPricingTable tbody td:first-child {
+            text-align: left;
+            padding-right: 0;
+        }*/
+
 
     </style>
 
@@ -313,7 +332,7 @@
 
 <%--<script src="/assets/bundles/libscripts.bundle.js"></script>--%>
 <script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
-<script src="/assets/js/pages/ui/global.js"></script>
+<script src="/assets/js/pages/ui/global.js"></script><%-- should be called after page.js--%>
 
 <script src="/assets/bundles/vendorscripts.bundle.js"></script>
 

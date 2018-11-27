@@ -1,5 +1,5 @@
 $(function(){
-    $('input[disabled="disabled"],select[disabled="disabled"],textarea[disabled="disabled"]').each(function(){
+    /*$('input[disabled="disabled"],select[disabled="disabled"],textarea[disabled="disabled"]').each(function(){
         var msg = '';
         if($(this).hasClass('js-parent-level')) {
             msg = 'This property can only be modified at the product level';
@@ -17,7 +17,7 @@ $(function(){
                 toastr.info(msg, 'Readonly Property');
             }));
         }
-    });
+    });*/
 
     $('.fancy-checkbox.js-disabled').each(function(){
         var msg = '';
@@ -51,6 +51,8 @@ $(function(){
 
     $('textarea.auto-resize').each(function() {
         $(this).height( $(this)[0].scrollHeight );
-    })
+    });
+
+    $.lockInput();
 
 });
