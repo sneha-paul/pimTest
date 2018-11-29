@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
     <link rel="stylesheet" href="/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
+    <%--<link rel="stylesheet" href="/assets/vendor/bootstrap-treeview/bootstrap-treeview.min.css">--%>
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
     <link rel="stylesheet" href="/assets/vendor/light-gallery/css/lightgallery.css">
@@ -50,6 +51,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.2/dist/sweetalert2.all.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
     <script src="/assets/js/pages/ui/page.js"></script>
+    <script src="/assets/vendor/jquery-datatable/jquery.dataTables.min.js"></script>
 
     <%-- PAGE LEVEL JS --%>
     <c:forEach var="pageJS" items="${pageTopScripts}">
@@ -58,6 +60,12 @@
 
     <style>
         a:focus {outline:0;}
+        .disable-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
         .card.inner {
             border: 1px solid #CCC;
             background-color: #f4f7f6;
@@ -248,6 +256,21 @@
             text-align: right;
         }
 
+        .js-tree-view span.icon.glyphicon {
+            display: none;
+        }
+        .js-tree-view span.icon.node-icon.fa.fa-caret-right {
+            margin-right: -5px;
+        }
+
+        .js-tree-view span.icon.node-icon.fa.fa-folder {
+            margin-right: 11px;
+        }
+
+        .js-tree-view span.icon.node-icon.fa.fa-caret-down {
+            margin-right: 0;
+        }
+
         /*table#paginatedPricingTable thead th {
             text-align: right;
             padding-right: 30px;
@@ -266,6 +289,11 @@
             text-align: left;
             padding-right: 0;
         }*/
+
+        .btn:focus, .btn:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
 
 
     </style>
@@ -337,7 +365,7 @@
 <script src="/assets/bundles/vendorscripts.bundle.js"></script>
 
 <%--<script src="/assets/bundles/datatablescripts.bundle.js"></script>--%>
-<script src="/assets/vendor/jquery-datatable/jquery.dataTables.min.js"></script>
+
 <script src="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable-conditional-paging.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable.js"></script>
@@ -346,7 +374,9 @@
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
 <script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+<%--<script src="/assets/vendor/bootstrap-treeview/bootstrap-treeview.js"></script>--%>
+<%--<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>--%>
+<%--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/1.6.2/jquery.mockjax.js"></script>--%>
 <script src="/assets/vendor/parsleyjs/js/parsley.min.js"></script>
 
 <script src="/assets/bundles/mainscripts.bundle.js"></script>
