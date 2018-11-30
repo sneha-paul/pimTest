@@ -1,14 +1,14 @@
 var dataSet = [
-    {"DT_RowId": "1","level": 0,"key": "1","parent": 0,"name": "Adam","isParent": true},
-    {"DT_RowId": "2","level": 1,"key": "2","parent": 1,"name": "Nelenil Adam","isParent": false},
-    {"DT_RowId": "3","level": 1,"key": "3","parent": 1,"name": "Skakal Adam","isParent": true},
-    {"DT_RowId": "4","level": 2,"key": "4","parent": 3,"name": "Skakal *st* Adam","isParent": false},
-    {"DT_RowId": "5","level": 2,"key": "5","parent": 3,"name": "Skakal *ml* Adam","isParent": false},
-    {"DT_RowId": "6","level": 0,"key": "6","parent": 0,"name": "Ivan","isParent": true},
-    {"DT_RowId": "7","level": 1,"key": "7","parent": 6,"name": "Nelenil Ivan","isParent": false},
-    {"DT_RowId": "8","level": 0,"key": "8","parent": 0,"name": "Karol","isParent": true},
-    {"DT_RowId": "9","level": 1,"key": "9","parent": 8,"name": "Hufnagel Karol","isParent": false},
-    {"DT_RowId": "10","level": 1,"key": "10","parent": 8,"name": "Sipeky Karol","isParent": false}
+    {"level": 0,"key": "1","parent": "0","name": "Adam","isParent": true},
+    {"level": 1,"key": "2","parent": "1","name": "Nelenil Adam","isParent": false},
+    {"level": 1,"key": "3","parent": "1","name": "Skakal Adam","isParent": true},
+    {"level": 2,"key": "4","parent": "3","name": "Skakal *st* Adam","isParent": false},
+    {"level": 2,"key": "5","parent": "3","name": "Skakal *ml* Adam","isParent": false},
+    {"level": 0,"key": "6","parent": "0","name": "Ivan","isParent": true},
+    {"level": 1,"key": "7","parent": "6","name": "Nelenil Ivan","isParent": false},
+    {"level": 0,"key": "8","parent": "0","name": "Karol","isParent": true},
+    {"level": 1,"key": "9","parent": "8","name": "Hufnagel Karol","isParent": false},
+    {"level": 1,"key": "10","parent": "8","name": "Sipeky Karol","isParent": false}
 ];
 $(document).ready(function () {
     var displayed = new Set([]);
@@ -32,7 +32,7 @@ $(document).ready(function () {
                 }
             }
         },
-        "columns": [
+        columns: [
             { data: 'level', visible: false },
             { data: 'key', visible: false },
             { data: 'parent', visible: false },

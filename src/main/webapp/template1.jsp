@@ -374,7 +374,7 @@
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
 <script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-<%--<script src="/assets/vendor/bootstrap-treeview/bootstrap-treeview.js"></script>--%>
+<script src="/assets/vendor/bootstrap-treeview/bootstrap-treeview.js"></script>
 <%--<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>--%>
 <%--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/1.6.2/jquery.mockjax.js"></script>--%>
 <script src="/assets/vendor/parsleyjs/js/parsley.min.js"></script>
