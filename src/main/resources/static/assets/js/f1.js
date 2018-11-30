@@ -1,4 +1,5 @@
-var dataSet = [{"DT_RowId": "1","level": 0,"key": "1","parent": 0,"name": "Adam","isParent": true},
+var dataSet = [
+    {"DT_RowId": "1","level": 0,"key": "1","parent": 0,"name": "Adam","isParent": true},
     {"DT_RowId": "2","level": 1,"key": "2","parent": 1,"name": "Nelenil Adam","isParent": false},
     {"DT_RowId": "3","level": 1,"key": "3","parent": 1,"name": "Skakal Adam","isParent": true},
     {"DT_RowId": "4","level": 2,"key": "4","parent": 3,"name": "Skakal *st* Adam","isParent": false},
@@ -7,58 +8,48 @@ var dataSet = [{"DT_RowId": "1","level": 0,"key": "1","parent": 0,"name": "Adam"
     {"DT_RowId": "7","level": 1,"key": "7","parent": 6,"name": "Nelenil Ivan","isParent": false},
     {"DT_RowId": "8","level": 0,"key": "8","parent": 0,"name": "Karol","isParent": true},
     {"DT_RowId": "9","level": 1,"key": "9","parent": 8,"name": "Hufnagel Karol","isParent": false},
-    {"DT_RowId": "10","level": 1,"key": "10","parent": 8,"name": "Sipeky Karol","isParent": false}];
+    {"DT_RowId": "10","level": 1,"key": "10","parent": 8,"name": "Sipeky Karol","isParent": false}
+];
 $(document).ready(function () {
-
+    var displayed = new Set([]);
+    var collapsed = false;
+    var collapsible =true;
     var dt = $('#example2').DataTable( {
         data: dataSet,
         ordering: false,
         info: false,
         searching: true,
-        "paging":   false,
-        "createdRow": function (row, data, index) {
+        paging:   false,
+        createdRow: function (row, data, index) {
             $(row).addClass('disable-select parent-' + data.parent);
-
             if(data.isParent) {
-                $(row).addClass('parent-node');
+                if(collapsible || collapsed) {
+                    $(row).addClass('parent-node');
+                }
+                if(!collapsed) {
+                    displayed.add(data.key);
+                    $(row).addClass('details');
+                }
             }
         },
         "columns": [
-            {
-            "class": "details-control",
-            "orderable": false,
-            "data": null,
-            "visible": false,
-            "title": 'Select',
-            "defaultContent": "",
-            "width": 50,
-            "createdCell": function (td, cellData, rowData) {
-                if (rowData.level > 0) {
-                    td.className = td.className + ' level-' + rowData.level;
+            { data: 'level', visible: false },
+            { data: 'key', visible: false },
+            { data: 'parent', visible: false },
+            { data: 'name', title: 'Name',
+                render: function ( data, type, row, meta ) {
+                    var level = row.level;
+                    return '<div style="padding-left:' + (level * 25) + 'px"><div class="float-left"><span class="collapsed-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-right p-r-10 js-ctrl"  style="cursor: pointer"></i><i class=" text-primary fa fa-folder"></i></span><span class="expanded-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-down p-r-5 js-ctrl"  style="cursor: pointer"></i><i class="text-primary fa fa-folder-open"></i></span></div><div class="float-left p-l-10"><h6>' + data + '</h6></div></div>';
                 }
-            },
-        }, {
-            "data": "level",
-            "title": 'Level1',
-            "visible": false
-        }, {
-            "data": "key",
-            "visible": false
-        }, {
-            "data": "parent",
-            "visible": false
-        }, {
-            "data": "name",
-            "title": 'Name',
-            render: function ( data, type, row, meta ) {
-                var level = row.level;
-                return '<div style="padding-left:' + (level * 25) + 'px"><div class="float-left"><span class="collapsed-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-right p-r-5 js-ctrl"  style="cursor: pointer"></i><i class="fa fa-folder"></i></span><span class="expanded-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-down p-r-5 js-ctrl"  style="cursor: pointer"></i><i class="fa fa-folder-open"></i></span></div><div class="float-left p-l-10"><h6>' + data + '</h6></div></div>';
             }
-        }]
+        ]
     } );
 
-    dt.columns([3]).search('^(0)$', true, false).draw();
-    var displayed = new Set([]);
+    if(collapsed) {
+        dt.columns([2]).search('^(0)$', true, false).draw();
+    }
+
+
     $('#example2 tbody').on('click', 'tr td:first-child .js-ctrl', function () {
         var _tr = $(this).closest('tr');
         var _row = dt.row(_tr);
@@ -89,6 +80,6 @@ $(document).ready(function () {
             regex = regex + "|" + value;
         });
         regex = regex + ")$";
-        dt.columns([3]).search(regex, true, false).draw();
+        dt.columns([2]).search(regex, true, false).draw();
     });
 });

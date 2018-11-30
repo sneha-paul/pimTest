@@ -5,6 +5,7 @@
     .collapsed-icons, tr.details .expanded-icons {
         display: block;
     }
+
     .js-ctrl {
         visibility: hidden;
     }
