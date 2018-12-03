@@ -18,16 +18,16 @@ public class Catalog extends Entity<Catalog> {
 
     @Transient
     @NotEmpty(message = "Catalog Id cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
-    String catalogId;
+    private String catalogId;
 
-    @Indexed(unique = true)
+//    @Indexed(unique = true)
     @NotEmpty(message = "Catalog Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String catalogName;
 
     private String description;
 
-    @Transient
-    private Page<RootCategory> rootCategories;
+    /*@Transient
+    private Page<RootCategory> rootCategories;*/
 
     public Catalog() {
         super();
@@ -63,13 +63,13 @@ public class Catalog extends Entity<Catalog> {
         this.description = description;
     }
 
-    public Page<RootCategory> getRootCategories() {
+    /*public Page<RootCategory> getRootCategories() {
         return rootCategories;
     }
 
     public void setRootCategories(Page<RootCategory> rootCategories) {
         this.rootCategories = rootCategories;
-    }
+    }*/
 
     void setExternalId() {
         this.catalogId = getExternalId();

@@ -12,8 +12,9 @@ import java.util.List;
  */
 public interface RootCategoryDAO extends BaseAssociationDAO<RootCategory>, MongoRepository<RootCategory, String> {
 
-    Page<RootCategory> findByCatalogIdAndActiveIn(String catalogId, String active[], Pageable pageable);
-    long countByCatalogId(String catalogId);
-    List<RootCategory> findByCatalogId(String catalogId);
+    Page<RootCategory> findByWebsiteCatalogIdAndActiveIn(String websiteCatalogId, String active[], Pageable pageable);
+    List<RootCategory> findByWebsiteCatalogId(String catalogId);
+//    long countByCatalogId(String catalogId);
+
 
 }

@@ -12,7 +12,7 @@ $( document ).ready(function() {
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]
     });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
     $.addModal({
         selector: '#js-create-variant',
         url: $.getURL('/pim/products/{productId}/variants/create?ts=' + new Date().getTime()),

@@ -8,7 +8,7 @@
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#Catalogs">Catalogs</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#catalogs">Catalogs</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="DETAILS">
@@ -52,7 +52,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="Catalogs">
+                    <div class="tab-pane" id="catalogs">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -91,15 +91,15 @@
             selector: '#paginatedCatalogsTable',
             name: 'catalogs',
             type: 'TYPE_2',
-            url: $.getURL('/pim/websites/{websiteId}/catalogs'),
+            url: $.getURL('/pim/websites/{websiteId}/catalogs/'),
             columns: [
                 { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-                { data: 'catalogId', name : 'catalogId', title : 'Catalog ID' },
+                { data: 'externalId', name : 'catalogId', title : 'Catalog ID' },
                 { data: 'active', name : 'active' , title : 'Status', orderable: false},
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
     });
 </script>
 <script src="/assets/js/pages/ui/website/website.js"></script>

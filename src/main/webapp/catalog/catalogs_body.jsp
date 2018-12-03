@@ -36,7 +36,7 @@
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
     });
     $.addModal({
         selector: '#js-create-catalog',

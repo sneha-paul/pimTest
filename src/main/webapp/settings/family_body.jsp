@@ -272,7 +272,7 @@
             ]
         });
 
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
     });
 </script>
 <script src="/assets/js/pages/ui/settings/family.js"></script>

@@ -127,6 +127,20 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     }
 
     @Override
+    public Optional<WebsiteCatalog> getWebsiteCatalog(String websiteCatalogId) {
+        return websiteCatalogDAO.findById(websiteCatalogId);
+    }
+
+    @Override
+    public Optional<WebsiteCatalog> getWebsiteCatalog(String websiteId, FindBy websiteIdFindBy, String catalogId, FindBy catalogIdFindBy) {
+        return websiteDAO.findById(websiteId, websiteIdFindBy, Website.class)
+                .map(website -> catalogService.get(catalogId, catalogIdFindBy, false)
+                        .map(catalog -> websiteCatalogDAO.findByWebsiteIdAndCatalogId(website.getId(), catalog.getId()))
+                        .orElse(Optional.empty()))
+                .orElse(Optional.empty());
+    }
+
+    @Override
     @Caching(evict = {@CacheEvict(value = "websites", key = "#findBy.INTERNAL_ID+\"|\"+#website.id"), @CacheEvict(value = "websites", key = "#findBy.EXTERNAL_ID+\"|\"+#website.externalId")})
     public Website update(String id, FindBy findBy, Website website) {
         return super.update(id, findBy, website);

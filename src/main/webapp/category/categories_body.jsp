@@ -65,7 +65,7 @@
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
 
         $('.js-category-grid-view').on('click', function(){
             $('a.nav-link[href*="categoryGrid"]').trigger('click');

@@ -37,7 +37,7 @@
                 { data: 'active', name : 'active' , title : 'Status', orderable: false},
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}            ]
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
 
         $.addModal({
             selector: '#js-create-product',

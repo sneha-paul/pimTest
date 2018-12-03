@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
 
@@ -47,6 +48,10 @@ public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
      * @return
      */
     WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2);
+
+    Optional<WebsiteCatalog> getWebsiteCatalog(String websiteCatalogId);
+
+    Optional<WebsiteCatalog> getWebsiteCatalog(String websiteId, FindBy websiteIdFindBy, String catalogId, FindBy catalogIdFindBy);
 
 
 }

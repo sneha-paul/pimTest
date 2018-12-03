@@ -11,7 +11,7 @@ import java.util.UUID;
  * Created by manu on 8/19/18.
  */
 @Document
-abstract public class EntityAssociation<P extends Entity, C extends Entity> {
+abstract public class EntityAssociation<P, C extends Entity> {
     @Id
     private String id;
 

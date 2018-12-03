@@ -121,7 +121,7 @@
             ]
         });
 
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
     });
 </script>
 <script src="/assets/js/pages/ui/settings/attributeCollection.js"></script>

@@ -890,7 +890,7 @@
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
     });
 </script>
 

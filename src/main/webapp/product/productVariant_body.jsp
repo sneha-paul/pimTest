@@ -823,6 +823,6 @@
             url: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{productVariantId}/pricing'),
             columns: cols
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
     });
 </script>

@@ -35,16 +35,17 @@
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+
+        $.addModal({
+            selector: '#js-create-users',
+            url: $.getURL('/pim/users/create/inside'),
+            name:'create-users',
+            title:'Create Users',
+            buttons: [
+                {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('users');$.closeModal();});}},
+                {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+            ]
+        });
     });
-    $.addModal({
-     selector: '#js-create-users',
-     url: $.getURL('/pim/users/create/inside'),
-     name:'create-users',
-     title:'Create Users',
-     buttons: [
-     {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('users');$.closeModal();});}},
-     {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-     ]
-     });
+
 </script>

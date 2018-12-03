@@ -24,6 +24,8 @@ public class WebsiteCatalog extends EntityAssociation<Website, Catalog> {
     @Indexed
     private String catalogId;
 
+
+
     public WebsiteCatalog() {
         super();
     }
@@ -60,7 +62,7 @@ public class WebsiteCatalog extends EntityAssociation<Website, Catalog> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("catalogId", getChild().getCatalogId());
+        map.put("externalId", getChild().getCatalogId());
         map.put("catalogName", getChild().getCatalogName());
         map.put("active", getActive());
         map.put("sequenceNum", Long.toString(getSequenceNum()));
