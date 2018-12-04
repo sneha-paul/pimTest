@@ -353,7 +353,7 @@ public class ProductVariantController extends ControllerSupport {
     private static Set<Integer> getQuantityBreaks(Map<String, Map<Integer, BigDecimal>> pricingDetails) {
         Set<Integer> qtyBreaks = new TreeSet<>();
         pricingDetails.forEach((a, pd) -> pd.forEach((q, p) -> qtyBreaks.add(q)));
-        return qtyBreaks;
+        return qtyBreaks.isEmpty() ? PIMConstants.DEFAULT_QUANTITY_BREAKS : qtyBreaks;
     }
 
     private static Map<String, String> getAttributePricingDetails(Map<String, Map<Integer, BigDecimal>> pricingDetails, PricingAttribute pricingAttribute) {

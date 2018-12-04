@@ -1,6 +1,6 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Pagination;
+/*import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
@@ -24,13 +24,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Map;*/
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-@Controller
+/*@Controller
 @RequestMapping("pim/websites/{websiteId}")
 public class WebsiteCatalogController {
     private WebsiteService websiteService;
@@ -132,4 +132,4 @@ public class WebsiteCatalogController {
         model.put("success", success);
         return model;
     }
-}
+}*/

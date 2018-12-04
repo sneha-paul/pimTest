@@ -10,7 +10,6 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -25,17 +24,15 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     private WebsiteCatalogDAO websiteCatalogDAO;
     private RootCategoryDAO rootCategoryDAO;
     private CategoryService categoryService;
-    private WebsiteService websiteService;
 
 
     @Autowired
-    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, CategoryService categoryService, @Lazy WebsiteService websiteService) {
+    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, CategoryService categoryService) {
         super(catalogDAO, "catalog", validator);
         this.catalogDAO = catalogDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
         this.rootCategoryDAO = rootCategoryDAO;
         this.categoryService = categoryService;
-        this.websiteService = websiteService;
     }
 
 
@@ -47,30 +44,28 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
 
 
     /**
-     * Method to get available categories of a websiteCatalog in paginated format.
+     * Method to get available categories of a catalog in paginated format.
      *
-     * @param websiteCatalogId Id of the websiteCatalog
+     * @param id Internal or External id of the Catalog
+     * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param page page number
      * @param size page size
      * @param sort sort object
      * @return
      */
     @Override
-    public Page<Category> getAvailableRootCategoriesForCatalog(String websiteCatalogId, int page, int size, Sort sort) {
-
-        return websiteCatalogDAO.findById(websiteCatalogId)
-                .map(websiteCatalog -> categoryService.getAllWithExclusions(rootCategoryDAO.findByWebsiteCatalogId(websiteCatalogId).stream().map(RootCategory::getRootCategoryId).collect(Collectors.toList()).toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort))
-                .orElse(new PageImpl<>(new ArrayList<>()));
-        /*Optional<Catalog> catalog = get(id, findBy, false);
+    public Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort) {
+        Optional<Catalog> catalog = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
-        catalog.ifPresent(catalog1 -> rootCategoryDAO.findByWebsiteCatalogId(catalog1.getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId())));
-        return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);*/
+        catalog.ifPresent(catalog1 -> rootCategoryDAO.findByCatalogId(catalog1.getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId())));
+        return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
     }
 
     /**
-     * Method to get rootCategories of a WebsiteCatalog in paginated format.
+     * Method to get categories of a Catalog in paginated format.
      *
-     * @param websiteCatalogId Id of the websiteCatalog
+     * @param catalogId Internal or External id of the Catalog
+     * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param page page number
      * @param size page size
      * @param sort sort Object
@@ -78,55 +73,48 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * @return
      */
     @Override
-    public Page<RootCategory> getRootCategories(String websiteCatalogId, int page, int size, Sort sort, boolean... activeRequired) {
+    public Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Optional<Catalog> _catalog = get(catalogId, findBy, false);
+        if(_catalog.isPresent()) {
+            Catalog catalog = _catalog.get();
+            Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            List<String> categoryIds = new ArrayList<>();
+            rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
+            if(categoryIds.size() > 0) {
+                Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                List<RootCategory> _rootCategories = rootCategories.filter(rc -> categoriesMap.containsKey(rc.getRootCategoryId())).stream().collect(Collectors.toList());
+                _rootCategories.forEach(rc -> rc.init(catalog, categoriesMap.get(rc.getRootCategoryId())));
+                rootCategories = new PageImpl<>(_rootCategories,pageable,_rootCategories.size());//TODO : verify this logic
+            }
+            return rootCategories;
+        }
+        return new PageImpl<>(new ArrayList<>(), pageable, 0);
 
-        Sort _sort = sort == null ? Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum")) : sort;
-        return websiteCatalogDAO.findById(websiteCatalogId)
-                .map(websiteCatalog -> {
-                    Pageable pageable = PageRequest.of(page, size, _sort);
-
-                    //Get all rootCategories for the given webCatalogId
-                    Page<RootCategory> rootCategories = rootCategoryDAO.findByWebsiteCatalogIdAndActiveIn(websiteCatalogId, PimUtil.getActiveOptions(activeRequired), pageable);
-
-                    //List to hold categoryId of all the rootCategories
-                    List<String> categoryIds = new ArrayList<>();
-
-                    //Get the categoryId of all rootCategories
-                    rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
-
-                    //If there are rootCategory categoryIds,
-                    //      1) Get all the category instances for those categoryIds,
-                    //      2) Filter those rootCategories that has an invalid categoryId,
-                    //      3) Inject the parent and child instance for each root category instances
-                    if(categoryIds.size() > 0) {
-                        Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                        List<RootCategory> _rootCategories = rootCategories.filter(rc -> categoriesMap.containsKey(rc.getRootCategoryId())).stream().collect(Collectors.toList());
-                        _rootCategories.forEach(rc -> rc.init(websiteCatalog, categoriesMap.get(rc.getRootCategoryId())));
-                        rootCategories = new PageImpl<>(_rootCategories,pageable,_rootCategories.size());//TODO : verify this logic
-                    }
-                    return rootCategories;
-                })
-                .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     /**
      * Method to add category for a catalog.
      *
-     * @param websiteId Internal or External id of the Website
-     * @param websiteIdFindBy Type of the website id, INTERNAL_ID or EXTERNAL_ID
-     * @param catalogId Internal or External id of the Catalog
-     * @param catalogIdFindBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
+     * @param id Internal or External id of the Catalog
+     * @param findBy1 Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param rootCategoryId Internal or External id of the Category
-     * @param rootCategoryIdFindBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */
     @Override
-    public RootCategory addRootCategory(String websiteId, FindBy websiteIdFindBy, String catalogId, FindBy catalogIdFindBy, String rootCategoryId, FindBy rootCategoryIdFindBy) {
-        return websiteService.getWebsiteCatalog(websiteId, websiteIdFindBy, catalogId, catalogIdFindBy)
-                .map(websiteCatalog -> categoryService.get(rootCategoryId, rootCategoryIdFindBy, false)
-                        .map(rootCategory -> rootCategoryDAO.save(new RootCategory(websiteCatalog.getId(), rootCategory.getId(), rootCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0).map(top -> top.getSubSequenceNum() + 1).orElse(0))))
-                        .orElse(null))
-                .orElse(null);
-
+    public RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2) {
+        Optional<Catalog> catalog = get(id, findBy1, false);
+        if(catalog.isPresent()) {
+            Optional<Category> rootCategory = categoryService.get(rootCategoryId, findBy2, false);
+            if(rootCategory.isPresent()) {
+                Optional<RootCategory> top = rootCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
+            }
+        }
+        return null;
     }
 }

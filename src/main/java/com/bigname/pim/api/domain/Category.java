@@ -31,7 +31,6 @@ public class Category extends Entity<Category> {
    // @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "category.categoryId.invalid")
     private String categoryId;
 
-    @Indexed(unique = true)
     @NotEmpty(message = "Category Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
    // @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "category.categoryName.invalid")
     private String categoryName;

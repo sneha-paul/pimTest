@@ -99,17 +99,18 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
             model.put("mode", "CREATE");
             model.put("website", new Website());
             model.put("breadcrumbs", new Breadcrumbs("Websites", "Websites", "/pim/websites", "Create Website", ""));
+            return new ModelAndView("website/website", model);
         } else {
-            Optional<Website> website = websiteService.get(id, FindBy.EXTERNAL_ID, false);
-            if(website.isPresent()) {
-                model.put("mode", "DETAILS");
-                model.put("website", website.get());
-                model.put("breadcrumbs", new Breadcrumbs("Websites", "Websites", "/pim/websites", website.get().getWebsiteName(), ""));
-            } else {
-                throw new EntityNotFoundException("Unable to find Website with Id: " + id);
-            }
+            return websiteService.get(id, FindBy.EXTERNAL_ID, false)
+                    .map(website -> {
+                        model.put("mode", "DETAILS");
+                        model.put("website", website);
+                        model.put("breadcrumbs", new Breadcrumbs("Websites", "Websites", "/pim/websites", website.getWebsiteName(), ""));
+                        return new ModelAndView("website/website", model);
+                    })
+                    .orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + id));
+
         }
-        return new ModelAndView("website/website", model);
     }
 
     /**
@@ -136,7 +137,8 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      */
     @RequestMapping("/{id}/catalogs")
     @ResponseBody
-    public Result<Map<String, String>> getWebsiteCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+    public Result<Map<String, String>> getWebsiteCatalogs(@PathVariable(value = "id") String id,
+                                                          HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
@@ -157,11 +159,10 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
     /**
      * Handler method for the availableCatalogs page.
      *
-     * @param id
      * @return
      */
     @RequestMapping(value = "/{id}/catalogs/available")
-    public ModelAndView availableCatalogs(@PathVariable(value = "id") String id) {
+    public ModelAndView availableCatalogs() {
         Map<String, Object> model = new HashMap<>();
         return new ModelAndView("catalog/availableCatalogs", model);
     }

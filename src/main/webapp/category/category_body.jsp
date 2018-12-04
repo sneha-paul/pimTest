@@ -9,10 +9,8 @@
                         <ul class="nav nav-tabs-new2">
                             <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SEO">SEO</a></li>
-                            <c:if test="${not empty website}">
-                                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SUB_CATEGORIES">SubCategories</a></li>
-                                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#PRODUCTS">Products</a></li>
-                            </c:if>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#SUB_CATEGORIES">SubCategories</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#PRODUCTS">Products</a></li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane show active" id="DETAILS">
@@ -62,7 +60,7 @@
                                                     <br>
                                                     <input type="hidden" name="group" value="DETAILS"/>
                                                     <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
-                                                    <a href="<c:choose><c:when test="${not empty website}">/pim/websites/${website.websiteId}/catalogs/${catalog.catalogId}#rootCategories</c:when><c:otherwise>/pim/categories</c:otherwise></c:choose>"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                                    <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
                                                 </form>
                                             </div>
                                         </div>
@@ -152,12 +150,8 @@
                 </div>
             </div>
         </div>
-<c:choose>
-    <c:when test="${not empty website}">
         <script>
             $.initPage({
-                'websiteId': '${website.websiteId}',
-                'catalogId': '${catalog.catalogId}',
                 'categoryId' : '${category.categoryId}'
             });
             $( document ).ready(function() {
@@ -173,8 +167,15 @@
                         { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
                     ]
                 });
-
-
+//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+            });
+        </script>
+        <script src="/assets/js/pages/ui/category/category.js"></script>
+        <script>
+            $.initPage({
+                'categoryId' : '${category.categoryId}'
+            });
+           $( document ).ready(function() {
                 $.initDataTable({
                     selector: '#paginatedProductsTable',
                     name: 'products',
@@ -187,19 +188,8 @@
                         { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
                     ]
                 });
-
-
+//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
             });
         </script>
-        <script src="/assets/js/pages/ui/category/category.js"></script>
-    </c:when>
-    <c:otherwise>
-        <script>
-            $.initPage({
-                'categoryId' : '${category.categoryId}'
-            });
-        </script>
-    </c:otherwise>
-</c:choose>
 
 

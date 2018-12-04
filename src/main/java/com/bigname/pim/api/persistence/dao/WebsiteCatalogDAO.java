@@ -17,5 +17,4 @@ public interface WebsiteCatalogDAO extends BaseAssociationDAO<WebsiteCatalog>, M
     Page<WebsiteCatalog> findByWebsiteIdAndActiveIn(String websiteId, String[] active, Pageable pageable);
     long countByWebsiteId(String websiteId);
     List<WebsiteCatalog> findByWebsiteId(String websiteId);
-    Optional<WebsiteCatalog> findByWebsiteIdAndCatalogId(String websiteId, String catalogId);
 }

@@ -1,6 +1,6 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.exception.EntityNotFoundException;
+/*import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map;*/
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-@Controller
+/*@Controller
 @RequestMapping("pim/websites/{websiteId}/catalogs/{catalogId}")
 public class RootCategoryController {
     private WebsiteService websiteService;
@@ -59,4 +59,4 @@ public class RootCategoryController {
                         ).orElseThrow(() -> new EntityNotFoundException("Unable to find Catalog with Id: " + catalogId)))
                 .orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + websiteId));
     }
-}
+}*/

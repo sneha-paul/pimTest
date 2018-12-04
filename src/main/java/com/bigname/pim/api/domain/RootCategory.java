@@ -8,10 +8,13 @@ import java.util.Map;
 /**
  * Created by sruthi on 31-08-2018.
  */
-public class RootCategory extends  EntityAssociation<WebsiteCatalog, Category> {
+public class RootCategory extends  EntityAssociation<Catalog, Category> {
 
+    /**
+     * Internal id of the Catalog document, not the externalId (catalogId) attribute
+     */
     @Indexed
-    private String websiteCatalogId;
+    private String catalogId;
 
     /**
      * Internal id of the Category document, not the externalId (categoryId) attribute
@@ -21,25 +24,25 @@ public class RootCategory extends  EntityAssociation<WebsiteCatalog, Category> {
 
     public RootCategory() { super(); }
 
-    public RootCategory(String websiteCatalogId, String categoryId, int subSequenceNum) {
+    public RootCategory(String catalogId, String categoryId, int subSequenceNum) {
         super();
-        this.websiteCatalogId = websiteCatalogId;
+        this.catalogId = catalogId;
         this.rootCategoryId = categoryId;
         setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
 
-    public RootCategory init(WebsiteCatalog websiteCatalog, Category rootCategory) {
-        super.init(websiteCatalog, rootCategory);
+    public RootCategory init(Catalog catalog, Category rootCategory) {
+        super.init(catalog, rootCategory);
         return this;
     }
 
-    public String getWebsiteCatalogId() {
-        return websiteCatalogId;
+    public String getCatalogId() {
+        return catalogId;
     }
 
-    public void setWebsiteCatalogId(String websiteCatalogId) {
-        this.websiteCatalogId = websiteCatalogId;
+    public void setCatalogId(String catalogId) {
+        this.catalogId = catalogId;
     }
 
     public String getRootCategoryId() {
@@ -53,7 +56,7 @@ public class RootCategory extends  EntityAssociation<WebsiteCatalog, Category> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("externalId", getChild().getCategoryId());
+        map.put("rootCategoryId", getChild().getCategoryId());
         map.put("rootCategoryName", getChild().getCategoryName());
         map.put("active", getActive());
         map.put("sequenceNum", Long.toString(getSequenceNum()));
@@ -68,13 +71,13 @@ public class RootCategory extends  EntityAssociation<WebsiteCatalog, Category> {
 
         RootCategory that = (RootCategory) o;
 
-        if (websiteCatalogId != null ? !websiteCatalogId.equals(that.websiteCatalogId) : that.websiteCatalogId != null) return false;
+        if (catalogId != null ? !catalogId.equals(that.catalogId) : that.catalogId != null) return false;
         return rootCategoryId != null ? rootCategoryId.equals(that.rootCategoryId) : that.rootCategoryId == null;
     }
 
     @Override
     public int hashCode() {
-        int result = websiteCatalogId != null ? websiteCatalogId.hashCode() : 0;
+        int result = catalogId != null ? catalogId.hashCode() : 0;
         result = 31 * result + (rootCategoryId != null ? rootCategoryId.hashCode() : 0);
         return result;
     }

@@ -3,7 +3,7 @@ $( document ).ready(function() {
         selector: '#paginatedAvailableRootCategoriesTable',
         name: 'availableRootCategories',
         type: 'TYPE_3',
-        url: $.getURL('/pim/websites/{websiteId}/catalogs/{catalogId}/rootCategories/available/list'),
+        url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/available/list'),
         columns: [
             { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
             { data: 'externalId', name : 'externalId', title : 'Category ID' },
@@ -15,7 +15,7 @@ $( document ).ready(function() {
         var rootCategoryId = $(this).data('external-id');
 
         $.ajax({
-            url: $.getURL('/pim/websites/{websiteId}/catalogs/{catalogId}/rootCategories/{rootCategoryId}', {'rootCategoryId': rootCategoryId}),
+            url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/{rootCategoryId}', {'rootCategoryId': rootCategoryId}),
             data: {},
             method: 'POST',
             dataType: 'json'
@@ -25,11 +25,11 @@ $( document ).ready(function() {
                 $.refreshDataTable('availableRootCategories');
                 toastr.success('Successfully added the root category', 'Root Category Added');
             } else {
-                toastr.error('Error occurred while adding the root category', 'Error Adding Root Category');
+                toastr.success('Error occurred while adding the root category', 'Error Adding Root Category');
             }
 
         }).fail(function(jqXHR, status) {
-            toastr.error('Error occurred while adding the root category', 'Error Adding Root Category');
+            toastr.success('Error occurred while adding the root category', 'Error Adding Root Category');
         });
     });
 });
