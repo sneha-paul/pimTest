@@ -13,6 +13,7 @@ import java.util.List;
 public interface RelatedCategoryDAO extends BaseAssociationDAO<RelatedCategory>, MongoRepository<RelatedCategory, String> {
 
     Page<RelatedCategory> findByCategoryIdAndActiveIn(String categoryId, String active[], Pageable pageable);
+    List<RelatedCategory> findByActiveIn(String active[]);
     long countByCategoryId(String categoryId);
     List<RelatedCategory> findByCategoryId(String categoryId);
 }

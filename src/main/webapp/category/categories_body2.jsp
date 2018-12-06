@@ -1,17 +1,5 @@
 <style>
-    .expanded-icons, tr.details .collapsed-icons {
-        display: none;
-    }
-    .collapsed-icons, tr.details .expanded-icons {
-        display: block;
-    }
 
-    .js-ctrl {
-        visibility: hidden;
-    }
-    tr.parent-node .js-ctrl {
-        visibility: visible;
-    }
 </style>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">

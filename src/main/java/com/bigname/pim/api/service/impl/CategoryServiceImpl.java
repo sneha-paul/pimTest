@@ -42,17 +42,63 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return categoryDAO.save(category);
     }
 
+    @Override
+    public List<Map<String, Object>> getCategoryHierarchy(boolean... activeRequired) {
+        Map<String, Map<String, Object>> nodes = new LinkedHashMap<>();
 
-    /*@Override
-    public Page<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        if(sort == null) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "categoryId"));
+        List<Category> categories = categoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        for(Category category : categories) {
+            Map<String, Object> node = new HashMap<>();
+            node.put("id", category.getId());
+            node.put("key", category.getExternalId());
+            node.put("level", 0);
+            node.put("parent", "0");
+            node.put("name", category.getCategoryName());
+            node.put("isParent", false);
+            node.put("active", category.getActive());
+            node.put("sequenceNum", 0);
+            node.put("subSequenceNum", 0);
+            nodes.put(category.getId(), node);
         }
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return findBy == FindBy.INTERNAL_ID ? categoryDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : categoryDAO.findByCategoryIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
-    }*/
 
-    /**
+        Map<String, List<RelatedCategory>> childCategoriesMap = new LinkedHashMap<>();
+        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        for (RelatedCategory relatedCategory : relatedCategories) {
+            if(childCategoriesMap.containsKey(relatedCategory.getCategoryId())) {
+                childCategoriesMap.get(relatedCategory.getCategoryId()).add(relatedCategory);
+            } else {
+                List<RelatedCategory> childList = new ArrayList<>();
+                childList.add(relatedCategory);
+                childCategoriesMap.put(relatedCategory.getCategoryId(), childList);
+            }
+        }
+
+        for (Map.Entry<String, Map<String, Object>> entry : nodes.entrySet()) {
+            setChildNodes(entry.getKey(), nodes, childCategoriesMap);
+        }
+
+        return new ArrayList<>(nodes.values());
+    }
+
+    private void setChildNodes(String nodeId, Map<String, Map<String, Object>> nodes, Map<String, List<RelatedCategory>> childCategoriesMap) {
+
+        if(childCategoriesMap.containsKey(nodeId)) {
+            List<RelatedCategory> childNodes = childCategoriesMap.get(nodeId);
+            childNodes.forEach(childCategory -> {
+                String childNodeId = childCategory.getSubCategoryId();
+                Map<String, Object> node = nodes.get(nodeId);
+                if(((int)node.get("level")) == 0) {
+                    Map<String, Object> childNode = nodes.get(childNodeId);
+                    node.put("isParent", true);
+                    childNode.put("level", ((int) node.get("level")) + 1);
+                    childNode.put("parent", node.get("key"));
+                    setChildNodes(childNodeId, nodes, childCategoriesMap);
+                }
+            });
+        }
+    }
+
+     /**
      * Method to get available subCategories of a category in paginated format.
      *
      * @param id Internal or External id of the Category
@@ -111,7 +157,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      *
      * @param id Internal or External id of the Category
      * @param findBy1 Type of the category id, INTERNAL_ID or EXTERNAL_ID
-     * @param categoryId Internal or External id of the Category
+     * @param subCategoryId Internal or External id of the subCategory
      * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */

@@ -68,7 +68,8 @@ public class CategoryController extends BaseController<Category, CategoryService
     }
 
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(value = "view", defaultValue = "0") String view) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATEGORIES");
         if(id == null) {
@@ -80,7 +81,7 @@ public class CategoryController extends BaseController<Category, CategoryService
             if(category.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
-                model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories", category.get().getCategoryName(), ""));
+                model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories" + ("1".equals(view) ? "#1" : ""), category.get().getCategoryName(), ""));
             } else {
                 throw new EntityNotFoundException("Unable to find Category with Id: " + id);
             }
@@ -89,10 +90,17 @@ public class CategoryController extends BaseController<Category, CategoryService
     }
 
     @RequestMapping()
-    public ModelAndView all(){
+    public ModelAndView all(@RequestParam(name = "reload", required = false) boolean reload){
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATEGORIES");
-        return new ModelAndView("category/categories", model);
+        return new ModelAndView("category/categories" + (reload ? "_body" : ""), model);
+    }
+
+    @RequestMapping("/hierarchy")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> getAllAsHierarchy() {
+        return categoryService.getCategoryHierarchy(false);
     }
 
     @RequestMapping("/{id}/subCategories")

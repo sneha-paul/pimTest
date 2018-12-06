@@ -11,7 +11,15 @@ var dataSet = [
     {"level": 1,"key": "10","parent": "8","name": "Sipeky Karol","isParent": false}
 ];
 $(document).ready(function () {
-    var displayed = new Set([]);
+
+    $.initTreeDataTable({
+        selector: '#categoriesHierarchy',
+        url: '/pim/categories/hierarchy',
+        collapsed: false,
+        collapsible: true
+    });
+
+    /*var displayed = new Set([]);
     var collapsed = false;
     var collapsible =true;
     var dt = $('#example2').DataTable( {
@@ -81,5 +89,5 @@ $(document).ready(function () {
         });
         regex = regex + ")$";
         dt.columns([2]).search(regex, true, false).draw();
-    });
+    });*/
 });

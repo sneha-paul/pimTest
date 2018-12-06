@@ -12,11 +12,13 @@ import java.util.Optional;
  */
 public interface BaseDAO<T> {
     Page<T> findByActiveIn(String active[], Pageable pageable);
+    List<T> findByActiveIn(String active[]);
 
     Page<T> findByIdNotInAndActiveIn(String[] ids, String[] active, Pageable pageable);
     Page<T> findByExternalIdNotInAndActiveIn(String[] ids, String[] active, Pageable pageable);
 
     Page<T> findByIdInAndActiveIn(String[] ids, String[] active, Pageable pageable);
+    List<T> findByIdInAndActiveIn(String[] ids, String[] active);
     Page<T> findByExternalIdInAndActiveIn(String[] ids, String[] active, Pageable pageable);
 
     Optional<T> findById(String id);

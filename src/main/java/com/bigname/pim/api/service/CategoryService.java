@@ -7,12 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sruthi on 29-08-2018.
  */
 public interface CategoryService extends  BaseService<Category, CategoryDAO> {
 //    Page<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+
+    List<Map<String, Object>> getCategoryHierarchy(boolean... activeRequired);
 
     /**
      * Method to get available subCategories of a category in paginated format.
