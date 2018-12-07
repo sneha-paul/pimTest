@@ -12,16 +12,16 @@ var dataSet = [
 ];
 $(document).ready(function () {
 
-    $.initTreeDataTable({
+    /*$.initTreeDataTable({
         selector: '#categoriesHierarchy',
         url: '/pim/categories/hierarchy',
         collapsed: false,
         collapsible: true
-    });
+    });*/
 
-    /*var displayed = new Set([]);
+    var displayed = new Set([]);
     var collapsed = false;
-    var collapsible =true;
+    var collapsible =false;
     var dt = $('#example2').DataTable( {
         data: dataSet,
         ordering: false,
@@ -89,5 +89,5 @@ $(document).ready(function () {
         });
         regex = regex + ")$";
         dt.columns([2]).search(regex, true, false).draw();
-    });*/
+    });
 });

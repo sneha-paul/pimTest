@@ -295,7 +295,23 @@
             box-shadow: none !important;
         }
 
+        .treeDataTable .expanded-icons, tr.details .collapsed-icons {
+            display: none;
+        }
+        .treeDataTable .collapsed-icons, tr.details .expanded-icons {
+            display: block;
+        }
 
+        .treeDataTable .js-ctrl {
+            visibility: hidden;
+        }
+        .treeDataTable tr.parent-node .js-ctrl {
+            visibility: visible;
+        }
+
+        .no-filter .dataTables_filter {
+            visibility: hidden;
+        }
     </style>
 
 </head>

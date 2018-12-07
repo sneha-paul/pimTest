@@ -36,11 +36,13 @@ import java.util.*;
 @RequestMapping("pim/categories")
 public class CategoryController extends BaseController<Category, CategoryService>{
 
+    private CatalogService catalogService;
     private CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService){
+    public CategoryController(CategoryService categoryService, CatalogService catalogService){
         super(categoryService);
         this.categoryService = categoryService;
+        this.catalogService = catalogService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -60,7 +62,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Category category) {
         Map<String, Object> model = new HashMap<>();
-        if(isValid(category, model, category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup().equals("SEO") ? Category.SeoGroup.class : null)) {
+        if(isValid(category, model, category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null)) {
             categoryService.update(id, FindBy.EXTERNAL_ID, category);
             model.put("success", true);
         }
@@ -69,19 +71,31 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id,
-                                @RequestParam(value = "view", defaultValue = "0") String view) {
+                                @RequestParam Map<String, Object> parameterMap,
+                                HttpServletRequest request) {
+
+
         Map<String, Object> model = new HashMap<>();
+        String referrer = getReferrerURL(request, "/pim/categories");
         model.put("active", "CATEGORIES");
         if(id == null) {
             model.put("mode", "CREATE");
             model.put("category", new Category());
-            model.put("breadcrumbs", new Breadcrumbs("Categories", "Categories", "/pim/categories", "Create Category", ""));
+            model.put("breadcrumbs", new Breadcrumbs("Categories", "Categories", referrer, "Create Category", ""));
         } else {
             Optional<Category> category = categoryService.get(id, FindBy.findBy(true), false);
             if(category.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
-                model.put("breadcrumbs", new Breadcrumbs("Category", "Categories", "/pim/categories" + ("1".equals(view) ? "#1" : ""), category.get().getCategoryName(), ""));
+                model.put("backURL", referrer);
+                Breadcrumbs breadcrumbs = new Breadcrumbs("Category");
+                if(parameterMap.containsKey("catalogId")) {
+                    breadcrumbs.addCrumbs("Catalogs", "/pim/catalogs");
+                    catalogService.get((String)parameterMap.get("catalogId"), FindBy.EXTERNAL_ID, false)
+                            .ifPresent(catalog -> breadcrumbs.addCrumbs(catalog.getCatalogName(), "/pim/catalogs/" + catalog.getCatalogId()));
+                }
+                breadcrumbs.addCrumbs("Categories", referrer, category.get().getCategoryName(), "");
+                model.put("breadcrumbs", breadcrumbs);
             } else {
                 throw new EntityNotFoundException("Unable to find Category with Id: " + id);
             }

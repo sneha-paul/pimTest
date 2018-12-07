@@ -22,7 +22,7 @@
             options.treeDataTable = options.treeDataTable || true;
             var displayed = new Set([]);
             var collapsed = options.collapsed || false;
-            var collapsible = options.collapsible ||true;
+            var collapsible = true === options.collapsible;
             function getData(dt, refresh) {
                 $.ajax({
                     url: options.url,
@@ -105,7 +105,7 @@
                                 action = 'Enable';
                                 btnClass = 'btn-success';
                             }
-                            actions = '<a href="' + (options.url2 ? options.url2 : options.url) + row.key + '?view=1" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
+                            actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + row.key, options.flashAttributes) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
                             actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + row.key + '" data-active="' + row.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             return actions;
                         }
@@ -245,7 +245,7 @@
                                         }
                                     }
                                 } else {
-                                    value.actions = '<a href="' + (options.url2 ? options.url2 : options.url) + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
+                                    value.actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + value.externalId, options.flashAttributes) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ';
                                         // '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
                                 }
@@ -535,18 +535,35 @@
         getPageAttribute: function(key) {
             return $.getPageAttributes()[key];
         },
-        getURL: function(uri, params) {
+        getURL: function(uri, context) {
             var url = uri;
             var match;
             var regex = /(\{(\S+?)\})/g;
             while(match = regex.exec(uri)) {
-                if(params && match[2] in params) {
-                    url = url.replace(match[1], params[match[2]]);
+                if(context && match[2] in context) {
+                    url = url.replace(match[1], context[match[2]]);
                 } else if(match[2] in $.getPageAttributes()) {
                     url = url.replace(match[1], $.getPageAttribute(match[2]));
                 }
             }
             return (url.startsWith('http') || url.startsWith('www') ? '' : $.getPageAttribute("urlRoot") ) + url;
+        },
+        getURLWithRequestParams: function(uri, requestParams, fullURL, context) {
+            if(_.isEmpty(requestParams)) {
+                return uri;
+            }
+            if(uri.indexOf('?') === -1) {
+                uri += '?'
+            } else {
+                uri += '&';
+            }
+            for(var param in requestParams) {
+                if(requestParams.hasOwnProperty(param)) {
+                    uri += (uri.endsWith('?') || uri.endsWith('&') ? '' : '&');
+                    uri += param + '=' + requestParams[param];
+                }
+            }
+            return $.getURL(uri, context);
         },
         pageURL: function() {
             return $.getPageAttribute("pageUrl");

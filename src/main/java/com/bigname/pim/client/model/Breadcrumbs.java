@@ -38,7 +38,7 @@ public class Breadcrumbs {
         return breadcrumbs;
     }
 
-    public void addCrumbs(String... breadcrumbs) {
+    public Breadcrumbs addCrumbs(String... breadcrumbs) {
         if(breadcrumbs != null && breadcrumbs.length > 1) {
             if(this.breadcrumbs.isEmpty()) {
                 addHomeCrumb();
@@ -47,7 +47,7 @@ public class Breadcrumbs {
                 this.breadcrumbs.add(new String[]{breadcrumbs[i], breadcrumbs[i + 1]});
             }
         }
-
+        return this;
 
     }
 

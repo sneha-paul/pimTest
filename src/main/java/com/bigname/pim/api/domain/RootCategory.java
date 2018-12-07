@@ -56,7 +56,7 @@ public class RootCategory extends  EntityAssociation<Catalog, Category> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("rootCategoryId", getChild().getCategoryId());
+        map.put("externalId", getChild().getCategoryId());
         map.put("rootCategoryName", getChild().getCategoryName());
         map.put("active", getActive());
         map.put("sequenceNum", Long.toString(getSequenceNum()));

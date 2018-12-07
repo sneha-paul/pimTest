@@ -1,22 +1,3 @@
-<style>
-    .expanded-icons, tr.details .collapsed-icons {
-        display: none;
-    }
-    .collapsed-icons, tr.details .expanded-icons {
-        display: block;
-    }
-
-    .js-ctrl {
-        visibility: hidden;
-    }
-    tr.parent-node .js-ctrl {
-        visibility: visible;
-    }
-
-    #categoryTree .dataTables_filter {
-        visibility: hidden;
-    }
-</style>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
@@ -44,8 +25,8 @@
                         </div>
                     </div>
                     <div class="tab-pane" id="categoryTree">
-                        <div class="table-responsive">
-                            <table id="categoriesHierarchy" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
+                        <div class="table-responsive no-filter">
+                            <table id="categoriesHierarchy" class="table table-hover dataTable treeDataTable table-custom m-b-0" style="width: 100% !important">
                                 <thead class="thead-dark">
                                 </thead>
                             </table>
@@ -82,7 +63,8 @@
             url: '/pim/categories/hierarchy/',
             url2: '/pim/categories/',
             collapsed: false,
-            collapsible: true
+            collapsible: true,
+            flashAttributes: {hash: '1'}
         });
 
         $('.js-category-grid-view').on('click', function(){

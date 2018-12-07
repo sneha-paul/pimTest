@@ -10,13 +10,12 @@
             </div>
             <div class="body">
                 <ul class="nav nav-tabs-new2">
-                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a>
-                    </li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#RootCategories">RootCategories</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#rootCategories">RootCategories</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#hierarchy">Hierarchy</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane show active" id="DETAILS">
+                    <div class="tab-pane show active" id="details">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -78,7 +77,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="RootCategories">
+                    <div class="tab-pane" id="rootCategories">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -93,9 +92,24 @@
                                             </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="paginatedRootCategoriesTable"
-                                                   class="table table-hover dataTable table-custom" style="width: 100%">
+                                            <table id="paginatedRootCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark"></thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="hierarchy">
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card">
+                                    <div class="body">
+                                        <div class="table-responsive no-filter">
+                                            <table id="categoriesHierarchy" class="table table-hover dataTable treeDataTable table-custom m-b-0" style="width: 100% !important">
+                                                <thead class="thead-dark">
+                                                </thead>
                                             </table>
                                         </div>
                                     </div>
@@ -118,14 +132,24 @@
             name: 'rootCategories',
             type: 'TYPE_2',
             url: $.getURL('/pim/catalogs/{catalogId}/rootCategories'),
+            url2: '/pim/categories/',
+            flashAttributes: { catalogId: '{catalogId}', hash : 'rootCategories'},
             columns: [
                 {data: 'rootCategoryName', name: 'rootCategoryName', title: 'Category Name'},
-                {data: 'rootCategoryId', name: 'rootCategoryId', title: 'Category ID'},
+                {data: 'externalId', name: 'rootCategoryId', title: 'Category ID'},
                 {data: 'active', name: 'active', title: 'Status', orderable: false},
                 {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
             ]
         });
-//        $('#paginatedTable').dataTable().fnSetFilteringEnterPress();
+        $.initTreeDataTable({
+            selector: '#categoriesHierarchy',
+            names: ['categoriesHierarchy', 'category'],
+            url: '/pim/categories/hierarchy/',
+            url2: '/pim/categories/',
+            collapsed: false,
+            collapsible: false,
+            flashAttributes: { catalogId: '{catalogId}', hash : 'hierarchy'}
+        });
     });
 </script>
 <script src="/assets/js/pages/ui/catalog/catalog.js"></script>
