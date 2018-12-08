@@ -64,7 +64,7 @@
             url2: '/pim/categories/',
             collapsed: false,
             collapsible: true,
-            flashAttributes: {hash: '1'}
+            urlParams: {hash: '1'}
         });
 
         $('.js-category-grid-view').on('click', function(){

@@ -14,6 +14,7 @@ public interface RelatedCategoryDAO extends BaseAssociationDAO<RelatedCategory>,
 
     Page<RelatedCategory> findByCategoryIdAndActiveIn(String categoryId, String active[], Pageable pageable);
     List<RelatedCategory> findByActiveIn(String active[]);
+    List<RelatedCategory> findBySubCategoryId(String subCategoryId);
     long countByCategoryId(String categoryId);
     List<RelatedCategory> findByCategoryId(String categoryId);
 }

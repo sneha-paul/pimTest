@@ -168,7 +168,9 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             Optional<Category> subCategory = get(subCategoryId, findBy2, false);
             if(subCategory.isPresent()) {
                 Optional<RelatedCategory> top = relatedCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return relatedCategoryDAO.save(new RelatedCategory(category.get().getId(), subCategory.get().getId(), top.map(EntityAssociation::getSubSequenceNum).orElse(0)));
+                List<RelatedCategory> subCategories = relatedCategoryDAO.findBySubCategoryId(category.get().getId());
+                String fullSubCategoryId = subCategories.isEmpty() ? category.get().getId() : subCategories.get(0).getFullSubCategoryId();
+                return relatedCategoryDAO.save(new RelatedCategory(category.get().getId(), subCategory.get().getId(), fullSubCategoryId, top.map(EntityAssociation::getSubSequenceNum).orElse(0)));
             }
         }
         return null;

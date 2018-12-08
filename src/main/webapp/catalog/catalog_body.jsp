@@ -133,7 +133,7 @@
             type: 'TYPE_2',
             url: $.getURL('/pim/catalogs/{catalogId}/rootCategories'),
             url2: '/pim/categories/',
-            flashAttributes: { catalogId: '{catalogId}', hash : 'rootCategories'},
+            urlParams: { catalogId: '{catalogId}', hash : 'rootCategories'},
             columns: [
                 {data: 'rootCategoryName', name: 'rootCategoryName', title: 'Category Name'},
                 {data: 'externalId', name: 'rootCategoryId', title: 'Category ID'},
@@ -148,7 +148,7 @@
             url2: '/pim/categories/',
             collapsed: false,
             collapsible: false,
-            flashAttributes: { catalogId: '{catalogId}', hash : 'hierarchy'}
+            urlParams: { catalogId: '{catalogId}', hash : 'hierarchy'}
         });
     });
 </script>

@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -12,6 +13,7 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -28,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -76,7 +79,7 @@ public class CategoryController extends BaseController<Category, CategoryService
 
 
         Map<String, Object> model = new HashMap<>();
-        String referrer = getReferrerURL(request, "/pim/categories");
+        String referrer = getReferrerURL(request, "/pim/categories", "");
         model.put("active", "CATEGORIES");
         if(id == null) {
             model.put("mode", "CREATE");
@@ -88,13 +91,55 @@ public class CategoryController extends BaseController<Category, CategoryService
                 model.put("mode", "DETAILS");
                 model.put("category", category.get());
                 model.put("backURL", referrer);
+                String parentId = parameterMap.containsKey("parentId") ? (String) parameterMap.get("parentId") : "";
+                String catalogId = parameterMap.containsKey("catalogId") ? (String) parameterMap.get("catalogId") : "";
+                String hash = parameterMap.containsKey("hash") ? (String) parameterMap.get("hash") : "";
                 Breadcrumbs breadcrumbs = new Breadcrumbs("Category");
-                if(parameterMap.containsKey("catalogId")) {
+                if(!catalogId.isEmpty()) {
                     breadcrumbs.addCrumbs("Catalogs", "/pim/catalogs");
-                    catalogService.get((String)parameterMap.get("catalogId"), FindBy.EXTERNAL_ID, false)
+                    catalogService.get(catalogId, FindBy.EXTERNAL_ID, false)
                             .ifPresent(catalog -> breadcrumbs.addCrumbs(catalog.getCatalogName(), "/pim/catalogs/" + catalog.getCatalogId()));
+                    referrer = getReferrerURL(request, "/pim/catalogs/" + catalogId, "/pim/categories/");
                 }
-                breadcrumbs.addCrumbs("Categories", referrer, category.get().getCategoryName(), "");
+
+                breadcrumbs.addCrumbs("Categories", referrer);
+                if(!parentId.isEmpty()) {
+                    model.put("parentId", parameterMap.get("parentId"));
+                    String[] parentIds = StringUtil.splitPipeDelimited(parentId);
+                    Map<String, Category> parentsMap = categoryService.getAll(parentIds, FindBy.EXTERNAL_ID, null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
+                    String _parentId = "";
+                    for (int i = 0; i < parentIds.length; i++) {
+                        if(i > 0) {
+                            _parentId = (_parentId.isEmpty() ? "" : "|") + parentIds[i - 1];
+                        }
+                        Category parentCategory = parentsMap.get(parentIds[i]);
+                        StringBuilder url = new StringBuilder("/pim/categories/" + parentCategory.getCategoryId());
+                        if(!_parentId.isEmpty() || !hash.isEmpty()) {
+                            url.append("?");
+                            if(!catalogId.isEmpty()) {
+                                url.append("catalogId=").append(catalogId);
+                                if(!_parentId.isEmpty() || !hash.isEmpty()) {
+                                    url.append("&");
+                                }
+                            }
+                            if(!_parentId.isEmpty()) {
+                                url.append("parentId=").append(_parentId);
+                                if(!hash.isEmpty()) {
+                                    url.append("&");
+                                }
+                            }
+                            if(!hash.isEmpty()) {
+                                url.append("hash=").append(hash);
+                            }
+                        }
+                        url.append("#subCategories");
+                        breadcrumbs.addCrumbs(parentCategory.getCategoryName(), url.toString());
+                        if(i == parentIds.length - 1) {
+                            model.put("backURL", url.toString());
+                        }
+                    }
+                }
+                breadcrumbs.addCrumbs(category.get().getCategoryName(), "");
                 model.put("breadcrumbs", breadcrumbs);
             } else {
                 throw new EntityNotFoundException("Unable to find Category with Id: " + id);

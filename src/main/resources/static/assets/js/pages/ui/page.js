@@ -105,7 +105,7 @@
                                 action = 'Enable';
                                 btnClass = 'btn-success';
                             }
-                            actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + row.key, options.flashAttributes) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
+                            actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + row.key, options.urlParams) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
                             actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + row.key + '" data-active="' + row.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             return actions;
                         }
@@ -245,7 +245,7 @@
                                         }
                                     }
                                 } else {
-                                    value.actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + value.externalId, options.flashAttributes) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
+                                    value.actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + value.externalId, options.urlParams) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
                                     '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ';
                                         // '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
                                 }
@@ -546,7 +546,7 @@
                     url = url.replace(match[1], $.getPageAttribute(match[2]));
                 }
             }
-            return (url.startsWith('http') || url.startsWith('www') ? '' : $.getPageAttribute("urlRoot") ) + url;
+            return encodeURI((url.startsWith('http') || url.startsWith('www') ? '' : $.getPageAttribute("urlRoot") ) + url);
         },
         getURLWithRequestParams: function(uri, requestParams, fullURL, context) {
             if(_.isEmpty(requestParams)) {

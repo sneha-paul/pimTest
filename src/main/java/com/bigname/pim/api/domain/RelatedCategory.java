@@ -22,12 +22,16 @@ public class RelatedCategory extends EntityAssociation<Category, Category> {
     @Indexed
     private String subCategoryId;
 
+    @Indexed
+    private String fullSubCategoryId;
+
     public RelatedCategory() { super(); }
 
-    public RelatedCategory(String categoryId, String subCategoryId, int subSequenceNum) {
+    public RelatedCategory(String categoryId, String subCategoryId, String fullSubCategoryId, int subSequenceNum) {
         super();
         this.categoryId = categoryId;
         this.subCategoryId = subCategoryId;
+        this.fullSubCategoryId = fullSubCategoryId + "|" + subCategoryId;
         setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
@@ -53,10 +57,19 @@ public class RelatedCategory extends EntityAssociation<Category, Category> {
         this.subCategoryId = subCategoryId;
     }
 
+    public String getFullSubCategoryId() {
+        return fullSubCategoryId;
+    }
+
+    public void setFullSubCategoryId(String fullSubCategoryId) {
+        this.fullSubCategoryId = fullSubCategoryId;
+    }
+
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("subCategoryId", getChild().getCategoryId());
+        map.put("externalId", getChild().getCategoryId());
+        map.put("fullId", getFullSubCategoryId());
         map.put("subCategoryName", getChild().getCategoryName());
         map.put("active", getActive());
         map.put("sequenceNum", Long.toString(getSequenceNum()));

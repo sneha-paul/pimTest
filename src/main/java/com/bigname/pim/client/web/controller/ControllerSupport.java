@@ -40,10 +40,14 @@ abstract public class ControllerSupport {
         return attributesMap;
     }
 
-    protected String getReferrerURL(HttpServletRequest request, String defaultURL) {
-        String referrer = request.getHeader("referer").substring(request.getHeader("referer").indexOf("/pim/"));
-        if(referrer.contains("/pim/")) {
+    protected String getReferrerURL(HttpServletRequest request, String defaultURL, String compareURL) {
+        String referrer = request.getHeader("referer");
+        if(referrer != null && referrer.contains("/pim/")) {
+            referrer = referrer.substring(request.getHeader("referer").indexOf("/pim/"));
             referrer = referrer.substring(referrer.indexOf("/pim/"));
+            if(referrer.startsWith(defaultURL) || referrer.startsWith(compareURL)) {
+                referrer = defaultURL;
+            }
             String hash = request.getParameter("hash");
             if(hash != null) {
                 referrer += "#" + hash;
