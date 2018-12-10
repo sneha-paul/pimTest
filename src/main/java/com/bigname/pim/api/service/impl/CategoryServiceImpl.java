@@ -74,10 +74,35 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         }
 
         for (Map.Entry<String, Map<String, Object>> entry : nodes.entrySet()) {
-            setChildNodes(entry.getKey(), nodes, childCategoriesMap);
+            if(((int)entry.getValue().get("level")) == 0) {
+                setChildNodes(entry.getKey(), nodes, childCategoriesMap);
+            }
         }
 
-        return new ArrayList<>(nodes.values());
+        nodes.entrySet().stream().sorted((o1, o2) -> (int) o1.getValue().get("level") > (int) o2.getValue().get("level") ? 1 : -1);
+
+        //TODO - sort level 0 nodes by sequenceNum ASC and subSequenceNum DESC
+
+        List<Map<String, Object>> nodesList = new ArrayList<>();
+
+        for (Map.Entry<String, Map<String, Object>> entry : nodes.entrySet()) {
+            if(((int)entry.getValue().get("level")) == 0) {
+                nodesList.addAll(getCompleteNode(entry.getKey(), nodes, childCategoriesMap));
+            }
+        }
+        return new ArrayList<>(nodesList);
+    }
+
+    private List<Map<String, Object>> getCompleteNode(String nodeId, Map<String, Map<String, Object>> nodes, Map<String, List<RelatedCategory>> childCategoriesMap) {
+        List<Map<String, Object>> nodesList = new ArrayList<>();
+
+        nodesList.add(nodes.get(nodeId));
+        if(childCategoriesMap.containsKey(nodeId)) {
+            List<RelatedCategory> childNodes = childCategoriesMap.get(nodeId);
+            childNodes.sort(Comparator.comparing(EntityAssociation::getSequenceNum));//TODO - sort sequenceNum ASC and subSequenceNum DESC
+            childNodes.forEach(childCategory -> nodesList.addAll(getCompleteNode(childCategory.getSubCategoryId(), nodes, childCategoriesMap)));
+        }
+        return nodesList;
     }
 
     private void setChildNodes(String nodeId, Map<String, Map<String, Object>> nodes, Map<String, List<RelatedCategory>> childCategoriesMap) {
@@ -87,13 +112,11 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             childNodes.forEach(childCategory -> {
                 String childNodeId = childCategory.getSubCategoryId();
                 Map<String, Object> node = nodes.get(nodeId);
-                if(((int)node.get("level")) == 0) {
-                    Map<String, Object> childNode = nodes.get(childNodeId);
-                    node.put("isParent", true);
-                    childNode.put("level", ((int) node.get("level")) + 1);
-                    childNode.put("parent", node.get("key"));
-                    setChildNodes(childNodeId, nodes, childCategoriesMap);
-                }
+                Map<String, Object> childNode = nodes.get(childNodeId);
+                node.put("isParent", true);
+                childNode.put("level", ((int) node.get("level")) + 1);
+                childNode.put("parent", node.get("key"));
+                setChildNodes(childNodeId, nodes, childCategoriesMap);
             });
         }
     }

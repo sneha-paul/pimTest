@@ -86,7 +86,7 @@
                     { data: 'name', title: 'Category Name',
                         render: function ( data, type, row, meta ) {
                             var level = row.level;
-                            return '<div style="padding-left:' + (level * 25) + 'px"><div class="float-left"><span class="collapsed-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-right p-r-10 js-ctrl"  style="cursor: pointer"></i><i class=" text-primary fa fa-folder"></i></span><span class="expanded-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-down p-r-5 js-ctrl"  style="cursor: pointer"></i><i class="text-primary fa fa-folder-open"></i></span></div><div class="float-left p-l-10"><h6>' + data + '</h6></div></div>';
+                            return '<div style="padding-left:' + (level * 25) + 'px"><div class="float-left"><span class="collapsed-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-right p-r-10 js-ctrl "  style="cursor: pointer"></i><i class=" text-primary fa fa-folder"></i></span><span class="expanded-icons" style="position: relative; top: -5px; font-size: 20px"><i class="fa fa-caret-down p-r-5 js-ctrl"  style="cursor: pointer"></i><i class="text-primary fa fa-folder-open"></i></span></div><div class="float-left p-l-10"><h6>' + data + '</h6></div></div>';
                         }
                     },
                     { data: 'key', title: 'Category ID'},
@@ -116,7 +116,7 @@
             getData(dt, false);
 
 
-            $(options.selector + ' tbody').on('click', 'tr td:first-child .js-ctrl', function () {
+            $(options.selector + ' tbody').off().on('click', 'tr td:first-child .js-ctrl', function () {
                 var _tr = $(this).closest('tr');
                 var _row = dt.row(_tr);
                 var _key = _row.data().key;
@@ -144,7 +144,7 @@
                 draw(dt, true);
             });
 
-            $(options.selector).on('click', '.js-toggle-status', function() {
+            $(options.selector).off().on('click', '.js-toggle-status', function() {
                 $.toggleStatus(
                     $.getURL(options.url2 + '{externalId}/active/{active}', {
                         externalId: $(this).data('external-id'),
