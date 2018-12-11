@@ -23,29 +23,28 @@
     </div>
 </div>
 <script>
-    $( document ).ready(function() {
-        $.initDataTable({
+    $( document).ready(function() {
+        $.initEntitiesGrid({
             selector: '#paginatedCatalogsTable',
             names: ['catalogs','catalog'],
-            type: 'TYPE_1',
             url: '/pim/catalogs/',
             columns: [
                 { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-                { data: 'externalId', name : 'externalId', title : 'Catalog ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                { data: 'externalId', name : 'externalId', title : 'Catalog ID' }
+            ],
+        });
+        $.addModal({
+            selector: '#js-create-catalog',
+            url: $.getURL('/pim/catalogs/create'),
+            name:'create-catalog',
+            title:'Create Catalog',
+            buttons: [
+                {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('catalogs');$.closeModal();});}},
+                {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });
 
+
     });
-    $.addModal({
-        selector: '#js-create-catalog',
-        url: $.getURL('/pim/catalogs/create'),
-        name:'create-catalog',
-        title:'Create Catalog',
-        buttons: [
-            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('catalogs');$.closeModal();});}},
-            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-        ]
-    });
+
 </script>

@@ -156,7 +156,6 @@
             });
         },
         initDataTable: function(options) {
-            // $.unbindDataTable(options);
             $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
                 serverSide: true,
@@ -172,7 +171,24 @@
                         //process data before sent to server.
                     },
                     dataSrc: function(json) {
-                       $.each(json.data, function(index, value) {
+                        $.each(json.data, function(index, value) {
+                            value.actions = '';
+                            $.each(options.buttons, function(index, button){
+                                switch(button.name) {
+                                    case 'TOGGLE_STATUS':
+                                        if('Y' !== value.active) {
+                                            button.icon = 'icon-check';
+                                            button.title = 'Enable';
+                                            button.style = 'success';
+                                        } else {
+                                            button.icon = 'icon-ban';
+                                            button.title = 'Disable';
+                                            button.style = 'danger';
+                                        }
+                                        break;
+                                }
+                                value.actions += '<button type="button" class="btn btn-sm btn-' + button.style + ' js-' + button.name + '" title="' + button.title + '"><i class="' + button.icon + '"></i></button> ';
+                            });
                             if('GROUP_4' === options.buttonGroup || 'GROUP_4A' === options.buttonGroup) {
                                 value.actions = '';
                                 if('Y' === value.selectable) {
@@ -189,7 +205,7 @@
                                 value.actions = '<button type="button" class="btn btn-sm btn-secondary js-edit-pricing-attribute-data" data-external-id="' + value.externalId + '" title="Edit"><i class="fa fa-edit"></i></button> '/* +
                                                 '<button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button> '*/;
                             } else if(options.type === 'TYPE_1' || options.type === 'TYPE_1A') {
-                                var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
+                                /*var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
                                 if('Y' !== value.active) {
                                     icon = 'icon-check';
                                     action = 'Enable';
@@ -199,7 +215,7 @@
                                 if(options.type === 'TYPE_1') {
                                     value.actions += '<button type="button" class="btn btn-sm btn-primary js-clone" data-external-id="' + value.externalId + '" title="Clone"><i class="icon-docs"></i></button> ';
                                 }
-                                value.actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
+                                value.actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';*/
                             } else if(options.type === 'TYPE_2') {
 
                                 if('GROUP_4B' === options.buttonGroup) {
@@ -255,7 +271,7 @@
                                 value.actions = '<button type="button" class="btn btn-success js-add" data-id="' + value.id + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
                             }
 
-                            if(options.type === 'TYPE_1' || options.type === 'TYPE_2') {
+                            if(/*options.type === 'TYPE_1' || */options.type === 'TYPE_2') {
                                 //alert(value.discontinued)
                                 if(value.discontinued === 'Y'){
                                     value.active = '<span class="badge badge-warning">Discontinued</span>';
@@ -290,7 +306,47 @@
                 },
                 columns: options.columns
             }));
-            $(options.selector).on('click', '.js-toggle-status', function () {
+
+            $.each(options.buttons, function(index, button){
+                const dataTableName = typeof options.names === 'undefined' ? options.name : options.names[0];
+                $(options.selector).on('click', '.js-' + button.name, function () {
+                    let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
+                    if(button.click) {
+                        button.click(row.data());
+                    }
+                });
+                /*switch(button.name) {
+                    case 'DETAILS':
+                        $(options.selector).on('click', '.js-' + button.name, function () {
+                            let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
+                            if(button.click) {
+                                button.click(row.data());
+                            }
+                        });
+                    break;
+                    case 'CLONE':
+                        $(options.selector).on('click', '.js-' + button.name, function (e, options) {
+                            let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
+                            if(button.click) {
+                                button.click(row.data());
+                            }
+                        });
+                        break;
+                    case 'DETAILS':
+                        $(options.selector).on('click', '.js-' + button.name, function () {
+                            let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
+                            if(button.click) {
+                                button.click(row.data());
+                            } else {
+                                const rowData = row.data();
+                                window.location.href = rowData.externalId;
+                            }
+                        });
+                        break;
+                }*/
+            });
+
+            /*$(options.selector).on('click', '.js-toggle-status', function () {
                 if('TYPE_1' === options.type) {
                     $.toggleStatus(
                         $.getURL(options.url + '{externalId}/active/{active}', {
@@ -301,7 +357,7 @@
                         typeof options.names !== 'undefined' ? options.names[1] : 'entity',
                         $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
                 }
-            });
+            });*/
 
             $(options.selector).on('click', '.js-scope-selector', function () {
                 var url = $.getURL(options.url + '/{familyAttributeId}/scope/{scope}', {
@@ -361,7 +417,7 @@
                 });
             });
 
-            $(options.selector).on('click', '.js-clone', function () {
+            /*$(options.selector).on('click', '.js-clone', function () {
                 if('TYPE_1' === options.type) {
                     $.cloneInstance(
                         $.getURL(options.url + '{externalId}/clone/{cloneType}', {
@@ -371,7 +427,7 @@
                         typeof options.names !== 'undefined' ? options.names[1] : 'entity',
                         $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]));
                 }
-            });
+            });*/
 
             $(options.selector).on('click', '.js-attribute-options', function(){
                 if('GROUP_4' === options.buttonGroup) {

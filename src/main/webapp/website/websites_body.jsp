@@ -23,29 +23,26 @@
     </div>
 </div>
 <script>
-    $( document ).ready(function() {
-        $.initDataTable({
+    $( document).ready(function() {
+        $.initEntitiesGrid({
             selector: '#paginatedWebsitesTable',
             names: ['websites','website'],
-            type: 'TYPE_1',
             url: '/pim/websites/',
             columns: [
-                { data: 'websiteName', name : 'websiteName' , title : 'Website Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.url + '<small>'}},
-                { data: 'externalId', name : 'externalId', title : 'Website ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                { data: 'websiteName', name : 'websiteName' , title : 'Website Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.url + '<small>';}},
+                { data: 'externalId', name : 'externalId', title : 'Website ID' }
+            ],
+        });
+        $.addModal({
+            selector: '#js-create-website',
+            url: $.getURL('/pim/websites/create'),
+            name:'create-website',
+            title:'Create Website',
+            buttons: [
+                {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('websites');$.closeModal();});}},
+                {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });
+    });
 
-    });
-    $.addModal({
-        selector: '#js-create-website',
-        url: $.getURL('/pim/websites/create'),
-        name:'create-website',
-        title:'Create Website',
-        buttons: [
-            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('websites');$.closeModal();});}},
-            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-        ]
-    });
 </script>

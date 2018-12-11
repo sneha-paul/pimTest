@@ -52,8 +52,10 @@
     <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
     <script src="/assets/js/pages/ui/page.js"></script>
     <script src="/assets/vendor/jquery-datatable/jquery.dataTables.min.js"></script>
+    <script src="/assets/js/pages/ui/GridUtil.js"></script>
 
-    <%-- PAGE LEVEL JS --%>
+
+<%-- PAGE LEVEL JS --%>
     <c:forEach var="pageJS" items="${pageTopScripts}">
         <script type="text/javascript" src='<c:out value="${pageJS}"/>'></script>
     </c:forEach>
