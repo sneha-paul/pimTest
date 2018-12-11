@@ -68,7 +68,7 @@
                                             <button type="submit" class="btn btn-primary"
                                                     onclick="$.submitAction(event, this)">Save
                                             </button>
-                                            <a href="/pim/catalogs">
+                                            <a href="${backURL}">
                                                 <button type="button" class="btn btn-danger">Cancel</button>
                                             </a>
                                         </form>

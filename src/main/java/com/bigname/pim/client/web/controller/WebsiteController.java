@@ -133,7 +133,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      * @param request
      * @return
      */
-    @RequestMapping("/{id}/catalogs")
+    @RequestMapping("/{id}/catalogs/data")
     @ResponseBody
     public Result<Map<String, String>> getWebsiteCatalogs(@PathVariable(value = "id") String id,
                                                           HttpServletRequest request) {
@@ -175,7 +175,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      * @param model
      * @return
      */
-    @RequestMapping("/{id}/catalogs/available/list")
+    @RequestMapping("/{id}/catalogs/available/data")
     @ResponseBody
     public Result<Map<String, String>> getAvailableCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
         Request dataTableRequest = new Request(request);

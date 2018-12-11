@@ -45,7 +45,7 @@ abstract public class ControllerSupport {
         if(referrer != null && referrer.contains("/pim/")) {
             referrer = referrer.substring(request.getHeader("referer").indexOf("/pim/"));
             referrer = referrer.substring(referrer.indexOf("/pim/"));
-            if(referrer.startsWith(defaultURL) || referrer.startsWith(compareURL)) {
+            if(referrer.startsWith(defaultURL) || (!"".equals(compareURL) && referrer.startsWith(compareURL))) {
                 referrer = defaultURL;
             }
             String hash = request.getParameter("hash");

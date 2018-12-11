@@ -1,18 +1,18 @@
 (function(){
     $.extend({
-        entitiesGridDetailsButton: function(options, customButton) {
+        detailsButton: function(options, customButton) {
             const button = {
                 name: 'DETAILS',
                 style: 'info',
                 title: 'Details',
                 icon: 'icon-eye',
                 click: function (row) {
-                    window.location.href = options.pageUrl + row.externalId;
+                    window.location.href = $.getURLWithRequestParams(options.pageUrl + row.externalId, options.urlParams || {});
                 }
             };
             return Object.assign({}, button, customButton || {});
         },
-        entitiesGridCloneButton: function(options, customButton) {
+        cloneButton: function(options, customButton) {
             const button = {
                 name: 'CLONE',
                 style: 'primary',
@@ -30,7 +30,7 @@
             };
             return Object.assign({}, button, customButton || {});
         },
-        entitiesGridToggleStatusButton: function(options, customButton) {
+        toggleStatusButton: function(options, customButton) {
             const button = {
                 name: 'TOGGLE_STATUS',
                 style: 'danger',
@@ -61,11 +61,18 @@
             }
         },
 
-        initEntitiesGrid: function(options) {
+        initGrid: function(options) {
             $.initDataTable({
                 selector: options.selector,
                 names: options.names,
                 url: options.dataUrl,
+                columns: options.columns,
+                buttons: options.buttons
+            });
+        },
+
+        initEntitiesGrid: function(options) {
+            $.initGrid(Object.assign(options, {
                 columns: [
                     options.columns[0],
                     options.columns[1],
@@ -73,11 +80,25 @@
                     { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
                 ],
                 buttons: [
-                    $.entitiesGridDetailsButton(options),
-                    $.entitiesGridCloneButton(options),
-                    $.entitiesGridToggleStatusButton(options)
+                    $.detailsButton(options),
+                    $.cloneButton(options),
+                    $.toggleStatusButton(options)
                 ]
-            });
+            }));
+        },
+        initAssociationsGrid: function(options) {
+            $.initGrid(Object.assign(options, {
+                columns: [
+                    options.columns[0],
+                    options.columns[1],
+                    { data: 'active', name : 'active' , title : 'Status', orderable: false, render: function(data, type, row, meta){return $.renderStatusColumn(row);}},
+                    { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                ],
+                buttons: [
+                    $.detailsButton(options),
+                    $.toggleStatusButton(options)
+                ]
+            }));
         }
 
     });

@@ -3,7 +3,7 @@ $( document ).ready(function() {
         selector: '#paginatedAvailableCatalogsTable',
         name: 'availableCatalogs',
         type: 'TYPE_3',
-        url: $.getURL('/pim/websites/{websiteId}/catalogs/available/list'),
+        url: $.getURL('/pim/websites/{websiteId}/catalogs/available/data'),
         columns: [
             { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
             { data: 'externalId', name : 'externalId', title : 'Catalog ID' },
