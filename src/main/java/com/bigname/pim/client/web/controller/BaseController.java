@@ -43,7 +43,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         this.service = service;
     }
 
-    @RequestMapping("/list")
+    @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")
     public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {

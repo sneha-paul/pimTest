@@ -7,7 +7,7 @@
                 title: 'Details',
                 icon: 'icon-eye',
                 click: function (row) {
-                    window.location.href = options.url + row.externalId;
+                    window.location.href = options.pageUrl + row.externalId;
                 }
             };
             return Object.assign({}, button, customButton || {});
@@ -20,12 +20,31 @@
                 icon: 'icon-docs',
                 click: function(row){
                     $.cloneInstance(
-                        $.getURL(options.url + '{externalId}/clone/{cloneType}', {
+                        $.getURL(options.pageUrl + '{externalId}/clone/{cloneType}', {
                             externalId: row.externalId,
                             cloneType: 'LIGHT'
                         }),
                         options.names[1],
                         $.refreshDataTable.bind(this, options.names[0]));
+                }
+            };
+            return Object.assign({}, button, customButton || {});
+        },
+        entitiesGridToggleStatusButton: function(options, customButton) {
+            const button = {
+                name: 'TOGGLE_STATUS',
+                style: 'danger',
+                title: 'Disable',
+                icon: 'icon-ban',
+                click: function(row){
+                    $.toggleStatus(
+                        $.getURL(options.pageUrl + '{externalId}/active/{active}', {
+                            externalId: row.externalId,
+                            active: row.active,
+                            discontinued: row.discontinued
+                        }),
+                        options.names[1],
+                        $.refreshDataTable.bind(this, options.names[0]), row.active);
                 }
             };
             return Object.assign({}, button, customButton || {});
@@ -41,32 +60,12 @@
                 }
             }
         },
-        entitiesGridToggleStatusButton: function(options, customButton) {
-            const button = {
-                name: 'TOGGLE_STATUS',
-                style: 'danger',
-                title: 'Disable',
-                icon: 'icon-ban',
-                click: function(row){
-                    $.toggleStatus(
-                        $.getURL(options.url + '{externalId}/active/{active}', {
-                            externalId: row.externalId,
-                            active: row.active,
-                            discontinued: row.discontinued
-                        }),
-                        options.names[1],
-                        $.refreshDataTable.bind(this, options.names[0]), row.active);
-                }
-            };
-            return Object.assign({}, button, customButton || {});
-        },
 
         initEntitiesGrid: function(options) {
             $.initDataTable({
                 selector: options.selector,
                 names: options.names,
-                url: options.url,
-                type: 'TYPE_1',
+                url: options.dataUrl,
                 columns: [
                     options.columns[0],
                     options.columns[1],

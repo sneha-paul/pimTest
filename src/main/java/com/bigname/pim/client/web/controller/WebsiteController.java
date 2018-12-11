@@ -131,8 +131,6 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      *
      * @param id
      * @param request
-     * @param response
-     * @param model
      * @return
      */
     @RequestMapping("/{id}/catalogs")

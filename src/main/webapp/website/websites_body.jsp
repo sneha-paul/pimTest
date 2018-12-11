@@ -27,7 +27,8 @@
         $.initEntitiesGrid({
             selector: '#paginatedWebsitesTable',
             names: ['websites','website'],
-            url: '/pim/websites/',
+            pageUrl: '/pim/websites/',
+            dataUrl: '/pim/websites/data',
             columns: [
                 { data: 'websiteName', name : 'websiteName' , title : 'Website Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.url + '<small>';}},
                 { data: 'externalId', name : 'externalId', title : 'Website ID' }

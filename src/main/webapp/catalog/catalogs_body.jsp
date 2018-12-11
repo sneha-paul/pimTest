@@ -27,7 +27,8 @@
         $.initEntitiesGrid({
             selector: '#paginatedCatalogsTable',
             names: ['catalogs','catalog'],
-            url: '/pim/catalogs/',
+            pageUrl: '/pim/catalogs/',
+            dataUrl: '/pim/catalogs/data',
             columns: [
                 { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
                 { data: 'externalId', name : 'externalId', title : 'Catalog ID' }
