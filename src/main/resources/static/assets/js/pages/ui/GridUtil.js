@@ -1,5 +1,6 @@
 (function(){
     $.extend({
+
         detailsButton: function(options, customButton) {
             const button = {
                 name: 'DETAILS',
@@ -12,6 +13,7 @@
             };
             return Object.assign({}, button, customButton || {});
         },
+
         cloneButton: function(options, customButton) {
             const button = {
                 name: 'CLONE',
@@ -30,6 +32,7 @@
             };
             return Object.assign({}, button, customButton || {});
         },
+
         toggleStatusButton: function(options, customButton) {
             const button = {
                 name: 'TOGGLE_STATUS',
@@ -49,6 +52,7 @@
             };
             return Object.assign({}, button, customButton || {});
         },
+        
         renderStatusColumn: function(data) {
             if (data.discontinued === 'Y') {
                 return '<span class="badge badge-warning">Discontinued</span>';
@@ -72,6 +76,24 @@
         },
 
         initEntitiesGrid: function(options) {
+            let buttons = [];
+            if(options.buttons) {
+                $.each(options.buttons, function(i, button) {
+                    if(typeof button === 'string') {
+                        switch (button) {
+                            case 'DETAILS':
+                                buttons[i] = $.detailsButton(options);
+                                break;
+                            case 'CLONE':
+                                buttons[i] = $.cloneButton(options);
+                                break;
+                            case 'TOGGLE_STATUS':
+                                buttons[i] = $.toggleStatusButton(options);
+                                break;
+                        }
+                    }
+                });
+            }
             $.initGrid(Object.assign(options, {
                 columns: [
                     options.columns[0],
@@ -79,7 +101,7 @@
                     { data: 'active', name : 'active' , title : 'Status', orderable: false, render: function(data, type, row, meta){return $.renderStatusColumn(row);}},
                     { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
                 ],
-                buttons: [
+                buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
                     $.cloneButton(options),
                     $.toggleStatusButton(options)
@@ -87,6 +109,21 @@
             }));
         },
         initAssociationsGrid: function(options) {
+            let buttons = [];
+            if(options.buttons) {
+                $.each(options.buttons, function(i, button) {
+                    if(typeof button === 'string') {
+                        switch (button) {
+                            case 'DETAILS':
+                                buttons[i] = $.detailsButton(options);
+                                break;
+                            case 'TOGGLE_STATUS':
+                                buttons[i] = $.toggleStatusButton(options);
+                                break;
+                        }
+                    }
+                });
+            }
             $.initGrid(Object.assign(options, {
                 columns: [
                     options.columns[0],
@@ -94,7 +131,7 @@
                     { data: 'active', name : 'active' , title : 'Status', orderable: false, render: function(data, type, row, meta){return $.renderStatusColumn(row);}},
                     { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
                 ],
-                buttons: [
+                buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
                     $.toggleStatusButton(options)
                 ]

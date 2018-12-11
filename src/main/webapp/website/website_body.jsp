@@ -86,21 +86,6 @@
     $.initPage({
         'websiteId' : '${website.websiteId}'
     });
-    /*$( document ).ready(function() {
-        $.initDataTable({
-            selector: '#paginatedCatalogsTable',
-            name: 'catalogs',
-            type: 'TYPE_2',
-            url: $.getURL('/pim/websites/{websiteId}/catalogs/'),
-            columns: [
-                { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-                { data: 'externalId', name : 'catalogId', title : 'Catalog ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-            ]
-        });
-
-    });*/
     $( document ).ready(function() {
         var urlParams = {websiteId: '{websiteId}', hash: 'catalogs'};
 
@@ -114,7 +99,8 @@
             columns: [
                 { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
                 { data: 'externalId', name : 'catalogId', title : 'Catalog ID' }
-            ]
+            ],
+            buttons: ['DETAILS']
         });
 
     });
