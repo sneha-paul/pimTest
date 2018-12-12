@@ -51,6 +51,10 @@ public class Breadcrumbs {
 
     }
 
+    public String getBackURL() {
+        return breadcrumbs.isEmpty() ? "" : breadcrumbs.get(breadcrumbs.size() - 2)[1];
+    }
+
     private void addHomeCrumb() {
         this.breadcrumbs.add(homeCrumb);
     }

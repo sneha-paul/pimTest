@@ -11,6 +11,7 @@ import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
@@ -94,23 +95,21 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
         Map<String, Object> model = new HashMap<>();
-        model.put("active", "WEBSITES");
-        if(id == null) {
-            model.put("mode", "CREATE");
-            model.put("website", new Website());
-            model.put("breadcrumbs", new Breadcrumbs("Websites", "Websites", "/pim/websites", "Create Website", ""));
-            return new ModelAndView("website/website", model);
-        } else {
-            return websiteService.get(id, FindBy.EXTERNAL_ID, false)
-                    .map(website -> {
-                        model.put("mode", "DETAILS");
-                        model.put("website", website);
-                        model.put("breadcrumbs", new Breadcrumbs("Websites", "Websites", "/pim/websites", website.getWebsiteName(), ""));
-                        return new ModelAndView("website/website", model);
-                    })
-                    .orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + id));
 
+        model.put("active", "WEBSITES");
+        model.put("mode", id == null ? "CREATE" : "DETAILS");
+
+        if(id == null) {
+            return new ModelAndView("website/website", model);
         }
+
+        return websiteService.get(id, FindBy.EXTERNAL_ID, false)
+                .map(website -> {
+                    model.put("website", website);
+                    model.put("breadcrumbs", new BreadcrumbsBuilder(id, Website.class, websiteService).build());
+                    return new ModelAndView("website/website", model);
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + id));
     }
 
     /**

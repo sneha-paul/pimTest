@@ -68,7 +68,7 @@
                                             <button type="submit" class="btn btn-primary"
                                                     onclick="$.submitAction(event, this)">Save
                                             </button>
-                                            <a href="${backURL}">
+                                            <a href="${breadcrumbs.backURL}">
                                                 <button type="button" class="btn btn-danger">Cancel</button>
                                             </a>
                                         </form>
@@ -124,16 +124,23 @@
 </div>
 <script>
     $.initPage({
-        'catalogId': '${catalog.catalogId}'
+        'catalogId': '${catalog.catalogId}',
+        'websiteId': '<c:if test="${not empty param.websiteId}">${param.websiteId}</c:if>'
     });
     $(document).ready(function () {
+        var urlParams = {};
+        if($.getPageAttribute('websiteId') !== '') {
+            urlParams['websiteId'] = '{websiteId}';
+        }
+        urlParams['catalogId'] = '{catalogId}';
+        urlParams['hash'] = 'rootCategories';
         $.initDataTable({
             selector: '#paginatedRootCategoriesTable',
             name: 'rootCategories',
             type: 'TYPE_2',
             url: $.getURL('/pim/catalogs/{catalogId}/rootCategories'),
             url2: '/pim/categories/',
-            urlParams: { catalogId: '{catalogId}', hash : 'rootCategories'},
+            urlParams: urlParams,
             columns: [
                 {data: 'rootCategoryName', name: 'rootCategoryName', title: 'Category Name'},
                 {data: 'externalId', name: 'rootCategoryId', title: 'Category ID'},

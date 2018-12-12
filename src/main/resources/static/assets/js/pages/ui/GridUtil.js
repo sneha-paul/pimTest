@@ -1,8 +1,8 @@
 (function(){
     $.extend({
 
-        detailsButton: function(options, customButton) {
-            const button = {
+        detailsButton: function(options) {
+            return {
                 name: 'DETAILS',
                 style: 'info',
                 title: 'Details',
@@ -11,11 +11,10 @@
                     window.location.href = $.getURLWithRequestParams(options.pageUrl + row.externalId, options.urlParams || {});
                 }
             };
-            return Object.assign({}, button, customButton || {});
         },
 
-        cloneButton: function(options, customButton) {
-            const button = {
+        cloneButton: function(options) {
+            return {
                 name: 'CLONE',
                 style: 'primary',
                 title: 'Clone',
@@ -30,11 +29,10 @@
                         $.refreshDataTable.bind(this, options.names[0]));
                 }
             };
-            return Object.assign({}, button, customButton || {});
         },
 
-        toggleStatusButton: function(options, customButton) {
-            const button = {
+        toggleStatusButton: function(options) {
+            return {
                 name: 'TOGGLE_STATUS',
                 style: 'danger',
                 title: 'Disable',
@@ -50,9 +48,8 @@
                         $.refreshDataTable.bind(this, options.names[0]), row.active);
                 }
             };
-            return Object.assign({}, button, customButton || {});
         },
-        
+
         renderStatusColumn: function(data) {
             if (data.discontinued === 'Y') {
                 return '<span class="badge badge-warning">Discontinued</span>';

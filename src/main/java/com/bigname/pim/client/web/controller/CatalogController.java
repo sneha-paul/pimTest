@@ -11,6 +11,7 @@ import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -74,40 +75,20 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
                                 @RequestParam Map<String, Object> parameterMap,
                                 HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        String websiteId = parameterMap.containsKey("websiteId") ? (String) parameterMap.get("websiteId") : "";
-        String hash = parameterMap.containsKey("hash") ? (String) parameterMap.get("hash") : "";
-        String defaultURL = "/pim/catalogs";
-        if(!websiteId.isEmpty()) {
-            defaultURL = "/pim/websites/" + websiteId + "#" + hash;
-        }
-        String referrer = getReferrerURL(request, defaultURL, "");
+
         model.put("active", "CATALOGS");
+        model.put("mode", id == null ? "CREATE" : "DETAILS");
+
         if(id == null) {
-            model.put("mode", "CREATE");
-            model.put("catalog", new Catalog());
-            model.put("breadcrumbs", new Breadcrumbs("Catalogs", "Catalogs", referrer, "Create Catalog", ""));
             return new ModelAndView("catalog/catalog", model);
-        } else {
-            return catalogService.get(id, FindBy.findBy(true), false)
-                 .map(catalog -> {
-
-                     model.put("mode", "DETAILS");
-                     model.put("catalog", catalog);
-                     model.put("backURL", referrer);
-
-                     Breadcrumbs breadcrumbs = new Breadcrumbs("Catalogs");
-                     if(!websiteId.isEmpty()) {
-                         breadcrumbs.addCrumbs("Websites", "/pim/websites");
-                         websiteService.get(websiteId, FindBy.EXTERNAL_ID, false)
-                                 .ifPresent(website -> breadcrumbs.addCrumbs(website.getWebsiteName(), "/pim/websites/" + website.getWebsiteId()));
-                     }
-                     breadcrumbs.addCrumbs("Catalogs", referrer);
-                     breadcrumbs.addCrumbs(catalog.getCatalogName(), "");
-                     model.put("breadcrumbs", breadcrumbs);
-
-                     return new ModelAndView("catalog/catalog", model);
-                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Catalog with Id: " + id));
         }
+
+        return catalogService.get(id, FindBy.findBy(true), false)
+                .map(catalog -> {
+                    model.put("catalog", catalog);
+                    model.put("breadcrumbs", new BreadcrumbsBuilder(id, Catalog.class, request, parameterMap, websiteService, catalogService).build());
+                    return new ModelAndView("catalog/catalog", model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Catalog with Id: " + id));
     }
 
     @RequestMapping()
