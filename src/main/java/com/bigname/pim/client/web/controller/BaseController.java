@@ -9,6 +9,8 @@ import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.service.BaseService;
+import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
@@ -20,15 +22,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The base controller class containing reusable endpoints and methods
@@ -38,9 +38,18 @@ import java.util.Map;
  */
 public class BaseController<T extends Entity, Service extends BaseService<T, ?>> extends ControllerSupport {
     private Service service;
+    private Class<T> entityClass;
+    private Set<BaseService> services = new HashSet<>();
 
     protected BaseController(Service service) {
         this.service = service;
+    }
+
+    protected BaseController(Service service, Class<T> entityClass, BaseService... services) {
+        this.service = service;
+        this.entityClass = entityClass;
+        this.services = new HashSet<>(Arrays.asList(services));
+        this.services.add(service);
     }
 
     @RequestMapping(value =  {"/list", "/data"})
@@ -85,6 +94,24 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     @Override
     protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
         return service.validate(e, groups);
+    }
+
+    ModelAndView details(String id, Map<String, Object> parameterMap, HttpServletRequest request, Map<String, Object> model) {
+        model.put("breadcrumbs", buildBreadcrumbs(id, request, parameterMap));
+        return details(model);
+    }
+
+    ModelAndView details(String id, Map<String, Object> model) {
+        model.put("breadcrumbs", buildBreadcrumbs(id, null, null));
+        return details(model);
+    }
+
+    ModelAndView details(Map<String, Object> model) {
+        return new ModelAndView((String)model.remove("view"), model);
+    }
+
+    private Breadcrumbs buildBreadcrumbs(String id, HttpServletRequest request, Map<String, Object> parameterMap) {
+        return new BreadcrumbsBuilder(id, entityClass, request, parameterMap, new ArrayList<>(services).toArray(new BaseService[0])).build();
     }
 
 

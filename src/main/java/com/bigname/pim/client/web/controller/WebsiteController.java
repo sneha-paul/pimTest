@@ -40,7 +40,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
     private WebsiteService websiteService;
 
     public WebsiteController(WebsiteService websiteService) {
-        super(websiteService);
+        super(websiteService, Website.class);
         this.websiteService = websiteService;
     }
 
@@ -94,22 +94,17 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      */
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
-        Map<String, Object> model = new HashMap<>();
 
+        Map<String, Object> model = new HashMap<>();
         model.put("active", "WEBSITES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
+        model.put("view", "website/website");
 
-        if(id == null) {
-            return new ModelAndView("website/website", model);
-        }
-
-        return websiteService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : websiteService.get(id, FindBy.EXTERNAL_ID, false)
                 .map(website -> {
                     model.put("website", website);
-                    model.put("breadcrumbs", new BreadcrumbsBuilder(id, Website.class, websiteService).build());
-                    return new ModelAndView("website/website", model);
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + id));
+                    return super.details(id, model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + id));
     }
 
     /**

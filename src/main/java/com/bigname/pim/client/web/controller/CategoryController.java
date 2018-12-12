@@ -12,6 +12,7 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.Toggle;
@@ -39,13 +40,11 @@ import java.util.stream.Collectors;
 @RequestMapping("pim/categories")
 public class CategoryController extends BaseController<Category, CategoryService>{
 
-    private CatalogService catalogService;
     private CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService, CatalogService catalogService){
-        super(categoryService);
+    public CategoryController(CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService){
+        super(categoryService, Category.class, websiteService, catalogService);
         this.categoryService = categoryService;
-        this.catalogService = catalogService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -77,75 +76,18 @@ public class CategoryController extends BaseController<Category, CategoryService
                                 @RequestParam Map<String, Object> parameterMap,
                                 HttpServletRequest request) {
 
-
         Map<String, Object> model = new HashMap<>();
-        String referrer = getReferrerURL(request, "/pim/categories", "");
         model.put("active", "CATEGORIES");
-        if(id == null) {
-            model.put("mode", "CREATE");
-            model.put("category", new Category());
-            model.put("breadcrumbs", new Breadcrumbs("Categories", "Categories", referrer, "Create Category", ""));
-        } else {
-            Optional<Category> category = categoryService.get(id, FindBy.findBy(true), false);
-            if(category.isPresent()) {
-                model.put("mode", "DETAILS");
-                model.put("category", category.get());
-                model.put("backURL", referrer);
-                String parentId = parameterMap.containsKey("parentId") ? (String) parameterMap.get("parentId") : "";
-                String catalogId = parameterMap.containsKey("catalogId") ? (String) parameterMap.get("catalogId") : "";
-                String hash = parameterMap.containsKey("hash") ? (String) parameterMap.get("hash") : "";
-                Breadcrumbs breadcrumbs = new Breadcrumbs("Category");
-                if(!catalogId.isEmpty()) {
-                    breadcrumbs.addCrumbs("Catalogs", "/pim/catalogs");
-                    catalogService.get(catalogId, FindBy.EXTERNAL_ID, false)
-                            .ifPresent(catalog -> breadcrumbs.addCrumbs(catalog.getCatalogName(), "/pim/catalogs/" + catalog.getCatalogId()));
-                    referrer = getReferrerURL(request, "/pim/catalogs/" + catalogId, "/pim/categories/");
-                }
-
-                breadcrumbs.addCrumbs("Categories", referrer);
-                if(!parentId.isEmpty()) {
-                    model.put("parentId", parameterMap.get("parentId"));
-                    String[] parentIds = StringUtil.splitPipeDelimited(parentId);
-                    Map<String, Category> parentsMap = categoryService.getAll(parentIds, FindBy.EXTERNAL_ID, null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
-                    String _parentId = "";
-                    for (int i = 0; i < parentIds.length; i++) {
-                        if(i > 0) {
-                            _parentId = (_parentId.isEmpty() ? "" : "|") + parentIds[i - 1];
-                        }
-                        Category parentCategory = parentsMap.get(parentIds[i]);
-                        StringBuilder url = new StringBuilder("/pim/categories/" + parentCategory.getCategoryId());
-                        if(!_parentId.isEmpty() || !hash.isEmpty()) {
-                            url.append("?");
-                            if(!catalogId.isEmpty()) {
-                                url.append("catalogId=").append(catalogId);
-                                if(!_parentId.isEmpty() || !hash.isEmpty()) {
-                                    url.append("&");
-                                }
-                            }
-                            if(!_parentId.isEmpty()) {
-                                url.append("parentId=").append(_parentId);
-                                if(!hash.isEmpty()) {
-                                    url.append("&");
-                                }
-                            }
-                            if(!hash.isEmpty()) {
-                                url.append("hash=").append(hash);
-                            }
-                        }
-                        url.append("#subCategories");
-                        breadcrumbs.addCrumbs(parentCategory.getCategoryName(), url.toString());
-                        if(i == parentIds.length - 1) {
-                            model.put("backURL", url.toString());
-                        }
+        model.put("mode", id == null ? "CREATE" : "DETAILS");
+        model.put("view", "category/category");
+        return id == null ? super.details(model) : categoryService.get(id, FindBy.findBy(true), false)
+                .map(category -> {
+                    if(parameterMap.containsKey("parentId")) {
+                        model.put("parentId", parameterMap.get("parentId"));
                     }
-                }
-                breadcrumbs.addCrumbs(category.get().getCategoryName(), "");
-                model.put("breadcrumbs", breadcrumbs);
-            } else {
-                throw new EntityNotFoundException("Unable to find Category with Id: " + id);
-            }
-        }
-        return new ModelAndView("category/category", model);
+                    model.put("category", category);
+                    return super.details(id, parameterMap, request, model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Category with Id: " + id));
     }
 
     @RequestMapping()

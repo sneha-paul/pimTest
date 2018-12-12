@@ -13,6 +13,10 @@ public class PIMConstants {
 
     public static final int MAX_FETCH_SIZE = 300;
 
+    public static class Character {
+        public static final String EQUALS = "=";
+    }
+
     public static class EncodedCharater {
         public static final String PIPE = "%7C";
     }

@@ -148,6 +148,7 @@
                 {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
             ]
         });
+        urlParams['hash'] = 'hierarchy';
         $.initTreeDataTable({
             selector: '#categoriesHierarchy',
             names: ['categoriesHierarchy', 'category'],
@@ -155,7 +156,7 @@
             url2: '/pim/categories/',
             collapsed: false,
             collapsible: false,
-            urlParams: { catalogId: '{catalogId}', hash : 'hierarchy'}
+            urlParams: urlParams
         });
     });
 </script>

@@ -156,12 +156,16 @@
     $.initPage({
         'categoryId' : '${category.categoryId}',
         'parentId' : '<c:if test="${not empty parentId}">${parentId}|</c:if>${category.categoryId}',
+        'websiteId': '<c:if test="${not empty param.websiteId}">${param.websiteId}</c:if>',
         'hash': '${param.hash}',
         'catalogId' : '${param.catalogId}'
     });
     $( document ).ready(function() {
         var urlParams = {};
 
+        if($.getPageAttribute('websiteId') !== '') {
+            urlParams['websiteId'] = $.getPageAttribute('websiteId');
+        }
         if($.getPageAttribute('catalogId') !== '') {
             urlParams['catalogId'] = $.getPageAttribute('catalogId');
         }

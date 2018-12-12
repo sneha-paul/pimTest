@@ -31,7 +31,7 @@ public class StringUtil {
     }
 
     public static final String[] splitPipeDelimited(String value) {
-        return split(value, "\\|");
+        return ValidationUtil.isEmpty(value) ? new String[0] : split(value, "\\|");
     }
     public static final List<String> splitPipeDelimitedAsList(String value) {
         return Arrays.asList(split(value, "\\|"));

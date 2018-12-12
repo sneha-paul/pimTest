@@ -40,7 +40,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     private WebsiteService websiteService;
 
     public CatalogController(CatalogService catalogService, WebsiteService websiteService) {
-        super(catalogService);
+        super(catalogService, Catalog.class, websiteService);
         this.catalogService = catalogService;
         this.websiteService = websiteService;
     }
@@ -74,20 +74,15 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     public ModelAndView details(@PathVariable(value = "id", required = false) String id,
                                 @RequestParam Map<String, Object> parameterMap,
                                 HttpServletRequest request) {
-        Map<String, Object> model = new HashMap<>();
 
+        Map<String, Object> model = new HashMap<>();
         model.put("active", "CATALOGS");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-
-        if(id == null) {
-            return new ModelAndView("catalog/catalog", model);
-        }
-
-        return catalogService.get(id, FindBy.findBy(true), false)
+        model.put("view", "catalog/catalog");
+        return id == null ? super.details(model) : catalogService.get(id, FindBy.findBy(true), false)
                 .map(catalog -> {
                     model.put("catalog", catalog);
-                    model.put("breadcrumbs", new BreadcrumbsBuilder(id, Catalog.class, request, parameterMap, websiteService, catalogService).build());
-                    return new ModelAndView("catalog/catalog", model);
+                    return super.details(id, parameterMap, request, model);
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Catalog with Id: " + id));
     }
 
