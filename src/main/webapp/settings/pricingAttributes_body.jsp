@@ -24,19 +24,16 @@
 </div>
 <script>
     $( document ).ready(function() {
-        $.initDataTable({
+        $.initEntitiesGrid({
             selector: '#paginatedPricingAttributesTable',
             names: ['pricingAttributes','pricingAttribute'],
-            type: 'TYPE_1',
-            url: '/pim/pricingAttributes/',
+            pageUrl: '/pim/pricingAttributes/',
+            dataUrl: '/pim/pricingAttributes/data',
             columns: [
                 { data: 'pricingAttributeName', name : 'pricingAttributeName' , title : 'Pricing Attribute Name'},
-                { data: 'externalId', name : 'externalId', title : 'Pricing Attribute ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                { data: 'externalId', name : 'externalId', title : 'Pricing Attribute ID' }
             ]
         });
-
     });
     $.addModal({
         selector: '#js-create-pricingAttribute',

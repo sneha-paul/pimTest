@@ -21,16 +21,14 @@
 </div>
 <script>
     $( document ).ready(function() {
-        $.initDataTable({
+        $.initEntitiesGrid({
             selector: '#paginatedFamiliesTable',
             names: ['families','family'],
-            type: 'TYPE_1',
-            url: '/pim/families/',
+            pageUrl: '/pim/families/',
+            dataUrl: '/pim/families/data',
             columns: [
                 { data: 'externalId', name : 'externalId', title : 'Family ID' },
-                { data: 'familyName', name : 'familyName' , title : 'Family Name'},
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                { data: 'familyName', name : 'familyName' , title : 'Family Name'}
             ]
         });
 

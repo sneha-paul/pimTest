@@ -32,7 +32,7 @@
             columns: [
                 { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
                 { data: 'externalId', name : 'externalId', title : 'Catalog ID' }
-            ],
+            ]
         });
         $.addModal({
             selector: '#js-create-catalog',
