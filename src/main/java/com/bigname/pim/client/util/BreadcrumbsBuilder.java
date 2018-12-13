@@ -4,10 +4,7 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.URLUtil;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.service.BaseService;
-import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.api.service.WebsiteService;
+import com.bigname.pim.api.service.*;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 
@@ -50,6 +47,8 @@ public class BreadcrumbsBuilder {
                 this.services.put("catalogService", baseService);
             } else if(baseService instanceof CategoryService) {
                 this.services.put("categoryService", baseService);
+            } else if(baseService instanceof AttributeCollectionService) {
+                this.services.put("attributeCollectionService", baseService);
             }
         });
     }
@@ -81,7 +80,6 @@ public class BreadcrumbsBuilder {
         if(!productId.isEmpty()) {
             addCrumbs(productId, Product.class);
         }
-
         addNestedCrumbs(entity);
 
         if(!entity.equals(Category.class)) {
@@ -134,8 +132,10 @@ public class BreadcrumbsBuilder {
                 return new String[] {"Catalogs", "catalogs"};
             case "com.bigname.pim.api.domain.Category":
                 return new String[] {"Categories", "categories"};
+            case "com.bigname.pim.api.domain.AttributeCollection":
+                return new String[] {"AttributeCollections", "attributeCollections"};
         }
-        return new String[] {"", "", ""};
+        return new String[] {"", "", "", ""};
     }
 
     private String getCrumbName(String id, Class<?> entity) {
@@ -146,6 +146,8 @@ public class BreadcrumbsBuilder {
                 return ((CatalogService)services.get("catalogService")).get(id, FindBy.EXTERNAL_ID, false).map(Catalog::getCatalogName).orElse("");
             case "com.bigname.pim.api.domain.Category":
                 return ((CategoryService)services.get("categoryService")).get(id, FindBy.EXTERNAL_ID, false).map(Category::getCategoryName).orElse("");
+            case "com.bigname.pim.api.domain.AttributeCollection":
+                return ((AttributeCollectionService)services.get("attributeCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AttributeCollection::getCollectionName).orElse("");
         }
         return "";
     }

@@ -9,9 +9,7 @@ import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -35,10 +33,15 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     private AttributeCollectionService attributeCollectionService;
 
     public AttributeCollectionController(AttributeCollectionService attributeCollectionService) {
-        super(attributeCollectionService);
+        super(attributeCollectionService, AttributeCollection.class);
         this.attributeCollectionService = attributeCollectionService;
     }
 
+    /**
+     * Handler method to load the list attributeCollection page
+     *
+     * @return The ModelAndView instance for the list attributeCollection page
+     */
     @RequestMapping()
     public ModelAndView all() {
         Map<String, Object> model = new HashMap<>();
@@ -46,6 +49,13 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return new ModelAndView("settings/attributeCollections", model);
     }
 
+    /**
+     * Handler method to create a new attributeCollection
+     *
+     * @param attributeCollection The attributeCollection model attribute that needs to be created
+     *
+     * @return a map of model attributes
+     */
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> create( AttributeCollection attributeCollection) {
@@ -58,6 +68,14 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return model;
     }
 
+    /**
+     * Handler method to update a attributeCollection instance
+     *
+     * @param id collectionId of the attributeCollection instance that needs to be updated
+     * @param attributeCollection The modified website instance corresponding to the given collectionId
+     *
+     * @return a map of model attributes
+     */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, AttributeCollection attributeCollection) {
@@ -77,25 +95,24 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return model;
     }*/
 
+    /**
+     * Handler method to load the attributeCollection details page or the create new attributeCollection page
+     *
+     * @param id collectionId of the attributeCollection instance that needs to be loaded
+     *
+     * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
+     */
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "ATTRIBUTE_COLLECTIONS");
-        if(id == null) {
-            model.put("mode", "CREATE");
-            model.put("attributeCollection", new AttributeCollection());
-            model.put("breadcrumbs", new Breadcrumbs("Attribute Collections", "Attribute Collections", "/pim/attributeCollections", "Create Attribute Collection", ""));
-        } else {
-            Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false);
-            if(attributeCollection.isPresent()) {
-                model.put("mode", "DETAILS");
-                model.put("attributeCollection", attributeCollection.get());
-                model.put("breadcrumbs", new Breadcrumbs("Attribute Collections", "Attribute Collections", "/pim/attributeCollections", attributeCollection.get().getCollectionName(), ""));
-            } else {
-                throw new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id);
-            }
-        }
-        return new ModelAndView("settings/attributeCollection", model);
+        model.put("mode", id == null ? "CREATE" : "DETAILS");
+        model.put("view", "settings/attributeCollection");
+        return id == null ? super.details(model) : attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+                .map(attributeCollection -> {
+                    model.put("attributeCollection", attributeCollection);
+                    return super.details(id, model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));
     }
 
     @RequestMapping("/{id}/attribute")
