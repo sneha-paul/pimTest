@@ -49,7 +49,10 @@ public class BreadcrumbsBuilder {
                 this.services.put("categoryService", baseService);
             } else if(baseService instanceof AttributeCollectionService) {
                 this.services.put("attributeCollectionService", baseService);
+            } else if(baseService instanceof PricingAttributeService) {
+                this.services.put("pricingAttributeService", baseService);
             }
+
         });
     }
 
@@ -134,6 +137,8 @@ public class BreadcrumbsBuilder {
                 return new String[] {"Categories", "categories"};
             case "com.bigname.pim.api.domain.AttributeCollection":
                 return new String[] {"AttributeCollections", "attributeCollections"};
+            case "com.bigname.pim.api.domain.PricingAttribute":
+                return new String[] {"PricingAttributes", "pricingAttributes"};
         }
         return new String[] {"", "", "", ""};
     }
@@ -148,6 +153,8 @@ public class BreadcrumbsBuilder {
                 return ((CategoryService)services.get("categoryService")).get(id, FindBy.EXTERNAL_ID, false).map(Category::getCategoryName).orElse("");
             case "com.bigname.pim.api.domain.AttributeCollection":
                 return ((AttributeCollectionService)services.get("attributeCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AttributeCollection::getCollectionName).orElse("");
+            case "com.bigname.pim.api.domain.PricingAttribute":
+                return ((PricingAttributeService)services.get("pricingAttributeService")).get(id, FindBy.EXTERNAL_ID, false).map(PricingAttribute::getPricingAttributeName).orElse("");
         }
         return "";
     }
