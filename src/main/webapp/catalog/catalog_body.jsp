@@ -134,21 +134,25 @@
         }
         urlParams['catalogId'] = '{catalogId}';
         urlParams['hash'] = 'rootCategories';
-        $.initDataTable({
+
+        $.initAssociationsGrid({
             selector: '#paginatedRootCategoriesTable',
-            name: 'rootCategories',
-            type: 'TYPE_2',
-            url: $.getURL('/pim/catalogs/{catalogId}/rootCategories'),
-            url2: '/pim/categories/',
+            names: ['rootCategories', 'rootCategories'],
+            pageUrl: $.getURL('/pim/categories/'),
+            dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
             urlParams: urlParams,
             columns: [
-                {data: 'rootCategoryName', name: 'rootCategoryName', title: 'Category Name'},
-                {data: 'externalId', name: 'rootCategoryId', title: 'Category ID'},
-                {data: 'active', name: 'active', title: 'Status', orderable: false},
-                {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+                { data: 'rootCategoryName', name : 'rootCategoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'rootCategoryId', title : 'Category ID' }
             ]
         });
-        urlParams['hash'] = 'hierarchy';
+
+        var urlParams1 = {};
+        if($.getPageAttribute('websiteId') !== '') {
+            urlParams1['websiteId'] = '{websiteId}';
+        }
+        urlParams1['catalogId'] = '{catalogId}';
+        urlParams1['hash'] = 'hierarchy';
         $.initTreeDataTable({
             selector: '#categoriesHierarchy',
             names: ['categoriesHierarchy', 'category'],
@@ -156,7 +160,7 @@
             url2: '/pim/categories/',
             collapsed: false,
             collapsible: false,
-            urlParams: urlParams
+            urlParams: urlParams1
         });
     });
 </script>

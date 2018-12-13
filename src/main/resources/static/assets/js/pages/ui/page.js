@@ -489,7 +489,7 @@
 
         reloadTreeDataTable: function(name) {
             var options = $.getDataTableOptions(name);
-            var treeDataTable = options.treeDataTable || false;
+            var treeDataTable = typeof options.treeDataTable !== 'undefined' || false;
             if(treeDataTable) {
                 $.getDataTable(name).destroy();
                 $.initTreeDataTable(options);

@@ -93,7 +93,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         return new ModelAndView("catalog/catalogs", model);
     }
 
-    @RequestMapping("/{id}/rootCategories")
+    @RequestMapping("/{id}/rootCategories/data")
     @ResponseBody
     public Result<Map<String, String>> getRootCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
         Request dataTableRequest = new Request(request);
