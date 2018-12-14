@@ -145,6 +145,7 @@
 
         .js-scope-selector, .js-scopable, .js-channel-selector {
             cursor: pointer;
+            text-align: center;
         }
 
         .js-locked, .js-level-locked, .js-axis-locked {
@@ -165,6 +166,13 @@
 
         select[disabled="disabled"]::-ms-expand {
             display: none;
+        }
+
+        .js-handle {
+            text-align: center;
+        }
+        td.js-handle {
+            cursor: move;
         }
 
         .js-locked.js-checkbox, .js-level-locked.js-checkbox, .js-axis-locked.js-checkbox {

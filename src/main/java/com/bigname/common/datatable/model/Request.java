@@ -235,7 +235,7 @@ public class Request {
             this.setSearch(request.getParameter("search[value]"));
             this.setRegex(Boolean.valueOf(request.getParameter("search[regex]")));
 
-            int sortableCol = Integer.parseInt(request.getParameter("order[0][column]"));
+            int sortableCol = request.getParameter("order[0][column]") != null ? Integer.parseInt(request.getParameter("order[0][column]")) : -1;
 
             List<Column> columns = new ArrayList<>();
 

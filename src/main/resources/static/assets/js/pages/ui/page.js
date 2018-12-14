@@ -163,6 +163,7 @@
                 pageLength: 25,
                 conditionalPaging: true,
                 searching: false,
+                ordering: !(typeof options.reordering !== 'undefined' && options.reordering),
                 rowReorder: typeof options.reordering !== 'undefined' && options.reordering ? {snapX: 10} : false,
                 language: {
                     info: "_START_ to _END_ of _TOTAL_"
@@ -461,18 +462,55 @@
                 }
             });*/
         },
+        /**
+         * Refreshes the dataTable data only. All current parameters will be preserved, including
+         * current sorting, page size and page number,
+         *
+         * NOTE- This method can be used to reload both dataTable and treeDataTable
+         *
+         * @param name - Name of the dataTable
+         */
         refreshDataTable: function(name) {
+            //If this is a treeDataTable, reload the treeDataTable, otherwise refresh the data
             if(!$.reloadTreeDataTable(name)) {
                 $.getDataTable(name).ajax.reload(null, false);
             }
         },
+
+        /**
+         * Reloads the dataTable. Will reload the data, reset sorting, page size and page number
+         * to the initial configuration default
+         *
+         * NOTE- This method can be used to reload both dataTable and treeDataTable
+         *
+         * @param name - Name of the dataTable
+         */
         reloadDataTable: function(name) {
+            //If this is a treeDataTable, reload the treeDataTable, otherwise reload the dataTable
             if(!$.reloadTreeDataTable(name)) {
-                $.getDataTable(name).destroy();
+                $.destroyDataTable(name);
                 $.initDataTable($.getDataTableOptions(name));
             }
         },
 
+        /**
+         * Reinitialize the dataTable with new configuration parameters.
+         * @param options - The new configuration options
+         */
+        reInitDataTable: function(options) {
+            $.destroyDataTable(name, true);
+            $.initDataTable(options);
+        },
+
+        /**
+         * Reloads the treeDataTable. Will reload the data, reset sorting, page size and page number
+         * to the initial configuration default, if present
+         *
+         * NOTE - Currently refreshing only the data of a treeDataTable is not supported.
+         *
+         * @param name - Name of the treeDataTable
+         * @returns {boolean}
+         */
         reloadTreeDataTable: function(name) {
             var options = $.getDataTableOptions(name);
             var treeDataTable = typeof options.treeDataTable !== 'undefined' || false;
@@ -510,22 +548,25 @@
             $('.js-eModal-close').trigger('click');
         },
         bindDataTable: function(options, dataTable) {
-            var name = typeof options.names === 'undefined' ? options.name : options.names[0];
+            const name = typeof options.names === 'undefined' ? options.name : options.names[0];
             $.setPageAttribute(name + '_datatable', dataTable);
             $.setPageAttribute(name + '_datatable_options', options);
             return dataTable;
         },
-        unbindDataTable: function(options) {
-            var name = typeof options.names === 'undefined' ? options.name : options.names[0];
-            if($.getDataTable(name)) {
-                $.destroyDataTable(name);
+        unbindDataTable: function(name, hard) {
+            const dt = $.getDataTable(name);
+            if(dt && $.removePageAttribute(name + '_datatable')) {
+                dt.destroy(true);
+                if(hard) {
+                    $.removePageAttribute(name + '_datatable_options');
+                }
             }
         },
         getDataTable: function(name) {
             return $.getPageAttribute(name + '_datatable');
         },
-        destroyDataTable: function(name) {
-
+        destroyDataTable: function(name, hard) {
+            $.unbindDataTable(name, hard);
         },
         getDataTableOptions: function(name) {
             return $.getPageAttribute(name + '_datatable_options');
@@ -576,6 +617,10 @@
         },
         getPageAttribute: function(key) {
             return $.getPageAttributes()[key];
+        },
+
+        removePageAttribute: function(key) {
+            return delete $.getPageAttributes()[key];
         },
         getURL: function(uri, context) {
             var url = uri;

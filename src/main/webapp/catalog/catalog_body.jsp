@@ -91,10 +91,25 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="table-responsive">
-                                            <table id="paginatedRootCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
-                                                <thead class="thead-dark"></thead>
-                                            </table>
+                                        <ul class="nav nav-tabs-new2" style="position: absolute; top: -1000px">
+                                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#sortable">Sortable</a></li>
+                                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#reorderable">Reorderable</a></li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <div class="tab-pane show active" id="sortable">
+                                                <div class="table-responsive">
+                                                    <table id="paginatedRootCategoriesSortableTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark"></thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane" id="reorderable">
+                                                <div class="table-responsive no-filter">
+                                                    <table id="paginatedRootCategoriesReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
+                                                        <thead class="thead-dark"></thead>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -136,15 +151,27 @@
         urlParams['hash'] = 'rootCategories';
 
         $.initAssociationsGrid({
-            selector: '#paginatedRootCategoriesTable',
-            names: ['rootCategories', 'rootCategories'],
+            selector: '#paginatedRootCategoriesSortableTable',
+            names: ['rootCategoriesSortable', 'rootCategory'],
+            pageUrl: $.getURL('/pim/categories/'),
+            dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
+            urlParams: urlParams,
+            reordering: false,
+            columns: [
+                { data: 'rootCategoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' }
+            ]
+        });
+
+        $.initAssociationsGrid({
+            selector: '#paginatedRootCategoriesReorderableTable',
+            names: ['rootCategoriesSortable', 'rootCategory'],
             pageUrl: $.getURL('/pim/categories/'),
             dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
             urlParams: urlParams,
             reordering: true,
             columns: [
-
-                { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', visible: false},
+                { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
                 { data: 'rootCategoryName', name : 'categoryName' , title : 'Category Name'},
                 { data: 'externalId', name : 'externalId', title : 'Category ID' }
             ]
@@ -168,24 +195,21 @@
 
         $('.js-sorting-mode').on('click', function() {
             if(!$(this).hasClass('selected')) {
+                $('a.nav-link[href*="sortable"]').trigger('click');
                 $(this).parent().find('.js-reordering-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
                 $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
-                const dt = $.getDataTable('rootCategories');
-                dt.columns([0]).visible(false);
             }
 
         });
 
         $('.js-reordering-mode').on('click', function() {
             if(!$(this).hasClass('selected')) {
+                $('a.nav-link[href*="reorderable"]').trigger('click');
                 $(this).parent().find('.js-sorting-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
                 $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
-                $.reloadDataTable('rootCategories')
-                const dt = $.getDataTable('rootCategories');
-                dt.order([0, 'desc']).draw();
-                dt.columns([0]).visible(true);
             }
         });
+
     });
 </script>
 <script src="/assets/js/pages/ui/catalog/catalog.js"></script>

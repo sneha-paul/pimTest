@@ -203,8 +203,8 @@ public class Column {
         this.setSearch(request.getParameter("columns["+ i +"][search][value]"));
         this.setSearchable(Boolean.valueOf(request.getParameter("columns["+ i +"][searchable]")));
 
-        int sortableCol = Integer.parseInt(request.getParameter("order[0][column]"));
-        String sortDir = request.getParameter("order[0][dir]");
+        int sortableCol = request.getParameter("order[0][column]") != null ? Integer.parseInt(request.getParameter("order[0][column]")) : -1;
+        String sortDir = request.getParameter("order[0][dir]") != null ? request.getParameter("order[0][dir]") : "";
 
         if(i == sortableCol) {
             this.setSortDir(sortDir);
