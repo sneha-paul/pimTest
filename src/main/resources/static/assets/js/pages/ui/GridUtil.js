@@ -67,6 +67,7 @@
                 selector: options.selector,
                 names: options.names,
                 url: options.dataUrl,
+                reordering: options.reordering,
                 columns: options.columns,
                 buttons: options.buttons
             });

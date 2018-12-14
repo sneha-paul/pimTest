@@ -73,15 +73,17 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * @return
      */
     @Override
-    public Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
-        if(sort == null) {
+    public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
+        /*if(sort == null || sort.getOrderFor("seq") != null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
-        }
+        }*/
         Pageable pageable = PageRequest.of(page, size, sort);
         Optional<Catalog> _catalog = get(catalogId, findBy, false);
         if(_catalog.isPresent()) {
             Catalog catalog = _catalog.get();
-            Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            Page<Map<String, Object>> rootCategories = catalogDAO.getAllRootCategories(catalog.getId(), pageable);
+            /*Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            catalogDAO.getAllRootCategories(_catalog.get().getId());
             List<String> categoryIds = new ArrayList<>();
             rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
             if(categoryIds.size() > 0) {
@@ -89,7 +91,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                 List<RootCategory> _rootCategories = rootCategories.filter(rc -> categoriesMap.containsKey(rc.getRootCategoryId())).stream().collect(Collectors.toList());
                 _rootCategories.forEach(rc -> rc.init(catalog, categoriesMap.get(rc.getRootCategoryId())));
                 rootCategories = new PageImpl<>(_rootCategories,pageable,_rootCategories.size());//TODO : verify this logic
-            }
+            }*/
             return rootCategories;
         }
         return new PageImpl<>(new ArrayList<>(), pageable, 0);

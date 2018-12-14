@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,7 +29,7 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<RootCategory> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired);
+    Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to get available categories of a catalog in paginated format.

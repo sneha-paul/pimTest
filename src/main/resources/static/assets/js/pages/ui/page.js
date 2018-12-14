@@ -68,6 +68,7 @@
                 info: false,
                 searching: true,
                 paging:   false,
+                rowReorder: typeof options.reordering === 'undefined' || options.reordering ? {snapX: 10} : false,
                 createdRow: function (row, data, index) {
                     $(row).addClass('disable-select parent-' + data.parent);
                     if(data.isParent) {
@@ -162,6 +163,7 @@
                 pageLength: 25,
                 conditionalPaging: true,
                 searching: false,
+                rowReorder: typeof options.reordering !== 'undefined' && options.reordering ? {snapX: 10} : false,
                 language: {
                     info: "_START_ to _END_ of _TOTAL_"
                 },
@@ -172,6 +174,7 @@
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
+                            value.seq = 1;
                             value.actions = '';
                             $.each(options.buttons, function(index, button){
                                 switch(button.name) {
@@ -306,44 +309,27 @@
                 },
                 columns: options.columns
             }));
-
+            const dataTableName = typeof options.names === 'undefined' ? options.name : options.names[0];
             $.each(options.buttons, function(index, button){
-                const dataTableName = typeof options.names === 'undefined' ? options.name : options.names[0];
                 $(options.selector).on('click', '.js-' + button.name, function () {
                     let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
                     if(button.click) {
                         button.click(row.data());
                     }
                 });
-                /*switch(button.name) {
-                    case 'DETAILS':
-                        $(options.selector).on('click', '.js-' + button.name, function () {
-                            let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
-                            if(button.click) {
-                                button.click(row.data());
-                            }
-                        });
-                    break;
-                    case 'CLONE':
-                        $(options.selector).on('click', '.js-' + button.name, function (e, options) {
-                            let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
-                            if(button.click) {
-                                button.click(row.data());
-                            }
-                        });
-                        break;
-                    case 'DETAILS':
-                        $(options.selector).on('click', '.js-' + button.name, function () {
-                            let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
-                            if(button.click) {
-                                button.click(row.data());
-                            } else {
-                                const rowData = row.data();
-                                window.location.href = rowData.externalId;
-                            }
-                        });
-                        break;
-                }*/
+            });
+
+            $.getDataTable(dataTableName).on( 'row-reorder', function ( e, diff, edit ) {
+                const oTable = $.getDataTable(dataTableName);
+                let src = edit.triggerRow.data();
+                let direction = diff.length > 1 && oTable.row( diff[diff.length - 1].node ).data().externalId === src.externalId ? 'DOWN' : 'UP';
+                console.log(direction);
+                let dest = {};
+                if(diff.length > 1) {
+                    dest = oTable.row( diff[direction === 'UP' ? 1 : diff.length - 2].node ).data();
+                    console.log(src.externalId);
+                    console.log(dest.externalId);
+                }
             });
 
             /*$(options.selector).on('click', '.js-toggle-status', function () {

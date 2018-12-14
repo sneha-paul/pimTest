@@ -43,4 +43,15 @@ public class CollectionsUtil {
                 TreeMap::new
         );
     }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> generifyMap(Map map) {
+        Map<String, Object> genericMap = new LinkedHashMap<>();
+        map.keySet().forEach(o -> {
+            String key = (String) o;
+            genericMap.put(key, map.get(o));
+        });
+
+        return genericMap;
+    }
 }

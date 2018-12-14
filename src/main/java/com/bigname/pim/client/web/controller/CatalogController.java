@@ -95,18 +95,24 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
 
     @RequestMapping("/{id}/rootCategories/data")
     @ResponseBody
-    public Result<Map<String, String>> getRootCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+    public Result<Map<String, Object>> getRootCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
+        Result<Map<String, Object>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
         Sort sort = null;
-        if(pagination.hasSorts()) {
+        boolean reorderingMode = false;
+        if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            reorderingMode = sort.getOrderFor("seq") != null;
         }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<RootCategory> paginatedResult = catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        List<Map<String, Object>> dataObjects = new ArrayList<>();
+        Page<Map<String, Object>> paginatedResult = catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+        int seq[] = {1};
+        paginatedResult.getContent().forEach(e -> {
+            e.put("sequenceNum", Integer.toString(seq[0] ++));
+            dataObjects.add(RootCategory.toMap(e));
+        });
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic

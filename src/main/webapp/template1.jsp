@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="/assets/vendor/nestable/jquery-nestable.css">
     <link rel="stylesheet" href="/assets/vendor/sweetalert/sweetalert.css"/>
     <link rel="stylesheet" href="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/assets/vendor/jquery-datatable/rowReorder.bootstrap4.css">
     <link rel="stylesheet" href="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.css">
     <link rel="stylesheet" href="/assets/vendor/parsleyjs/css/parsley.css">
     <link rel="stylesheet" href="/assets/vendor/table-dragger/table-dragger.min.css">
@@ -385,6 +386,8 @@
 <%--<script src="/assets/bundles/datatablescripts.bundle.js"></script>--%>
 
 <script src="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.js"></script>
+<script src="/assets/vendor/jquery-datatable/dataTables.rowReorder.js"></script>
+
 <script src="/assets/js/pages/tables/jquery-datatable-conditional-paging.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable.js"></script>
 <script src="/assets/vendor/nestable/jquery.nestable.js"></script>

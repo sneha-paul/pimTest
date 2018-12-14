@@ -30,4 +30,6 @@ abstract public class GenericRepositoryImpl<T>  implements GenericRepository<T>{
         T t = mongoTemplate.findOne(query, clazz);
         return Optional.of(t);
     }
+
+
 }

@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -83,5 +84,9 @@ abstract public class EntityAssociation<P extends Entity, C extends Entity> {
         this.active = active;
     }
 
-    abstract public Map<String, String> toMap();
+    @Deprecated
+    public Map<String, String> toMap() {
+        return new HashMap<>();
+    }
+
 }

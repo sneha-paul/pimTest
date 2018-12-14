@@ -85,9 +85,9 @@
                                         <div class="row p-b-25">
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
-                                                    <button type="button" class="btn btn-success js-add-category"><i
-                                                            class="fa fa-plus"></i> <span class="p-l-5">Add RootCategories</span>
-                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-success js-add-category"><i class="fa fa-plus"></i> <span class="p-l-5">Add RootCategories</span></button>
+                                                    <button type="button" class="btn btn-sm btn-secondary js-sorting-mode selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -141,9 +141,12 @@
             pageUrl: $.getURL('/pim/categories/'),
             dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
             urlParams: urlParams,
+            reordering: true,
             columns: [
-                { data: 'rootCategoryName', name : 'rootCategoryName' , title : 'Category Name'},
-                { data: 'externalId', name : 'rootCategoryId', title : 'Category ID' }
+
+                { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', visible: false},
+                { data: 'rootCategoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' }
             ]
         });
 
@@ -161,6 +164,27 @@
             collapsed: false,
             collapsible: false,
             urlParams: urlParams1
+        });
+
+        $('.js-sorting-mode').on('click', function() {
+            if(!$(this).hasClass('selected')) {
+                $(this).parent().find('.js-reordering-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+                $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+                const dt = $.getDataTable('rootCategories');
+                dt.columns([0]).visible(false);
+            }
+
+        });
+
+        $('.js-reordering-mode').on('click', function() {
+            if(!$(this).hasClass('selected')) {
+                $(this).parent().find('.js-sorting-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+                $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+                $.reloadDataTable('rootCategories')
+                const dt = $.getDataTable('rootCategories');
+                dt.order([0, 'desc']).draw();
+                dt.columns([0]).visible(true);
+            }
         });
     });
 </script>
