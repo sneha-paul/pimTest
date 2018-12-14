@@ -165,7 +165,7 @@
 
         $.initAssociationsGrid({
             selector: '#paginatedRootCategoriesReorderableTable',
-            names: ['rootCategoriesSortable', 'rootCategory'],
+            names: ['rootCategoriesReorderable', 'rootCategory'],
             pageUrl: $.getURL('/pim/categories/'),
             dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
             urlParams: urlParams,
@@ -195,6 +195,7 @@
 
         $('.js-sorting-mode').on('click', function() {
             if(!$(this).hasClass('selected')) {
+                $.refreshDataTable('rootCategoriesSortable');
                 $('a.nav-link[href*="sortable"]').trigger('click');
                 $(this).parent().find('.js-reordering-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
                 $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
@@ -204,6 +205,7 @@
 
         $('.js-reordering-mode').on('click', function() {
             if(!$(this).hasClass('selected')) {
+                $.refreshDataTable('rootCategoriesReorderable');
                 $('a.nav-link[href*="reorderable"]').trigger('click');
                 $(this).parent().find('.js-sorting-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
                 $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');

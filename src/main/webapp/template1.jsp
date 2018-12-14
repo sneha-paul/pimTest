@@ -169,7 +169,7 @@
         }
 
         .js-handle {
-            text-align: center;
+            /*text-align: center;*/
         }
         td.js-handle {
             cursor: move;
