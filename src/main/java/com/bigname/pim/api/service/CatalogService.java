@@ -32,6 +32,18 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
     Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
+     * Method to set the sequencing of two root categories
+     * @param catalogId Internal or External id of the Catalog
+     * @param catalogIdFindBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
+     * @param sourceId Internal or External id of the rootCategory, whose sequencing needs to be set
+     * @param sourceIdFindBy Type of the source rootCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @param destinationId Internal or External id of the rootCategory at the destination slot
+     * @param destinationIdFindBy Type of the destination rootCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @return true if sequencing got modified, false otherwise
+     */
+    boolean setRootCategorySequence(String catalogId, FindBy catalogIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy);
+
+    /**
      * Method to get available categories of a catalog in paginated format.
      *
      * @param id Internal or External id of the Catalog

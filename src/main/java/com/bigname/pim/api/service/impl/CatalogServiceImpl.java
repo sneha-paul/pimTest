@@ -8,6 +8,7 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 import javax.validation.Validator;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.bigname.pim.util.PIMConstants.*;
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection.*;
 
 @Service
 public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, CatalogService> implements CatalogService {
@@ -96,6 +100,74 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         }
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
 
+    }
+
+    /**
+     * Method to set the sequencing of two root categories
+     *
+     * @param catalogId           Internal or External id of the Catalog
+     * @param catalogIdFindBy     Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
+     * @param sourceId            Internal or External id of the rootCategory, whose sequencing needs to be set
+     * @param sourceIdFindBy      Type of the source rootCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @param destinationId       Internal or External id of the rootCategory at the destination slot
+     * @param destinationIdFindBy Type of the destination rootCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @return true if sequencing got modified, false otherwise
+     */
+    @Override
+    public boolean setRootCategorySequence(String catalogId, FindBy catalogIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy) {
+        return get(catalogId, catalogIdFindBy, false)
+                .map(catalog -> {
+                    Map<String, Category> categoriesMap = categoryService.getAll(new String[] {sourceId, destinationId}, FindBy.EXTERNAL_ID, null, false)
+                            .stream().collect(Collectors.toMap(Category::getCategoryId, category -> category));
+
+                    List<String> rootCategoryIds = categoriesMap.entrySet().stream().map(entry -> entry.getValue().getId()).collect(Collectors.toList());
+
+                    Map<String, RootCategory> rootCategoriesMap = rootCategoryDAO.findByCatalogIdAndRootCategoryIdIn(catalog.getId(), rootCategoryIds.toArray(new String[0]))
+                            .stream().collect(Collectors.toMap(RootCategory::getRootCategoryId, rootCategory -> rootCategory));
+
+                    RootCategory source = rootCategoriesMap.get(categoriesMap.get(sourceId).getId());
+                    RootCategory destination = rootCategoriesMap.get(categoriesMap.get(destinationId).getId());
+
+                    ReorderingDirection direction = DOWN;
+                    if(source.getSequenceNum() > destination.getSequenceNum() ||
+                            (source.getSequenceNum() == destination.getSequenceNum() && source.getSubSequenceNum() <= destination.getSubSequenceNum())) {
+                        direction = UP;
+                    }
+                    List<RootCategory> modifiedRootCategories = new ArrayList<>();
+                    if(direction == DOWN) {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum());
+                        modifiedRootCategories.add(source);
+                        destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        modifiedRootCategories.add(destination);
+                        modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId, source, destination, direction));
+                    } else {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        modifiedRootCategories.add(source);
+                        modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId, source, destination, direction));
+                    }
+                    rootCategoryDAO.saveAll(modifiedRootCategories);
+                    return true;
+                }).orElse(false);
+    }
+
+    private List<RootCategory> rearrangeOtherRootCategories(String catalogId, RootCategory source, RootCategory destination, ReorderingDirection direction) {
+        List<RootCategory> adjustedRootCategories = new ArrayList<>();
+        List<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(catalogId, destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
+        int subSequenceNum = direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum();
+        for(RootCategory rootCategory : rootCategories) {
+            if(rootCategory.getRootCategoryId().equals(source.getRootCategoryId()) || rootCategory.getRootCategoryId().equals(destination.getRootCategoryId())) {
+                continue;
+            }
+            if(rootCategory.getSubSequenceNum() == subSequenceNum) {
+                rootCategory.setSubSequenceNum(++subSequenceNum);
+                adjustedRootCategories.add(rootCategory);
+            } else {
+                break;
+            }
+        }
+        return adjustedRootCategories;
     }
 
     /**

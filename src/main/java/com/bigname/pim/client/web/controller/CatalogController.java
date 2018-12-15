@@ -95,16 +95,14 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
 
     @RequestMapping("/{id}/rootCategories/data")
     @ResponseBody
-    public Result<Map<String, Object>> getRootCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+    public Result<Map<String, Object>> getRootCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, Object>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
         Sort sort = null;
-        boolean reorderingMode = false;
         if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            reorderingMode = sort.getOrderFor("seq") != null;
         }
         List<Map<String, Object>> dataObjects = new ArrayList<>();
         Page<Map<String, Object>> paginatedResult = catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
@@ -117,6 +115,15 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
         return result;
+    }
+
+    @RequestMapping(value = "/{id}/rootCategories/data", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> setRootCategoriesOrder(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = catalogService.setRootCategorySequence(id, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
+        model.put("success", success);
+        return model;
     }
 
 

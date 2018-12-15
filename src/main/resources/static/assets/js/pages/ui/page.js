@@ -324,12 +324,24 @@
                 const oTable = $.getDataTable(dataTableName);
                 let src = edit.triggerRow.data();
                 let direction = diff.length > 1 && oTable.row( diff[diff.length - 1].node ).data().externalId === src.externalId ? 'DOWN' : 'UP';
-                console.log(direction);
                 let dest = {};
                 if(diff.length > 1) {
                     dest = oTable.row( diff[direction === 'UP' ? 1 : diff.length - 2].node ).data();
-                    console.log(src.externalId);
-                    console.log(dest.externalId);
+                    $.ajax({
+                        url: options.url,
+                        data: {sourceId : src.externalId, destinationId: dest.externalId},
+                        method: 'PUT',
+                        success: function (data) {
+                            oTable.columns.adjust().draw();
+                            toastr.success('Sequencing updated successfully', "Sequencing", {timeOut: 3000});
+
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $.ajaxError(jqXHR, function(){
+                                toastr.error('An error occurred while reordering, try refreshing the page', "Error", {timeOut: 3000});
+                            });
+                        }
+                    });
                 }
             });
 

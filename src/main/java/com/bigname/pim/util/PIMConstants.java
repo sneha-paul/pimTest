@@ -22,4 +22,6 @@ public class PIMConstants {
     }
 
     public static Set<Integer> DEFAULT_QUANTITY_BREAKS = new TreeSet<>(Arrays.asList(50, 100, 250, 500, 1000));
+
+    public enum ReorderingDirection {UP, DOWN}
 }
