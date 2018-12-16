@@ -12,5 +12,5 @@ import java.util.Map;
  * @since 1.0
  */
 public interface CatalogRepository extends GenericRepository<Catalog> {
-    Page<Map<String, Object>> getAllRootCategories(String catalogId, Pageable pageable);
+    Page<Map<String, Object>> getRootCategories(String catalogId, Pageable pageable);
 }

@@ -333,6 +333,9 @@
                         method: 'PUT',
                         success: function (data) {
                             oTable.columns.adjust().draw();
+                            if(options.reorderCallback) {
+                                options.reorderCallback();
+                            }
                             toastr.success('Sequencing updated successfully', "Sequencing", {timeOut: 3000});
 
                         },

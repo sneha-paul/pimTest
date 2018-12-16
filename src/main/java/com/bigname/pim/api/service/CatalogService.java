@@ -31,6 +31,8 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
      */
     Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
+    List<Map<String, Object>> getCategoryHierarchy(String catalogId, boolean... activeRequired);
+
     /**
      * Method to set the sequencing of two root categories
      * @param catalogId Internal or External id of the Catalog

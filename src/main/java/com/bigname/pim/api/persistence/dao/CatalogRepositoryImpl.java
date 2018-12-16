@@ -3,11 +3,9 @@ package com.bigname.pim.api.persistence.dao;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.RootCategory;
+import com.bigname.pim.util.PIMConstants;
 import org.bson.Document;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -30,7 +28,7 @@ public class CatalogRepositoryImpl extends GenericRepositoryImpl<Catalog> implem
     }
 
     @SuppressWarnings("unchecked")
-    public Page<Map<String, Object>> getAllRootCategories(String catalogId, Pageable pageable) {
+    public Page<Map<String, Object>> getRootCategories(String catalogId, Pageable pageable) {
         Sort sort = pageable.getSort();
         SortOperation sortOperation;
         if(sort == null) {

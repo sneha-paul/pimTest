@@ -15,6 +15,7 @@ public interface RootCategoryDAO extends BaseAssociationDAO<RootCategory>, Mongo
     Page<RootCategory> findByCatalogIdAndActiveIn(String catalogId, String active[], Pageable pageable);
     long countByCatalogId(String catalogId);
     List<RootCategory> findByCatalogId(String catalogId);
+    List<RootCategory> findByCatalogIdOrderBySequenceNumAscSubSequenceNumDesc(String catalogId);
     List<RootCategory> findByCatalogIdAndRootCategoryIdIn(String catalogId, String[] rootCategoryIds);
     List<RootCategory> findByCatalogIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(String catalogId, long sequenceNum, int subSequenceNum);
 }

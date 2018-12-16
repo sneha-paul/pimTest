@@ -163,4 +163,11 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         model.put("success", success);
         return model;
     }
+
+    @RequestMapping("/{id}/hierarchy")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> getCategoriesHierarchy(@PathVariable(value = "id") String id) {
+        return catalogService.getCategoryHierarchy(id);
+    }
 }

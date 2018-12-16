@@ -1,7 +1,9 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
+import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.service.CatalogService;
@@ -27,15 +29,17 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     private CatalogDAO catalogDAO;
     private WebsiteCatalogDAO websiteCatalogDAO;
     private RootCategoryDAO rootCategoryDAO;
+    private RelatedCategoryDAO relatedCategoryDAO;
     private CategoryService categoryService;
 
 
     @Autowired
-    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, CategoryService categoryService) {
+    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService) {
         super(catalogDAO, "catalog", validator);
         this.catalogDAO = catalogDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
         this.rootCategoryDAO = rootCategoryDAO;
+        this.relatedCategoryDAO = relatedCategoryDAO;
         this.categoryService = categoryService;
     }
 
@@ -85,7 +89,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         Optional<Catalog> _catalog = get(catalogId, findBy, false);
         if(_catalog.isPresent()) {
             Catalog catalog = _catalog.get();
-            Page<Map<String, Object>> rootCategories = catalogDAO.getAllRootCategories(catalog.getId(), pageable);
+            Page<Map<String, Object>> rootCategories = catalogDAO.getRootCategories(catalog.getId(), pageable);
             /*Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
             catalogDAO.getAllRootCategories(_catalog.get().getId());
             List<String> categoryIds = new ArrayList<>();
@@ -101,6 +105,82 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
 
     }
+
+    @Override
+    public List<Map<String, Object>> getCategoryHierarchy(String catalogId, boolean... activeRequired) {
+        List<Map<String, Object>> hierarchy = new ArrayList<>();
+        get(catalogId, FindBy.EXTERNAL_ID, false)
+                .ifPresent(catalog -> {
+                    //Sorted rootCategories
+                    Map<String, RootCategory> rootCategoriesMap = rootCategoryDAO.findByCatalogIdOrderBySequenceNumAscSubSequenceNumDesc(catalog.getId()).stream().collect(CollectionsUtil.toLinkedMap(RootCategory::getRootCategoryId, e -> e));
+
+                    //Unsorted relatedCategories
+                    List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+
+                    Map<String, List<RelatedCategory>> parentCategoriesMap = new LinkedHashMap<>();
+
+                    for (RelatedCategory relatedCategory : relatedCategories) {
+                        if(parentCategoriesMap.containsKey(relatedCategory.getCategoryId())) {
+                            parentCategoriesMap.get(relatedCategory.getCategoryId()).add(relatedCategory);
+                        } else {
+                            List<RelatedCategory> childList = new ArrayList<>();
+                            childList.add(relatedCategory);
+                            parentCategoriesMap.put(relatedCategory.getCategoryId(), childList);
+                        }
+                    }
+                    Set<String> categoryIds = new HashSet<>(rootCategoriesMap.keySet());
+
+                    //Sort all subCategories within each parent category
+                    parentCategoriesMap.forEach((parentCategoryId, subCategories) -> {
+                        subCategories.sort((sc1, sc2) -> sc1.getSequenceNum() > sc2.getSequenceNum() ? -1 : sc1.getSequenceNum() < sc2.getSequenceNum() ? 1 : sc1.getSubSequenceNum() < sc2.getSequenceNum() ? -1 : 1);
+                        categoryIds.add(parentCategoryId);
+                        subCategories.forEach(subCategory -> categoryIds.add(subCategory.getSubCategoryId()));
+                    });
+
+                    //Categories lookup map
+                    Map<String, Category> categoriesMap = categoryService.getAll(new ArrayList<>(categoryIds).toArray(new String[0]), FindBy.INTERNAL_ID, null, false).stream().collect(Collectors.toMap(c -> c.getId(), c -> c));
+
+                    //Build the full node hierarchy for each root category
+                    rootCategoriesMap.forEach((rootCategoryId, rootCategory) -> hierarchy.addAll(buildFullNode(rootCategoryId, 0, parentCategoriesMap, categoriesMap)));
+
+                });
+
+        return hierarchy;
+    }
+
+    private List<Map<String, Object>> buildFullNode(String categoryId, int level, Map<String, List<RelatedCategory>> parentCategoriesMap, Map<String, Category> categoriesLookup) {
+        List<Map<String, Object>> fullNode = new ArrayList<>();
+        Map<String, Object> node = buildNode(categoryId, level, categoriesLookup);
+        fullNode.add(node);
+        if(parentCategoriesMap.containsKey(categoryId)) {
+            node.put("isParent", true);
+            List<RelatedCategory> subCategories = parentCategoriesMap.get(categoryId);
+            subCategories.forEach(subCategory -> {
+                List<Map<String, Object>> childNode = buildFullNode(subCategory.getSubCategoryId(), level + 1,  parentCategoriesMap, categoriesLookup);
+                childNode.get(0).put("level", ((int) node.get("level")) + 1);
+                childNode.get(0).put("parent", node.get("key"));
+                fullNode.addAll(childNode);
+            });
+        }
+        return fullNode;
+    }
+
+    private Map<String, Object> buildNode(String categoryId, int level, Map<String, Category> categoriesLookup) {
+        Category category = categoriesLookup.get(categoryId);
+        Map<String, Object> node = new HashMap<>();
+        node.put("id", category.getId());
+        node.put("key", category.getExternalId());
+        node.put("level", level);
+        node.put("parent", "0");
+        node.put("name", category.getCategoryName());
+        node.put("isParent", false);
+        node.put("active", category.getActive());
+//        node.put("sequenceNum", 0);
+//        node.put("subSequenceNum", 0);
+        return node;
+    }
+
+
 
     /**
      * Method to set the sequencing of two root categories

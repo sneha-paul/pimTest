@@ -158,6 +158,7 @@
             urlParams: urlParams,
             reordering: false,
             columns: [
+                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
                 { data: 'rootCategoryName', name : 'categoryName' , title : 'Category Name'},
                 { data: 'externalId', name : 'externalId', title : 'Category ID' }
             ]
@@ -170,6 +171,7 @@
             dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
             urlParams: urlParams,
             reordering: true,
+            reorderCallback: function() {$.refreshDataTable('categoriesHierarchy')},
             columns: [
                 { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
                 { data: 'rootCategoryName', name : 'categoryName' , title : 'Category Name'},
@@ -186,7 +188,7 @@
         $.initTreeDataTable({
             selector: '#categoriesHierarchy',
             names: ['categoriesHierarchy', 'category'],
-            url: '/pim/categories/hierarchy/',
+            url: $.getURL('/pim/catalogs/{catalogId}/hierarchy/'),
             url2: '/pim/categories/',
             collapsed: false,
             collapsible: false,
