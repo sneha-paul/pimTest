@@ -91,6 +91,7 @@
                         }
                     },
                     { data: 'key', title: 'Category ID'},
+                    { data: 'parentChain', visible: false},
                     { data: 'active', title: 'Status',
                         render: function(data, type, row, meta) {
                             return 'Y' === data ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
@@ -106,7 +107,7 @@
                                 action = 'Enable';
                                 btnClass = 'btn-success';
                             }
-                            actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + row.key, options.urlParams) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
+                            actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + row.key, options.urlParams, '', {parentId: row.parentChain}) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
                             actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + row.key + '" data-active="' + row.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             return actions;
                         }

@@ -141,22 +141,24 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                     Map<String, Category> categoriesMap = categoryService.getAll(new ArrayList<>(categoryIds).toArray(new String[0]), FindBy.INTERNAL_ID, null, false).stream().collect(Collectors.toMap(c -> c.getId(), c -> c));
 
                     //Build the full node hierarchy for each root category
-                    rootCategoriesMap.forEach((rootCategoryId, rootCategory) -> hierarchy.addAll(buildFullNode(rootCategoryId, 0, parentCategoriesMap, categoriesMap)));
+                    rootCategoriesMap.forEach((rootCategoryId, rootCategory) -> hierarchy.addAll(buildFullNode(rootCategoryId, 0, "", parentCategoriesMap, categoriesMap)));
 
                 });
 
         return hierarchy;
     }
 
-    private List<Map<String, Object>> buildFullNode(String categoryId, int level, Map<String, List<RelatedCategory>> parentCategoriesMap, Map<String, Category> categoriesLookup) {
+    private List<Map<String, Object>> buildFullNode(String categoryId, int level, String parentId, Map<String, List<RelatedCategory>> parentCategoriesMap, Map<String, Category> categoriesLookup) {
         List<Map<String, Object>> fullNode = new ArrayList<>();
-        Map<String, Object> node = buildNode(categoryId, level, categoriesLookup);
+        Map<String, Object> node = buildNode(categoryId, level, parentId, categoriesLookup);
         fullNode.add(node);
         if(parentCategoriesMap.containsKey(categoryId)) {
             node.put("isParent", true);
+            StringBuilder builder = new StringBuilder(parentId);
+            builder.append(parentId.isEmpty() ? "" : "|" ).append(node.get("key"));
             List<RelatedCategory> subCategories = parentCategoriesMap.get(categoryId);
             subCategories.forEach(subCategory -> {
-                List<Map<String, Object>> childNode = buildFullNode(subCategory.getSubCategoryId(), level + 1,  parentCategoriesMap, categoriesLookup);
+                List<Map<String, Object>> childNode = buildFullNode(subCategory.getSubCategoryId(), level + 1, builder.toString(),  parentCategoriesMap, categoriesLookup);
                 childNode.get(0).put("level", ((int) node.get("level")) + 1);
                 childNode.get(0).put("parent", node.get("key"));
                 fullNode.addAll(childNode);
@@ -165,12 +167,13 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         return fullNode;
     }
 
-    private Map<String, Object> buildNode(String categoryId, int level, Map<String, Category> categoriesLookup) {
+    private Map<String, Object> buildNode(String categoryId, int level, String parentId, Map<String, Category> categoriesLookup) {
         Category category = categoriesLookup.get(categoryId);
         Map<String, Object> node = new HashMap<>();
         node.put("id", category.getId());
         node.put("key", category.getExternalId());
         node.put("level", level);
+        node.put("parentChain", parentId);
         node.put("parent", "0");
         node.put("name", category.getCategoryName());
         node.put("isParent", false);
