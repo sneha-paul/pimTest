@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
@@ -49,6 +50,80 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
     @Override
     public List<Map<String, Object>> getCategoryHierarchy(boolean... activeRequired) {
+
+        List<Map<String, Object>> hierarchy = new ArrayList<>();
+        //Unsorted relatedCategories
+        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+
+        Map<String, List<RelatedCategory>> parentCategoriesMap = new LinkedHashMap<>();
+
+        Set<String> nonRootCategoryIds = new HashSet<>();
+
+        for (RelatedCategory relatedCategory : relatedCategories) {
+            nonRootCategoryIds.add(relatedCategory.getSubCategoryId());
+            if(parentCategoriesMap.containsKey(relatedCategory.getCategoryId())) {
+                parentCategoriesMap.get(relatedCategory.getCategoryId()).add(relatedCategory);
+            } else {
+                List<RelatedCategory> childList = new ArrayList<>();
+                childList.add(relatedCategory);
+                parentCategoriesMap.put(relatedCategory.getCategoryId(), childList);
+            }
+        }
+
+        //Sorted rootCategories
+        Map<String, Category> rootCategoriesMap = getAllWithExclusions(new ArrayList<>(nonRootCategoryIds).toArray(new String[0]), FindBy.INTERNAL_ID, Sort.by(new Sort.Order(Sort.Direction.ASC, "categoryName"))).stream().collect(CollectionsUtil.toLinkedMap(Category::getId, e -> e));
+
+        //Sort all subCategories within each parent category
+        parentCategoriesMap.forEach((parentCategoryId, subCategories) -> {
+            if(subCategories.size() > 1) {
+                subCategories.sort((sc1, sc2) -> sc1.getSequenceNum() > sc2.getSequenceNum() ? 1 : sc1.getSequenceNum() < sc2.getSequenceNum() ? -1 : sc1.getSubSequenceNum() < sc2.getSubSequenceNum() ? 1 : -1);
+            }
+        });
+
+        //Categories lookup map
+        Map<String, Category> categoriesMap = getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, c -> c));
+
+        //Build the full node hierarchy for each root category
+        rootCategoriesMap.forEach((rootCategoryId, rootCategory) -> hierarchy.addAll(buildFullNode(rootCategoryId, 0, "", parentCategoriesMap, categoriesMap)));
+
+        return hierarchy;
+    }
+
+    private List<Map<String, Object>> buildFullNode(String categoryId, int level, String parentId, Map<String, List<RelatedCategory>> parentCategoriesMap, Map<String, Category> categoriesLookup) {
+        List<Map<String, Object>> fullNode = new ArrayList<>();
+        Map<String, Object> node = buildNode(categoryId, level, parentId, categoriesLookup);
+        fullNode.add(node);
+        if(parentCategoriesMap.containsKey(categoryId)) {
+            node.put("isParent", true);
+            StringBuilder builder = new StringBuilder(parentId);
+            builder.append(parentId.isEmpty() ? "" : "|" ).append(node.get("key"));
+            List<RelatedCategory> subCategories = parentCategoriesMap.get(categoryId);
+            subCategories.forEach(subCategory -> {
+                List<Map<String, Object>> childNode = buildFullNode(subCategory.getSubCategoryId(), level + 1, builder.toString(),  parentCategoriesMap, categoriesLookup);
+                childNode.get(0).put("level", ((int) node.get("level")) + 1);
+                childNode.get(0).put("parent", node.get("key"));
+                fullNode.addAll(childNode);
+            });
+        }
+        return fullNode;
+    }
+
+    private Map<String, Object> buildNode(String categoryId, int level, String parentId, Map<String, Category> categoriesLookup) {
+        Category category = categoriesLookup.get(categoryId);
+        Map<String, Object> node = new HashMap<>();
+        node.put("id", category.getId());
+        node.put("key", category.getExternalId());
+        node.put("level", level);
+        node.put("parentChain", parentId);
+        node.put("parent", "0");
+        node.put("name", category.getCategoryName());
+        node.put("isParent", false);
+        node.put("active", category.getActive());
+//        node.put("sequenceNum", 0);
+//        node.put("subSequenceNum", 0);
+        return node;
+    }
+    /*public List<Map<String, Object>> getCategoryHierarchy1(boolean... activeRequired) {
         Map<String, Map<String, Object>> nodes = new LinkedHashMap<>();
 
         List<Category> categories = categoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
@@ -96,7 +171,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             }
         }
         return new ArrayList<>(nodesList);
-    }
+    }*/
 
     private List<Map<String, Object>> getCompleteNode(String nodeId, Map<String, Map<String, Object>> nodes, Map<String, List<RelatedCategory>> childCategoriesMap) {
         List<Map<String, Object>> nodesList = new ArrayList<>();

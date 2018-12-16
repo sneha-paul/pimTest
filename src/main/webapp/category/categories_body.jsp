@@ -57,6 +57,10 @@
             ]
         });
 
+        var urlParams = {};
+        urlParams['parentId'] = '{parentId}';
+        urlParams['hash'] = '1';
+
         $.initTreeDataTable({
             selector: '#categoriesHierarchy',
             names: ['categoriesHierarchy', 'category'],
@@ -64,7 +68,7 @@
             url2: '/pim/categories/',
             collapsed: false,
             collapsible: true,
-            urlParams: {hash: '1'}
+            urlParams: urlParams
         });
 
         $('.js-category-grid-view').on('click', function(){

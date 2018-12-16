@@ -68,7 +68,7 @@
                 info: false,
                 searching: true,
                 paging:   false,
-                rowReorder: typeof options.reordering === 'undefined' || options.reordering ? {snapX: 10} : false,
+                // rowReorder: typeof options.reordering === 'undefined' || options.reordering ? {snapX: 10} : false,
                 createdRow: function (row, data, index) {
                     $(row).addClass('disable-select parent-' + data.parent);
                     if(data.isParent) {
