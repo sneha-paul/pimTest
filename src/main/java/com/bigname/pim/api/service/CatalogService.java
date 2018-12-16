@@ -34,7 +34,7 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
     List<Map<String, Object>> getCategoryHierarchy(String catalogId, boolean... activeRequired);
 
     /**
-     * Method to set the sequencing of two root categories
+     * Method to set the sequencing of two rootCategories
      * @param catalogId Internal or External id of the Catalog
      * @param catalogIdFindBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param sourceId Internal or External id of the rootCategory, whose sequencing needs to be set

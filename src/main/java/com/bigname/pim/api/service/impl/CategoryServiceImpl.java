@@ -7,6 +7,7 @@ import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +18,9 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection.DOWN;
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection.UP;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -153,27 +157,78 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      * @return
      */
     @Override
-    public Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        if(sort == null) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
-        }
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Category> _category = get(categoryId, findBy, false);
-        if(_category.isPresent()) {
-            Category category = _category.get();
-            Page<RelatedCategory> relatedCategories = relatedCategoryDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
-            List<String> subCategoryIds = new ArrayList<>();
-            relatedCategories.forEach(rc -> subCategoryIds.add(rc.getSubCategoryId()));
-            if(subCategoryIds.size() > 0) {
-                Map<String, Category> categoriesMap = PimUtil.getIdedMap(getAll(subCategoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                List<RelatedCategory> _relatedCategories = relatedCategories.filter(rc -> categoriesMap.containsKey(rc.getSubCategoryId())).stream().collect(Collectors.toList());
-                _relatedCategories.forEach(rc -> rc.init(category, categoriesMap.get(rc.getSubCategoryId())));
-                relatedCategories = new PageImpl<>(_relatedCategories,pageable,_relatedCategories.size());//TODO : verify this logic
+    public Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+        return get(categoryId, findBy, false)
+                .map(category -> categoryDAO.getSubCategories(category.getId(), PageRequest.of(page, size, sort)))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
 
+    /**
+     * Method to set the sequencing of two subCategories
+     *
+     * @param categoryId          Internal or External id of the Category
+     * @param categoryIdFindBy    Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param sourceId            Internal or External id of the subCategory, whose sequencing needs to be set
+     * @param sourceIdFindBy      Type of the source subCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @param destinationId       Internal or External id of the subCategory at the destination slot
+     * @param destinationIdFindBy Type of the destination subCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @return true if sequencing got modified, false otherwise
+     */
+    @Override
+    public boolean setSubCategorySequence(String categoryId, FindBy categoryIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy) {
+        return get(categoryId, categoryIdFindBy, false)
+                .map(category -> {
+                    Map<String, Category> categoriesMap = getAll(new String[] {sourceId, destinationId}, FindBy.EXTERNAL_ID, null, false)
+                            .stream().collect(Collectors.toMap(Category::getCategoryId, category1 -> category1));
+
+                    List<String> subCategoryIds = categoriesMap.entrySet().stream().map(entry -> entry.getValue().getId()).collect(Collectors.toList());
+
+                    Map<String, RelatedCategory> subCategoriesMap = relatedCategoryDAO.findByCategoryIdAndSubCategoryIdIn(category.getId(), subCategoryIds.toArray(new String[0]))
+                            .stream().collect(Collectors.toMap(RelatedCategory::getSubCategoryId, subCategory -> subCategory));
+
+                    RelatedCategory source = subCategoriesMap.get(categoriesMap.get(sourceId).getId());
+                    RelatedCategory destination = subCategoriesMap.get(categoriesMap.get(destinationId).getId());
+
+                    PIMConstants.ReorderingDirection direction = DOWN;
+                    if(source.getSequenceNum() > destination.getSequenceNum() ||
+                            (source.getSequenceNum() == destination.getSequenceNum() && source.getSubSequenceNum() <= destination.getSubSequenceNum())) {
+                        direction = UP;
+                    }
+                    List<RelatedCategory> modifiedSubCategories = new ArrayList<>();
+                    if(direction == DOWN) {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum());
+                        modifiedSubCategories.add(source);
+                        destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        modifiedSubCategories.add(destination);
+                        modifiedSubCategories.addAll(rearrangeOtherSubCategories(categoryId, source, destination, direction));
+                    } else {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        modifiedSubCategories.add(source);
+                        modifiedSubCategories.addAll(rearrangeOtherSubCategories(categoryId, source, destination, direction));
+                    }
+                    relatedCategoryDAO.saveAll(modifiedSubCategories);
+                    return true;
+                }).orElse(false);
+    }
+
+    private List<RelatedCategory> rearrangeOtherSubCategories(String categoryId, RelatedCategory source, RelatedCategory destination, PIMConstants.ReorderingDirection direction) {
+        List<RelatedCategory> adjustedSubCategories = new ArrayList<>();
+        List<RelatedCategory> subCategories = relatedCategoryDAO.findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(categoryId, destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
+        int subSequenceNum = direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum();
+        for(RelatedCategory subCategory : subCategories) {
+            if(subCategory.getSubCategoryId().equals(source.getSubCategoryId()) || subCategory.getSubCategoryId().equals(destination.getSubCategoryId())) {
+                continue;
             }
-            return relatedCategories;
+            if(subCategory.getSubSequenceNum() == subSequenceNum) {
+                subCategory.setSubSequenceNum(++subSequenceNum);
+                adjustedSubCategories.add(subCategory);
+            } else {
+                break;
+            }
         }
-        return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        return adjustedSubCategories;
     }
 
     /**

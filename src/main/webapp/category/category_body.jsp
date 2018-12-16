@@ -110,13 +110,30 @@
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
                                                     <button type="button" class="btn btn-success js-add-subCategory"><i class="fa fa-plus"></i> <span class="p-l-5">Add SubCategories</span></button>
+                                                    <button type="button" class="btn btn-sm btn-secondary js-sorting-mode selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="table-responsive">
-                                            <table id="paginatedSubCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
-                                                <thead class="thead-dark"></thead>
-                                            </table>
+                                        <ul class="nav nav-tabs-new2" style="position: absolute; top: -1000px">
+                                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#sortable">Sortable</a></li>
+                                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#reorderable">Reorderable</a></li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <div class="tab-pane show active" id="sortable">
+                                                <div class="table-responsive">
+                                                    <table id="paginatedSubCategoriesSortableTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                        <thead class="thead-dark"></thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane" id="reorderable">
+                                                <div class="table-responsive no-filter">
+                                                    <table id="paginatedSubCategoriesReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
+                                                        <thead class="thead-dark"></thead>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -174,7 +191,7 @@
             urlParams['hash'] = $.getPageAttribute('hash');
         }
 
-        $.initDataTable({
+        /*$.initDataTable({
             selector: '#paginatedSubCategoriesTable',
             name: 'subCategories',
             type: 'TYPE_2',
@@ -187,7 +204,54 @@
                 { data: 'active', name : 'active' , title : 'Status', orderable: false},
                 { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             ]
+        });*/
+        $.initAssociationsGrid({
+            selector: '#paginatedSubCategoriesSortableTable',
+            names: ['subCategoriesSortable', 'subCategory'],
+            pageUrl: $.getURL('/pim/categories/'),
+            dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
+            urlParams: urlParams,
+            reordering: false,
+            columns: [
+                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
+                { data: 'subCategoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' }
+            ]
         });
+
+        $.initAssociationsGrid({
+            selector: '#paginatedSubCategoriesReorderableTable',
+            names: ['subCategoriesReorderable', 'subCategory'],
+            pageUrl: $.getURL('/pim/categories/'),
+            dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
+            urlParams: urlParams,
+            reordering: true,
+            columns: [
+                { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
+                { data: 'subCategoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' }
+            ]
+        });
+
+        $('.js-sorting-mode').on('click', function() {
+            if(!$(this).hasClass('selected')) {
+                $.refreshDataTable('subCategoriesSortable');
+                $('a.nav-link[href*="sortable"]').trigger('click');
+                $(this).parent().find('.js-reordering-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+                $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+            }
+
+        });
+
+        $('.js-reordering-mode').on('click', function() {
+            if(!$(this).hasClass('selected')) {
+                $.refreshDataTable('subCategoriesReorderable');
+                $('a.nav-link[href*="reorderable"]').trigger('click');
+                $(this).parent().find('.js-sorting-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+                $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+            }
+        });
+
         $.initDataTable({
             selector: '#paginatedProductsTable',
             name: 'products',

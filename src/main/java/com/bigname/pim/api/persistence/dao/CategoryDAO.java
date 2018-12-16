@@ -10,5 +10,5 @@ import java.util.List;
 /**
  * Created by sruthi on 29-08-2018.
  */
-public interface CategoryDAO extends BaseDAO<Category>, MongoRepository<Category, String> {
+public interface CategoryDAO extends BaseDAO<Category>, MongoRepository<Category, String>, CategoryRepository {
 }

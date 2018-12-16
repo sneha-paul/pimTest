@@ -119,7 +119,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
 
     @RequestMapping(value = "/{id}/rootCategories/data", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> setRootCategoriesOrder(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
+    public Map<String, Object> setRootCategoriesSequence(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
         Map<String, Object> model = new HashMap<>();
         boolean success = catalogService.setRootCategorySequence(id, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
         model.put("success", success);

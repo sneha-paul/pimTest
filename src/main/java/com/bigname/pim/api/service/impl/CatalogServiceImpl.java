@@ -82,28 +82,9 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      */
     @Override
     public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
-        /*if(sort == null || sort.getOrderFor("seq") != null) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
-        }*/
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Catalog> _catalog = get(catalogId, findBy, false);
-        if(_catalog.isPresent()) {
-            Catalog catalog = _catalog.get();
-            Page<Map<String, Object>> rootCategories = catalogDAO.getRootCategories(catalog.getId(), pageable);
-            /*Page<RootCategory> rootCategories = rootCategoryDAO.findByCatalogIdAndActiveIn(catalog.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
-            catalogDAO.getAllRootCategories(_catalog.get().getId());
-            List<String> categoryIds = new ArrayList<>();
-            rootCategories.forEach(rc -> categoryIds.add(rc.getRootCategoryId()));
-            if(categoryIds.size() > 0) {
-                Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                List<RootCategory> _rootCategories = rootCategories.filter(rc -> categoriesMap.containsKey(rc.getRootCategoryId())).stream().collect(Collectors.toList());
-                _rootCategories.forEach(rc -> rc.init(catalog, categoriesMap.get(rc.getRootCategoryId())));
-                rootCategories = new PageImpl<>(_rootCategories,pageable,_rootCategories.size());//TODO : verify this logic
-            }*/
-            return rootCategories;
-        }
-        return new PageImpl<>(new ArrayList<>(), pageable, 0);
-
+        return get(catalogId, findBy, false)
+                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(page, size, sort)))
+                .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
@@ -132,7 +113,9 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
 
                     //Sort all subCategories within each parent category
                     parentCategoriesMap.forEach((parentCategoryId, subCategories) -> {
-                        subCategories.sort((sc1, sc2) -> sc1.getSequenceNum() > sc2.getSequenceNum() ? -1 : sc1.getSequenceNum() < sc2.getSequenceNum() ? 1 : sc1.getSubSequenceNum() < sc2.getSequenceNum() ? -1 : 1);
+                        if(subCategories.size() > 1) {
+                            subCategories.sort((sc1, sc2) -> sc1.getSequenceNum() > sc2.getSequenceNum() ? 1 : sc1.getSequenceNum() < sc2.getSequenceNum() ? -1 : sc1.getSubSequenceNum() < sc2.getSubSequenceNum() ? 1 : -1);
+                        }
                         categoryIds.add(parentCategoryId);
                         subCategories.forEach(subCategory -> categoryIds.add(subCategory.getSubCategoryId()));
                     });

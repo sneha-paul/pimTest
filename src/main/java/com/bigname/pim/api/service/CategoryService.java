@@ -40,7 +40,7 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<RelatedCategory> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to add subCategory for a category.
@@ -89,5 +89,16 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
      */
     CategoryProduct addProduct(String id, FindBy findBy1, String productId, FindBy findBy2);
 
+    /**
+     * Method to set the sequencing of two subCategories
+     * @param categoryId Internal or External id of the Category
+     * @param categoryIdFindBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param sourceId Internal or External id of the subCategory, whose sequencing needs to be set
+     * @param sourceIdFindBy Type of the source subCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @param destinationId Internal or External id of the subCategory at the destination slot
+     * @param destinationIdFindBy Type of the destination subCategory id, INTERNAL_ID or EXTERNAL_ID
+     * @return true if sequencing got modified, false otherwise
+     */
+    boolean setSubCategorySequence(String categoryId, FindBy categoryIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy);
 }
 
