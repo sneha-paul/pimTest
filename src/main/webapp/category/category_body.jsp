@@ -168,102 +168,12 @@
     </div>
 </div>
 <script>
-
-
     $.initPage({
         'categoryId' : '${category.categoryId}',
         'parentId' : '<c:if test="${not empty parentId}">${parentId}|</c:if>${category.categoryId}',
         'websiteId': '<c:if test="${not empty param.websiteId}">${param.websiteId}</c:if>',
         'hash': '${param.hash}',
         'catalogId' : '${param.catalogId}'
-    });
-    $( document ).ready(function() {
-        var urlParams = {};
-
-        if($.getPageAttribute('websiteId') !== '') {
-            urlParams['websiteId'] = $.getPageAttribute('websiteId');
-        }
-        if($.getPageAttribute('catalogId') !== '') {
-            urlParams['catalogId'] = $.getPageAttribute('catalogId');
-        }
-        urlParams['parentId'] = '{parentId}';
-        if($.getPageAttribute('hash') !== '') {
-            urlParams['hash'] = $.getPageAttribute('hash');
-        }
-
-        /*$.initDataTable({
-            selector: '#paginatedSubCategoriesTable',
-            name: 'subCategories',
-            type: 'TYPE_2',
-            url: $.getURL('/pim/categories/{categoryId}/subCategories/'),
-            url2: $.getURL('/pim/categories/'),
-            urlParams: urlParams,
-            columns: [
-                { data: 'subCategoryName', name : 'subCategoryName' , title : 'Category Name'},
-                { data: 'externalId', name : 'subCategoryId', title : 'Category ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-            ]
-        });*/
-        $.initAssociationsGrid({
-            selector: '#paginatedSubCategoriesSortableTable',
-            names: ['subCategoriesSortable', 'subCategory'],
-            pageUrl: $.getURL('/pim/categories/'),
-            dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
-            urlParams: urlParams,
-            reordering: false,
-            columns: [
-                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
-                { data: 'subCategoryName', name : 'categoryName' , title : 'Category Name'},
-                { data: 'externalId', name : 'externalId', title : 'Category ID' }
-            ]
-        });
-
-        $.initAssociationsGrid({
-            selector: '#paginatedSubCategoriesReorderableTable',
-            names: ['subCategoriesReorderable', 'subCategory'],
-            pageUrl: $.getURL('/pim/categories/'),
-            dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
-            urlParams: urlParams,
-            reordering: true,
-            columns: [
-                { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
-                { data: 'subCategoryName', name : 'categoryName' , title : 'Category Name'},
-                { data: 'externalId', name : 'externalId', title : 'Category ID' }
-            ]
-        });
-
-        $('.js-sorting-mode').on('click', function() {
-            if(!$(this).hasClass('selected')) {
-                $.refreshDataTable('subCategoriesSortable');
-                $('a.nav-link[href*="sortable"]').trigger('click');
-                $(this).parent().find('.js-reordering-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
-                $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
-            }
-
-        });
-
-        $('.js-reordering-mode').on('click', function() {
-            if(!$(this).hasClass('selected')) {
-                $.refreshDataTable('subCategoriesReorderable');
-                $('a.nav-link[href*="reorderable"]').trigger('click');
-                $(this).parent().find('.js-sorting-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
-                $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
-            }
-        });
-
-        $.initDataTable({
-            selector: '#paginatedProductsTable',
-            name: 'products',
-            type: 'TYPE_2',
-            url: $.getURL('/pim/categories/{categoryId}/products'),
-            columns: [
-                { data: 'productName', name : 'productName' , title : 'Product Name'},
-                { data: 'productId', name : 'productId', title : 'Product ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-            ]
-        });
     });
 </script>
 <script src="/assets/js/pages/ui/category/category.js"></script>
