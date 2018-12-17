@@ -53,9 +53,7 @@ public class BreadcrumbsBuilder {
                 this.services.put("pricingAttributeService", baseService);
             } else if(baseService instanceof FamilyService) {
                 this.services.put("familyService", baseService);
-            } /*else if(baseService instanceof Channel) {
-                this.services.put("channelService", baseService);
-            }*/
+            } 
 
 
         });
