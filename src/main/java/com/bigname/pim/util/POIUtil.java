@@ -57,13 +57,13 @@ public class POIUtil {
                         }
 
                     }
-                    System.out.println(rowData.size());
+//                    System.out.println(rowData.size());
                     data.add(rowData);
-                    System.out.println();
+//                    System.out.println();
 
                 }
             }
-            System.out.println(data);
+//            System.out.println(data);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

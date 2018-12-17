@@ -2,6 +2,7 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
+import com.bigname.pim.data.loader.CategoryLoader;
 import com.bigname.pim.data.loader.ProductLoader;
 import com.bigname.pim.util.FindBy;
 import org.apache.commons.collections.map.AbstractHashedMap;
@@ -25,19 +26,31 @@ import java.util.Optional;
 @RequestMapping("pim/feeds")
 public class FeedController {
 
+    private CategoryLoader categoryLoader;
     private ProductLoader productLoader;
 
     @Value("${loader.productFeed.path:C:\\DevStudio\\Projects\\PIM\\src\\10_REGULAR.xlsx}")
-    private String feedPath;
+    private String productFeedPath;
 
-    public FeedController(ProductLoader productLoader) {
+    @Value("${loader.categoryFeed.path:C:\\DevStudio\\Projects\\PIM\\src\\CATEGORIES.xlsx}")
+    private String categoryFeedPath;
+
+    public FeedController(CategoryLoader categoryLoader, ProductLoader productLoader) {
+        this.categoryLoader = categoryLoader;
         this.productLoader = productLoader;
     }
 
-    @RequestMapping(value = "load", method = RequestMethod.GET)
-    public Map<String, Object> loadData(HttpServletRequest request) {
+    @RequestMapping(value = "/load/products", method = RequestMethod.GET)
+    public Map<String, Object> loadProductData(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        productLoader.load(feedPath);
+        productLoader.load(productFeedPath);
+        return model;
+    }
+
+    @RequestMapping(value = "/load/categories", method = RequestMethod.GET)
+    public Map<String, Object> loadCategoryData(HttpServletRequest request) {
+        Map<String, Object> model = new HashMap<>();
+        categoryLoader.load(categoryFeedPath);
         return model;
     }
 

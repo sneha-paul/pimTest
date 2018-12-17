@@ -86,23 +86,5 @@
     $.initPage({
         'websiteId' : '${website.websiteId}'
     });
-    $( document ).ready(function() {
-        var urlParams = {websiteId: '{websiteId}', hash: 'catalogs'};
-
-
-        $.initAssociationsGrid({
-            selector: '#paginatedCatalogsTable',
-            names: ['website catalogs', 'website catalog'],
-            pageUrl: $.getURL('/pim/catalogs/'),
-            dataUrl: $.getURL('/pim/websites/{websiteId}/catalogs/data'),
-            urlParams: urlParams,
-            columns: [
-                { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-                { data: 'externalId', name : 'catalogId', title : 'Catalog ID' }
-            ],
-            buttons: ['DETAILS']
-        });
-
-    });
 </script>
 <script src="/assets/js/pages/ui/website/website.js"></script>

@@ -21,7 +21,7 @@ $( document ).ready(function() {
             dataType: 'json'
         }).done(function(data) {
             if(data.success === true) {
-                $.refreshDataTable('catalogs');
+                $.refreshDataTable('websiteCatalogs');
                 $.refreshDataTable('availableCatalogs');
                 toastr.success('Successfully added the website catalog', 'Website Catalog Added');
             } else {

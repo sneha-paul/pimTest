@@ -484,13 +484,18 @@
          *
          * NOTE- This method can be used to reload both dataTable and treeDataTable
          *
-         * @param name - Name of the dataTable
+         * @param names - Comma separated name of the dataTables
          */
-        refreshDataTable: function(name) {
-            //If this is a treeDataTable, reload the treeDataTable, otherwise refresh the data
-            if(!$.reloadTreeDataTable(name)) {
-                $.getDataTable(name).ajax.reload(null, false);
-            }
+        refreshDataTable: function(names) {
+            let _names = names.split(',');
+            $.each(_names, function(i, name){
+                name = name.trim();
+                //If this is a treeDataTable, reload the treeDataTable, otherwise refresh the data
+                if(!$.reloadTreeDataTable(name)) {
+                    $.getDataTable(name).ajax.reload(null, false);
+                }
+            });
+
         },
 
         /**
@@ -499,14 +504,18 @@
          *
          * NOTE- This method can be used to reload both dataTable and treeDataTable
          *
-         * @param name - Name of the dataTable
+         * @param names - Comma separated name of the dataTables
          */
-        reloadDataTable: function(name) {
-            //If this is a treeDataTable, reload the treeDataTable, otherwise reload the dataTable
-            if(!$.reloadTreeDataTable(name)) {
-                $.destroyDataTable(name);
-                $.initDataTable($.getDataTableOptions(name));
-            }
+        reloadDataTable: function(names) {
+            let _names = names.split(',');
+            $.each(_names, function(i, name){
+                name = name.trim();
+                //If this is a treeDataTable, reload the treeDataTable, otherwise reload the dataTable
+                if(!$.reloadTreeDataTable(name)) {
+                    $.destroyDataTable(name);
+                    $.initDataTable($.getDataTableOptions(name));
+                }
+            });
         },
 
         /**
@@ -528,7 +537,7 @@
          * @returns {boolean}
          */
         reloadTreeDataTable: function(name) {
-            var options = $.getDataTableOptions(name);
+            var options = $.getDataTableOptions(name) || {};
             var treeDataTable = typeof options.treeDataTable !== 'undefined' || false;
             if(treeDataTable) {
                 $.getDataTable(name).destroy();
@@ -572,7 +581,7 @@
         unbindDataTable: function(name, hard) {
             const dt = $.getDataTable(name);
             if(dt && $.removePageAttribute(name + '_datatable')) {
-                dt.destroy(true);
+                dt.destroy();
                 if(hard) {
                     $.removePageAttribute(name + '_datatable_options');
                 }

@@ -21,7 +21,7 @@ $( document ).ready(function() {
             dataType: 'json'
         }).done(function(data) {
             if(data.success === true) {
-                $.refreshDataTable('rootCategories');
+                $.refreshDataTable('rootCategoriesSortable,rootCategoriesReorderable,categoriesHierarchy');
                 $.refreshDataTable('availableRootCategories');
                 toastr.success('Successfully added the root category', 'Root Category Added');
             } else {

@@ -27,11 +27,12 @@ public class RelatedCategory extends EntityAssociation<Category, Category> {
 
     public RelatedCategory() { super(); }
 
-    public RelatedCategory(String categoryId, String subCategoryId, String fullSubCategoryId, int subSequenceNum) {
+    public RelatedCategory(String categoryId, String subCategoryId, String fullSubCategoryId, long sequenceNum,  int subSequenceNum) {
         super();
         this.categoryId = categoryId;
         this.subCategoryId = subCategoryId;
         this.fullSubCategoryId = fullSubCategoryId + "|" + subCategoryId;
+        setSequenceNum(sequenceNum);
         setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
