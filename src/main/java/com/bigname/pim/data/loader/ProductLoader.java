@@ -115,6 +115,7 @@ public class ProductLoader {
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
                 String categoryId = variantsData.get(row).get(attributeNamesMetadata.indexOf("Category"));
                 String style = variantsData.get(row).get(attributeNamesMetadata.indexOf("Style"));
+                if(categoryId.equals("FOLDERS")) {continue;}
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
                 }
@@ -130,6 +131,17 @@ public class ProductLoader {
                     categoryDTO.setCategoryName(categoryId);
                     categoryDTO.setGroup("CREATE");
                     categoryService.create(categoryDTO);
+                    System.out.println("======>" + categoryId);
+                }
+
+                if(isNotEmpty(style) && !categoryService.get(style, FindBy.EXTERNAL_ID, false).isPresent()) {
+                    Category categoryDTO = new Category();
+                    categoryDTO.setActive("Y");
+                    categoryDTO.setCategoryId(style);
+                    categoryDTO.setCategoryName(style);
+                    categoryDTO.setGroup("CREATE");
+                    categoryService.create(categoryDTO);
+                    System.out.println("======>" + style);
                 }
 
 
@@ -320,6 +332,7 @@ public class ProductLoader {
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
                 String categoryId = variantsData.get(row).get(attributeNamesMetadata.indexOf("Category"));
                 String style = variantsData.get(row).get(attributeNamesMetadata.indexOf("Style"));
+                if(categoryId.equals("FOLDERS")) {continue;}
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
                 }
