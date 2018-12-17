@@ -258,17 +258,17 @@
             columns: columns
         });
 
-        $.initDataTable({
+        var urlParams = {familyId: '{familyId}', hash: 'variantGroups'};
+        $.initAssociationsGrid({
             selector: '#paginatedVariantGroupsTable',
-            name: 'variantGroups',
-            type: 'TYPE_1A',
-            url: $.getURL('/pim/families/{familyId}/variantGroups/'),
+            names: 'variantGroups',
+            pageUrl: $.getURL('/pim/families/'),
+            dataUrl: $.getURL('/pim/families/{familyId}/variantGroups/'),
+            urlParams: urlParams,
             columns: [
                 {data: 'name', name: 'name', title: 'Name'},
                 {data: 'externalId', name: 'externalId', title: 'Group ID'},
-                {data: 'variantAxis', name: 'variantAxis', title: 'Variant Axis'},
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+                {data: 'variantAxis', name: 'variantAxis', title: 'Variant Axis'}
             ]
         });
 

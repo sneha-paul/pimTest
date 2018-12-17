@@ -1,19 +1,13 @@
 $(function(){
-    $.initDataTable({
+    $.initEntitiesGrid({
         selector: '#paginatedCategoriesTable',
-        names: ['categories', 'category'],
-        type: 'TYPE_1',
-        url: '/pim/categories/',
+        names: ['categories','category'],
+        pageUrl: '/pim/categories/',
+        dataUrl: '/pim/categories/data',
         columns: [
-            { data: 'categoryName', name : 'categoryName' , title : 'Category Name',
-                render: function(data, type, row, meta) {
-                    return '<h6>' + data + '</h6>'
-                }
-            },
-            { data: 'externalId', name : 'externalId', title : 'Category ID' },
-            { data: 'active', name : 'active' , title : 'Status', orderable: false},
-            { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
+            { data: 'categoryName', name : 'categoryName' , title : 'Category Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.url + '<small>';}},
+            { data: 'externalId', name : 'externalId', title : 'Category ID' }
+        ],
     });
 
     var urlParams = {};

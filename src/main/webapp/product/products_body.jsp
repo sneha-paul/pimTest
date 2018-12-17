@@ -25,19 +25,17 @@
 
 <script>
     $( document ).ready(function() {
-        $.initDataTable({
+        $.initEntitiesGrid({
             selector: '#paginatedProductsTable',
             names: ['products','product'],
-            type: 'TYPE_1',
-            url: '/pim/products/',
+            pageUrl: '/pim/products/',
+            dataUrl: '/pim/products/data',
             columns: [
                 { data: 'productName', name : 'productName' , title : 'Product Name' },
                 { data: 'externalId', name : 'externalId', title : 'Product ID' },
-                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}            ]
+                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family' }
+            ],
         });
-
 
         $.addModal({
             selector: '#js-create-product',
