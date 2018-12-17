@@ -123,13 +123,11 @@
                     }
                 });
             }
+            var columns = options.columns;
+            columns[columns.length] = { data: 'active', name : 'active' , title : 'Status', orderable: false, render: function(data, type, row, meta){return $.renderStatusColumn(row);}};
+            columns[columns.length] = { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
             $.initGrid(Object.assign(options, {
-                columns: [
-                    options.columns[0],
-                    options.columns[1],
-                    { data: 'active', name : 'active' , title : 'Status', orderable: false, render: function(data, type, row, meta){return $.renderStatusColumn(row);}},
-                    { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-                ],
+                columns: columns,
                 buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
                     $.toggleStatusButton(options)
