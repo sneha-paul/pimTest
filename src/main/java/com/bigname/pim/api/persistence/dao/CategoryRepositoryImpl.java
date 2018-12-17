@@ -56,4 +56,35 @@ public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category> impl
 
         return new PageImpl<>(results, pageable, results.size());
     }
+
+    @Override
+    public Page<Map<String, Object>> getProducts(String categoryId, Pageable pageable) {
+        Sort sort = pageable.getSort();
+        SortOperation sortOperation;
+        if(sort == null) {
+            sortOperation = sort(Sort.Direction.ASC, "sequenceNum").and(Sort.Direction.DESC, "subSequenceNum");
+        } else {
+            Sort.Order order = sort.iterator().next();
+            sortOperation = sort(order.getDirection(), order.getProperty());
+        }
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("product");
+
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where("categoryId").is(categoryId)),
+                lookupOperation,
+                replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(product, 0)")).mergeWith(ROOT)),
+                project().andExclude("scopedFamilyAttributes", "product"),
+                sortOperation,
+                skip(pageable.getOffset()),
+                limit((long) pageable.getPageSize())
+        );
+
+        List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "categoryProduct", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
+
+        return new PageImpl<>(results, pageable, results.size());
+    }
 }

@@ -5,13 +5,17 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import static com.bigname.common.util.ValidationUtil.*;
+
+import com.bigname.common.util.ReflectionUtil;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Entity;
+import com.bigname.pim.api.domain.EntityAssociation;
 import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.service.BaseService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
@@ -109,6 +113,39 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     ModelAndView details(Map<String, Object> model) {
         return new ModelAndView((String)model.remove("view"), model);
     }
+
+    Result<Map<String, Object>> getAssociationGridData(Page<Map<String, Object>> paginatedResult, Class<? extends EntityAssociation<T, ?>> associationClass, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, Object>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, Object>> dataObjects = new ArrayList<>();
+        int seq[] = {1};
+        EntityAssociation<T, ?> association = ReflectionUtil.newInstance(associationClass);
+        paginatedResult.getContent().forEach(e -> {
+            e.put("sequenceNum", Integer.toString(seq[0] ++));
+            dataObjects.add(association != null ? association.toMap(e) : e);
+        });
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        return result;
+    }
+
+    Pageable getPaginationRequest(HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Sort sort = null;
+        if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        return new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort);
+    }
+
 
     private Breadcrumbs buildBreadcrumbs(String id, HttpServletRequest request, Map<String, Object> parameterMap) {
         return new BreadcrumbsBuilder(id, entityClass, request, parameterMap, new ArrayList<>(services).toArray(new BaseService[0])).build();

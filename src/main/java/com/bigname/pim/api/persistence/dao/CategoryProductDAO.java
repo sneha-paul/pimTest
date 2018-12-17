@@ -12,5 +12,7 @@ import java.util.List;
  */
 public interface CategoryProductDAO extends BaseAssociationDAO<CategoryProduct>, MongoRepository<CategoryProduct, String> {
     Page<CategoryProduct> findByCategoryIdAndActiveIn(String websiteId, String active[], Pageable pageable);
+    List<CategoryProduct> findByCategoryIdAndProductIdIn(String categoryId, String[] productIds);
+    List<CategoryProduct> findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(String categoryId, long sequenceNum, int subSequenceNum);
     List<CategoryProduct> findByCategoryId(String categoryId);
 }

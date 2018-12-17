@@ -56,13 +56,12 @@ public class CategoryProduct extends EntityAssociation<Category, Product> {
     }
 
     @Override
-    public Map<String, String> toMap() {
-        Map<String, String> map = new LinkedHashMap<>();
-        map.put("productId", getChild().getProductId());
-        map.put("productName", getChild().getProductName());
-        map.put("active", getActive());
-        map.put("sequenceNum", Long.toString(getSequenceNum()));
-        map.put("subSequenceNum", Integer.toString(getSubSequenceNum()));
+    public Map<String, Object> toMap(Map<String, Object> attributesMap) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("externalId", attributesMap.get("externalId"));
+        map.put("productName", attributesMap.get("productName"));
+        map.put("active", attributesMap.get("active"));
+        map.put("sequenceNum", attributesMap.get("sequenceNum"));
         return map;
     }
 

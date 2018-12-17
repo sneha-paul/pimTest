@@ -13,6 +13,7 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -96,25 +97,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     @RequestMapping("/{id}/rootCategories/data")
     @ResponseBody
     public Result<Map<String, Object>> getRootCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, Object>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, Object>> dataObjects = new ArrayList<>();
-        Page<Map<String, Object>> paginatedResult = catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
-        int seq[] = {1};
-        paginatedResult.getContent().forEach(e -> {
-            e.put("sequenceNum", Integer.toString(seq[0] ++));
-            dataObjects.add(RootCategory.toMap(e));
-        });
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
-        return result;
+        return getAssociationGridData(catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), RootCategory.class, request);
     }
 
     @RequestMapping(value = "/{id}/rootCategories/data", method = RequestMethod.PUT)

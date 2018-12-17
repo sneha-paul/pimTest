@@ -53,7 +53,7 @@ public class RootCategory extends  EntityAssociation<Catalog, Category> {
         this.rootCategoryId = rootCategoryId;
     }
 
-    public static Map<String, Object> toMap(Map<String, Object> attributesMap) {
+    public Map<String, Object> toMap(Map<String, Object> attributesMap) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("externalId", attributesMap.get("externalId"));
         map.put("rootCategoryName", attributesMap.get("categoryName"));

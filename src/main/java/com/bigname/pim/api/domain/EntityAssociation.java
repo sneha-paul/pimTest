@@ -89,4 +89,9 @@ abstract public class EntityAssociation<P extends Entity, C extends Entity> {
         return new HashMap<>();
     }
 
+//    public abstract Map<String, Object> toMap(Map<String, Object> attributesMap); TODO - Make the below method abstract
+    public Map<String, Object> toMap(Map<String, Object> attributesMap) {
+        return new HashMap<>();
+    }
+
 }

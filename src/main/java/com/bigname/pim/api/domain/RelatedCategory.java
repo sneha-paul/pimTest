@@ -66,7 +66,7 @@ public class RelatedCategory extends EntityAssociation<Category, Category> {
         this.fullSubCategoryId = fullSubCategoryId;
     }
 
-    public static Map<String, Object> toMap(Map<String, Object> attributesMap) {
+    public Map<String, Object> toMap(Map<String, Object> attributesMap) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("externalId", attributesMap.get("externalId"));
         map.put("subCategoryName", attributesMap.get("categoryName"));

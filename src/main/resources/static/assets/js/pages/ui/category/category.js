@@ -40,21 +40,81 @@ $(function(){
         ]
     });
 
-    $('.js-sorting-mode').on('click', function() {
+    $('.js-sorting-mode.subCategories').on('click', function() {
         if(!$(this).hasClass('selected')) {
             $.refreshDataTable('subCategoriesSortable');
-            $('a.nav-link[href*="sortable"]').trigger('click');
-            $(this).parent().find('.js-reordering-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $('a.nav-link[href*="subCategoriesSortable"]').trigger('click');
+            $(this).parent().find('.js-reordering-mode.subCategories').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
             $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
         }
 
     });
 
-    $('.js-reordering-mode').on('click', function() {
+    $('.js-reordering-mode.subCategories').on('click', function() {
         if(!$(this).hasClass('selected')) {
             $.refreshDataTable('subCategoriesReorderable');
-            $('a.nav-link[href*="reorderable"]').trigger('click');
-            $(this).parent().find('.js-sorting-mode').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $('a.nav-link[href*="subCategoriesReorderable"]').trigger('click');
+            $(this).parent().find('.js-sorting-mode.subCategories').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+        }
+    });
+
+    var urlParams1 = {};
+
+    if($.getPageAttribute('websiteId') !== '') {
+        urlParams1['websiteId'] = $.getPageAttribute('websiteId');
+    }
+    if($.getPageAttribute('catalogId') !== '') {
+        urlParams1['catalogId'] = $.getPageAttribute('catalogId');
+    }
+    urlParams1['parentId'] = '{parentId}';
+    if($.getPageAttribute('hash') !== '') {
+        urlParams1['hash'] = $.getPageAttribute('hash');
+    }
+
+    $.initAssociationsGrid({
+        selector: '#paginatedProductsSortableTable',
+        names: ['productsSortable', 'product'],
+        pageUrl: $.getURL('/pim/products/'),
+        dataUrl: $.getURL('/pim/categories/{categoryId}/products/data'),
+        urlParams: urlParams1,
+        reordering: false,
+        columns: [
+            { data: 'sequenceNum', name : 'sequenceNum', visible: false },
+            { data: 'productName', name : 'productName' , title : 'Product Name'},
+            { data: 'externalId', name : 'externalId', title : 'Product ID' }
+        ]
+    });
+
+    $.initAssociationsGrid({
+        selector: '#paginatedProductsReorderableTable',
+        names: ['productsReorderable', 'product'],
+        pageUrl: $.getURL('/pim/products/'),
+        dataUrl: $.getURL('/pim/categories/{categoryId}/products/data'),
+        urlParams: urlParams1,
+        reordering: true,
+        columns: [
+            { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
+            { data: 'productName', name : 'productName' , title : 'Product Name'},
+            { data: 'externalId', name : 'externalId', title : 'Product ID' }
+        ]
+    });
+
+    $('.js-sorting-mode.products').on('click', function() {
+        if(!$(this).hasClass('selected')) {
+            $.refreshDataTable('productsSortable');
+            $('a.nav-link[href*="productsSortable"]').trigger('click');
+            $(this).parent().find('.js-reordering-mode.products').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+        }
+
+    });
+
+    $('.js-reordering-mode.products').on('click', function() {
+        if(!$(this).hasClass('selected')) {
+            $.refreshDataTable('productsReorderable');
+            $('a.nav-link[href*="productsReorderable"]').trigger('click');
+            $(this).parent().find('.js-sorting-mode.products').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
             $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
         }
     });

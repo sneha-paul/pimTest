@@ -5,6 +5,7 @@ import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -23,13 +24,11 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
      *
      * @param catalogId Internal or External id of the Catalog
      * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
-     * @param page page number
-     * @param size page size
-     * @param sort sort Object
+     * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, Pageable pageable, boolean... activeRequired);
 
     List<Map<String, Object>> getCategoryHierarchy(String catalogId, boolean... activeRequired);
 

@@ -3,6 +3,7 @@ package com.bigname.pim.api.service;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
@@ -34,13 +35,11 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
      *
      * @param categoryId Internal or External id of the Category
      * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
-     * @param page page number
-     * @param size page size
-     * @param sort sort Object
+     * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired);
 
     /**
      * Method to add subCategory for a category.
@@ -53,18 +52,18 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
      */
     RelatedCategory addSubCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
 
+    Page<CategoryProduct> getCategoryProducts(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+
     /**
      * Method to get products of a Category in paginated format.
      *
      * @param categoryId Internal or External id of the Category
      * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
-     * @param page page number
-     * @param size page size
-     * @param sort sort Object
+     * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<CategoryProduct> getCategoryProducts(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<Map<String, Object>> getCategoryProducts(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired);
 
     /**
      * Method to get available products of a category in paginated format.
@@ -100,5 +99,17 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
      * @return true if sequencing got modified, false otherwise
      */
     boolean setSubCategorySequence(String categoryId, FindBy categoryIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy);
+
+    /**
+     * Method to set the sequencing of two products inside a category
+     * @param categoryId Internal or External id of the Category
+     * @param categoryIdFindBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param sourceId Internal or External id of the product, whose sequencing needs to be set
+     * @param sourceIdFindBy Type of the source product id, INTERNAL_ID or EXTERNAL_ID
+     * @param destinationId Internal or External id of the product at the destination slot
+     * @param destinationIdFindBy Type of the destination product id, INTERNAL_ID or EXTERNAL_ID
+     * @return true if sequencing got modified, false otherwise
+     */
+    boolean setProductSequence(String categoryId, FindBy categoryIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy);
 }
 

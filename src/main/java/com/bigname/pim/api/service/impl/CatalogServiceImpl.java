@@ -9,9 +9,7 @@ import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -74,16 +72,14 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      *
      * @param catalogId Internal or External id of the Catalog
      * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
-     * @param page page number
-     * @param size page size
-     * @param sort sort Object
+     * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, int page, int size,Sort sort, boolean... activeRequired) {
+    public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
         return get(catalogId, findBy, false)
-                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(page, size, sort)))
+                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), pageable.getPageRequest()))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 

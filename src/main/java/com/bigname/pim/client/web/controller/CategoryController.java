@@ -106,26 +106,8 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @RequestMapping("/{id}/subCategories/data")
     @ResponseBody
-    public Result<Map<String, Object>> getSubCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, Object>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, Object>> dataObjects = new ArrayList<>();
-        Page<Map<String, Object>> paginatedResult = categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
-        int seq[] = {1};
-        paginatedResult.getContent().forEach(e -> {
-            e.put("sequenceNum", Integer.toString(seq[0] ++));
-            dataObjects.add(RelatedCategory.toMap(e));
-        });
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
-        return result;
+    public Result<Map<String, Object>> getSubCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return getAssociationGridData(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), RelatedCategory.class, request);
     }
 
     @RequestMapping(value = "/{id}/subCategories/data", method = RequestMethod.PUT)
@@ -133,6 +115,21 @@ public class CategoryController extends BaseController<Category, CategoryService
     public Map<String, Object> setSubCategoriesSequence(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
         Map<String, Object> model = new HashMap<>();
         boolean success = categoryService.setSubCategorySequence(id, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
+        model.put("success", success);
+        return model;
+    }
+
+    @RequestMapping("/{id}/products/data")
+    @ResponseBody
+    public Result<Map<String, Object>> getCategoryProducts(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return getAssociationGridData(categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), CategoryProduct.class, request);
+    }
+
+    @RequestMapping(value = "/{id}/products/data", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> setProductsSequence(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = categoryService.setProductSequence(id, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
         model.put("success", success);
         return model;
     }
@@ -174,25 +171,7 @@ public class CategoryController extends BaseController<Category, CategoryService
         return model;
     }
 
-    @RequestMapping("/{id}/products")
-    @ResponseBody
-    public Result<Map<String, String>> getCategoryProducts(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<CategoryProduct> paginatedResult = categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
-        return result;
-    }
+
 
     @RequestMapping(value = "/{id}/products/available")
     public ModelAndView availableProducts(@PathVariable(value = "id") String id) {
