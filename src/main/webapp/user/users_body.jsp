@@ -23,19 +23,16 @@
 </div>
 <script>
     $( document ).ready(function() {
-        $.initDataTable({
+        $.initEntitiesGrid({
             selector: '#paginatedUsersTable',
             names: ['users','user'],
-            type: 'TYPE_1',
-            url: '/pim/users/',
+            pageUrl: '/pim/users/',
+            dataUrl: '/pim/users/data',
             columns: [
                 { data: 'userName', name : 'userName' , title : 'User Name'},
-                { data: 'externalId', name : 'externalId', title : 'Email Id' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-            ]
+                { data: 'externalId', name : 'externalId', title : 'Email Id' }
+            ],
         });
-
         $.addModal({
             selector: '#js-create-users',
             url: $.getURL('/pim/users/create/inside'),
