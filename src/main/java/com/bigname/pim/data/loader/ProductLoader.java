@@ -11,6 +11,7 @@ import com.bigname.pim.util.POIUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static com.bigname.common.util.ValidationUtil.*;
@@ -115,6 +116,7 @@ public class ProductLoader {
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
                 String categoryId = variantsData.get(row).get(attributeNamesMetadata.indexOf("Category"));
                 String style = variantsData.get(row).get(attributeNamesMetadata.indexOf("Style"));
+                String pricing = variantsData.get(row).get(attributeNamesMetadata.indexOf("Pricing"));
                 if(categoryId.equals("FOLDERS")) {continue;}
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
@@ -332,6 +334,7 @@ public class ProductLoader {
                 String familyId = variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID"));
                 String categoryId = variantsData.get(row).get(attributeNamesMetadata.indexOf("Category"));
                 String style = variantsData.get(row).get(attributeNamesMetadata.indexOf("Style"));
+                String pricing = variantsData.get(row).get(attributeNamesMetadata.indexOf("Pricing"));
                 if(categoryId.equals("FOLDERS")) {continue;}
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
@@ -397,9 +400,9 @@ public class ProductLoader {
                 List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 300, null, false).getContent();
                 CategoryProduct categoryProduct = categoryProducts.stream().filter(categoryProduct1 -> categoryProduct1.getProductId().equals(idOfProduct)).findFirst().orElse(null);
                 if(isNull(categoryProduct)) {
-                    CategoryProduct categoryProduct1 = new CategoryProduct(category.getId(), product.getId(), 0);
+//                    CategoryProduct categoryProduct1 = new CategoryProduct(category.getId(), product.getId(), 0);
                     categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
-                    productService.addCategory(product.getProductId(), FindBy.EXTERNAL_ID, category.getCategoryId(), FindBy.EXTERNAL_ID);
+//                    productService.addCategory(product.getProductId(), FindBy.EXTERNAL_ID, category.getCategoryId(), FindBy.EXTERNAL_ID);
 
                 }
                 String variantIdentifier = "COLOR_NAME|" + (String)variantAttributesMap.get("COLOR_NAME"); //TODO - change this to support multiple axis atribute values
@@ -430,6 +433,11 @@ public class ProductLoader {
                     setVariantAttributeValues(productVariant, variantAttributesMap);
                     if(productVariantService.validate(productVariant, ProductVariant.DetailsGroup.class).isEmpty()) {
                         productVariant.setGroup("DETAILS");
+                        productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+                    }
+                    if(isNotEmpty(pricing)) {
+                        productVariant.setGroup("PRICING_DETAILS");
+                        setPricingDetails(productVariant, pricing);
                         productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                     }
                 }
@@ -488,6 +496,37 @@ public class ProductLoader {
             }
         }
         return familyAttributes;
+    }
+
+    static Map<String, String> atttributeIdMap = new HashMap<>();
+    static {
+        atttributeIdMap.put("0", "PLAIN");
+        atttributeIdMap.put("1", "1_COLOR");
+        atttributeIdMap.put("2", "2_COLOR");
+        atttributeIdMap.put("4", "4_COLOR");
+    }
+
+    private void setPricingDetails(ProductVariant productVariant, String pricing) {
+        try {
+            Map<String, Map<Integer, BigDecimal>> attributesPricingMap = new HashMap<>();
+            List<String> list = new ArrayList<String>(Arrays.asList(pricing.split(";")));
+
+            list.forEach(s -> {
+                List<String> attributePricing = new ArrayList<>(Arrays.asList(s.split(",")));
+                String attributeId = atttributeIdMap.get(attributePricing.get(1));
+                if(!attributesPricingMap.containsKey(attributeId)) {
+                    attributesPricingMap.put(attributeId, new TreeMap<>());
+                }
+                String qty = attributePricing.get(0);
+                String qtyPrice = attributePricing.get(2);
+
+                attributesPricingMap.get(attributeId).put(new Integer(qty), new BigDecimal(qtyPrice));
+
+            });
+            productVariant.setPricingDetails(attributesPricingMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
