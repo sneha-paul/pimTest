@@ -436,9 +436,15 @@ public class ProductLoader {
                         productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                     }
                     if(isNotEmpty(pricing)) {
-                        productVariant.setGroup("PRICING_DETAILS");
-                        setPricingDetails(productVariant, pricing);
-                        productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+                        try {
+                            productVariant.setGroup("PRICING_DETAILS");
+                            setPricingDetails(productVariant, pricing);
+                            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+                        } catch (Exception e) {
+                            System.out.println(pricing);
+                            System.out.println(productVariant.getProductVariantId());
+                            e.printStackTrace();
+                        }
                     }
                 }
                 if(row % 100 == 0) {
@@ -514,13 +520,15 @@ public class ProductLoader {
             list.forEach(s -> {
                 List<String> attributePricing = new ArrayList<>(Arrays.asList(s.split(",")));
                 String attributeId = atttributeIdMap.get(attributePricing.get(1));
-                if(!attributesPricingMap.containsKey(attributeId)) {
-                    attributesPricingMap.put(attributeId, new TreeMap<>());
-                }
-                String qty = attributePricing.get(0);
-                String qtyPrice = attributePricing.get(2);
+                if(attributeId != null) {
+                    if (!attributesPricingMap.containsKey(attributeId)) {
+                        attributesPricingMap.put(attributeId, new TreeMap<>());
+                    }
+                    String qty = attributePricing.get(0);
+                    String qtyPrice = attributePricing.get(2);
 
-                attributesPricingMap.get(attributeId).put(new Integer(qty), new BigDecimal(qtyPrice));
+                    attributesPricingMap.get(attributeId).put(new Integer(qty), new BigDecimal(qtyPrice));
+                }
 
             });
             productVariant.setPricingDetails(attributesPricingMap);
