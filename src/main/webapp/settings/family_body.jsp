@@ -262,8 +262,8 @@
         $.initAssociationsGrid({
             selector: '#paginatedVariantGroupsTable',
             names: 'variantGroups',
-            pageUrl: $.getURL('/pim/families/'),
-            dataUrl: $.getURL('/pim/families/{familyId}/variantGroups/'),
+            pageUrl: $.getURL('/pim/families/{familyId}/variantGroups/'),
+            dataUrl: $.getURL('/pim/families/{familyId}/variantGroups/list'),
             urlParams: urlParams,
             columns: [
                 {data: 'name', name: 'name', title: 'Name'},
