@@ -9,11 +9,9 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
-import com.bigname.pim.api.service.ChannelService;
-import com.bigname.pim.api.service.PricingAttributeService;
-import com.bigname.pim.api.service.ProductService;
-import com.bigname.pim.api.service.ProductVariantService;
+import com.bigname.pim.api.service.*;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
@@ -51,14 +49,26 @@ public class ProductVariantController extends ControllerSupport {
 
     private ChannelService channelService;
 
+    private CategoryService categoryService;
+
+    private CatalogService catalogService;
+
+    private WebsiteService websiteService;
+
     public ProductVariantController( ProductVariantService productVariantService,
                                      ProductService productService,
                                      ChannelService channelService,
-                                     PricingAttributeService pricingAttributeService){
+                                     PricingAttributeService pricingAttributeService,
+                                     CategoryService categoryService,
+                                     CatalogService catalogService,
+                                     WebsiteService websiteService){
         this.productVariantService = productVariantService;
         this.productService = productService;
         this.channelService = channelService;
         this.pricingAttributeService = pricingAttributeService;
+        this.websiteService = websiteService;
+        this.catalogService = catalogService;
+        this.categoryService = categoryService;
     }
 
     @RequestMapping("/{productId}/channels/{channelId}/variants/available/list")
@@ -163,7 +173,7 @@ public class ProductVariantController extends ControllerSupport {
         });
     }
 
-    @RequestMapping("/{productId}/channels/{channelId}/variants/list")
+    @RequestMapping("/{productId}/channels/{channelId}/variants/data")
     @ResponseBody
     public Result<Map<String, String>> allChannelVariants(@PathVariable(name = "productId") String productId, @PathVariable(name = "channelId") String channelId, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
@@ -264,7 +274,9 @@ public class ProductVariantController extends ControllerSupport {
     public ModelAndView variantDetails(@PathVariable(value = "productId") String productId,
                                        @PathVariable(value = "variantId", required = false) String variantId,
                                        @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId,
-                                       @RequestParam(name = "reload", required = false) boolean reload) {
+                                       @RequestParam(name = "reload", required = false) boolean reload,
+                                       @RequestParam Map<String, Object> parameterMap,
+                                       HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
         Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
@@ -280,17 +292,15 @@ public class ProductVariantController extends ControllerSupport {
             } else {
                 Optional<ProductVariant> _productVariant = productVariantService.get(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, false);
                 if(_productVariant.isPresent()) {
+                    parameterMap.put("productId", productId);
                     ProductVariant productVariant = _productVariant.get();
                     productVariant.setProduct(product);
                     model.put("mode", "DETAILS");
                     model.put("productVariant", productVariant);
                     model.put("productFamily", productVariant.getProduct().getProductFamily());
                     model.put("pricingGridColumns", ConversionUtil.toJSONString(getPricingGridColumns(productVariant.getPricingDetails())));
-                    model.put("breadcrumbs", new Breadcrumbs("Product",
-                            "Products", "/pim/products",
-                            product.getProductName(), "/pim/products/" + productId,
-                            "Product Variants", "/pim/products/" + productId + "#productVariants",
-                            productVariant.getProductVariantName(), ""));
+                    model.put("breadcrumbs", new BreadcrumbsBuilder(variantId, ProductVariant.class, request, parameterMap, new BaseService[] {websiteService, catalogService, categoryService, productService, productVariantService}).build());
+
                 } else {
                     throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
                 }

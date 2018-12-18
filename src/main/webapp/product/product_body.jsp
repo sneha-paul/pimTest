@@ -875,22 +875,12 @@
 <%--<script src="/assets/js/pages/ui/product/product.js"></script>--%>
 <script>
     $.initPage({
-        'productId' : '${product.productId}'
-    });
-    $( document ).ready(function() {
-        $.initDataTable({
-            selector: '#paginatedCategoriesTable',
-            name: 'categories',
-            type: 'TYPE_2',
-            url: $.getURL('/pim/products/{productId}/categories'),
-            columns: [
-                { data: 'CategoryName', name : 'CategoryName' , title : 'Category Name'},
-                { data: 'CategoryId', name : 'CategoryId', title : 'Category ID' },
-                { data: 'active', name : 'active' , title : 'Status', orderable: false},
-                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-            ]
-        });
-
+        'productId' : '${product.productId}',
+        'categoryId' : '${not empty param.categoryId ? param.categoryId : ""}',
+        'parentId' : '<c:if test="${not empty param.parentId}">${param.parentId}</c:if>',
+        'websiteId': '${not empty param.websiteId ? param.websiteId : ""}',
+        'hash': '${param.hash}',
+        'catalogId' : '${param.catalogId}'
     });
 </script>
 

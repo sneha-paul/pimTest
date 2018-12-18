@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -19,14 +20,14 @@ public class ProductCategory extends EntityAssociation<Product, Category> {
      * Internal id of the Category document, not the externalId (categoryId) attribute
      */
     @Indexed
-    private String categoryId;
+    private String productCategoryId;
 
     public ProductCategory(){ super();}
 
     public ProductCategory(String productId, String categoryId, int subSequenceNum) {
         super();
         this.productId = productId;
-        this.categoryId = categoryId;
+        this.productCategoryId = categoryId;
         setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
@@ -44,16 +45,21 @@ public class ProductCategory extends EntityAssociation<Product, Category> {
         this.productId = productId;
     }
 
-    public String getCategoryId() {
-        return categoryId;
+    public String getProductCategoryId() {
+        return productCategoryId;
     }
 
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
+    public void setProductCategoryId(String categoryId) {
+        this.productCategoryId = categoryId;
     }
 
     @Override
-    public Map<String, String> toMap() {
-        return null;
+    public Map<String, Object> toMap(Map<String, Object> attributesMap) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("externalId", attributesMap.get("externalId"));
+        map.put("categoryName", attributesMap.get("categoryName"));
+        map.put("active", attributesMap.get("active"));
+        map.put("sequenceNum", attributesMap.get("sequenceNum"));
+        return map;
     }
 }

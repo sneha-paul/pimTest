@@ -312,10 +312,10 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
             Product product = _product.get();
             Page<ProductCategory> productCategories = productCategoryDAO.findByProductIdAndActiveIn(product.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
             List<String> categoryIds = new ArrayList<>();
-            productCategories.forEach(pc -> categoryIds.add(pc.getCategoryId()));
+            productCategories.forEach(pc -> categoryIds.add(pc.getProductCategoryId()));
             if(categoryIds.size() > 0) {
                 Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
-                productCategories.forEach(pc -> pc.init(product, categoriesMap.get(pc.getCategoryId())));
+                productCategories.forEach(pc -> pc.init(product, categoriesMap.get(pc.getProductCategoryId())));
             }
             return productCategories;
         }
@@ -336,7 +336,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     public Page<Category> getAvailableCategoriesForProduct(String id, FindBy findBy, int page, int size, Sort sort) {
         Optional<Product> product = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
-        product.ifPresent(product1 -> productCategoryDAO.findByProductId(product1.getId()).forEach(pc -> categoryIds.add(pc.getCategoryId())));
+        product.ifPresent(product1 -> productCategoryDAO.findByProductId(product1.getId()).forEach(pc -> categoryIds.add(pc.getProductCategoryId())));
         return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
 
     }

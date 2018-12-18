@@ -3,19 +3,48 @@ $( document ).ready(function() {
     if($.getPageAttribute('websiteId') !== '') {
         urlParams['websiteId'] = '{websiteId}';
     }
-    urlParams['catalogId'] = '{catalogId}';
-    urlParams['hash'] = 'rootCategories';
+    if($.getPageAttribute('catalogId') !== '') {
+        urlParams['catalogId'] = '{catalogId}';
+    }
+    if($.getPageAttribute('categoryId') !== '') {
+        urlParams['categoryId'] = '{categoryId}';
+    }
+    if($.getPageAttribute('parentId') !== '') {
+        urlParams['parentId'] = '{parentId}';
+    }
+    urlParams['hash'] = 'productVariants';
 
     $.initAssociationsGrid({
         selector: '#paginatedProductVariantsTable',
         names: ['productVariants', 'productVariant'],
         pageUrl: $.getURL('/pim/products/{productId}/variants/'),
-        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/'),
+        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
         urlParams: urlParams,
         reordering: false,
         columns: [
             { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name'},
             { data: 'externalId', name : 'externalId', title : 'Variant ID' }
+        ]
+    });
+
+    var urlParams1 = {};
+    if($.getPageAttribute('websiteId') !== '') {
+        urlParams1['websiteId'] = '{websiteId}';
+    }
+    if($.getPageAttribute('catalogId') !== '') {
+        urlParams1['catalogId'] = '{catalogId}';
+    }
+
+    $.initAssociationsGrid({
+        selector: '#paginatedCategoriesTable',
+        names: ['categories', 'category'],
+        pageUrl: $.getURL('/pim/categories/{categoryId}/'),
+        dataUrl: $.getURL('/pim/products/{productId}/categories/data'),
+        urlParams: urlParams1,
+        reordering: false,
+        columns: [
+            { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
+            { data: 'externalId', name : 'externalId', title : 'Category ID' }
         ]
     });
 
