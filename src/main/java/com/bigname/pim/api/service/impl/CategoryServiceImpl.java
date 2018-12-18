@@ -4,6 +4,7 @@ import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
+import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
@@ -30,15 +31,17 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
     private CategoryDAO categoryDAO;
     private RelatedCategoryDAO relatedCategoryDAO;
+    private ProductCategoryDAO productCategoryDAO;
     private CategoryProductDAO categoryProductDAO;
     private ProductService productService;
 
     @Autowired
-    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductService productService) {
+    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductCategoryDAO productCategoryDAO, ProductService productService) {
         super(categoryDAO, "category", validator);
         this.categoryDAO = categoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
         this.categoryProductDAO = categoryProductDAO;
+        this.productCategoryDAO = productCategoryDAO;
         this.productService = productService;
     }
 
@@ -469,8 +472,11 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         if(category.isPresent()) {
             Optional<Product> product = productService.get(productId, findBy2, false);
             if(product.isPresent()) {
-                Optional<CategoryProduct> top = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
+                Optional<ProductCategory> top1 = productCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                productCategoryDAO.save(new ProductCategory(product.get().getId(), category.get().getId(), top1.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+
+                Optional<CategoryProduct> top2 = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top2.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
             }
         }
         return null;

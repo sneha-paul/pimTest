@@ -5,6 +5,7 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.GenericEntityException;
+import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
@@ -12,13 +13,12 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.*;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
@@ -36,18 +36,20 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
 
     private ProductVariantService productVariantService;
     private ProductCategoryDAO productCategoryDAO;
+    private CategoryProductDAO categoryProductDAO;
     private CategoryService categoryService;
     private FamilyService familyService;
     private ProductDAO productDAO;
 
 
     @Autowired
-    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, ProductCategoryDAO productCategoryDAO,@Lazy CategoryService categoryService) {
+    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, ProductCategoryDAO productCategoryDAO, CategoryProductDAO categoryProductDAO, @Lazy CategoryService categoryService) {
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
         this.productVariantService = productVariantService;
         this.familyService = productFamilyService;
         this.productCategoryDAO = productCategoryDAO;
+        this.categoryProductDAO = categoryProductDAO;
         this.categoryService = categoryService;
     }
 
@@ -181,72 +183,8 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     private void setProductFamily(Product product, FindBy findBy) {
-        familyService.get(product.getProductFamilyId(), findBy).ifPresent(productFamily -> product.setProductFamily(productFamily));
+        familyService.get(product.getProductFamilyId(), findBy).ifPresent(product::setProductFamily);
     }
-
-
-    /*@Override
-    public Page<Product> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        if(sort == null) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "productId"));
-        }
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Product> products =  findBy == FindBy.INTERNAL_ID ? productDAO.findByIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable) : productDAO.findByExternalIdNotInAndActiveIn(excludedIds, PimUtil.getActiveOptions(activeRequired), pageable);
-        products.forEach(product -> setProductFamily(product, FindBy.INTERNAL_ID));
-        return products;
-    }*/
-
-    /*@Override
-    public Page<List<Pair<String, String>>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort) {
-        int page = isNull(pageNumber) ? 0 : pageNumber;
-        int size = isNull(pageSize) ? 25 : pageSize;
-        int level = 1;
-        List<List<Pair<String, String>>> variantMatrix = new ArrayList<>();
-        String _channelId = isEmpty(channelId) ? PIMConstants.DEFAULT_CHANNEL_ID : channelId;
-        get(productId, findBy, false).ifPresent(product -> {
-            product.setChannelId(_channelId);
-            Family productFamily = product.getProductFamily();
-            String variantGroupId = productFamily.getChannelVariantGroups().get(channelId);
-            Map<String, FamilyAttribute> familyAttributesMap = productFamily.getAllAttributesMap();
-            if(isNotEmpty(variantGroupId)) {
-                VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
-                if(isNotEmpty(variantGroup)) {
-//                    List<String> axisAttributeIds = variantGroup.getVariantAxis().get(level);
-//                    List<FamilyAttribute> axisAttributes = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).collect(Collectors.toList());
-//                    List<List<FamilyAttributeOption>> axisAttributesOptions = axisAttributes.stream().map(axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())).collect(Collectors.toList());
-                    List<List<FamilyAttributeOption>> axisAttributesOptions = variantGroup.getVariantAxis().get(level).stream().map(familyAttributesMap::get).map(axisAttribute -> new ArrayList<>(axisAttribute.getOptions().values())).collect(Collectors.toList());
-
-                    int counters = axisAttributesOptions.size();
-                    int[] idx = new int[counters];
-                    int[] max = new int[counters];
-                    for(int i = 0; i < counters; i ++) {
-                        idx[i] = 0;
-                        max[i] = axisAttributesOptions.get(i).size();
-                    }
-
-                    while(idx[0] < max[0]) {
-                        List<Pair<String, String>> variantAttributes = new ArrayList<>();
-                        for(int i = 0; i < counters; i ++) {
-                            variantAttributes.add(Pair.with(axisAttributesOptions.get(i).get(idx[i]).getId(), axisAttributesOptions.get(i).get(idx[i]).getValue()));
-                        }
-                        idx[counters - 1] ++;
-                        for(int i = counters - 1; i >= 0; i --) {
-                            if(idx[i] >= max[i]) {
-                                if(i > 0) {
-                                    idx[i] = 0;
-                                    idx[i - 1] ++;
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        variantMatrix.add(variantAttributes);
-                    }
-                }
-            }
-        });
-        return paginate(variantMatrix, page, size);
-    }*/
 
     /**
      * Method to get available variants of a product in paginated format.
@@ -335,11 +273,6 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
             FamilyAttributeGroup sectionGroup = masterGroup.getChildGroups().get(AttributeGroup.DEFAULT_GROUP_ID);
             sectionGroup.getChildGroups().forEach((k, attributeGroup) ->
                 attributeGroup.getAttributes().forEach((k1, attribute) -> {
-                    /*if(attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getFamilyAttributes().containsKey(k1)) {
-                        product.getFamilyAttributes().put(k1, new String[0]);
-                    } else if(attribute.getUiType() == Attribute.UIType.YES_NO && !product.getFamilyAttributes().containsKey(k1)) {
-                        product.getFamilyAttributes().put(k1, "N");
-                    }*/
                     if(attribute.getType(product.getChannelId()) == FamilyAttribute.Type.COMMON) {
                         if (attribute.getUiType() == Attribute.UIType.CHECKBOX && !product.getChannelFamilyAttributes().containsKey(k1)) {
                             product.getChannelFamilyAttributes().put(k1, new String[0]);
@@ -347,14 +280,6 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                             product.getChannelFamilyAttributes().put(k1, "N");
                         }
                     }
-
-                    /*Pair<String, Object> error = null;
-                    if(product.getFamilyAttributes().containsKey(attribute.getId())) {
-//                        error = attribute.validate(product.getFamilyAttributes().get(attribute.getId()));
-                    } else if(product.getChannelFamilyAttributes().containsKey(attribute.getId())) {
-                        error = attribute.validate(product.getChannelFamilyAttributes().get(attribute.getId()), product.getChannelId(), 0);
-                    }*/
-
                     Pair<String, Object> error = attribute.validate(product.getChannelFamilyAttributes().get(attribute.getId()), product.getChannelId(), 0);//TODO - check if the above commented out logic is required
                     if(isNotEmpty(error)) {
                         fieldErrors.put(attribute.getId(), error);
@@ -419,22 +344,41 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     /**
      * Method to add category for a product.
      *
-     * @param id Internal or External id of the Product
-     * @param findBy1 Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param productId Internal or External id of the Product
+     * @param productIdFindBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param categoryId Internal or External id of the Category
-     * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param categoryIdFindBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */
     @Override
-    public ProductCategory addCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2) {
-        Optional<Product> product = get(id, findBy1, false);
+    public ProductCategory addCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy) {
+        Optional<Product> product = get(productId, productIdFindBy, false);
         if(product.isPresent()) {
-            Optional<Category> category = categoryService.get(categoryId, findBy2, false);
+            Optional<Category> category = categoryService.get(categoryId, categoryIdFindBy, false);
             if(category.isPresent()) {
-                Optional<ProductCategory> top = productCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return productCategoryDAO.save(new ProductCategory(product.get().getId(), category.get().getId(), top.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+                Optional<CategoryProduct> top1 = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top1.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
+
+                Optional<ProductCategory> top2 = productCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                return productCategoryDAO.save(new ProductCategory(product.get().getId(), category.get().getId(), top2.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
             }
         }
         return null;
+    }
+
+    /**
+     * Method to get categories of a Product in paginated format.
+     *
+     * @param productId      Internal or External id of the Product
+     * @param findBy         Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param pageable       The pageable object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
+    @Override
+    public Page<Map<String, Object>> getCategories(String productId, FindBy findBy, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(productId, findBy, false)
+                .map(catalog -> productDAO.getCategories(catalog.getId(), pageable.getPageRequest()))
+                .orElse(new PageImpl<>(new ArrayList<>()));
     }
 }

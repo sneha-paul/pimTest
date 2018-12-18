@@ -67,6 +67,7 @@ $(function(){
     if($.getPageAttribute('catalogId') !== '') {
         urlParams1['catalogId'] = $.getPageAttribute('catalogId');
     }
+    urlParams1['categoryId'] = '{categoryId}';
     urlParams1['parentId'] = '{parentId}';
     if($.getPageAttribute('hash') !== '') {
         urlParams1['hash'] = $.getPageAttribute('hash');
@@ -119,7 +120,7 @@ $(function(){
         }
     });
 
-    $.initDataTable({
+    /*$.initDataTable({
         selector: '#paginatedProductsTable',
         name: 'products',
         type: 'TYPE_2',
@@ -130,7 +131,7 @@ $(function(){
             { data: 'active', name : 'active' , title : 'Status', orderable: false},
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]
-    });
+    });*/
 
     $('.js-add-subCategory').on('click', function(){
         //var eventA = function(){};

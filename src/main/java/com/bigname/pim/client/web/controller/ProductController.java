@@ -7,9 +7,7 @@ import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
-import com.bigname.pim.api.service.ChannelService;
-import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.api.service.ProductService;
+import com.bigname.pim.api.service.*;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
@@ -40,8 +38,8 @@ public class ProductController extends BaseController<Product, ProductService>{
     private FamilyService productFamilyService;
     private ChannelService channelService;
 
-    public ProductController( ProductService productService,FamilyService productFamilyService, ChannelService channelService){
-        super(productService);
+    public ProductController(ProductService productService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService){
+        super(productService, Product.class, websiteService, categoryService, catalogService);
         this.productService = productService;
         this.productFamilyService = productFamilyService;
         this.channelService = channelService;
@@ -75,35 +73,25 @@ public class ProductController extends BaseController<Product, ProductService>{
     }
 
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id, @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId, @RequestParam(name = "reload", required = false) boolean reload) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "channelId", defaultValue = PIMConstants.DEFAULT_CHANNEL_ID) String channelId,
+                                @RequestParam(name = "reload", required = false) boolean reload,
+                                @RequestParam Map<String, Object> parameterMap,
+                                HttpServletRequest request) {
+
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
+        model.put("mode", id == null ? "CREATE" : "DETAILS");
+        model.put("view", "product/product" + (reload ? "_body" : ""));
+        model.put("productFamilies", productFamilyService.getAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))));
         model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - replace with a separate service method
-        if(id == null) {
-            model.put("mode", "CREATE");
-            model.put("product", new Product(channelId));
-            model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))).getContent()); //TODO - JIRA BNPIM-6
-        } else {
-            Optional<Product> _product = productService.get(id, FindBy.EXTERNAL_ID, false);
-            if(_product.isPresent()) {
-                Product product = _product.get();
-                product.setChannelId(channelId);
-                /*if(ValidationUtil.isNotEmpty(product.getProductFamilyId())) {
-                    Optional<Family> productFamily = productFamilyService.get(product.getProductFamilyId(), FindBy.INTERNAL_ID);
-                    productFamily.ifPresent(product::setProductFamily);
-                }*/
-                model.put("mode", "DETAILS");
-                model.put("product", product);
-                model.put("productFamilies", productFamilyService.getAll(0, 100, Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))).getContent()); //TODO - JIRA BNPIM-6
-                model.put("breadcrumbs", new Breadcrumbs("Product", "Products", "/pim/products", product.getProductName(), ""));
-            } else {
-                throw new EntityNotFoundException("Unable to find Product with Id: " + id);
-            }
-        }
-        return new ModelAndView("product/product" + (reload ? "_body" : ""), model);
+        return id == null ? super.details(model) : productService.get(id, FindBy.findBy(true), false)
+                .map(product -> {
+                    product.setChannelId(channelId);
+                    model.put("product", product);
+                    return super.details(id, parameterMap, request, model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Product with Id: " + id));
     }
-
-
 
     @RequestMapping()
     public ModelAndView all(){
@@ -112,60 +100,11 @@ public class ProductController extends BaseController<Product, ProductService>{
         return new ModelAndView("product/products", model);
     }
 
-    /*@RequestMapping(value = "/{id}/familyAttributes", method = RequestMethod.PUT)
+    @RequestMapping("/{id}/categories/data")
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, @RequestParam Map<String, Object> attributes) {
-        Map<String, Object> model = new HashMap<>();
-        Optional<Product> product = productService.get(id, FindBy.EXTERNAL_ID, false);
-        product.ifPresent(product1 -> {
-            product1.setGroup((String)attributes.remove("group"));
-            product1.setFamilyAttributes(attributes);
-            productService.update(id, FindBy.EXTERNAL_ID, product1);
-        });
-        model.put("success", true);
-        return model;
-    }*/
+    public Result<Map<String, Object>> getProductCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return getAssociationGridData(productService.getCategories(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), ProductCategory.class, request);
 
-    //Deprecated, use the corresponding method in variant controller
-    /*@RequestMapping("/{id}/variants")
-    @ResponseBody
-    public Result<Map<String, String>> getProductVariants(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<ProductVariant> paginatedResult = productService.getProductVariants(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
-        return result;
-    }*/
-
-    @RequestMapping("/{id}/categories")
-    @ResponseBody
-    public Result<Map<String, String>> getProductCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<ProductCategory> paginatedResult = productService.getProductCategories(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
-
-        return result;
     }
 
     @RequestMapping(value = "/{id}/categories/available")
@@ -176,7 +115,7 @@ public class ProductController extends BaseController<Product, ProductService>{
 
     @RequestMapping("/{id}/categories/available/list")
     @ResponseBody
-    public Result<Map<String, String>> getAvailableCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
+    public Result<Map<String, String>> getAvailableCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();

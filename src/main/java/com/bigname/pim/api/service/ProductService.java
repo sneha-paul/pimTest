@@ -6,6 +6,7 @@ import com.bigname.pim.api.domain.ProductCategory;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -105,4 +106,15 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
      * @return
      */
     ProductCategory addCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy);
+
+    /**
+     * Method to get categories of a Product in paginated format.
+     *
+     * @param productId Internal or External id of the Product
+     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
+     * @param pageable The pageable object
+     * @param activeRequired activeRequired Boolean flag
+     * @return
+     */
+    Page<Map<String,Object>> getCategories(String productId, FindBy findBy, Pageable pageable, boolean... activeRequired);
 }

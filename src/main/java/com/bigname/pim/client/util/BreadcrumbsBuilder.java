@@ -47,6 +47,10 @@ public class BreadcrumbsBuilder {
                 this.services.put("catalogService", baseService);
             } else if(baseService instanceof CategoryService) {
                 this.services.put("categoryService", baseService);
+            } else if(baseService instanceof ProductService) {
+                this.services.put("productService", baseService);
+            } else if(baseService instanceof ProductVariantService) {
+                this.services.put("productVariantService", baseService);
             } else if(baseService instanceof AttributeCollectionService) {
                 this.services.put("attributeCollectionService", baseService);
             } else if(baseService instanceof PricingAttributeService) {
@@ -86,22 +90,27 @@ public class BreadcrumbsBuilder {
         if(!productId.isEmpty()) {
             addCrumbs(productId, Product.class);
         }
-        addNestedCrumbs(entity);
 
-        if(!entity.equals(Category.class)) {
-            addCrumbs(id, entity, true);
-        }
+        addCrumbs(id, entity, true);
 
         return breadcrumbs;
     }
 
-    private String[] getUrls(String id, Class<?> entity) {//TODO
+    private String[] getUrls(String id, Class<?> entity) {
 
 
         String url1 = "/pim/" + getNames(entity)[1];
         String url2 = url1 + "/" + id;
         String websiteId = getParameter("websiteId");
         String catalogId = getParameter("catalogId");
+        String parentId = getParameter("parentId");
+        if(parentId.contains("|")) {
+            parentId = parentId.substring(0, parentId.lastIndexOf("|"));
+        } else {
+            parentId = "";
+        }
+        String categoryId = getParameter("categoryId");
+        String productId = getParameter("productId");
         String hash = getParameter("hash");
 
         Map<String, Object> urlParams = new LinkedHashMap<>();
@@ -127,6 +136,56 @@ public class BreadcrumbsBuilder {
                 url1 += "#" + hash;
             }
         }
+        if(entity.equals(Product.class)) {
+            if(isNotEmpty(websiteId)) {
+                urlParams.put("websiteId", websiteId);
+            }
+            if(isNotEmpty(catalogId)) {
+                urlParams.put("catalogId", catalogId);
+            }
+
+            if(isNotEmpty(parentId)) {
+                urlParams.put("parentId", URLUtil.encode(parentId));
+            }
+            if(isNotEmpty(getParameter("hash"))) {
+                urlParams.put("hash", getParameter("hash"));
+            }
+
+            if(isNotEmpty(categoryId)) {
+                baseURL = "/pim/" + getNames(Category.class)[1] + "/" + categoryId;
+                url1 = buildURL(baseURL, "#products", urlParams);
+            }
+
+            if(isEmpty(websiteId) && isEmpty(catalogId) && isEmpty(categoryId) && isNotEmpty(hash)) {
+                url1 += "#" + hash;
+            }
+        }
+        if(entity.equals(ProductVariant.class)) {
+            if(isNotEmpty(websiteId)) {
+                urlParams.put("websiteId", websiteId);
+            }
+            if(isNotEmpty(catalogId)) {
+                urlParams.put("catalogId", catalogId);
+            }
+            if(isNotEmpty(categoryId)) {
+                urlParams.put("categoryId", categoryId);
+            }
+            if(isNotEmpty(parentId)) {
+                urlParams.put("parentId", URLUtil.encode(parentId));
+            }
+            if(isNotEmpty(getParameter("hash"))) {
+                urlParams.put("hash", getParameter("hash"));
+            }
+
+            if(isNotEmpty(productId)) {
+                baseURL = "/pim/" + getNames(Product.class)[1] + "/" + productId;
+                url1 = buildURL(baseURL, "#variants", urlParams);
+            }
+
+            if(isEmpty(websiteId) && isEmpty(catalogId) && isEmpty(categoryId) && isEmpty(productId) && isNotEmpty(hash)) {
+                url1 += "#" + hash;
+            }
+        }
         return new String[] {url1, url2};
     }
 
@@ -138,10 +197,14 @@ public class BreadcrumbsBuilder {
                 return new String[] {"Catalogs", "catalogs"};
             case "com.bigname.pim.api.domain.Category":
                 return new String[] {"Categories", "categories"};
+            case "com.bigname.pim.api.domain.Product":
+                return new String[] {"Products", "products"};
+            case "com.bigname.pim.api.domain.ProductVariant":
+                return new String[] {"Product Variants", "variants"};
             case "com.bigname.pim.api.domain.AttributeCollection":
-                return new String[] {"AttributeCollections", "attributeCollections"};
+                return new String[] {"Attribute Collections", "attributeCollections"};
             case "com.bigname.pim.api.domain.PricingAttribute":
-                return new String[] {"PricingAttributes", "pricingAttributes"};
+                return new String[] {"Pricing Attributes", "pricingAttributes"};
             case "com.bigname.pim.api.domain.Family":
                 return new String[] {"Families", "families"};
         }
@@ -156,6 +219,10 @@ public class BreadcrumbsBuilder {
                 return ((CatalogService)services.get("catalogService")).get(id, FindBy.EXTERNAL_ID, false).map(Catalog::getCatalogName).orElse("");
             case "com.bigname.pim.api.domain.Category":
                 return ((CategoryService)services.get("categoryService")).get(id, FindBy.EXTERNAL_ID, false).map(Category::getCategoryName).orElse("");
+            case "com.bigname.pim.api.domain.Product":
+                return ((ProductService)services.get("productService")).get(id, FindBy.EXTERNAL_ID, false).map(Product::getProductName).orElse("");
+            case "com.bigname.pim.api.domain.ProductVariant":
+                return ((ProductVariantService)services.get("productVariantService")).get(id, FindBy.EXTERNAL_ID, false).map(ProductVariant::getProductVariantName).orElse("");
             case "com.bigname.pim.api.domain.AttributeCollection":
                 return ((AttributeCollectionService)services.get("attributeCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AttributeCollection::getCollectionName).orElse("");
             case "com.bigname.pim.api.domain.PricingAttribute":
@@ -174,42 +241,46 @@ public class BreadcrumbsBuilder {
                 urls[1] = "";
             }
             breadcrumbs.addCrumbs(names[0], urls[0]);
-            breadcrumbs.addCrumbs(getCrumbName(id, entity), urls[1]);
+            if(entity.equals(Category.class)) {
+                addParentCrumbs();
+                if(this.entity.equals(Category.class)) {
+                    breadcrumbs.addCrumbs(getCrumbName(id, entity), urls[1]);
+                }
+            } else {
+                breadcrumbs.addCrumbs(getCrumbName(id, entity), urls[1]);
+            }
+
         }
     }
 
-    private void addNestedCrumbs(Class<?> entity) {
-        if(entity.equals(Category.class)) {
-            breadcrumbs.addCrumbs("Categories", getUrls("", entity)[0]);
-            if(isNotEmpty(getParameter("parentId"))) {
-                String parentId = getParameter("parentId");
-                String[] parentIds = StringUtil.splitPipeDelimited(parentId);
-                Map<String, Category> parentsMap = ((CategoryService) services.get("categoryService")).getAll(parentIds, FindBy.EXTERNAL_ID, null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
+    private void addParentCrumbs() {
+        if(isNotEmpty(getParameter("parentId"))) {
+            String parentId = getParameter("parentId");
+            String[] parentIds = StringUtil.splitPipeDelimited(parentId);
+            Map<String, Category> parentsMap = ((CategoryService) services.get("categoryService")).getAll(parentIds, FindBy.EXTERNAL_ID, null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
 
-                String _parentId = "";
-                for (int i = 0; i < parentIds.length; i++) {
-                    if (i > 0) {
-                        _parentId += (_parentId.isEmpty() ? "" : "|") + parentIds[i - 1];
-                    }
-                    Category parentCategory = parentsMap.get(parentIds[i]);
-                    String baseURL = "/pim/categories/" + parentCategory.getCategoryId();
-                    Map<String, Object> urlParams = new LinkedHashMap<>();
-                    if(isNotEmpty(getParameter("websiteId"))) {
-                        urlParams.put("websiteId", getParameter("websiteId"));
-                    }
-                    if(isNotEmpty(getParameter("catalogId"))) {
-                        urlParams.put("catalogId", getParameter("catalogId"));
-                    }
-                    if(isNotEmpty(_parentId)) {
-                        urlParams.put("parentId", URLUtil.encode(_parentId));
-                    }
-                    if(isNotEmpty(getParameter("hash"))) {
-                        urlParams.put("hash", getParameter("hash"));
-                    }
-                    breadcrumbs.addCrumbs(parentCategory.getCategoryName(), buildURL(baseURL, "#subCategories", urlParams));
+            String _parentId = "";
+            for (int i = 0; i < parentIds.length; i++) {
+                if (i > 0) {
+                    _parentId += (_parentId.isEmpty() ? "" : "|") + parentIds[i - 1];
                 }
+                Category parentCategory = parentsMap.get(parentIds[i]);
+                String baseURL = "/pim/categories/" + parentCategory.getCategoryId();
+                Map<String, Object> urlParams = new LinkedHashMap<>();
+                if(isNotEmpty(getParameter("websiteId"))) {
+                    urlParams.put("websiteId", getParameter("websiteId"));
+                }
+                if(isNotEmpty(getParameter("catalogId"))) {
+                    urlParams.put("catalogId", getParameter("catalogId"));
+                }
+                if(isNotEmpty(_parentId)) {
+                    urlParams.put("parentId", URLUtil.encode(_parentId));
+                }
+                if(isNotEmpty(getParameter("hash"))) {
+                    urlParams.put("hash", getParameter("hash"));
+                }
+                breadcrumbs.addCrumbs(parentCategory.getCategoryName(), buildURL(baseURL, "", urlParams));
             }
-            breadcrumbs.addCrumbs(getCrumbName(id, entity), "");
         }
     }
 
@@ -230,8 +301,5 @@ public class BreadcrumbsBuilder {
         }
         return isEmpty(hash) ? url.toString() : url.append(hash).toString();
     }
-
-
-
 
 }
