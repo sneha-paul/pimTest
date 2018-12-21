@@ -39,15 +39,15 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product> implem
         }
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("category")
-                .localField("categoryId")
+                .localField("productCategoryId")
                 .foreignField("_id")
-                .as("category");
+                .as("productCategory");
 
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("productId").is(productId)),
                 lookupOperation,
-                replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(rootCategory, 0)")).mergeWith(ROOT)),
-                project().andExclude("description", "category"),
+                replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(productCategory, 0)")).mergeWith(ROOT)),
+                project().andExclude("description", "productCategory"),
                 sortOperation,
                 skip(pageable.getOffset()),
                 limit((long) pageable.getPageSize())

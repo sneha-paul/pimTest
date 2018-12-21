@@ -20,14 +20,14 @@ public class ProductCategory extends EntityAssociation<Product, Category> {
      * Internal id of the Category document, not the externalId (categoryId) attribute
      */
     @Indexed
-    private String productCategoryId;
+    private String categoryId;
 
     public ProductCategory(){ super();}
 
     public ProductCategory(String productId, String categoryId, int subSequenceNum) {
         super();
         this.productId = productId;
-        this.productCategoryId = categoryId;
+        this.categoryId = categoryId;
         setSubSequenceNum(subSequenceNum);
         setActive("Y");
     }
@@ -45,12 +45,12 @@ public class ProductCategory extends EntityAssociation<Product, Category> {
         this.productId = productId;
     }
 
-    public String getProductCategoryId() {
-        return productCategoryId;
+    public String getCategoryId() {
+        return categoryId;
     }
 
-    public void setProductCategoryId(String categoryId) {
-        this.productCategoryId = categoryId;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 
     @Override
