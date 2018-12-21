@@ -326,7 +326,7 @@
     </style>
 
 </head>
-<body class="theme-orange">
+<body class="theme-blue">
 
 <%-- Page Loader --%>
 <div class="page-loader-wrapper">

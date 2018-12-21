@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/color_skins.css">
 </head>
-<body class="theme-orange">
+<body class="theme-blue">
     <!-- WRAPPER -->
     <div id="wrapper">
         <div class="vertical-align-wrap">
