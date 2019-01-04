@@ -82,6 +82,11 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         }
     }
 
+    @Override
+    public Optional<ProductVariant> get(String productVariantId, FindBy findBy, String channelId, boolean... activeRequired) {
+        return findBy == FindBy.INTERNAL_ID ? productVariantDAO.findByIdAndChannelIdAndActiveIn(productVariantId, channelId, PimUtil.getActiveOptions(activeRequired)) : productVariantDAO.findByExternalIdAndChannelIdAndActiveIn(productVariantId, channelId, PimUtil.getActiveOptions(activeRequired));
+    }
+
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
     public boolean toggle(String id, FindBy findBy, Toggle active) {

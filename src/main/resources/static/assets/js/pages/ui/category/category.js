@@ -7,7 +7,12 @@ $(function(){
     if($.getPageAttribute('catalogId') !== '') {
         urlParams['catalogId'] = $.getPageAttribute('catalogId');
     }
-    urlParams['parentId'] = '{parentId}';
+    if($.getPageAttribute("parentId") !== '') {
+        urlParams['parentId'] = '{parentId}|{categoryId}';
+    } else {
+        urlParams['parentId'] = '{categoryId}';
+    }
+
     if($.getPageAttribute('hash') !== '') {
         urlParams['hash'] = $.getPageAttribute('hash');
     }
@@ -68,7 +73,9 @@ $(function(){
         urlParams1['catalogId'] = $.getPageAttribute('catalogId');
     }
     urlParams1['categoryId'] = '{categoryId}';
-    urlParams1['parentId'] = '{parentId}';
+    if($.getPageAttribute("parentId") !== '') {
+        urlParams1['parentId'] = '{parentId}';
+    }
     if($.getPageAttribute('hash') !== '') {
         urlParams1['hash'] = $.getPageAttribute('hash');
     }

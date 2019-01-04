@@ -104,11 +104,11 @@ public class BreadcrumbsBuilder {
         String websiteId = getParameter("websiteId");
         String catalogId = getParameter("catalogId");
         String parentId = getParameter("parentId");
-        if(parentId.contains("|")) {
+        /*if(parentId.contains("|")) {
             parentId = parentId.substring(0, parentId.lastIndexOf("|"));
         } else {
             parentId = "";
-        }
+        }*/
         String categoryId = getParameter("categoryId");
         String productId = getParameter("productId");
         String hash = getParameter("hash");
@@ -130,11 +130,22 @@ public class BreadcrumbsBuilder {
             if(isNotEmpty(catalogId)) {
                 baseURL = "/pim/" + getNames(Catalog.class)[1] + "/" + catalogId;
                 url1 = buildURL(baseURL, "#" + hash, urlParams);
+                urlParams.put("catalogId", catalogId);
+            }
+
+            if(isNotEmpty(parentId)) {
+                urlParams.put("parentId", parentId);
+            }
+
+            if(isNotEmpty(getParameter("hash"))) {
+                urlParams.put("hash", getParameter("hash"));
             }
 
             if(isEmpty(websiteId) && isEmpty(catalogId) && isNotEmpty(hash)) {
                 url1 += "#" + hash;
             }
+
+            url2 = buildURL(url2, "", urlParams);
         }
         if(entity.equals(Product.class)) {
             if(isNotEmpty(websiteId)) {
@@ -154,11 +165,13 @@ public class BreadcrumbsBuilder {
             if(isNotEmpty(categoryId)) {
                 baseURL = "/pim/" + getNames(Category.class)[1] + "/" + categoryId;
                 url1 = buildURL(baseURL, "#products", urlParams);
+                urlParams.put("categoryId", categoryId);
             }
 
             if(isEmpty(websiteId) && isEmpty(catalogId) && isEmpty(categoryId) && isNotEmpty(hash)) {
                 url1 += "#" + hash;
             }
+            url2 = buildURL(url2, "", urlParams);
         }
         if(entity.equals(ProductVariant.class)) {
             if(isNotEmpty(websiteId)) {
@@ -179,7 +192,7 @@ public class BreadcrumbsBuilder {
 
             if(isNotEmpty(productId)) {
                 baseURL = "/pim/" + getNames(Product.class)[1] + "/" + productId;
-                url1 = buildURL(baseURL, "#variants", urlParams);
+                url1 = buildURL(baseURL, "#productVariants", urlParams);
             }
 
             if(isEmpty(websiteId) && isEmpty(catalogId) && isEmpty(categoryId) && isEmpty(productId) && isNotEmpty(hash)) {
@@ -222,7 +235,7 @@ public class BreadcrumbsBuilder {
             case "com.bigname.pim.api.domain.Product":
                 return ((ProductService)services.get("productService")).get(id, FindBy.EXTERNAL_ID, false).map(Product::getProductName).orElse("");
             case "com.bigname.pim.api.domain.ProductVariant":
-                return ((ProductVariantService)services.get("productVariantService")).get(id, FindBy.EXTERNAL_ID, false).map(ProductVariant::getProductVariantName).orElse("");
+                return ((ProductVariantService)services.get("productVariantService")).get(id, FindBy.EXTERNAL_ID, getParameter("channelId"), false).map(ProductVariant::getProductVariantName).orElse("");
             case "com.bigname.pim.api.domain.AttributeCollection":
                 return ((AttributeCollectionService)services.get("attributeCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AttributeCollection::getCollectionName).orElse("");
             case "com.bigname.pim.api.domain.PricingAttribute":
@@ -243,9 +256,9 @@ public class BreadcrumbsBuilder {
             breadcrumbs.addCrumbs(names[0], urls[0]);
             if(entity.equals(Category.class)) {
                 addParentCrumbs();
-                if(this.entity.equals(Category.class)) {
+//                if(this.entity.equals(Category.class)) {
                     breadcrumbs.addCrumbs(getCrumbName(id, entity), urls[1]);
-                }
+//                }
             } else {
                 breadcrumbs.addCrumbs(getCrumbName(id, entity), urls[1]);
             }

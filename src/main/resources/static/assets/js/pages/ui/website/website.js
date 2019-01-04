@@ -1,5 +1,5 @@
 $(function(){
-    var urlParams = {websiteId: '{websiteId}', hash: 'catalogs'};
+    var urlParams = {websiteId: '{websiteId}'};
     $.initAssociationsGrid({
         selector: '#paginatedCatalogsTable',
         names: ['websiteCatalogs', 'websiteCatalog'],

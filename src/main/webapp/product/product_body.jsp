@@ -870,7 +870,7 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}'});$.getScript('/assets/js/pages/ui/product/product.js');"/>
+<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}', hash : '${param.hash}'});$.getScript('/assets/js/pages/ui/product/product.js');"/>
 
 <%--<script src="/assets/js/pages/ui/product/product.js"></script>--%>
 <script>

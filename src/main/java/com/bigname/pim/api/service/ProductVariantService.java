@@ -34,5 +34,7 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     Optional<ProductVariant> get(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
 
+    Optional<ProductVariant> get(String productVariantId, FindBy findBy, String channelId, boolean... activeRequired);
+
     Page<ProductVariant> getProductVariantPricing(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired);
 }

@@ -187,7 +187,7 @@
 <script>
     $.initPage({
         'categoryId' : '${category.categoryId}',
-        'parentId' : '<c:if test="${not empty parentId}">${parentId}|</c:if>${category.categoryId}',
+        'parentId' : '<c:if test="${not empty parentId}">${parentId}</c:if>',
         'websiteId': '<c:if test="${not empty param.websiteId}">${param.websiteId}</c:if>',
         'hash': '${param.hash}',
         'catalogId' : '${param.catalogId}'

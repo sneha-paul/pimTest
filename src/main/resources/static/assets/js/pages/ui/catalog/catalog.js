@@ -40,7 +40,6 @@ $(function(){
         urlParams1['websiteId'] = '{websiteId}';
     }
     urlParams1['catalogId'] = '{catalogId}';
-    urlParams1['parentId'] = '{parentId}';
     urlParams1['hash'] = 'hierarchy';
     $.initTreeDataTable({
         selector: '#categoriesHierarchy',

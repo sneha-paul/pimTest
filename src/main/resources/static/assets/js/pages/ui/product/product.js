@@ -12,7 +12,10 @@ $( document ).ready(function() {
     if($.getPageAttribute('parentId') !== '') {
         urlParams['parentId'] = '{parentId}';
     }
-    urlParams['hash'] = 'productVariants';
+    if($.getPageAttribute('hash') !== '') {
+        urlParams['hash'] = '{hash}';
+    }
+    urlParams['channelId'] = '{channelId}';
 
     $.initAssociationsGrid({
         selector: '#paginatedProductVariantsTable',
@@ -45,7 +48,8 @@ $( document ).ready(function() {
         columns: [
             { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
             { data: 'externalId', name : 'externalId', title : 'Category ID' }
-        ]
+        ],
+        buttons: ['TOGGLE_STATUS']
     });
 
     $.addModal({
