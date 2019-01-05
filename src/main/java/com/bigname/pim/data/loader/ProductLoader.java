@@ -159,7 +159,7 @@ public class ProductLoader {
                     family.setActive("Y");
                     family.setFamilyName(familyId);
                     family.setFamilyId(familyId);
-                    if (familyService.validate(family, Family.CreateGroup.class).isEmpty()) {
+                    if (familyService.validate(family, new HashMap<>(), Family.CreateGroup.class).isEmpty()) {
                         family = familyService.create(family);
                     }
                 } else {
@@ -385,7 +385,7 @@ public class ProductLoader {
                     product.setChannelId(channelId);
                     product.setGroup("DETAILS");
                     product.setAttributeValues(productAttributesMap);
-                    if(productService.validate(product, Product.DetailsGroup.class).isEmpty()) {
+                    if(productService.validate(product, new HashMap<>(), Product.DetailsGroup.class).isEmpty()) {
                         productService.update(productId, FindBy.EXTERNAL_ID, product);
                         product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
                         product.setProductId(productId);
@@ -431,7 +431,7 @@ public class ProductLoader {
                     productVariantService.create(productVariant);
                     productVariant.setLevel(1); //TODO - change for multi level variants support
                     setVariantAttributeValues(productVariant, variantAttributesMap);
-                    if(productVariantService.validate(productVariant, ProductVariant.DetailsGroup.class).isEmpty()) {
+                    if(productVariantService.validate(productVariant, new HashMap<>(), ProductVariant.DetailsGroup.class).isEmpty()) {
                         productVariant.setGroup("DETAILS");
                         productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                     }

@@ -96,8 +96,8 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     }
 
     @Override
-    protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
-        return service.validate(e, groups);
+    protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>... groups) {
+        return service.validate(e, context, groups);
     }
 
     ModelAndView details(String id, Map<String, Object> parameterMap, HttpServletRequest request, Map<String, Object> model) {

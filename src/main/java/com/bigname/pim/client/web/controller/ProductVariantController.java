@@ -325,8 +325,8 @@ public class ProductVariantController extends ControllerSupport {
     }
 
     @Override
-    protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>[] groups) {
-        return productVariantService.validate(e, groups);
+    protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>[] groups) {
+        return productVariantService.validate(e, context, groups);
     }
 
     /*@RequestMapping(value = "/{productId}/variants/{variantId}/clone/{cloneType}", method = RequestMethod.PUT)

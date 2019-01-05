@@ -54,4 +54,12 @@ public class CollectionsUtil {
 
         return genericMap;
     }
+
+    public static Map<String, Object> toMap(Object... objects) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for(int i = 0;  i < (objects.length % 2 == 0 ? objects.length : objects.length - 1); i++) {
+            map.put(objects[i].toString(), objects[++i]);
+        }
+        return map;
+    }
 }

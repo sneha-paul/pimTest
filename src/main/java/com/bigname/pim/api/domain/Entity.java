@@ -46,7 +46,7 @@ abstract public class Entity<T> extends ValidatableEntity implements Serializabl
     }
 
     public void setExternalId(String externalId) {
-        this.externalId = externalId;
+        this.externalId = isNotEmpty(externalId) ? externalId.toUpperCase() : externalId;
         setExternalId();
     }
 

@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Website;
@@ -78,9 +79,13 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Website website) {
         Map<String, Object> model = new HashMap<>();
+        model.put("context", CollectionsUtil.toMap("id", id));
         if(isValid(website, model, website.getGroup().length == 1 && website.getGroup()[0].equals("DETAILS") ? Website.DetailsGroup.class : null)) {
             websiteService.update(id, FindBy.EXTERNAL_ID, website);
             model.put("success", true);
+            if(!id.equals(website.getWebsiteId())) {
+                model.put("refreshUrl", "/pim/websites/" + website.getWebsiteId());
+            }
         }
         return model;
     }
@@ -93,12 +98,12 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
      */
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id, @RequestParam(name = "reload", required = false) boolean reload) {
 
         Map<String, Object> model = new HashMap<>();
         model.put("active", "WEBSITES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "website/website");
+        model.put("view", "website/website" + (reload ? "_body" : ""));
 
         return id == null ? super.details(model) : websiteService.get(id, FindBy.EXTERNAL_ID, false)
                 .map(website -> {

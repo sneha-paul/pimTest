@@ -282,6 +282,10 @@
             margin-right: 0;
         }
 
+        .js-external-id input {
+            text-transform: uppercase;
+        }
+
         /*table#paginatedPricingTable thead th {
             text-align: right;
             padding-right: 30px;

@@ -12,6 +12,10 @@ import java.util.regex.Matcher;
  */
 public class StringUtil {
 
+    public static String capitalize(String string) {
+        return Character.toUpperCase(string.charAt(0)) + string.substring(1);
+    }
+
     public static String[] split(String value, String delim) {
         if(ValidationUtil.isNull(value)) {
             return new String[0];

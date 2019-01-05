@@ -41,9 +41,9 @@ public interface BaseService<T, DAO> {
 
     List<T> getAllWithExclusions(String[] excludedIds, FindBy findBy, Sort sort, boolean... activeRequired);
 
-    <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups);
+    <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>... groups);
 
-    Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, T t, String group);
+    Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, T t, String group);
 
     String getEntityName();
 

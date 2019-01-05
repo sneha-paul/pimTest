@@ -230,7 +230,8 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, ProductVariant productVariant, String group) {
+    public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, ProductVariant productVariant, String group) {
+        Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, productVariant, group);
         FamilyAttributeGroup masterGroup = productVariant.getProduct().getProductFamily().getAttributes().get(group + "_GROUP");
         if(isNotEmpty(masterGroup)) {
             FamilyAttributeGroup sectionGroup = masterGroup.getChildGroups().get(AttributeGroup.DEFAULT_GROUP_ID);
@@ -245,12 +246,12 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                     }
                     Pair<String, Object> error = attribute.validate(productVariant.getVariantAttributes().get(attribute.getId()), productVariant.getChannelId(), productVariant.getLevel());
                     if(isNotEmpty(error)) {
-                        fieldErrors.put(attribute.getId(), error);
+                        _fieldErrors.put(attribute.getId(), error);
                     }
                 })
             );
         }
-        return fieldErrors;
+        return _fieldErrors;
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.ValidatableEntity;
+import com.bigname.pim.api.exception.DuplicateEntityException;
 import com.bigname.pim.api.exception.EntityCreateException;
 import com.bigname.pim.api.persistence.dao.BaseDAO;
 import com.bigname.pim.api.service.BaseService;
@@ -34,13 +37,21 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
 
     protected DAO dao;
     protected String entityName;
+    protected String externalIdProperty;
+    protected String externalIdPropertyLabel;
     protected Validator validator;
     protected Service service;
 
     protected BaseServiceSupport(DAO dao, String entityName, Validator validator) {
+        this(dao, entityName, entityName + "Id", StringUtil.capitalize(entityName) + " Id",  validator);
+    }
+
+    protected BaseServiceSupport(DAO dao, String entityName, String externalIdProperty, String externalIdPropertyLabel, Validator validator) {
         this.validator = validator;
         this.dao = dao;
         this.entityName = entityName;
+        this.externalIdProperty = externalIdProperty;
+        this.externalIdPropertyLabel = externalIdPropertyLabel;
     }
 
     public String getEntityName() {
@@ -53,6 +64,10 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
     @Override
     public T create(T t) {
         try {
+            get(t.getExternalId(), EXTERNAL_ID, false)
+                    .ifPresent(t1 ->    {
+                        throw new DuplicateEntityException("Another " + entityName + " instance exists with the given " + entityName + " id:" + t.getExternalId());
+                    });
             return createOrUpdate(t);
         } catch(Exception e) {
             throw new EntityCreateException("An error occurred while creating the " + entityName + " dut to: "+ e.getMessage(), e);
@@ -71,6 +86,12 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
                 Preconditions.checkState(id.equals(t.getId()), "Illegal operation");
             }
             T t1 = _t1.get();
+            if(!t.getExternalId().equals(t1.getExternalId())) {
+                get(t.getExternalId(), EXTERNAL_ID, false)
+                        .ifPresent(t2 ->    {
+                            throw new DuplicateEntityException("Another " + entityName + " instance exists with the given " + entityName + " id:" + t.getExternalId());
+                        });
+            }
             t1.merge(t);
             return createOrUpdate(t1);
         }
@@ -94,17 +115,25 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
     }
 
     @SuppressWarnings("unchecked")
-    public <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups) {
+    public <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>... groups) {
         e.orchestrate();
         Set<ConstraintViolation<E>> violations = ConversionUtil.toList(groups).size() > 0 ? validator.validate(e, groups) : validator.validate(e);
-        if(e.getClass().getSuperclass().equals(Entity.class) && e.getGroup().length != 0 && !"CREATE".equals(e.getGroup()[0])) {
-            return validate(e.getValidationErrors(violations), (T) e, e.getGroup().length != 0 ? e.getGroup()[0] : "DETAILS");
+        if(e.getClass().getSuperclass().equals(Entity.class)) {
+            if(e.getGroup().length != 0 && !"CREATE".equals(e.getGroup()[0])) {
+                return validate(context, e.getValidationErrors(violations), (T) e, e.getGroup().length != 0 ? e.getGroup()[0] : "DETAILS");
+            } else {
+                return validate(context, e.getValidationErrors(violations), (T) e, "");
+            }
         }
         return e.getValidationErrors(violations);
     }
 
     @Override
-    public Map<String, Pair<String, Object>> validate(Map<String, Pair<String, Object>> fieldErrors, T t, String group) {
+    public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, T t, String group) {
+        if(ValidationUtil.isEmpty(context.get("id")) || !context.get("id").equals(t.getExternalId())) {
+            get(t.getExternalId(), EXTERNAL_ID, false)
+                    .ifPresent(t1 -> fieldErrors.put(externalIdProperty, Pair.with(externalIdPropertyLabel + " already exists", t.getExternalId())));
+        }
         return fieldErrors;
     }
 

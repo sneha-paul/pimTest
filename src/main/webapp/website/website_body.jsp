@@ -23,15 +23,14 @@
                                                         <label for="websiteName">Website Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="websiteName" name="websiteName" value="${website.websiteName}" class="form-control" />
                                                     </div>
+                                                    <div class="form-group js-external-id">
+                                                        <label for="websiteId">Website ID</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <input type="text" id="websiteId" name="websiteId" class="form-control" value="${website.websiteId}" />
+                                                    </div>
                                                     <div class="form-group">
                                                         <label for="websiteUrl">Website URL</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="url" id="websiteUrl" name="url" class="form-control" value="${website.url}" />
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label for="websiteId">Website ID</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="websiteId" name="websiteId" class="form-control" value="${website.websiteId}" />
-                                                    </div>
-
                                                     <div class="form-group">
                                                         <label>Status</label>
                                                         <br/>

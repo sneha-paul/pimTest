@@ -15,10 +15,12 @@ import static com.bigname.common.util.ValidationUtil.isNotEmpty;
  * @since 1.0
  */
 abstract public class ControllerSupport {
-    abstract protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Class<?>... groups);
+    abstract protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>... groups);
 
+    @SuppressWarnings("unchecked")
     protected <E extends ValidatableEntity> boolean isValid(E e, Map<String, Object> model, Class<?>... groups) {
-        model.put("fieldErrors", validate(e, groups));
+        Map<String, Object> context = model.containsKey("context") ? (Map<String, Object>) model.remove("context") : new HashMap<>();
+        model.put("fieldErrors", validate(e, context, groups));
         model.put("group", e.getGroup());
         return isEmpty(model.get("fieldErrors"));
     }

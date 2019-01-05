@@ -54,5 +54,6 @@ $(function(){
     });
 
     $.lockInput();
+    $.autoExternalId();
 
 });
