@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
@@ -10,6 +11,7 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
+import org.javatuples.Pair;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -124,6 +126,34 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
             }
         }
         return null;
+    }
+
+    @Override
+    public Optional<Website> getWebsiteByName(String name) {
+        return websiteDAO.findByWebsiteName(name);
+    }
+
+    @Override
+    public Optional<Website> getWebsiteByUrl(String url) {
+        return websiteDAO.findByUrl(url);
+    }
+
+    @Override
+    public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, Website website, String group) {
+        Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, website, group);
+        Website existing = ValidationUtil.isNotEmpty(context.get("id")) ? get((String)context.get("id"), FindBy.EXTERNAL_ID, false).orElse(null) : null;
+
+        if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getWebsiteName().equals(website.getWebsiteName()))) {
+            getWebsiteByName(website.getWebsiteName())
+                    .ifPresent(website1 -> fieldErrors.put("websiteName", Pair.with("Website name must be unique, but already exists", website.getWebsiteName())));
+        }
+
+        if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getUrl().equals(website.getUrl()))) {
+            getWebsiteByUrl(website.getUrl())
+                    .ifPresent(website1 -> fieldErrors.put("url", Pair.with("Website url must be unique, but already exists", website.getUrl())));
+        }
+
+        return _fieldErrors;
     }
 
     /*@Override
