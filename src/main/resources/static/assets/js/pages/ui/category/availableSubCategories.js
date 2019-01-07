@@ -21,8 +21,7 @@ $( document ).ready(function() {
             dataType: 'json'
         }).done(function(data) {
             if(data.success === true) {
-                $.refreshDataTable('subCategories');
-                $.refreshDataTable('availableSubCategories');
+                $.refreshDataTable('subCategoriesSortable,subCategoriesReorderable,availableSubCategories');
                 toastr.success('Successfully added the sub category', 'Sub Category Added');
             } else {
                 toastr.success('Error occurred while adding the sub category', 'Error Adding Sub Category');
