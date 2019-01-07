@@ -15,11 +15,11 @@
                         <form method="post" action="/pim/attributeCollections" data-method="POST" data-success-message='["Successfully created the attribute collection", "Collection Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group js-name">
                                         <label for="collectionName">Collection Name</label>
                                         <input type="text" name="collectionName" id="collectionName" class="form-control" />
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group js-external-id">
                                         <label for="collectionId">Collection ID</label>
                                         <input type="text" name="collectionId" id="collectionId" class="form-control" />
                                     </div>

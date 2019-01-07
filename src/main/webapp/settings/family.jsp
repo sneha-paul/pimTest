@@ -15,11 +15,11 @@
                         <form method="post" action="/pim/families" data-method="POST" data-success-message='["Successfully created the family", "Family Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group js-name">
                                         <label>Family Name</label>
                                         <input type="text" name="familyName" class="form-control" />
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group js-external-id">
                                         <label>Family ID</label>
                                         <input type="text" name="familyId" class="form-control" />
                                     </div>

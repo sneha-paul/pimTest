@@ -4,16 +4,14 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.client.model.Breadcrumbs;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -64,6 +62,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, Catalog catalog) {
         Map<String, Object> model = new HashMap<>();
+        model.put("context", CollectionsUtil.toMap("id", id));
         if(isValid(catalog, model, catalog.getGroup().length == 1 && catalog.getGroup()[0].equals("DETAILS") ? Catalog.DetailsGroup.class : null)) {
             catalogService.update(id, FindBy.EXTERNAL_ID, catalog);
             model.put("success", true);

@@ -33,7 +33,7 @@
                                                                value="${catalog.catalogName}" class="form-control">
                                                     </div>
 
-                                                    <div class="form-group">
+                                                    <div class="form-group js-external-id">
                                                         <label for="catalogId">Catalog ID</label><code
                                                             class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="catalogId" name="catalogId"

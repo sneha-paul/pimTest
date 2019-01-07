@@ -66,7 +66,7 @@
                                                                             <label for="productName">Product Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                                             <input type="text" id="productName" name="productName" value="${product.productName}" class="form-control" required="true"/>
                                                                         </div>
-                                                                        <div class="form-group">
+                                                                        <div class="form-group js-external-id">
                                                                             <label for="productId">Product ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                                             <input type="text" id="productId" name="productId" class="form-control" value="${product.productId}" required="true"/>
                                                                         </div>

@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
@@ -80,6 +81,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, AttributeCollection attributeCollection) {
         Map<String, Object> model = new HashMap<>();
+        model.put("context", CollectionsUtil.toMap("id", id));
         if(isValid(attributeCollection, model, attributeCollection.getGroup().length == 1 && attributeCollection.getGroup()[0].equals("DETAILS") ? AttributeCollection.DetailsGroup.class : null)) {
             attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection);
             model.put("success", true);

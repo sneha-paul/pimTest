@@ -15,11 +15,11 @@
                         <form method="post" action="/pim/catalogs" data-method="POST" data-success-message='["Successfully created the website", "Catalog Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group js-name">
                                         <label>Catalog Name</label>
                                         <input type="text" name="catalogName" class="form-control" />
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group js-external-id">
                                         <label>Catalog ID</label>
                                         <input type="text" name="catalogId" class="form-control" />
                                     </div>

@@ -18,12 +18,12 @@
                               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group js-name">
                                         <label>Category Name</label><code class="highlighter-rouge m-l-10">*</code>
                                         <input type="text" name="categoryName" class="form-control">
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group js-external-id">
                                         <label>Category ID</label><code class="highlighter-rouge m-l-10">*</code>
                                         <input type="text" name="categoryId" class="form-control">
                                     </div>

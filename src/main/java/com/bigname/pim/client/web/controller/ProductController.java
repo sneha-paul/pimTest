@@ -4,27 +4,26 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.*;
+import com.bigname.common.util.CollectionsUtil;
+import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.Channel;
+import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.ProductCategory;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.*;
-import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.data.domain.Sort;
-
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -65,6 +64,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         productService.get(id, FindBy.EXTERNAL_ID, false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
         product.setProductId(id);
         product.setAttributeValues(getAttributesMap(request));
+        model.put("context", CollectionsUtil.toMap("id", id));
         if(isValid(product, model, product.getGroup().length == 1 && product.getGroup()[0].equals("DETAILS") ? Product.DetailsGroup.class : null)) {
             productService.update(id, FindBy.EXTERNAL_ID, product);
             model.put("success", true);

@@ -38,7 +38,7 @@
                                                                value="${family.familyName}"
                                                                class="form-control"/>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div class="form-group js-external-id">
                                                         <label for="familyId">Family ID</label><code
                                                             class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="familyId" name="familyId"

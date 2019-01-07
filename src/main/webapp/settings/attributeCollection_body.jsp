@@ -35,7 +35,7 @@
                                                                value="${attributeCollection.collectionName}"
                                                                class="form-control"/>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div class="form-group js-external-id">
                                                         <label for="collectionId">Collection ID</label><code
                                                             class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="collectionId" name="collectionId"

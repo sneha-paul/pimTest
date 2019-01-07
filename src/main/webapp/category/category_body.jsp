@@ -28,7 +28,7 @@
                                                         <input type="text" id="categoryName" name="categoryName" value="${category.categoryName}" class="form-control" />
                                                     </div>
 
-                                                    <div class="form-group">
+                                                    <div class="form-group" js-external-id>
                                                         <label for="categoryId">Category ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="categoryId" name="categoryId" class="form-control" value="${category.categoryId}" />
                                                     </div>

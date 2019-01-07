@@ -16,11 +16,11 @@
                       data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
-                            <div class="form-group">
+                            <div class="form-group js-name">
                                 <label for="productName">Product Name</label>
                                 <input type="text" name="productName" id="productName" class="form-control"/>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group js-external-id">
                                 <label for="productId">Product ID</label>
                                 <input type="text" id="productId" name="productId" class="form-control"/>
                             </div>
