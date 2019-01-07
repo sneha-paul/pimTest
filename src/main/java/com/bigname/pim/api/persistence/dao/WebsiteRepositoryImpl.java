@@ -15,7 +15,7 @@ import java.util.Optional;
 public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website> implements WebsiteRepository {
 
     public WebsiteRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+        super(mongoTemplate, Website.class);
     }
 
 }

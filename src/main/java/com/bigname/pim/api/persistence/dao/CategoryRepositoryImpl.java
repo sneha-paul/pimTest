@@ -23,7 +23,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.limi
  */
 public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category> implements CategoryRepository {
     public CategoryRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+        super(mongoTemplate, Category.class);
     }
 
     @Override

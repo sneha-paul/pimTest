@@ -1,7 +1,10 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.util.FindBy;
+import org.springframework.data.mongodb.core.query.Criteria;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -10,5 +13,9 @@ import java.util.Optional;
  */
 public interface GenericRepository<T> {
     //Test method using mongoTemplate
-    Optional<T> findById(String id, FindBy findBy, Class<T> clazz);
+    Optional<T> findById(String id, FindBy findBy);
+    List<T> findAll(Map<String, Object> criteria);
+    List<T> findAll(Criteria criteria);
+    Optional<T> findOne(Map<String, Object> criteria);
+    Optional<T> findOne(Criteria criteria);
 }

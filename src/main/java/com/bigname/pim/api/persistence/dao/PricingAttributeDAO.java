@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 /**
  * Created by dona on 08-11-2018.
  */
-public interface PricingAttributeDAO extends BaseDAO<PricingAttribute>, MongoRepository<PricingAttribute,String> {
+public interface PricingAttributeDAO extends BaseDAO<PricingAttribute>, MongoRepository<PricingAttribute,String>, PricingAttributeRepository {
 }

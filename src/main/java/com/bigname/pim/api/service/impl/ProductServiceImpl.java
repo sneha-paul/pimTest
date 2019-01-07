@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,26 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public Product createOrUpdate(Product product) {
         return productDAO.save(product);
+    }
+
+    @Override
+    public List<Product> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<Product> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Optional<Product> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<Product> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
     }
 
     /**

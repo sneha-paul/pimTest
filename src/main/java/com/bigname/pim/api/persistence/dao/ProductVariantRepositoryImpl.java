@@ -9,6 +9,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
  */
 public class ProductVariantRepositoryImpl extends GenericRepositoryImpl<ProductVariant> implements ProductVariantRepository {
     public ProductVariantRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+        super(mongoTemplate, ProductVariant.class);
     }
 }

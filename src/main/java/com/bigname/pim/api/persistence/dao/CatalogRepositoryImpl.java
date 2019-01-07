@@ -24,7 +24,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 public class CatalogRepositoryImpl extends GenericRepositoryImpl<Catalog> implements CatalogRepository {
 
     public CatalogRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+        super(mongoTemplate, Catalog.class);
     }
 
     @SuppressWarnings("unchecked")

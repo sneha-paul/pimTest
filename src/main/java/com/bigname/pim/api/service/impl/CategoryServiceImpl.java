@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
@@ -48,6 +49,26 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public Category createOrUpdate(Category category) {
         return categoryDAO.save(category);
+    }
+
+    @Override
+    public List<Category> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<Category> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Optional<Category> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<Category> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
     }
 
     @Override

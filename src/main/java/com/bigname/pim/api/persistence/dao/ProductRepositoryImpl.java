@@ -24,7 +24,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.limi
 public class ProductRepositoryImpl extends GenericRepositoryImpl<Product> implements ProductRepository {
 
     public ProductRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+        super(mongoTemplate, Product.class);
     }
 
     @SuppressWarnings("unchecked")

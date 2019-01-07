@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.persistence.dao.UserDAO;
 import com.bigname.pim.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,8 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Created by sruthi on 05-11-2018.
@@ -33,6 +33,26 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserServi
     @Override
     public User createOrUpdate(User user) {
         return userDAO.save(user);
+    }
+
+    @Override
+    public List<User> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<User> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Optional<User> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<User> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
@@ -21,6 +22,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.jws.WebService;
@@ -46,6 +48,25 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
         this.catalogService = catalogService;
     }
 
+    @Override
+    public List<Website> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<Website> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Optional<Website> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<Website> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
+    }
 
     @Override
     public Website createOrUpdate(Website website) {
@@ -144,12 +165,12 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
         Website existing = ValidationUtil.isNotEmpty(context.get("id")) ? get((String)context.get("id"), FindBy.EXTERNAL_ID, false).orElse(null) : null;
 
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getWebsiteName().equals(website.getWebsiteName()))) {
-            getWebsiteByName(website.getWebsiteName())
+            findOne(CollectionsUtil.toMap("websiteName", website.getWebsiteName()))
                     .ifPresent(website1 -> fieldErrors.put("websiteName", Pair.with("Website name must be unique, but already exists", website.getWebsiteName())));
         }
 
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getUrl().equals(website.getUrl()))) {
-            getWebsiteByUrl(website.getUrl())
+            findOne(CollectionsUtil.toMap("url", website.getUrl()))
                     .ifPresent(website1 -> fieldErrors.put("url", Pair.with("Website url must be unique, but already exists", website.getUrl())));
         }
 

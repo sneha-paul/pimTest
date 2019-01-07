@@ -9,6 +9,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
  */
 public class FamilyRepositoryImpl extends GenericRepositoryImpl<Family> implements FamilyRepository {
     public FamilyRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate);
+        super(mongoTemplate, Family.class);
     }
 }

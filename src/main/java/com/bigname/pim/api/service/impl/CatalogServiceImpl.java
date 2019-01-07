@@ -12,6 +12,7 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
@@ -47,7 +48,25 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         return catalogDAO.save(catalog);
     }
 
+    @Override
+    public List<Catalog> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
 
+    @Override
+    public List<Catalog> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Optional<Catalog> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<Catalog> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
+    }
 
     /**
      * Method to get available categories of a catalog in paginated format.

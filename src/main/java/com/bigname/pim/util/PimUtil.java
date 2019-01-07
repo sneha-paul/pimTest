@@ -3,6 +3,7 @@ package com.bigname.pim.util;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Entity;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.*;
 
@@ -55,5 +56,18 @@ public class PimUtil {
 
     public static Map<String, String> getTokenizedParameter(String value) {
         return StringUtil.toMap(StringUtil.split(value, "\\|"));
+    }
+
+    public static Criteria buildCriteria(Map<String, Object> criteria) {
+        Criteria _criteria = null;
+        int idx = 0;
+        for (Map.Entry<String, Object> entry : criteria.entrySet()) {
+            if(idx ++ == 0) {
+                _criteria = Criteria.where(entry.getKey()).is(entry.getValue());
+            } else {
+                _criteria.andOperator(Criteria.where(entry.getKey()).is(entry.getValue()));
+            }
+        }
+        return _criteria;
     }
 }

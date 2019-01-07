@@ -21,6 +21,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;

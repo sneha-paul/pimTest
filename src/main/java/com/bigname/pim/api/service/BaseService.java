@@ -8,6 +8,7 @@ import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.validation.ConstraintViolation;
 import java.util.List;
@@ -44,6 +45,14 @@ public interface BaseService<T, DAO> {
     <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>... groups);
 
     Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, T t, String group);
+
+    List<T> findAll(Map<String, Object> criteria);
+
+    List<T> findAll(Criteria criteria);
+
+    Optional<T> findOne(Map<String, Object> criteria);
+
+    Optional<T> findOne(Criteria criteria);
 
     String getEntityName();
 

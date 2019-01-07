@@ -9,6 +9,7 @@ import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
@@ -34,6 +35,25 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
         return familyDAO.save(family);
     }
 
+    @Override
+    public List<Family> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<Family> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Optional<Family> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<Family> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
+    }
 
     @Override
     public Page<FamilyAttribute> getFamilyAttributes(String familyId, FindBy findBy, int page, int size, Sort sort) {

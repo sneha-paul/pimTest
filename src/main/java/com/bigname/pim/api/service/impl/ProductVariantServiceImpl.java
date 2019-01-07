@@ -12,6 +12,7 @@ import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
@@ -38,6 +39,26 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         super(productVariantDAO, "productVariant", validator);
         this.productVariantDAO = productVariantDAO;
         this.productDAO = productDAO;
+    }
+
+    @Override
+    public List<ProductVariant> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<ProductVariant> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Optional<ProductVariant> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<ProductVariant> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
     }
 
     @Override
