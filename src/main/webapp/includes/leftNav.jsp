@@ -15,6 +15,7 @@
             <li <c:if test="${expanded}">class="active"</c:if>>
                 <a href="#Settings" class="has-arrow" aria-expanded="${expanded}"><i class="icon-settings"></i><span>Settings</span></a>
                 <ul aria-expanded="${expanded}" class="collapse <c:if test='${expanded}'>in</c:if>" style="height: 0px;">
+                    <li <c:if test="${active eq 'ASSET_COLLECTIONS'}">class="active"</c:if>><a href="/pim/assetCollections">Asset Collections</a></li>
                     <li <c:if test="${active eq 'ATTRIBUTE_COLLECTIONS'}">class="active"</c:if>><a href="/pim/attributeCollections">Attribute Collections</a></li>
                     <li <c:if test="${active eq 'FAMILIES'}">class="active"</c:if>><a href="/pim/families">Families</a></li>
                     <li <c:if test="${active eq 'PRICING_ATTRIBUTES'}">class="active"</c:if>><a href="/pim/pricingAttributes">Pricing Attributes</a></li>

@@ -26,6 +26,14 @@ public class StringUtil {
         }
     }
 
+    public static String concatinate(List<String> values, String delim) {
+        StringBuilder builder = new StringBuilder();
+        if(ValidationUtil.isNotEmpty(values)) {
+            values.forEach(value -> builder.append(builder.length() == 0 ? "" : delim).append(value));
+        }
+        return builder.toString();
+    }
+
     public static Map<String, String> toMap(String[] array) {
         Map<String, String> map = new LinkedHashMap<>();
         for(int i = 0; i < (array.length % 2 == 0 ? array.length : array.length - 1); i = i + 2) {
