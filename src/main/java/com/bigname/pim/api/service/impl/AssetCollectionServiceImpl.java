@@ -60,46 +60,38 @@ public class AssetCollectionServiceImpl extends BaseServiceSupport<AssetCollecti
         List<Map<String, Object>> hierarchy = new ArrayList<>();
         get(collectionId, findBy, activeRequired)
                 .ifPresent(assetCollection -> {
-                    List<Map<String, Object>> _hierarchy = assetDAO.getHierarchy(assetCollection.getRootId());
+                    List<VirtualFile> assets = assetDAO.getHierarchy(assetCollection.getRootId());
                     Map<String, String> lookUpMap = new HashMap<>();
-                    _hierarchy.forEach(map -> {
-                                lookUpMap.put((String) map.get("_id"), (String) map.get("externalId"));
-                                String parentId = (String) map.get("parentDirectoryId");
-                                String parentName = !parentId.isEmpty() ? lookUpMap.get(parentId) : "";
-
-                                if(!parentId.isEmpty() && !parentName.startsWith("+")) {
-                                    lookUpMap.put(parentId, "+" + parentName);
-                                }
-                            });
+                    assets.forEach(asset -> {
+                        lookUpMap.put(asset.getId(), "N");
+                        String parentId = asset.getParentDirectoryId();
+                        lookUpMap.put(parentId, "Y");
+                    });
                     List<String> parentChain = new ArrayList<>();
-                    _hierarchy.forEach(map -> {
+                    assets.forEach(asset -> {
 
-                        String parentId = (String) map.get("parentDirectoryId");
-                        String parentName = !parentId.isEmpty() ? lookUpMap.get(parentId) : "";
-                        boolean isParent = lookUpMap.get(map.get("_id")).startsWith("+");
-                        if(parentName.startsWith("+")) {
-                            parentName = parentName.substring(1);
-                        }
-
+                        String parentId = asset.getParentDirectoryId();
+//                        String parentName = !parentId.isEmpty() ? lookUpMap.get(parentId) : "";
+                        boolean isParent = lookUpMap.get(asset.getId()).equals("Y");
                         if(ValidationUtil.isNotEmpty(parentId)) {
-                            if(!parentChain.contains(parentName)) {
-                                parentChain.add(parentName);
+                            if(!parentChain.contains(parentId)) {
+                                parentChain.add(parentId);
                             } else {
-                                while(!parentChain.get(parentChain.size() - 1).equals(parentName)) {
+                                while(!parentChain.get(parentChain.size() - 1).equals(parentId)) {
                                     parentChain.remove(parentChain.size() - 1);
                                 }
                             }
                         }
-                        Map<String, Object> asset = new HashMap<>();
-                        asset.put("id", map.get("_id"));
-                        asset.put("key", map.get("externalId"));
-                        asset.put("name", map.get("fileName"));
-                        asset.put("active", map.get("active"));
-                        asset.put("isParent", isParent);
-                        asset.put("parent", parentName.isEmpty() ? "0" : parentName);
-                        asset.put("level", parentChain.size());
-                        asset.put("parentChain", StringUtil.concatinate(parentChain, "|"));
-                        hierarchy.add(asset);
+                        Map<String, Object> assetMap = new HashMap<>();
+                        assetMap.put("id", asset.getId());
+                        assetMap.put("key", asset.getId());
+                        assetMap.put("name", asset.getFileName());
+                        assetMap.put("active", asset.getActive());
+                        assetMap.put("isParent", isParent);
+                        assetMap.put("parent", parentId.isEmpty() ? "0" : parentId);
+                        assetMap.put("level", parentChain.size());
+//                        asset.put("parentChain", StringUtil.concatinate(parentChain, "|"));
+                        hierarchy.add(assetMap);
                     });
                 });
 

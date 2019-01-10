@@ -9,12 +9,10 @@ import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.util.FindBy;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,8 +79,8 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Asset Collection with Id: " + id));
     }
 
-    @RequestMapping(value = {"/{id}/asset/{assetGroupId}", "/{id}/asset"})
-    public ModelAndView assetDetails(@PathVariable(value = "id") String id, @PathVariable(value = "assetGroupId", required = false) String assetGroupId) {
+    @RequestMapping(value = {"/{id}/asset"})
+    public ModelAndView assetDetails(@PathVariable(value = "id") String id, @RequestParam(value = "assetGroupId", defaultValue = "ROOT") String assetGroupId) {
 
         Map<String, Object> model = new HashMap<>();
         VirtualFile asset = new VirtualFile();
@@ -91,8 +89,8 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         return new ModelAndView("settings/asset", model);
     }
 
-    @RequestMapping(value = {"/{id}/assetGroup/{assetGroupId}", "/{id}/assetGroup"})
-    public ModelAndView assetGroupDetails(@PathVariable(value = "id") String id, @PathVariable(value = "assetGroupId", required = false) String assetGroupId) {
+    @RequestMapping(value = {"/{id}/assetGroup"})
+    public ModelAndView assetGroupDetails(@PathVariable(value = "id") String id, @RequestParam(value = "assetGroupId", defaultValue = "ROOT") String assetGroupId) {
         Map<String, Object> model = new HashMap<>();
         VirtualFile asset = new VirtualFile(true);
         asset.setParentDirectoryId(ValidationUtil.isEmpty(assetGroupId) ? "ROOT" : assetGroupId);

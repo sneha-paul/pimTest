@@ -233,7 +233,7 @@
                         }
                     },
                     // { data: 'key', title: 'Category ID'},
-                    { data: 'parentChain', visible: false},
+                    // { data: 'parentChain', visible: false},
                     { data: 'active', title: 'Status',
                         render: function(data, type, row, meta) {
                             return 'Y' === data ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
@@ -249,11 +249,14 @@
                                 action = 'Enable';
                                 btnClass = 'btn-success';
                             }
-                            if(row.parentChain !== '') {
+                            if(row.parentId !== '0') {
                                 options.urlParams['parentId'] = '{parentId}';
                             }
-                            actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + row.key, options.urlParams, '', {parentId: row.parentChain}) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
-                            actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + row.key + '" data-active="' + row.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
+                            // let fullId = row.parentChain === '' ? row.key : row.parentChain + '|' + row.key;
+                            actions = '<a href="' + $.getURL((options.url2 ? options.url2 : options.url) + row.key) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
+                            actions += '<button type="button" class="btn btn-sm btn-success js-add-asset-group" data-external-id="' + row.key + '" title="Add Asset Group"><i class="fa fa-folder" style="position: relative;left: -2px;"></i><span style="font-size: 8px;position: absolute;"><i class="fa fa-plus"></i></span></button> ';
+                            actions += '<button type="button" class="btn btn-sm btn-primary js-add-asset" data-external-id="' + row.key + '" title="Upload Asset"><i class="fa fa-upload"></i></button> ';
+                            // actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + row.key + '" data-active="' + row.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             return actions;
                         }
                     }
@@ -291,15 +294,38 @@
                 draw(dt, true);
             });
 
-            $(options.selector).off().on('click', '.js-toggle-status', function() {
-                $.toggleStatus(
-                    $.getURL(options.url2 + '{externalId}/active/{active}', {
-                        externalId: $(this).data('external-id'),
-                        active: $(this).data('active'),
-                        discontinued: $(this).data('discontinued')
-                    }),
-                    typeof options.names !== 'undefined' ? options.names[1] : 'entity',
-                    $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
+            $(options.selector).on('click', '.js-add-asset,.js-add-asset-group,.js-toggle-status', function() {
+                if($(this).hasClass('js-add-asset')) {
+                    $.showModal({
+                        url: $.getURLWithRequestParams('/pim/assetCollections/{collectionId}/asset', {assetGroupId: $(this).data('external-id')}),
+                        name:'asset',
+                        title:'Asset',
+                        buttons: [
+                            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('assets');$.closeModal();});}},
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ]
+                    });
+                } else if($(this).hasClass('js-add-asset-group')) {
+                    $.showModal({
+                        url: $.getURLWithRequestParams('/pim/assetCollections/{collectionId}/assetGroup', {assetGroupId: $(this).data('external-id')}),
+                        name:'assetGroup',
+                        title:'Asset Group',
+                        buttons: [
+                            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('assets');$.closeModal();});}},
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ]
+                    });
+                } else if($(this).hasClass('js-toggle-status')) {
+                    $.toggleStatus(
+                        $.getURL(options.url2 + '{externalId}/active/{active}', {
+                            externalId: $(this).data('external-id'),
+                            active: $(this).data('active'),
+                            discontinued: $(this).data('discontinued')
+                        }),
+                        typeof options.names !== 'undefined' ? options.names[1] : 'entity',
+                        $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
+                }
+
             });
         },
         initDataTable: function(options) {

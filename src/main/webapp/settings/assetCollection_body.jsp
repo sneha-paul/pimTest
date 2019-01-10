@@ -76,13 +76,11 @@
                                         <div class="row p-b-25">
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
-                                                    <button type="button"
-                                                            class="btn btn-success js-add-asset-group"><i
-                                                            class="fa fa-plus"></i> <span class="p-l-5">Add Asset Group</span>
+                                                    <button type="button" class="btn btn-success js-add-asset-group">
+                                                        <i class="fa fa-folder"></i><span style="font-size: 8px;position: relative;top:-8px"><i class="fa fa-plus"></i></span><span class="p-l-5">Add Asset Group</span>
                                                     </button>
-                                                    <button type="button"
-                                                            class="btn btn-success js-add-asset"><i
-                                                            class="fa fa-plus"></i> <span class="p-l-5">Add Asset</span>
+                                                    <button type="button" class="btn btn-primary js-add-asset">
+                                                        <i class="fa fa-upload"></i><span class="p-l-5">Upload Asset</span>
                                                     </button>
                                                 </div>
                                             </div>

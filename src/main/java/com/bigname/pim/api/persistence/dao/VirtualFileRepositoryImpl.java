@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,7 +26,9 @@ public class VirtualFileRepositoryImpl extends GenericRepositoryImpl<VirtualFile
     }
 
     @Override
-    public List<Map<String, Object>> getHierarchy(String rootDirectoryId) {
+    public List<VirtualFile> getHierarchy(String rootDirectoryId) {
+        List<VirtualFile> assets = new ArrayList<>();
+        List<String> assetIds = new ArrayList<>();
         GraphLookupOperation graphLookupOperation = GraphLookupOperation.builder()
                 .from("virtualFile")
                 .startWith("$_id")
@@ -40,6 +43,21 @@ public class VirtualFileRepositoryImpl extends GenericRepositoryImpl<VirtualFile
 
         List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "virtualFile", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
 
-        return results;
+        results.forEach(assetMap -> {
+            List<VirtualFile> nodes = (List<VirtualFile>)assetMap.get("assetsHierarchy");
+            for (VirtualFile node : nodes) {
+                if (!assetIds.contains(node.getId())) {
+                    if (node.getParentDirectoryId().isEmpty()) {
+                        assets.add(0, node);
+                        assetIds.add(0, node.getId());
+                    } else {
+                        assets.add(assetIds.indexOf(node.getParentDirectoryId()) + 1, node);
+                        assetIds.add(assetIds.indexOf(node.getParentDirectoryId()) + 1, node.getId());
+                    }
+                }
+            }
+
+        });
+        return assets;
     }
 }
