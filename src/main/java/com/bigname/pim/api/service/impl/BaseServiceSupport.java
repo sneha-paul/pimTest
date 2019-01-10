@@ -132,8 +132,16 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
     @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, T t, String group) {
         if(ValidationUtil.isEmpty(context.get("id")) || !context.get("id").equals(t.getExternalId())) {
+
             get(t.getExternalId(), EXTERNAL_ID, false)
-                    .ifPresent(t1 -> fieldErrors.put(externalIdProperty, Pair.with(externalIdPropertyLabel + " already exists", t.getExternalId())));
+                    .ifPresent(t1 -> {
+                        if(context.containsKey("forceUniqueId") && (boolean)context.get("forceUniqueId")) {
+                            t.setExternalId(StringUtil.getUniqueName(t.getExternalId(), dao.findByExternalIdStartingWith(t.getExternalId()).stream().map(Entity::getExternalId).collect(Collectors.toList())));
+                        } else {
+                            fieldErrors.put(externalIdProperty, Pair.with(externalIdPropertyLabel + " already exists", t.getExternalId()));
+                        }
+
+                    });
         }
         return fieldErrors;
     }

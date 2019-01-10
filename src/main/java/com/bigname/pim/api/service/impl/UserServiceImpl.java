@@ -57,7 +57,7 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserServi
 
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException, DisabledException {
-        final User user = userDAO.findByEmail(email);
+        final User user = userDAO.findByEmail(email.toUpperCase());
 
         if(user == null){
             throw new UsernameNotFoundException("No user found with userName  " + email);

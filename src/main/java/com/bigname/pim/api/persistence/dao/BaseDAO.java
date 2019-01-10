@@ -23,6 +23,7 @@ public interface BaseDAO<T> {
 
     Optional<T> findById(String id);
     Optional<T> findByExternalId(String id);
+    List<T> findByExternalIdStartingWith(String id);
 
     Optional<T> findByIdAndActiveIn(String id, String[] active);
     Optional<T> findByExternalIdAndActiveIn(String id, String[] active);

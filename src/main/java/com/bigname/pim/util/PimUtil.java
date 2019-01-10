@@ -6,6 +6,7 @@ import com.bigname.pim.api.domain.Entity;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Manu on 8/6/2018.
@@ -59,15 +60,8 @@ public class PimUtil {
     }
 
     public static Criteria buildCriteria(Map<String, Object> criteria) {
-        Criteria _criteria = null;
-        int idx = 0;
-        for (Map.Entry<String, Object> entry : criteria.entrySet()) {
-            if(idx ++ == 0) {
-                _criteria = Criteria.where(entry.getKey()).is(entry.getValue());
-            } else {
-                _criteria.andOperator(Criteria.where(entry.getKey()).is(entry.getValue()));
-            }
-        }
+        Criteria _criteria = new Criteria();
+        _criteria.andOperator(criteria.entrySet().stream().map(entry -> Criteria.where(entry.getKey()).is(entry.getValue())).collect(Collectors.toList()).toArray(new Criteria[0]));
         return _criteria;
     }
 }

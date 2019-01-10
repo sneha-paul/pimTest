@@ -1,6 +1,8 @@
 package com.bigname.pim.api.domain;
 
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.LinkedHashMap;
@@ -10,6 +12,10 @@ import java.util.Map;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
+
+@CompoundIndexes({
+        @CompoundIndex(name = "uniqueFileName", unique = true, def = "{'parentDirectoryId':1, 'fileName':1}")
+})
 public class VirtualFile extends Entity<VirtualFile> {
 
     @Transient

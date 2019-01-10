@@ -33,7 +33,7 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
         Query query = new Query();
         query.addCriteria(Criteria.where(findBy == FindBy.INTERNAL_ID ? "id" : "externalId").is(id));
         T t = mongoTemplate.findOne(query, entityClass);
-        return Optional.of(t);
+        return t == null ? Optional.empty() : Optional.of(t);
     }
 
     public List<T> findAll(Map<String, Object> criteria) {
@@ -54,7 +54,7 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
         Query query = new Query();
         query.addCriteria(criteria);
         T t = mongoTemplate.findOne(query, entityClass);
-        return Optional.of(t);
+        return t == null ? Optional.empty() : Optional.of(t);
     }
 
 

@@ -100,9 +100,11 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
 
     @RequestMapping(value = "/{id}/asset", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "id") String id, VirtualFile asset) {
+    public Map<String, Object> saveAsset(@PathVariable(value = "id") String id, VirtualFile asset) {
         Map<String, Object> model = new HashMap<>();
-        assetCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+        model.put("context", CollectionsUtil.toMap("forceUniqueId", true));
+        if(isValid(asset, model, assetService, VirtualFile.CreateGroup.class)) {
+            assetCollectionService.get(id, FindBy.EXTERNAL_ID, false)
                 .ifPresent(assetCollection -> {
                     if(asset.getParentDirectoryId().equals("ROOT")) {
                         asset.setParentDirectoryId(assetCollection.getRootId());
@@ -112,6 +114,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                     assetService.create(asset);
                     model.put("success", true);
                 });
+        }
         return model;
     }
 

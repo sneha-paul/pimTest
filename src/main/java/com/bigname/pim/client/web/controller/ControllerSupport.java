@@ -1,6 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.ValidatableEntity;
+import com.bigname.pim.api.service.BaseService;
 import org.javatuples.Pair;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,13 @@ abstract public class ControllerSupport {
     protected <E extends ValidatableEntity> boolean isValid(E e, Map<String, Object> model, Class<?>... groups) {
         Map<String, Object> context = model.containsKey("context") ? (Map<String, Object>) model.remove("context") : new HashMap<>();
         model.put("fieldErrors", validate(e, context, groups));
+        model.put("group", e.getGroup());
+        return isEmpty(model.get("fieldErrors"));
+    }
+
+    protected <T extends Entity> boolean isValid(T e, Map<String, Object> model, BaseService<T, ?> service, Class<?>... groups) {
+        Map<String, Object> context = model.containsKey("context") ? (Map<String, Object>) model.remove("context") : new HashMap<>();
+        model.put("fieldErrors", service.validate(e, context, groups));
         model.put("group", e.getGroup());
         return isEmpty(model.get("fieldErrors"));
     }

@@ -14,7 +14,7 @@
                         <label>${isDirectory ? "Asset Group Name" : "Asset Name"}</label>
                         <input type="text" name="fileName" value="${asset.fileName}" class="form-control" required="true"/>
                     </div>
-                    <div class="form-group js-external-id">
+                    <div class="form-group js-external-id hidden">
                         <label>${isDirectory ? "Asset Group Id" : "Asset Id"}</label>
                         <input type="text" name="fileId" value="${asset.fileId}" class="form-control" required="true"/>
                     </div>
