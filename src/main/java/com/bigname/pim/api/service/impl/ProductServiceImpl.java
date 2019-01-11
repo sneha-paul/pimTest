@@ -8,24 +8,22 @@ import com.bigname.pim.api.exception.GenericEntityException;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
-import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
-import com.bigname.pim.util.*;
+import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
+import com.bigname.pim.util.PimUtil;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.*;
 
@@ -290,7 +288,10 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, Product product, String group) {
         Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, product, group);
-        FamilyAttributeGroup masterGroup = product.getProductFamily().getAttributes().get(group + "_GROUP");
+        FamilyAttributeGroup masterGroup = null;
+        if(ValidationUtil.isNotEmpty(context.get("id"))){
+            masterGroup = product.getProductFamily().getAttributes().get(group + "_GROUP");
+        }
         if(isNotEmpty(masterGroup)) {
             FamilyAttributeGroup sectionGroup = masterGroup.getChildGroups().get(AttributeGroup.DEFAULT_GROUP_ID);
             sectionGroup.getChildGroups().forEach((k, attributeGroup) ->
