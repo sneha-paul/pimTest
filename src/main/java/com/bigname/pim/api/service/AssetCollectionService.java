@@ -12,5 +12,5 @@ import java.util.Map;
  * @since 1.0
  */
 public interface AssetCollectionService extends BaseService<AssetCollection, AssetCollectionDAO> {
-    List<Map<String, Object>> getAssetsHierarchy(String collectionId, FindBy findBy, boolean... activeRequired);
+    List<Map<String, Object>> getAssetsHierarchy(String collectionId, FindBy findBy, String nodeId, boolean... activeRequired);
 }

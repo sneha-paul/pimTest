@@ -9,9 +9,7 @@ import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -88,23 +86,38 @@ public class VirtualFileRepositoryImpl extends GenericRepositoryImpl<VirtualFile
     }
 
     @Override
-    public List<VirtualFile> getHierarchy(String rootDirectoryId) {
+    public List<VirtualFile> getHierarchy(String rootDirectoryId, String nodeDirectoryId) {
 
         Query query = new Query();
         query.addCriteria(new Criteria().orOperator(Criteria.where("rootDirectoryId").is(rootDirectoryId), Criteria.where("_id").is(rootDirectoryId)));
         List<VirtualFile> results = mongoTemplate.find(query, VirtualFile.class);
         List<Node> hierarchy = new ArrayList<>();
-        hierarchy.add(hierarchy(results.stream().filter(asset -> asset.getId().equals(rootDirectoryId)).findFirst().orElse(null), results));
-        sort(hierarchy);
-        return flatten(hierarchy);
+        hierarchy.add(nest(results.stream().filter(asset -> asset.getId().equals(rootDirectoryId)).findFirst().orElse(null), results));
+        List<VirtualFile> flattenNodes = flatten(Collections.singletonList(sort(extract(nodeDirectoryId, hierarchy))));
+        return flattenNodes.isEmpty() ? new ArrayList<>() : flattenNodes.subList(1, flattenNodes.size());
     }
 
-    private Node hierarchy(VirtualFile parentAsset, List<VirtualFile> assets) {
+    private Node extract(String nodeDirectoryId, List<Node> hierarchy) {
+        Node extractedNode = null;
+        for(Node node : hierarchy) {
+            if(node.getNode().getId().equals(nodeDirectoryId)) {
+                extractedNode = node;
+            } else {
+                extractedNode = extract(nodeDirectoryId, node.getChildNodes());
+            }
+            if(extractedNode != null) {
+                break;
+            }
+        }
+        return extractedNode;
+    }
+
+    private Node nest(VirtualFile parentAsset, List<VirtualFile> assets) {
 
         Node node = new Node(parentAsset);
 
         assets.stream().filter(asset -> asset.getParentDirectoryId().equals(parentAsset.getId()))
-                .forEach(asset -> node.getChildNodes().add(hierarchy(asset, assets)));
+                .forEach(asset -> node.getChildNodes().add(nest(asset, assets)));
         return node;
     }
 

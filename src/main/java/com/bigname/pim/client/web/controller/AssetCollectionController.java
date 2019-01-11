@@ -7,6 +7,7 @@ import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -79,28 +82,50 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Asset Collection with Id: " + id));
     }
 
-    @RequestMapping(value = {"/{id}/asset"})
-    public ModelAndView assetDetails(@PathVariable(value = "id") String id, @RequestParam(value = "assetGroupId", defaultValue = "ROOT") String assetGroupId) {
 
-        Map<String, Object> model = new HashMap<>();
-        VirtualFile asset = new VirtualFile();
-        asset.setParentDirectoryId(ValidationUtil.isEmpty(assetGroupId) ? "ROOT" : assetGroupId);
-        model.put("asset", asset);
-        return new ModelAndView("settings/asset", model);
-    }
 
-    @RequestMapping(value = {"/{id}/assetGroup"})
+    /*@RequestMapping(value = {"/{id}/assetGroup"})
     public ModelAndView assetGroupDetails(@PathVariable(value = "id") String id, @RequestParam(value = "assetGroupId", defaultValue = "ROOT") String assetGroupId) {
         Map<String, Object> model = new HashMap<>();
         VirtualFile asset = new VirtualFile(true);
         asset.setParentDirectoryId(ValidationUtil.isEmpty(assetGroupId) ? "ROOT" : assetGroupId);
         model.put("asset", asset);
         return new ModelAndView("settings/asset", model);
+    }*/
+
+    @RequestMapping(value = {"/{collectionId}/assets/{assetId}", "/{collectionId}/assets"})
+    public ModelAndView assetDetails(@PathVariable(value = "collectionId") String collectionId,
+                                     @PathVariable(value = "assetId", required = false) String assetId,
+                                     @RequestParam(value = "parentId", defaultValue = "ROOT") String parentId,
+                                     @RequestParam(value = "assetGroup", defaultValue = "false") boolean assetGroup,
+                                     @RequestParam(value = "assetGroupId", required = false) String assetGroupId,
+                                     @RequestParam(name = "reload", required = false) boolean reload) {
+        Map<String, Object> model = new HashMap<>();
+
+        Optional<AssetCollection> assetCollection = assetCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false);
+        model.put("active", "ASSET_COLLECTIONS");
+        if(assetId == null) {
+            model.put("mode", "CREATE");
+            VirtualFile asset = new VirtualFile(assetGroup);
+            asset.setParentDirectoryId(assetGroupId);
+            model.put("asset", asset);
+        } else {
+            if(assetCollection.isPresent()) {
+                model.put("mode", "DETAILS");
+                model.put("assetCollectionId", collectionId);
+                model.put("asset", assetService.get(assetId, FindBy.EXTERNAL_ID, false).orElse(null));
+                model.put("breadcrumbs", new Breadcrumbs("Asset Collection",
+                        "Asset Collections", "/pim/assetCollections",
+                        assetCollection.get().getCollectionName(), "/pim/assetCollections/" + assetCollection.get().getCollectionId(),
+                        "Asset", ""));
+            }
+        }
+        return new ModelAndView("settings/asset" + (reload ? "_body" : ""), model);
     }
 
-    @RequestMapping(value = "/{id}/asset", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/assets", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> saveAsset(@PathVariable(value = "id") String id, VirtualFile asset) {
+    public Map<String, Object> createAsset(@PathVariable(value = "id") String id, VirtualFile asset) {
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("forceUniqueId", true));
         if(isValid(asset, model, assetService, VirtualFile.CreateGroup.class)) {
@@ -118,10 +143,11 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         return model;
     }
 
-    @RequestMapping("/{id}/hierarchy")
+    @RequestMapping("/{id}/{assetGroupId}/hierarchy")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> getAllAsHierarchy(@PathVariable(value = "id") String id) {
-        return assetCollectionService.getAssetsHierarchy(id, FindBy.EXTERNAL_ID, false);
+    public List<Map<String, Object>> getAllAsHierarchy(@PathVariable(value = "id") String id,
+                                                       @PathVariable(value = "assetGroupId") String assetGroupId) {
+        return assetCollectionService.getAssetsHierarchy(id, FindBy.EXTERNAL_ID, assetGroupId, false);
     }
 }

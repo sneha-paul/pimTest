@@ -51,6 +51,8 @@ public class BreadcrumbsBuilder {
                 this.services.put("productService", baseService);
             } else if(baseService instanceof ProductVariantService) {
                 this.services.put("productVariantService", baseService);
+            } else if(baseService instanceof AssetCollectionService) {
+                this.services.put("assetCollectionService", baseService);
             } else if(baseService instanceof AttributeCollectionService) {
                 this.services.put("attributeCollectionService", baseService);
             } else if(baseService instanceof PricingAttributeService) {
@@ -214,6 +216,8 @@ public class BreadcrumbsBuilder {
                 return new String[] {"Products", "products"};
             case "com.bigname.pim.api.domain.ProductVariant":
                 return new String[] {"Product Variants", "variants"};
+            case "com.bigname.pim.api.domain.AssetCollection":
+                return new String[] {"Asset Collections", "asseteCollections"};
             case "com.bigname.pim.api.domain.AttributeCollection":
                 return new String[] {"Attribute Collections", "attributeCollections"};
             case "com.bigname.pim.api.domain.PricingAttribute":
@@ -238,6 +242,8 @@ public class BreadcrumbsBuilder {
                 return ((ProductVariantService)services.get("productVariantService")).get(id, FindBy.EXTERNAL_ID, getParameter("channelId"), false).map(ProductVariant::getProductVariantName).orElse("");
             case "com.bigname.pim.api.domain.AttributeCollection":
                 return ((AttributeCollectionService)services.get("attributeCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AttributeCollection::getCollectionName).orElse("");
+            case "com.bigname.pim.api.domain.AssetCollection":
+                return ((AssetCollectionService)services.get("assetCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AssetCollection::getCollectionName).orElse("");
             case "com.bigname.pim.api.domain.PricingAttribute":
                 return ((PricingAttributeService)services.get("pricingAttributeService")).get(id, FindBy.EXTERNAL_ID, false).map(PricingAttribute::getPricingAttributeName).orElse("");
             case "com.bigname.pim.api.domain.Family":

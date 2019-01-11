@@ -10,5 +10,5 @@ import java.util.Map;
  * @since 1.0
  */
 public interface VirtualFileRepository extends GenericRepository<VirtualFile> {
-    List<VirtualFile> getHierarchy(String rootDirectoryId);
+    List<VirtualFile> getHierarchy(String rootDirectoryId, String nodeDirectoryId);
 }

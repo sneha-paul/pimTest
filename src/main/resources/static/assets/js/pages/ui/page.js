@@ -218,7 +218,7 @@
                             $(row).addClass('parent-node');
                         }
                         if(!collapsed) {
-                            displayed.add(data.key);
+                            displayed.add(data.id);
                             $(row).addClass('details');
                         }
                     }
@@ -254,8 +254,8 @@
                             }
                             // let fullId = row.parentChain === '' ? row.key : row.parentChain + '|' + row.key;
                             actions = '<a href="' + $.getURL((options.url2 ? options.url2 : options.url) + row.key) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
-                            actions += '<button type="button" class="btn btn-sm btn-success js-add-asset-group" data-external-id="' + row.key + '" title="Add Asset Group"><i class="fa fa-folder" style="position: relative;left: -2px;"></i><span style="font-size: 8px;position: absolute;"><i class="fa fa-plus"></i></span></button> ';
-                            actions += '<button type="button" class="btn btn-sm btn-primary js-add-asset" data-external-id="' + row.key + '" title="Upload Asset"><i class="fa fa-upload"></i></button> ';
+                            actions += '<button type="button" class="btn btn-sm btn-success js-add-asset-group" data-external-id="' + row.id + '" title="Add Asset Group"><i class="fa fa-folder" style="position: relative;left: -2px;"></i><span style="font-size: 8px;position: absolute;"><i class="fa fa-plus"></i></span></button> ';
+                            actions += '<button type="button" class="btn btn-sm btn-primary js-add-asset" data-external-id="' + row.id + '" title="Upload Asset"><i class="fa fa-upload"></i></button> ';
                             // actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + row.key + '" data-active="' + row.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';
                             return actions;
                         }
@@ -269,37 +269,37 @@
             $(options.selector + ' tbody').off().on('click', 'tr td:first-child .js-ctrl', function () {
                 var _tr = $(this).closest('tr');
                 var _row = dt.row(_tr);
-                var _key = _row.data().key;
-                if (displayed.has(_key)) {
+                var _id = _row.data().id;
+                if (displayed.has(_id)) {
                     function collapseChildNodes(trs) {
                         for(var i = 0; i < trs.length; i ++) {
                             var tr = $(trs[i]);
                             var row = dt.row(tr);
-                            var key = row.data().key;
+                            var id = row.data().id;
 
-                            var childTrs = tr.parent().find('.parent-' + key);
+                            var childTrs = tr.parent().find('.parent-' + id);
                             if(childTrs.length > 0) {
                                 collapseChildNodes(childTrs);
                             }
-                            displayed.delete(key);
+                            displayed.delete(id);
                             tr.removeClass('details');
                         }
                     }
                     collapseChildNodes([_tr]);
 
                 } else {
-                    displayed.add(_key);
+                    displayed.add(_id);
                     _tr.addClass('details');
                 }
                 draw(dt, true);
             });
 
-            $(options.selector).on('click', '.js-add-asset,.js-add-asset-group,.js-toggle-status', function() {
+            $(options.selector).off().on('click', '.js-add-asset,.js-add-asset-group,.js-toggle-status', function() {
                 if($(this).hasClass('js-add-asset')) {
                     $.showModal({
-                        url: $.getURLWithRequestParams('/pim/assetCollections/{collectionId}/asset', {assetGroupId: $(this).data('external-id')}),
+                        url: $.getURLWithRequestParams('/pim/assetCollections/{collectionId}/assets', {assetGroupId: $(this).data('external-id')}),
                         name:'asset',
-                        title:'Asset',
+                        title:'Create Asset',
                         buttons: [
                             {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable1('assetsHierarchy');$.closeModal();});}},
                             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
@@ -307,9 +307,9 @@
                     });
                 } else if($(this).hasClass('js-add-asset-group')) {
                     $.showModal({
-                        url: $.getURLWithRequestParams('/pim/assetCollections/{collectionId}/assetGroup', {assetGroupId: $(this).data('external-id')}),
+                        url: $.getURLWithRequestParams('/pim/assetCollections/{collectionId}/assets', {assetGroupId: $(this).data('external-id'), assetGroup: true}),
                         name:'assetGroup',
-                        title:'Asset Group',
+                        title:'Create Asset Group',
                         buttons: [
                             {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable1('assetsHierarchy');$.closeModal();});}},
                             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
