@@ -47,8 +47,8 @@ public class VirtualFile extends Entity<VirtualFile> {
 
     public static final VirtualFile getRootInstance() {
         VirtualFile root = new VirtualFile(true);
-        root.setFileId("ROOT");
-        root.setFileName("Root");
+        root.setFileId("ROOT" + root.getId());
+        root.setFileName("Root" + root.getId());
         root.setParentDirectoryId("");
         root.setActive("Y");
         return root;

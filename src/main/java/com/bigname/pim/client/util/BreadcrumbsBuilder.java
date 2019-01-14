@@ -217,7 +217,7 @@ public class BreadcrumbsBuilder {
             case "com.bigname.pim.api.domain.ProductVariant":
                 return new String[] {"Product Variants", "variants"};
             case "com.bigname.pim.api.domain.AssetCollection":
-                return new String[] {"Asset Collections", "asseteCollections"};
+                return new String[] {"Asset Collections", "assetCollections"};
             case "com.bigname.pim.api.domain.AttributeCollection":
                 return new String[] {"Attribute Collections", "attributeCollections"};
             case "com.bigname.pim.api.domain.PricingAttribute":
