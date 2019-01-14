@@ -51,6 +51,7 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
 
     public List<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         Query query = new Query();
+        keyword = "(?i)" + keyword;
         Criteria criteria = new Criteria();
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
         criteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
