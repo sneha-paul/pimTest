@@ -8,10 +8,12 @@ import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
+import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.bigname.common.util.ValidationUtil2.isEmpty;
 
 /**
  *
@@ -92,6 +96,35 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         model.put("active", "CATALOGS");
         return new ModelAndView("catalog/catalogs", model);
     }
+
+
+    @RequestMapping(value =  {"/list", "/data"})
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        if(isEmpty(dataTableRequest.getSearch())) {
+            return super.all(request, response, model);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, String>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort;
+            if(pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            } else {
+                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            List<Catalog> paginatedResult = catalogService.findAll("catalogName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.size()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.size()));
+            return result;
+        }
+    }
+
 
     @RequestMapping("/{id}/rootCategories/data")
     @ResponseBody

@@ -58,6 +58,13 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         return dao.findAll(criteria);
     }
 
+
+
+    @Override
+    public List<Catalog> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return catalogDAO.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
     @Override
     public Optional<Catalog> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
