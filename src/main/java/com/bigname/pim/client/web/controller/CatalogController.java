@@ -49,6 +49,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
     }
 
 
+
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> create( Catalog catalog) {
