@@ -1,15 +1,13 @@
 package com.bigname.pim;
 
-import com.bigname.pim.api.persistence.dao.BaseDAO;
 import com.bigname.pim.config.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
 
 @SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader"})
 @EnableMongoRepositories(basePackages = {"com.bigname.pim.api.persistence"})
@@ -26,7 +24,8 @@ import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver
 		WebConfig.class,
 		CacheConfig.class,
 		TilesConfig.class,
-		SecurityConfig.class
+		SecurityConfig.class,
+		EmailConfig.class
 })
 public class PimApplication extends SpringBootServletInitializer {
 

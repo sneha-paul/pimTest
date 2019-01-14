@@ -1,20 +1,22 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.persistence.dao.UserDAO;
 import com.bigname.pim.api.service.UserService;
+import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by sruthi on 05-11-2018.
@@ -74,9 +76,26 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserServi
 
 //        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(), true, true, true, true, getAuthorities("ROLE_USER"));
     }
+
+    @Override
+    public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, User user, String group) {
+        Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, user, group);
+        if(user.getGroup()[0].equals("CHANGE-PASSWORD")) {
+            if (ValidationUtil.isEmpty(context.get("id")) || (!user.getPassword().equals(user.getConfirmPassword()))) {
+                fieldErrors.put("confirmPassword", Pair.with("New Password does not match the Confirm Password.", user.getPassword()));
+            }
+        }
+        return _fieldErrors;
+    }
+
+
+
+
 /*
     private Collection< ?extends GrantedAuthority> getAuthorities(String role){
         return Arrays.asList(new SimpleGrantedAuthority(role));
     }*/
+
+
 }
 

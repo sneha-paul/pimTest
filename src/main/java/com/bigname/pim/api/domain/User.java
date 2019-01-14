@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,10 +26,15 @@ public class User extends Entity<User> implements UserDetails{
     @NotEmpty(message = "{user.userName.empty}", groups = {CreateGroup.class, DetailsGroup.class})
     private String userName;
 
-    @NotEmpty(message = "{user.password.empty}", groups = {CreateGroup.class})
+    @NotEmpty(message = "{user.password.empty}", groups = {CreateGroup.class, ChangePasswordGroup.class})
     private String password;
 
+    @Transient
+    private String confirmPassword;
+
     private String avatar = "avatar.png";
+
+    private String status;
 
     public User() {
         super();
@@ -56,12 +62,24 @@ public class User extends Entity<User> implements UserDetails{
         this.password = password;
     }
 
+    public String getConfirmPassword() {return confirmPassword;}
+
+    public void setConfirmPassword(String confirmPassword) {this.confirmPassword = confirmPassword;}
+
     public String getAvatar() {
         return avatar;
     }
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
@@ -78,6 +96,11 @@ public class User extends Entity<User> implements UserDetails{
                     this.setEmail(user.getEmail());
                     this.setUserName(user.getUserName());
                     this.setActive(user.getActive());
+                    this.setStatus(user.getStatus());
+                    this.setAvatar(user.getAvatar());
+                    break;
+                case "CHANGE-PASSWORD":
+                    this.setPassword(user.getPassword());
                     this.setAvatar(user.getAvatar());
                     break;
             }
@@ -91,6 +114,7 @@ public class User extends Entity<User> implements UserDetails{
         map.put("externalId", getExternalId());
         map.put("userName", getUserName());
         map.put("password", getPassword());
+        map.put("status", getStatus());
         map.put("active", getActive());
         return map;
     }
@@ -126,6 +150,8 @@ public class User extends Entity<User> implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return "Y".equals(getActive());
     }
+
+    public interface ChangePasswordGroup {}
 }

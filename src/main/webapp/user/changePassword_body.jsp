@@ -6,7 +6,7 @@
                 <h2>${user.userName} <small><code class="highlighter-rouge">${user.email}</code></small><small class="pull-right m-t--15"><code style="color:#808080">_id: ${user.id}</code></small></h2>
             </div>
             <div class="body">
-                <form method="post" action="/pim/users/${user.email}" data-method="PUT" data-success-message='["Successfully updated password"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
+                <form method="post" action="/pim/users/changePassword/${user.email}" data-method="PUT" data-success-message='["Successfully updated password"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group">
@@ -20,7 +20,7 @@
                         </div>
                     </div>
                     <br>
-                    <input type="hidden" name="group" value="CHANGEPASSWORD"/>
+                    <input type="hidden" name="group" value="CHANGE-PASSWORD"/>
                     <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
                     <a href="${breadcrumbs.backURL}"><button type="button" class="btn btn-danger">Cancel</button></a>
                     <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>

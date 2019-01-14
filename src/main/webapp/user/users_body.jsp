@@ -2,6 +2,7 @@
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
+            <div class="body">
             <div class="row p-b-25">
                 <div class="col-lg-12 col-md-12">
                     <div class="pull-right">
@@ -18,6 +19,8 @@
                     </table>
                 </div>
             </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -32,10 +35,11 @@
                 { data: 'userName', name : 'userName' , title : 'User Name'},
                 { data: 'externalId', name : 'externalId', title : 'Email Id' }
             ],
+            buttons: ['DETAILS', 'CHANGE_PASSWORD', 'TOGGLE_STATUS']
         });
         $.addModal({
             selector: '#js-create-users',
-            url: $.getURL('/pim/users/create/inside'),
+            url: $.getURL('/pim/users/create'),
             name:'create-users',
             title:'Create Users',
             buttons: [

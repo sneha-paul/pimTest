@@ -1,5 +1,17 @@
 (function(){
     $.extend({
+        changePasswordButton: function(options){
+            return {
+                name: 'CHANGE_PASSWORD',
+                style: 'primary',
+                title: 'Change Password',
+                icon: 'icon-key',
+                click: function (row) {
+                    window.location.href = $.getURLWithRequestParams(options.pageUrl+'changePassword/' + row.externalId, options.urlParams || {});
+
+                }
+            };
+        },
 
         detailsButton: function(options) {
             return {
@@ -88,6 +100,9 @@
                                 break;
                             case 'TOGGLE_STATUS':
                                 buttons[i] = $.toggleStatusButton(options);
+                                break;
+                            case 'CHANGE_PASSWORD':
+                                buttons[i] = $.changePasswordButton(options);
                                 break;
                         }
                     }

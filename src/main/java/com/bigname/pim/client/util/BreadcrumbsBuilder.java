@@ -59,7 +59,9 @@ public class BreadcrumbsBuilder {
                 this.services.put("pricingAttributeService", baseService);
             } else if(baseService instanceof FamilyService) {
                 this.services.put("familyService", baseService);
-            } 
+            } else if(baseService instanceof UserService) {
+                this.services.put("userService", baseService);
+            }
 
 
         });
@@ -224,6 +226,8 @@ public class BreadcrumbsBuilder {
                 return new String[] {"Pricing Attributes", "pricingAttributes"};
             case "com.bigname.pim.api.domain.Family":
                 return new String[] {"Families", "families"};
+            case "com.bigname.pim.api.domain.User":
+                return new String[] {"User", "users"};
         }
         return new String[] {"", "", "", ""};
     }
@@ -248,6 +252,8 @@ public class BreadcrumbsBuilder {
                 return ((PricingAttributeService)services.get("pricingAttributeService")).get(id, FindBy.EXTERNAL_ID, false).map(PricingAttribute::getPricingAttributeName).orElse("");
             case "com.bigname.pim.api.domain.Family":
                 return ((FamilyService)services.get("familyService")).get(id, FindBy.EXTERNAL_ID, false).map(Family::getFamilyName).orElse("");
+            case "com.bigname.pim.api.domain.User":
+                return ((UserService)services.get("userService")).get(id, FindBy.EXTERNAL_ID, false).map(User::getUserName).orElse("");
         }
         return "";
     }

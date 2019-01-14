@@ -27,7 +27,7 @@
                 <button class="btn btn-signin-social"><i class="fa fa-facebook-official facebook-color"></i> Sign in with Facebook</button>
             </div>--%>
             <div class="body">
-                <form class="form-auth-small" method="post" action="/pim/users" data-method="POST">
+                <form class="form-auth-small" method="post" action="/pim/user" data-method="POST">
                     <div class="form-group">
                         <label for="userName" class="control-label sr-only">Name</label>
                         <input type="text" class="form-control" id="userName" name="userName" placeholder="First Name  Last Name">
