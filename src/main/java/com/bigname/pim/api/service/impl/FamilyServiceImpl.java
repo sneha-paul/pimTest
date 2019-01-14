@@ -46,6 +46,11 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
+    public List<Family> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return familyDAO.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
+    @Override
     public Optional<Family> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
