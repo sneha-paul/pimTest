@@ -14,6 +14,7 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.bigname.common.util.ValidationUtil2.isEmpty;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -92,6 +95,35 @@ public class CategoryController extends BaseController<Category, CategoryService
         model.put("active", "CATEGORIES");
         return new ModelAndView("category/categories" + (reload ? "_body" : ""), model);
     }
+
+
+    @RequestMapping(value =  {"/list", "/data"})
+    @ResponseBody
+    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        if (isEmpty(dataTableRequest.getSearch())) {
+            return super.all(request, response, model);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, String>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort;
+            if (pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            } else {
+                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            List<Category> paginatedResult = categoryService.findAll("categoryName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.size()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.size()));
+            return result;
+        }
+
+    }
+
 
     @RequestMapping("/hierarchy")
     @ResponseBody

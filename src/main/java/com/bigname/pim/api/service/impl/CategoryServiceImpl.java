@@ -62,6 +62,12 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
+    public List<Category> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return categoryDAO.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
+
+    @Override
     public Optional<Category> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
