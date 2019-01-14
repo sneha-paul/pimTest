@@ -9,9 +9,7 @@ import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.PimUtil;
-import com.bigname.pim.util.Toggle;
+import com.bigname.pim.util.*;
 import org.javatuples.Pair;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +55,11 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     @Override
     public List<Website> findAll(Criteria criteria) {
         return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<Website> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return websiteDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 
     @Override
