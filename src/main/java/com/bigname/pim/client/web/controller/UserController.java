@@ -1,23 +1,32 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.common.datatable.model.Pagination;
+import com.bigname.common.datatable.model.Request;
+import com.bigname.common.datatable.model.Result;
+import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.UserService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+
+import static com.bigname.common.util.ValidationUtil.isEmpty;
 
 /**
  * Created by dona on 08-01-2019.
@@ -118,5 +127,32 @@ public class UserController extends BaseController<User, UserService> {
             model.put("success", true);
         }
         return model;
+    }
+
+    @RequestMapping(value =  {"/list", "/data"})
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        if(isEmpty(dataTableRequest.getSearch())) {
+            return super.all(request, response, model);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, String>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort;
+            if(pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            } else {
+                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            List<User> paginatedResult = userService.findAll("userName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.size()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.size()));
+            return result;
+        }
     }
 }
