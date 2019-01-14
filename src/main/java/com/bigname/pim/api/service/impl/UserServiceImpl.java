@@ -46,6 +46,11 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserServi
     }
 
     @Override
+    public List<User> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return userDAO.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
+    @Override
     public Optional<User> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
