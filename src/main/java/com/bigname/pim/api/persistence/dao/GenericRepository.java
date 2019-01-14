@@ -1,6 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public interface GenericRepository<T> {
     Optional<T> findById(String id, FindBy findBy);
     List<T> findAll(Map<String, Object> criteria);
     List<T> findAll(Criteria criteria);
+    List<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired);
     Optional<T> findOne(Map<String, Object> criteria);
     Optional<T> findOne(Criteria criteria);
 }

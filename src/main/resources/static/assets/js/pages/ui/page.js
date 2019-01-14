@@ -334,11 +334,27 @@
                 serverSide: true,
                 pageLength: 25,
                 conditionalPaging: true,
-                searching: false,
+                searching: true,
                 ordering: !(typeof options.reordering !== 'undefined' && options.reordering),
                 rowReorder: typeof options.reordering !== 'undefined' && options.reordering ? {snapX: 10} : false,
                 language: {
                     info: "_START_ to _END_ of _TOTAL_"
+                },
+                initComplete : function() {
+                    var input = $('.dataTables_filter input').unbind(),
+                        self = this.api(),
+                        $searchButton = $('<button type="button" class="btn btn btn-primary search-btn"><i class="icon-magnifier"></i></button>')
+
+                            .click(function() {
+                                self.search(input.val()).draw();
+                            }),
+                        $clearButton = $('<button>')
+                            .text('clear')
+                            .click(function() {
+                                input.val('');
+                                $searchButton.click();
+                            })
+                    $('.dataTables_filter').append($searchButton);
                 },
                 ajax: {
                     url: options.url + (options.type !== 'TYPE_1' && options.type !== 'TYPE_1A' ? '' : 'list'),

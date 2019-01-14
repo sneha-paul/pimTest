@@ -1,13 +1,16 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.PimUtil;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,6 +46,15 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
     public List<T> findAll(Criteria criteria) {
         Query query = new Query();
         query.addCriteria(criteria);
+        return mongoTemplate.find(query, entityClass);
+    }
+
+    public List<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
+        criteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+        query.addCriteria(criteria).with(PageRequest.of(pageable.getPage(), pageable.getSize(), pageable.getSort()));
         return mongoTemplate.find(query, entityClass);
     }
 

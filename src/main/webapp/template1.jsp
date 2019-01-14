@@ -168,6 +168,13 @@
             display: none;
         }
 
+        .search-btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            margin-top: -3px;
+            margin-left: -4px;
+        }
+
         .js-handle {
             /*text-align: center;*/
         }

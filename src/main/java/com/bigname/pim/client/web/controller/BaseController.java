@@ -4,10 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import static com.bigname.common.util.ValidationUtil.*;
-
 import com.bigname.common.util.ReflectionUtil;
-import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.EntityAssociation;
 import com.bigname.pim.api.domain.ValidatableEntity;
@@ -21,7 +18,6 @@ import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,8 +26,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.util.*;
 
 /**
@@ -75,7 +69,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
         return result;
     }
 
