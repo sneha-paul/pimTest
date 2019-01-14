@@ -9,16 +9,24 @@ import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+import com.bigname.common.datatable.model.Pagination;
+import com.bigname.common.datatable.model.Request;
+import com.bigname.common.datatable.model.Result;
+import com.bigname.common.datatable.model.SortOrder;
 import java.util.stream.Collectors;
+import static com.bigname.common.util.ValidationUtil.isEmpty;
+import com.bigname.pim.util.Pageable;
+
+
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -42,6 +50,33 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         Map<String, Object> model = new HashMap<>();
         model.put("active", "ASSET_COLLECTIONS");
         return new ModelAndView("settings/assetCollections", model);
+    }
+
+    @RequestMapping(value =  {"/list", "/data"})
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
+        Request dataTableRequest = new Request(request);
+        if(isEmpty(dataTableRequest.getSearch())) {
+            return super.all(request, response, model);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, String>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort;
+            if(pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            } else {
+                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            List<AssetCollection> paginatedResult = assetCollectionService.findAll("collectionName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.size()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.size()));
+            return result;
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST)

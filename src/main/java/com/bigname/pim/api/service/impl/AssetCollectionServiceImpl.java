@@ -41,6 +41,11 @@ public class AssetCollectionServiceImpl extends BaseServiceSupport<AssetCollecti
     }
 
     @Override
+    public List<AssetCollection> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return assetCollectionDAO.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
+    @Override
     public Optional<AssetCollection> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
