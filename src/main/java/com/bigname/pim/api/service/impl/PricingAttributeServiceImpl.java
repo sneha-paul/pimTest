@@ -42,6 +42,11 @@ public class PricingAttributeServiceImpl extends BaseServiceSupport<PricingAttri
     }
 
     @Override
+    public List<PricingAttribute> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return pricingAttributeDAO.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
+    @Override
     public Optional<PricingAttribute> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
