@@ -353,7 +353,8 @@
                             .click(function() {
                                 input.val('');
                                 $searchButton.click();
-                            })
+                            });
+                    $('.dataTables_filter .search-btn').remove();
                     $('.dataTables_filter').append($searchButton);
                 },
                 ajax: {
