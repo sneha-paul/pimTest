@@ -202,6 +202,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         VirtualFile directory = assetService.get(assetGroupId, FindBy.INTERNAL_ID).orElseThrow(() -> new EntityNotFoundException("Unable to find the uploading directory wit id:" + assetGroupId));
         String fileName = file.getOriginalFilename();
         VirtualFile vFile = new VirtualFile();
+        vFile.setFileId(vFile.getId());
         vFile.setFileName(fileName);
         vFile.setParentDirectoryId(directory.getId());
         vFile.setRootDirectoryId(directory.getRootDirectoryId());

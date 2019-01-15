@@ -56,7 +56,7 @@
                     <div class="p-t-25 file_manager">
                     <div class="p-b-15"><h6>Files</h6></div>
                     <div id="aniimated-thumbnials" class="row">
-                        <c:forEach var="folder" items="${folders}">
+                        <c:forEach var="file" items="${files}">
                             <div class="col-lg-3 col-md-4 col-sm-12">
                                 <div class="card" style="background-color: #fafafa">
                                     <div class="file">
@@ -67,10 +67,10 @@
                                                 </button>
                                             </div>
                                             <div class="image">
-                                                <img src="/assets/img/gallery/1.png" alt="img" class="img-fluid">
+                                                <img src="/uploads/${file.fileName}" alt="img" class="img-fluid">
                                             </div>
                                             <div class="file-name">
-                                                <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                                <p class="m-b-5 text-muted">${file.fileName}</p>
                                                 <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
                                             </div>
                                         </a>
