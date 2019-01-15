@@ -4,6 +4,7 @@ import com.bigname.common.util.ConversionUtil;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
@@ -50,6 +51,19 @@ public class VirtualFile extends Entity<VirtualFile> {
     public VirtualFile(boolean isDirectory) {
         super();
         this.setIsDirectory(isDirectory ? "Y" : "N");
+    }
+
+    public VirtualFile(MultipartFile file, String parentDirectoryId, String rootDirectoryId) {
+        this.setActive("Y");
+        this.setFileId(this.getId());
+        this.setFileName(file.getOriginalFilename());
+        this.setParentDirectoryId(parentDirectoryId);
+        this.setRootDirectoryId(rootDirectoryId);
+        this.setSize(file.getSize());
+        if(this.getFileName().contains(".")) {
+            this.setExtension(this.getFileName().substring(this.getFileName().lastIndexOf(".") + 1));
+            this.setType("IMAGE"); //TODO
+        }
     }
 
     public static final VirtualFile getRootInstance() {

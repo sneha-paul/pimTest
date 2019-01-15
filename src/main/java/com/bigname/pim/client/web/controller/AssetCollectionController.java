@@ -200,20 +200,10 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         modelMap.addAttribute("file", file);
         String assetGroupId = parameterMap.containsKey("assetGroupId") ? (String) parameterMap.get("assetGroupId") : "";
         VirtualFile directory = assetService.get(assetGroupId, FindBy.INTERNAL_ID).orElseThrow(() -> new EntityNotFoundException("Unable to find the uploading directory wit id:" + assetGroupId));
-        String fileName = file.getOriginalFilename();
-        VirtualFile vFile = new VirtualFile();
-        vFile.setFileId(vFile.getId());
-        vFile.setFileName(fileName);
-        vFile.setParentDirectoryId(directory.getId());
-        vFile.setRootDirectoryId(directory.getRootDirectoryId());
-        vFile.setSize(file.getSize());
-        if(fileName.contains(".")) {
-            vFile.setExtension(fileName.substring(fileName.lastIndexOf(".") + 1));
-            vFile.setType("IMAGE");
-        }
-        Files.write(Paths.get("/tmp/" + vFile.getFileId() + "." + vFile.getExtension()), file.getBytes());
-        vFile.setActive("Y");
-        assetService.create(vFile);
+        VirtualFile asset = new VirtualFile(file, directory.getId(), directory.getRootDirectoryId());
+        //TODO validation
+        Files.write(Paths.get("/tmp/" + asset.getInternalFileName()), file.getBytes());
+        assetService.create(asset);
         model.put("success", true);
         return model;
     }
