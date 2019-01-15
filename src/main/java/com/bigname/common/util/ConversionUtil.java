@@ -3,6 +3,7 @@ package com.bigname.common.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,5 +65,32 @@ abstract public class ConversionUtil {
 
     public static String toId(String value) {
         return value.replaceAll(ID_REG_EX_PATTERN, "_").toUpperCase();
+    }
+
+    public static String getFileSize(long sizeInBytes) {
+        String size = "0";
+        String unit = "KB";
+        if(sizeInBytes > 0) {
+            BigDecimal bytes = new BigDecimal(sizeInBytes);
+            BigDecimal kb = bytes.divide(new BigDecimal(1024), BigDecimal.ROUND_UP);
+            unit = "KB";
+            if(kb.intValue() < 4096) {
+                size = kb.toString();
+            } else {
+                BigDecimal mb = kb.divide(new BigDecimal(1024), BigDecimal.ROUND_HALF_EVEN);
+                unit = "MB";
+                if(mb.intValue() < 1024) {
+                    size = mb.toString();
+                } else {
+                    BigDecimal gb = mb.divide(new BigDecimal(1024), BigDecimal.ROUND_HALF_EVEN);
+                    unit = "GB";
+                    size = gb.toString();
+                }
+            }
+            if(size.length() == 4) {
+                size = size.substring(0, 1) + "," + size.substring(1);
+            }
+        }
+        return size + " " + unit;
     }
 }

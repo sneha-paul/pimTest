@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.ConversionUtil;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -39,6 +40,8 @@ public class VirtualFile extends Entity<VirtualFile> {
 
     private String rootDirectoryId;
 
+    private long size;
+
 
     public VirtualFile() {
         super();
@@ -63,8 +66,12 @@ public class VirtualFile extends Entity<VirtualFile> {
     }
 
     public void setFileId(String fileId) {
-        this.fileId = fileId;
         setExternalId(fileId);
+        this.fileId = getExternalId();
+    }
+
+    public String getInternalFileName() {
+        return getExternalId() + (isNotEmpty(getExtension()) ? "." + getExtension() : "");
     }
 
     public String getFileName() {
@@ -99,7 +106,7 @@ public class VirtualFile extends Entity<VirtualFile> {
     }
 
     public void setExtension(String extension) {
-        this.extension = extension;
+        this.extension = isNotNull(extension) ? extension.trim() : null;
     }
 
     public String getParentDirectoryId() {
@@ -130,6 +137,18 @@ public class VirtualFile extends Entity<VirtualFile> {
     public List<String> addParentId(String parentId) {
         getParentIds().add(parentId);
         return getParentIds();
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public String getFormattedSize() {
+        return ConversionUtil.getFileSize(getSize());
+    }
+
+    public void setSize(long size) {
+        this.size = size;
     }
 
     @Override

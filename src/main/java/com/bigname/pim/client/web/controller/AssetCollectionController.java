@@ -206,11 +206,12 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         vFile.setFileName(fileName);
         vFile.setParentDirectoryId(directory.getId());
         vFile.setRootDirectoryId(directory.getRootDirectoryId());
+        vFile.setSize(file.getSize());
         if(fileName.contains(".")) {
             vFile.setExtension(fileName.substring(fileName.lastIndexOf(".") + 1));
             vFile.setType("IMAGE");
         }
-        Files.write(Paths.get("/tmp/" + fileName), file.getBytes());
+        Files.write(Paths.get("/tmp/" + vFile.getFileId() + "." + vFile.getExtension()), file.getBytes());
         vFile.setActive("Y");
         assetService.create(vFile);
         model.put("success", true);

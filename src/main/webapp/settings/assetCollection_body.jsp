@@ -67,11 +67,11 @@
                                                 </button>
                                             </div>
                                             <div class="image">
-                                                <img src="/uploads/${file.fileName}" alt="img" class="img-fluid">
+                                                <img src="/uploads/${file.internalFileName}" alt="${file.fileName}" title="${file.fileName}"  class="img-fluid">
                                             </div>
                                             <div class="file-name">
                                                 <p class="m-b-5 text-muted">${file.fileName}</p>
-                                                <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                                <small>Size: ${file.formattedSize} <span class="date text-muted">Dec 11, 2017</span></small>
                                             </div>
                                         </a>
                                     </div>
