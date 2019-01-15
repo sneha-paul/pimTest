@@ -92,6 +92,17 @@
             </div>
         </div>
     </div>
+
+    <div class="body">
+        <form action="/file-upload" class="dz-clickable" id="my-dropzone">
+            <div class="dz-message d-flex flex-column">
+                <i class="material-icons text-muted">cloud_upload</i>
+                Drag &amp; Drop here or click
+            </div>
+        </form>
+
+    </div>
+
 </div>
 <script>
     $.initPage({
@@ -100,6 +111,7 @@
         'assetGroupId': '${asset.id}'
     });
     $(document).ready(function () {
+        $('#my-dropzone').dropzone();
         var urlParams = {};
         $.initTreeDataTable1({
             selector: '#assetsHierarchy',

@@ -1,8 +1,12 @@
+<%--@elvariable id="asset" type="com.bigname.pim.api.domain.VirtualFile"--%>
 <%--@elvariable id="assetCollection" type="com.bigname.pim.api.domain.AssetCollection"--%>
+<%--@elvariable id="folders" type="java.util.List<com.bigname.pim.api.domain.VirtualFile>"--%>
+<%--@elvariable id="files" type="java.util.List<com.bigname.pim.api.domain.VirtualFile>"--%>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
-        <div class="card">
+        <div class="card" style="min-height: calc(100vh - 192px);">
             <div class="header">
                 <h2>${assetCollection.collectionName}
                     <small><code class="highlighter-rouge">${assetCollection.collectionId}</code></small>
@@ -11,92 +15,272 @@
                 </h2>
             </div>
             <div class="body">
-                <ul class="nav nav-tabs-new2">
-                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#assets">Assets</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane show active" id="DETAILS">
-                        <div class="row clearfix m-t-20">
-                            <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <form method="post"
-                                              action="/pim/assetCollections/${assetCollection.collectionId}"
-                                              data-method="PUT"
-                                              data-success-message='["Successfully updated the asset collection", "Collection Updated"]'
-                                              data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
-                                            <div class="row">
-                                                <div class="col-md-6 col-sm-12">
-                                                    <div class="form-group">
-                                                        <label for="collectionName">Collection Name</label><code
-                                                            class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="collectionName" name="collectionName"
-                                                               value="${assetCollection.collectionName}"
-                                                               class="form-control"/>
-                                                    </div>
-                                                    <div class="form-group js-external-id">
-                                                        <label for="collectionId">Collection ID</label><code
-                                                            class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="collectionId" name="collectionId"
-                                                               class="form-control"
-                                                               value="${assetCollection.collectionId}"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label>Status</label>
-                                                        <br/>
-                                                        <label for="active" class="fancy-checkbox">
-                                                            <input type="checkbox" id="active" name="active" value="Y"
-                                                                   <c:if test="${assetCollection.active eq 'Y'}">checked="checked"</c:if>>
-                                                            <span>Active</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <input type="hidden" name="group" value="DETAILS"/>
-                                            <button type="submit" class="btn btn-primary"
-                                                    onclick="$.submitAction(event, this)">Save
-                                            </button>
-                                            <a href="/pim/assetCollections">
-                                                <button type="button" class="btn btn-danger">Cancel</button>
-                                            </a>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div style="border-bottom: 1px solid #DADADA">
+                    <div>
+                        <ul class="breadcrumb" style="background-color: #ffffff; font-size: 16px; margin-bottom: 0">
+                            <li class="breadcrumb-item"><a href="/pim/assetCollections/${assetCollection.collectionId}">${assetCollection.collectionId}</a></li>
+                            <c:forEach var="entry" items="${parentChain}">
+                                <li class="breadcrumb-item"><a href="${entry.key}"><i class="text-primary p-r-10 fa fa-folder"></i>${entry.value}</a></li>
+                            </c:forEach>
+                        </ul>
                     </div>
-                    <div class="tab-pane" id="assets">
-                        <div class="row clearfix">
-                            <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div class="row p-b-25">
-                                            <div class="col-lg-12 col-md-12">
-                                                <div class="pull-right">
-                                                    <button type="button" class="btn btn-success js-add-asset-group">
-                                                        <i class="fa fa-folder"></i><span style="font-size: 8px;position: relative;top:-8px"><i class="fa fa-plus"></i></span><span class="p-l-5">Add Asset Group</span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-primary js-add-asset">
-                                                        <i class="fa fa-upload"></i><span class="p-l-5">Upload Asset</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="table-responsive no-filter">
-                                            <table id="assetsHierarchy" class="table table-hover dataTable treeDataTable table-custom m-b-0" style="width: 100% !important">
-                                                <thead class="thead-dark">
-                                                </thead>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="float: right; position: relative; top: -50px;">
+                        <button type="button" class="btn btn-icon btn-success btn-round js-create-folder" title="Create New Folder">
+                            <i class="fa fa-folder"></i><span style="font-size: 8px;position: relative;top:-8px"><i class="fa fa-plus"></i></span><span class="p-l-5"></span>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-primary btn-round js-upload-files" title="Upload Files">
+                            <i class="fa fa-cloud-upload"></i>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-secondary btn-round" title="List View">
+                            <i class="fa fa-th-list"></i>
+                        </button>
                     </div>
                 </div>
+
+                <c:if test="${not empty folders}">
+                    <div class="p-t-25">
+                        <div class="p-b-15"><h6>Folders</h6></div>
+                        <div class="row">
+                            <div class="col">
+                                <c:forEach var="folder" items="${folders}">
+                                    <div id="${folder.id}" class="btn-label secondary js-folder">
+                                        <i class="text-primary fa fa-folder p-r-10"></i>${folder.fileName}
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+
+                <c:if test="${not empty files}">
+                    <div class="p-t-25 file_manager">
+                    <div class="p-b-15"><h6>Files</h6></div>
+                    <div id="aniimated-thumbnials" class="row">
+                        <c:forEach var="folder" items="${folders}">
+                            <div class="col-lg-3 col-md-4 col-sm-12">
+                                <div class="card" style="background-color: #fafafa">
+                                    <div class="file">
+                                        <a href="javascript:void(0);">
+                                            <div class="hover">
+                                                <button type="button" class="btn btn-icon btn-success">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                            </div>
+                                            <div class="image">
+                                                <img src="/assets/img/gallery/1.png" alt="img" class="img-fluid">
+                                            </div>
+                                            <div class="file-name">
+                                                <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                                <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                        <%--<div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card" style="background-color: #fafafa">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-success">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/1.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/2.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/3.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/4.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/5.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/6.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/7.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/8.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/4.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-4 col-sm-12">
+                            <div class="card">
+                                <div class="file">
+                                    <a href="javascript:void(0);">
+                                        <div class="hover">
+                                            <button type="button" class="btn btn-icon btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="image">
+                                            <img src="/assets/img/gallery/1.png" alt="img" class="img-fluid">
+                                        </div>
+                                        <div class="file-name">
+                                            <p class="m-b-5 text-muted">img21545ds.jpg</p>
+                                            <small>Size: 2MB <span class="date text-muted">Dec 11, 2017</span></small>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>--%>
+                    </div>
+                </div>
+                </c:if>
             </div>
         </div>
     </div>
@@ -104,10 +288,10 @@
 <script>
     $.initPage({
         'collectionId': '${assetCollection.collectionId}',
-        'assetGroupId': '${assetCollection.rootId}'
+        'assetGroupId': '${empty asset ? assetCollection.rootId : asset.id}'
     });
     $(document).ready(function () {
-        var urlParams = {};
+        /*var urlParams = {};
         $.initTreeDataTable1({
             selector: '#assetsHierarchy',
             names: ['assetsHierarchy', 'asset'],
@@ -116,7 +300,7 @@
             collapsed: false,
             collapsible: true,
             urlParams: urlParams
-        });
+        });*/
 
 
     });

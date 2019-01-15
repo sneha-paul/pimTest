@@ -97,6 +97,14 @@ public class VirtualFileRepositoryImpl extends GenericRepositoryImpl<VirtualFile
         return flattenNodes.isEmpty() ? new ArrayList<>() : flattenNodes.subList(1, flattenNodes.size());
     }
 
+    @Override
+    public List<VirtualFile> getFiles(String directoryId) {
+        Query query = new Query();
+        query.addCriteria(new Criteria().orOperator(Criteria.where("parentDirectoryId").is(directoryId)));
+        query.with(new Sort(Sort.Direction.ASC, "fileName"));
+        return mongoTemplate.find(query, VirtualFile.class);
+    }
+
     private Node extract(String nodeDirectoryId, List<Node> hierarchy) {
         Node extractedNode = null;
         for(Node node : hierarchy) {

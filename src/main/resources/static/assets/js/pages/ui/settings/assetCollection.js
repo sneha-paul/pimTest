@@ -1,10 +1,10 @@
 $(function(){
     $.addModal({
-        selector: '.js-add-asset',
+        selector: '.js-upload-files',
         url: $.getURL('/pim/assetCollections/{collectionId}/assets'),
         data: {assetGroupId: $.getPageAttribute('assetGroupId'), assetGroup: false},
-        name:'asset',
-        title:'Create Asset',
+        name:'uploadFiles',
+        title:'Upload Files',
         buttons: [
             {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable1('assetsHierarchy');$.closeModal();});}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
@@ -12,14 +12,21 @@ $(function(){
     });
 
     $.addModal({
-        selector: '.js-add-asset-group',
+        selector: '.js-create-folder',
         url: $.getURL('/pim/assetCollections/{collectionId}/assets'),
         data: {assetGroupId: $.getPageAttribute('assetGroupId'), assetGroup: true},
-        name:'assetGroup',
-        title:'Create Asset Group',
+        name:'createFolder',
+        title:'Create Folder',
         buttons: [
-            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable1('assetsHierarchy');$.closeModal();});}},
+            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.refreshPage();$.closeModal();});}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
+    });
+    $('.js-folder').off().on('dblclick', function(){
+        window.location.href = $.getURL('/pim/assetCollections/{collectionId}/assets/{assetId}', {assetId: $(this).attr('id')});
+    });
+    $('#aniimated-thumbnials').lightGallery({
+        thumbnail: true,
+        selector: 'a.js-asset'
     });
 });

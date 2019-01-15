@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.css">
     <link rel="stylesheet" href="/assets/vendor/parsleyjs/css/parsley.css">
     <link rel="stylesheet" href="/assets/vendor/table-dragger/table-dragger.min.css">
+    <link rel="stylesheet" href="/assets/vendor/dropzone/css/dropzone.css">
 
     <%-- MAIN CSS --%>
     <link rel="stylesheet" href="/assets/css/main.css">
@@ -214,6 +215,12 @@
             font-size: 12px;
             display: inline-block;
         }
+
+        .btn-round {
+            border-radius: 40px;
+            width: 40px;
+            height: 40px;
+        }
         .digital-asset-container {
             max-height:520px;
         }
@@ -334,6 +341,98 @@
         .no-filter .dataTables_filter {
             visibility: hidden;
         }
+
+        .dropzone {
+            border: 2px dashed #dedede;
+            border-radius: 5px;
+            background: #f5f5f5;
+        }
+
+        .dropzone i{
+            /*font-size: 5rem;*/
+        }
+
+        .dropzone .dz-message {
+            color: rgba(0,0,0,.54);
+            font-weight: 500;
+            font-size: initial;
+            text-transform: uppercase;
+        }
+
+        .btn-label {
+            display: inline-block;
+            font-weight: 400;
+            text-align: left;
+            white-space: nowrap;
+            vertical-align: middle;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            width:14%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 25px;
+            margin-bottom: 25px;
+            cursor: pointer;
+        }
+
+        .btn-label.secondary {
+            color: #6c757d;
+            background-color: #fafafa;
+            background-image: none;
+            border-color: #dadada;
+        }
+
+        .file_manager .file {
+            position: relative;
+            border-radius: .55rem;
+            overflow: hidden;
+        }
+
+        .file_manager .file .hover {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            display: none;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .file_manager .file a:hover .hover {
+            display: block;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .file_manager .file .image, .file_manager .file .icon {
+            width:100%;
+            overflow: hidden;
+            background-size: cover;
+            background-position: top;
+            text-align: center;
+        }
+
+        .file_manager .file .image {
+            background: url(/assets/img/transparent_bg.png);
+            background-repeat: repeat;
+            background-size: 100px 100px;
+            height:200px;
+        }
+
+        .file_manager .file .image img {
+            max-width:100%;
+            max-height: 220px;
+        }
+
+        .file_manager .file .file-name {
+            padding: 10px;
+            border-top: 1px solid #f7f7f7;
+        }
+
+        .file_manager .file .file-name small .date {
+            float: right;
+        }
     </style>
 
 </head>
@@ -410,6 +509,7 @@
 <script src="/assets/js/pages/tables/jquery-datatable-conditional-paging.js"></script>
 <script src="/assets/js/pages/tables/jquery-datatable.js"></script>
 <script src="/assets/vendor/nestable/jquery.nestable.js"></script>
+<script src="/assets/vendor/dropzone/js/dropzone.js"></script>
 
 
 <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>

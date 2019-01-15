@@ -170,7 +170,19 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
 
     @Override
     public List<T> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired) {
-        return getAll(ids, findBy, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
+        List<T> temp =  getAll(ids, findBy, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
+        if(sort != null) {
+            return temp;
+        } else {
+            Map<String, T> map = temp.stream().collect(Collectors.toMap(t -> findBy == INTERNAL_ID ? t.getId() : t.getExternalId(), t -> t));
+            Map<String, T> resultMap = new LinkedHashMap<>();
+            for(String id : ids) {
+                if(map.containsKey(id)) {
+                    resultMap.put(id, map.get(id));
+                }
+            }
+            return resultMap.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
+        }
     }
 
     @Override

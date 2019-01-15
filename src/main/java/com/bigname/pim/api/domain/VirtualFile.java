@@ -5,7 +5,9 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +34,8 @@ public class VirtualFile extends Entity<VirtualFile> {
     private String extension;
 
     private String parentDirectoryId;
+
+    private List<String> parentIds = new ArrayList<>();
 
     private String rootDirectoryId;
 
@@ -64,11 +68,11 @@ public class VirtualFile extends Entity<VirtualFile> {
     }
 
     public String getFileName() {
-        return fileName;
+        return isNotNull(fileName) ? fileName.trim() : null;
     }
 
     public void setFileName(String fileName) {
-        this.fileName = fileName;
+        this.fileName = isNotNull(fileName) ? fileName.trim() : null;
     }
 
     public String getIsDirectory() {
@@ -112,6 +116,20 @@ public class VirtualFile extends Entity<VirtualFile> {
 
     public void setRootDirectoryId(String rootDirectoryId) {
         this.rootDirectoryId = rootDirectoryId;
+    }
+
+    public List<String> getParentIds() {
+        return parentIds;
+    }
+
+    public List<String> setParentIds(List<String> parentIds) {
+        this.parentIds = parentIds;
+        return this.parentIds;
+    }
+
+    public List<String> addParentId(String parentId) {
+        getParentIds().add(parentId);
+        return getParentIds();
     }
 
     @Override

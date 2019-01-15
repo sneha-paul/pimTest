@@ -60,6 +60,11 @@ public class VirtualFileServiceImpl extends BaseServiceSupport<VirtualFile, Virt
     }
 
     @Override
+    public List<VirtualFile> getFiles(String directoryId) {
+        return virtualFileDAO.getFiles(directoryId);
+    }
+
+    @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, VirtualFile virtualFile, String group) {
         Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, virtualFile, group);
         VirtualFile existing = ValidationUtil.isNotEmpty(context.get("id")) ? get((String)context.get("id"), FindBy.EXTERNAL_ID, false).orElse(null) : null;

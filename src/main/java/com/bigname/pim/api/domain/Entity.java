@@ -86,7 +86,7 @@ abstract public class Entity<T> extends ValidatableEntity implements Serializabl
     @Override
     public int hashCode() {
         int result = getId().hashCode();
-        result = 31 * result + getExternalId().hashCode();
+        result = 31 * result + (getExternalId() != null ? getExternalId().hashCode() : 1288);
         return result;
     }
 
