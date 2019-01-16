@@ -76,6 +76,18 @@ public class AssetCollection extends Entity<AssetCollection> {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
         map.put("collectionName", getCollectionName());
+        map.put("rootId", getRootId());
+        map.put("active", getActive());
+        return map;
+    }
+
+    public Map<String, String> toMap1() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("externalId", getExternalId());
+        map.put("name", getCollectionName());
+        map.put("parentId", "");
+        map.put("id", getRootId());
+        map.put("isDirectory", "Y");
         map.put("active", getActive());
         return map;
     }

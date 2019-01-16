@@ -379,6 +379,14 @@
             cursor: pointer;
         }
 
+        .popup-content .btn-label {
+            width:25%;
+            font-size: .8rem;
+        }
+
+        .js-template, .js-hidden {
+            display: none;
+        }
         .btn-label.secondary {
             color: #6c757d;
             background-color: #fafafa;

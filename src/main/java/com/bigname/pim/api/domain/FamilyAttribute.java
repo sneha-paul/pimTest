@@ -420,12 +420,12 @@ public class FamilyAttribute extends ValidatableEntity {
 
         FamilyAttribute that = (FamilyAttribute) o;
 
-        return id.equals(that.id);
+        return id != null && id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return isNotEmpty(id) ? id.hashCode() : 1255;
     }
 
     public enum Type {COMMON, AXIS, VARIANT, NOT_APPLICABLE}

@@ -882,6 +882,18 @@
         'hash': '${param.hash}',
         'catalogId' : '${param.catalogId}'
     });
+
+    $.addModal({
+        selector: '#js-add-asset',
+        url: $.getURL('/pim/assetCollections/browser'),
+//        data: {directoryId : '0d95fa63-b3f3-4cf6-9744-eb5cc9184eb4'},
+        name:'add-assets',
+        title:'Select Asset',
+        buttons: [
+//            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('attributeCollections');$.closeModal();});}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
 </script>
 
 

@@ -169,6 +169,51 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
 
     }
 
+
+    @RequestMapping("/browser")
+    public ModelAndView assetBrowser(@RequestParam(value="directoryId", defaultValue = "") String directoryId) {
+        Map<String, Object> model = new HashMap<>();
+        model.putAll(getAssetsData(directoryId));
+//        List<VirtualFile> assets = assetService.getFiles("0d95fa63-b3f3-4cf6-9744-eb5cc9184eb4");
+//        List<VirtualFile> assets = assetService.getFiles("1ac04962-477a-4cf8-939b-10e4c634b010");
+//        model.put("folders", assets.stream().filter(a -> "Y".equals(a.getIsDirectory())).collect(Collectors.toList()));
+//        model.put("files", assets.stream().filter(a -> !"Y".equals(a.getIsDirectory())).collect(Collectors.toList()));
+        return new ModelAndView("settings/assetBrowser", model);
+    }
+
+    @ResponseBody
+    @RequestMapping("/browser/data")
+    public Map<String, Object> getAssetsData(@RequestParam(value="directoryId", defaultValue = "") String directoryId) {
+        boolean success = false;
+        Map<String, Object> model = new HashMap<>();
+        VirtualFile directory = isEmpty(directoryId) ? null : assetService.get(directoryId, FindBy.INTERNAL_ID).orElse(null);
+        if(directory == null) {
+            model.put("folders", assetCollectionService.getAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "collectionName"))).stream().map(AssetCollection::toMap1).collect(Collectors.toList()));
+            model.put("files", new ArrayList<>());
+            model.put("parentChain", new ArrayList<>());
+        } else {
+            List<VirtualFile> assets = assetService.getFiles(directoryId);
+            model.put("folders", assets.stream().filter(a -> "Y".equals(a.getIsDirectory())).map(VirtualFile::toMap).collect(Collectors.toList()));
+            model.put("files", assets.stream().filter(a -> !"Y".equals(a.getIsDirectory())).map(VirtualFile::toMap).collect(Collectors.toList()));
+
+            List<Object> list = new ArrayList<>();
+
+
+            if(!directory.getParentIds().isEmpty()) {
+                list.add(assetCollectionService.findOne(CollectionsUtil.toMap("rootId", directory.getParentIds().remove(0))).map(AssetCollection::toMap1)); // Root Directory, so add the associated asset collection
+                List<String> parentChain = directory.getParentIds();
+                parentChain.add(directory.getId());
+                list.addAll(assetService.getAll(parentChain.toArray(new String[0]), FindBy.INTERNAL_ID, null, false).stream().map(VirtualFile::toMap).collect(Collectors.toList()));
+            } else {
+                list.add(assetCollectionService.findOne(CollectionsUtil.toMap("rootId", directory.getId())).map(AssetCollection::toMap1));
+            }
+            model.put("parentChain", list);
+        }
+        success = true;
+        model.put("success", success);
+        return model;
+    }
+
     @RequestMapping(value = "/{id}/assets", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> createAsset(@PathVariable(value = "id") String id, VirtualFile asset) {

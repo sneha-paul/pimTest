@@ -190,8 +190,11 @@ public class VirtualFile extends Entity<VirtualFile> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
+        map.put("id", getId());
         map.put("externalId", getExternalId());
         map.put("name", getFileName());
+        map.put("internalFileName", getInternalFileName());
+        map.put("parentId", getParentDirectoryId());
         map.put("isDirectory", getIsDirectory());
         map.put("type", getType());
         map.put("extension", getExtension());
