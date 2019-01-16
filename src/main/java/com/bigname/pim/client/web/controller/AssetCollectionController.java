@@ -11,6 +11,8 @@ import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -240,17 +242,24 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
 
     @ResponseBody
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam Map<String, Object> parameterMap,  ModelMap modelMap) throws IOException {
+    public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam Map<String, Object> parameterMap, ModelMap modelMap) throws IOException {
         Map<String, Object> model = new HashMap<>();
-        modelMap.addAttribute("file", file);
-        String assetGroupId = parameterMap.containsKey("assetGroupId") ? (String) parameterMap.get("assetGroupId") : "";
-        VirtualFile directory = assetService.get(assetGroupId, FindBy.INTERNAL_ID).orElseThrow(() -> new EntityNotFoundException("Unable to find the uploading directory wit id:" + assetGroupId));
-        VirtualFile asset = new VirtualFile(file, directory.getId(), directory.getRootDirectoryId());
-        //TODO validation
-        Files.write(Paths.get("/tmp/" + asset.getInternalFileName()), file.getBytes());
-        assetService.create(asset);
-        model.put("success", true);
-        return model;
+        boolean success = false;
+        try {
+            modelMap.addAttribute("file", file);
+            String assetGroupId = parameterMap.containsKey("assetGroupId") ? (String) parameterMap.get("assetGroupId") : "";
+            VirtualFile directory = assetService.get(assetGroupId, FindBy.INTERNAL_ID).orElseThrow(() -> new EntityNotFoundException("Unable to find the uploading directory wit id:" + assetGroupId));
+            VirtualFile asset = new VirtualFile(file, directory.getId(), directory.getRootDirectoryId());
+            //TODO validation
+            Files.write(Paths.get("/tmp/" + asset.getInternalFileName()), file.getBytes());
+            assetService.create(asset);
+            success = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.put("error", "Another file with the same name already exists");
+        }
+        model.put("success", success);
+        return new ResponseEntity<>(model, success ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @RequestMapping("/{id}/{assetGroupId}/hierarchy")
