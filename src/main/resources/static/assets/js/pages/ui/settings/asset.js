@@ -5,10 +5,9 @@ $(document).ready(function () {
         },
         init: function(){
             this.on('addedfile', function(file) {
-                // console.log('added');
+
             });
             this.on('success', function(file, resp) {
-               // console.log(resp);
                $.refreshPage();
                var _this = this;
                 setTimeout(function () {

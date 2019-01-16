@@ -94,9 +94,9 @@ $( document ).ready(function() {
         selector: 'a.js-asset'
     });
 
-   /* $('.digital-asset-container').flip({
+    $('.digital-asset-container').flip({
         trigger: 'manual'
-    });*/
+    });
 
     $('.datepicker').datepicker();
     // $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');

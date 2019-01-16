@@ -274,12 +274,27 @@
                                     </div>
                                     <div class="body">
                                         <div id="aniimated-thumbnials" class="list-unstyled row clearfix">
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
+                                            <c:forEach var="asset" items="${product.channelAssets['ASSETS']}" varStatus="s">
+                                                <c:set var="isDefault" value="${asset.defaultFlag eq 'Y'}" />
+                                            <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12 m-b-30">
                                                 <div class="digital-asset-container front card overflowhidden">
                                                     <div class="header">
-                                                        <h2>10-RW-front<small style="position:absolute;top:15px;left:3px"><code class="highlighter-rouge">DEFAULT</code></small></h2>
+                                                        <h2 class="truncate" style="padding-right: 60px;">
+                                                            <c:choose>
+                                                                <c:when test="${asset.type eq 'IMAGE'}">
+                                                                    <span class="asset-type" title="image" style=""><i class="fa fa-file-image-o"></i></span>
+                                                                </c:when>
+                                                                <c:when test="${asset.type eq 'VIDEO'}">
+                                                                    <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="asset-type" title="template" style=""><i class="fa fa-file-pdf-o"></i></span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                            ${asset.name}<small class="${isDefault ? '' : 'js-hidden'}" style="position:absolute;top:15px;left:3px"><code class="highlighter-rouge">DEFAULT</code></small>
+                                                        </h2>
                                                         <ul class="header-dropdown">
-                                                            <li><span class="tab_btn active bg-success">1</span></li>
+                                                            <li><span class="tab_btn active ${isDefault ? 'bg-success' : ''}">${s.count}</span></li>
                                                             <li class="dropdown">
                                                                 <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
                                                                 <ul class="dropdown-menu dropdown-menu-right">
@@ -292,174 +307,21 @@
                                                     </div>
                                                     <div class="body">
                                                         <div class="digital-asset">
-                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
-                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
-                                                            </a>
+                                                            <div class="image">
+                                                                <a class="js-asset" href="/uploads/${asset.internalName}">
+                                                                    <img class="img-fluid" src="/uploads/${asset.internalName}" alt="">
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="footer">
                                                         <ul class="stats">
-                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
+                                                            <li class="${not empty asset.description ? '' : 'js-hidden'}"><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="${asset.description}" data-original-title="Description" class="text-danger icon-bubbles">Description</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
-                                                <div class="digital-asset-container card overflowhidden">
-                                                    <div class="header">
-                                                        <h2>10-RW-front</h2>
-                                                        <ul class="header-dropdown">
-                                                            <li><span class="tab_btn active">2</span></li>
-                                                            <li class="dropdown">
-                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                                    <li><a href="javascript:void(0);">Edit</a></li>
-                                                                    <li><a href="javascript:void(0);">Delete</a></li>
-                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
-                                                                </ul>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="body">
-                                                        <div class="digital-asset">
-                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
-                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="footer">
-                                                        <ul class="stats">
-                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
-                                                <div class="digital-asset-container card overflowhidden">
-                                                    <div class="header">
-                                                        <h2>10-RW-front</h2>
-                                                        <ul class="header-dropdown">
-                                                            <li><span class="tab_btn active">3</span></li>
-                                                            <li class="dropdown">
-                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                                    <li><a href="javascript:void(0);">Edit</a></li>
-                                                                    <li><a href="javascript:void(0);">Delete</a></li>
-                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
-                                                                </ul>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="body">
-                                                        <div class="digital-asset">
-                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
-                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="footer">
-                                                        <ul class="stats">
-                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
-                                                <div class="digital-asset-container card overflowhidden">
-                                                    <div class="header">
-                                                        <h2>10-RW-front</h2>
-                                                        <ul class="header-dropdown">
-                                                            <li><span class="tab_btn active">4</span></li>
-                                                            <li class="dropdown">
-                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                                    <li><a href="javascript:void(0);">Edit</a></li>
-                                                                    <li><a href="javascript:void(0);">Delete</a></li>
-                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
-                                                                </ul>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="body">
-                                                        <div class="digital-asset">
-                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
-                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="footer">
-                                                        <ul class="stats">
-                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
-                                                <div class="digital-asset-container card overflowhidden">
-                                                    <div class="header">
-                                                        <h2>10-RW-front</h2>
-                                                        <ul class="header-dropdown">
-                                                            <li><span class="tab_btn active">5</span></li>
-                                                            <li class="dropdown">
-                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                                    <li><a href="javascript:void(0);">Edit</a></li>
-                                                                    <li><a href="javascript:void(0);">Delete</a></li>
-                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
-                                                                </ul>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="body">
-                                                        <div class="digital-asset">
-                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
-                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="footer">
-                                                        <ul class="stats">
-                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12 m-b-30">
-                                                <div class="digital-asset-container card overflowhidden">
-                                                    <div class="header">
-                                                        <h2>10-RW-front</h2>
-                                                        <ul class="header-dropdown">
-                                                            <li><span class="tab_btn active">6</span></li>
-                                                            <li class="dropdown">
-                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                                    <li><a href="javascript:void(0);">Edit</a></li>
-                                                                    <li><a href="javascript:void(0);">Delete</a></li>
-                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
-                                                                </ul>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="body">
-                                                        <div class="digital-asset">
-                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                            <a class="js-asset" href="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1">
-                                                                <img class="img-fluid img-thumbnail" src="https://actionenvelope.scene7.com/is/image/ActionEnvelope/4260-15?hei=413&wid=510&fmt=jpeg&qlt=75&bgc=f1f1f1" alt="">
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="footer">
-                                                        <ul class="stats">
-                                                            <li><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Asset Description" class="text-danger icon-bubbles">Description</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            </c:forEach>
                                         </div>
                                     </div>
                                 </div>
@@ -890,7 +752,7 @@
         name:'add-assets',
         title:'Select Asset',
         buttons: [
-//            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('attributeCollections');$.closeModal();});}},
+            {text: 'ADD', style: 'primary', close: false, click: function(){$.ajaxSubmit({url: '/pim/products/{productId}/channels/{channelId}/assets', data: {assetFamily: 'ASSETS', assetIds: $.getSelectedItems()}});$.refreshPage();$.closeModal();}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });

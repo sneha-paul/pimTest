@@ -379,13 +379,19 @@
             cursor: pointer;
         }
 
+        .truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .popup-content .btn-label {
             width:25%;
             font-size: .8rem;
         }
 
         .js-template, .js-hidden {
-            display: none;
+            display: none !important;
         }
         .btn-label.secondary {
             color: #6c757d;
@@ -421,16 +427,25 @@
             text-align: center;
         }
 
-        .file_manager .file .image {
+        .file_manager .file .image, .digital-asset .image {
             background: url(/assets/img/transparent_bg.png);
             background-repeat: repeat;
             background-size: 100px 100px;
             height:200px;
+            overflow: hidden;
         }
 
-        .file_manager .file .image img {
+        .digital-asset .image {
+            height: 350px;
+        }
+
+        .file_manager .file .image img, .digital-asset .image img {
             max-width:100%;
             max-height: 220px;
+        }
+
+        .digital-asset .image img {
+            max-height: 330px;
         }
 
         .file_manager .file .file-name {
@@ -441,6 +456,20 @@
         .file_manager .file .file-name small .date {
             float: right;
         }
+
+        .file_manager .selected .file .image {
+            border-top: 4px solid #007bff;
+            border-left: 4px solid #007bff;
+            border-right: 4px solid #007bff;
+        }
+
+        .file_manager .selected .file .file-name {
+            border-top: none;
+            border-left: 4px solid #007bff;
+            border-right: 4px solid #007bff;
+            border-bottom: 4px solid #007bff;
+        }
+
     </style>
 
 </head>

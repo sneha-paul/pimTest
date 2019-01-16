@@ -10,9 +10,13 @@ $(function(){
 
     const crumbElTemplate = $('<li class="breadcrumb-item"><span class="js-crumb"><i class="text-primary p-r-10 fa fa-folder"></i></span></li>');
     $.extend({
-        bindFolderClickEvent : function() {
-            browserEl.on('click', '.js-folder,.js-crumb',  function(){
-                $.loadItems($(this).attr('id'));
+        bindClickEvent : function() {
+            browserEl.on('click', '.js-folder,.js-crumb,.js-file',  function(){
+                if($(this).hasClass('js-folder') || $(this).hasClass('js-crumb')) {
+                    $.loadItems($(this).attr('id'));
+                } else if($(this).hasClass('js-file')) {
+                    $(this).toggleClass('selected');
+                }
             });
         },
         clearItems: function() {
@@ -38,9 +42,9 @@ $(function(){
         renderFiles: function(files) {
             $.each(files, function(i, file) {
                 var fileEl = $(fileElTemplate).clone();
-                // $(fileEl).attr('id', file.id);
+                $(fileEl).attr('id', file.id);
                 $(fileEl).find('.image img').attr('src', '/uploads/' + file.internalFileName).attr('alt', file.name).attr('title', file.name);
-                $(fileEl).find('.name').html(file.name);
+                $(fileEl).find('.name').attr('title', file.name).html(file.name);
                 filesContainer.append(fileEl);
             });
             if(files.length > 0) {
@@ -77,7 +81,14 @@ $(function(){
                     });
                 }
             });
+        },
+        getSelectedItems: function() {
+            let ids = [];
+            $('.js-file.selected').each(function(){
+                ids.push($(this).attr('id'));
+            })
+            return ids;
         }
     });
-    $.bindFolderClickEvent();
+    $.bindClickEvent();
 });

@@ -46,20 +46,20 @@
             <div class="p-b-15 js-title${not empty files ? '' : ' js-hidden'}"><h6>Files</h6></div>
             <div class="row js-container">
                 <c:forEach var="file" items="${files}">
-                    <div class="col-lg-3 col-md-4 col-sm-12">
+                    <div class="col-lg-3 col-md-4 col-sm-12 js-file">
                         <div class="card" style="background-color: #fafafa">
-                            <div class="file">
+                            <div id="${file.id}" class="file">
                                 <a href="javascript:void(0);">
-                                    <div class="hover">
-                                        <button type="button" class="btn btn-icon btn-success">
-                                            <i class="fa fa-edit"></i>
+                                    <%--<div class="hover">
+                                        <button type="button" class="btn btn-icon btn-success js-add">
+                                            <i class="fa fa-save"></i>
                                         </button>
-                                    </div>
+                                    </div>--%>
                                     <div class="image" style="height: 100px">
                                         <img src="/uploads/${file.internalFileName}" alt="${file.name}" title="${file.name}"  class="img-fluid">
                                     </div>
-                                    <div class="file-name">
-                                        <p class="m-b-5 text-muted"><small>${file.name}</small></p>
+                                    <div class="file-name truncate">
+                                        <span class="m-b-5 text-muted"><small title="${file.name}">${file.name}</small></span>
                                     </div>
                                 </a>
                             </div>
@@ -72,16 +72,16 @@
                     <div class="card" style="background-color: #fafafa">
                         <div class="file">
                             <a href="javascript:void(0);">
-                                <div class="hover">
-                                    <button type="button" class="btn btn-icon btn-success">
-                                        <i class="fa fa-edit"></i>
+                                <%--<div class="hover">
+                                    <button type="button" class="btn btn-icon btn-success js-add">
+                                        <i class="fa fa-save"></i>
                                     </button>
-                                </div>
+                                </div>--%>
                                 <div class="image" style="height: 100px">
                                     <img src="" alt="" title=""  class="img-fluid">
                                 </div>
-                                <div class="file-name">
-                                    <p class="m-b-5 text-muted"><small class="name"></small></p>
+                                <div class="file-name truncate">
+                                    <span class="m-b-5 text-muted"><small class="name" title=""></small></span>
                                 </div>
                             </a>
                         </div>

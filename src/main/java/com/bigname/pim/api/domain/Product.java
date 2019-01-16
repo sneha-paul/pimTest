@@ -43,6 +43,8 @@ public class Product extends Entity<Product> {
 
     private Map<String, Map<String, Object>> scopedFamilyAttributes = new HashMap<>();
 
+    private Map<String, Map<String, Object>> scopedAssets = new HashMap<>();
+
     public Product() {
         super();
     }
@@ -110,6 +112,22 @@ public class Product extends Entity<Product> {
         setScopedFamilyAttributes(getChannelId(), familyAttributes);
     }
 
+    public Map<String, Map<String, Object>> getScopedAssets() {
+        return scopedAssets;
+    }
+
+    public void setScopedAssets(String channelId, Map<String, Object> assets) {
+        getScopedAssets().put(channelId, assets); //TODO - check this logic
+    }
+
+    public Map<String, Object> getChannelAssets() {
+        return scopedAssets.get(getChannelId());
+    }
+
+    public void setChannelAssets(Map<String, Object> assets) {
+        setScopedAssets(getChannelId(), assets);
+    }
+
     void setExternalId() {
         this.productId = getExternalId();
     }
@@ -136,7 +154,13 @@ public class Product extends Entity<Product> {
                     break;
 
                 case "ASSETS":
-                    //TODO
+                    if(isNotEmpty(product.getChannelAssets())) {
+                        if(!this.getScopedAssets().containsKey(product.getChannelId())) {
+                            this.getScopedAssets().put(product.getChannelId(), new HashMap<>());
+                        }
+                        Map<String, Object> channelAssets = this.getChannelAssets();
+                        product.getChannelAssets().forEach(channelAssets::put);
+                    }
                     break;
             }
         }
