@@ -109,15 +109,17 @@ public class ProductController extends BaseController<Product, ProductService>{
         return model;
     }
 
-/*
     @RequestMapping(value = "/{id}/channels/{channelId}/assets/reorder", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> reorderAsset(@PathVariable(value = "id") String id,
                                             @PathVariable(value = "channelId") String channelId,
-                                            @RequestParam(value = "sourceId") String sourceAssetId,
-                                            @RequestParam(value = "destinationId") String destinationAssetId) {
-
-    }*/
+                                            @RequestParam(value="assetIds[]") String[] assetIds,
+                                            @RequestParam(value="assetFamily") String assetFamily) {
+        Map<String, Object> model = new HashMap<>();
+        productService.reorderAssets(id, FindBy.EXTERNAL_ID, channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
+    }
 
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id,

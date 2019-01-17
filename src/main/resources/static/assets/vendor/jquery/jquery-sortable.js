@@ -240,7 +240,7 @@
     }
 
     return containerGroups[options.group]
-  }
+  };
 
   ContainerGroup.prototype = {
     dragInit: function  (e, itemContainer) {
@@ -253,6 +253,8 @@
       if (closestItem.length) {
         this.item = closestItem;
         this.itemContainer = itemContainer;
+        //hack for pim
+        this.containers = [itemContainer];
         if (this.item.is(this.options.exclude) || !this.options.onMousedown(this.item, groupDefaults.onMousedown, e)) {
             return;
         }

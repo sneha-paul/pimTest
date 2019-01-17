@@ -277,7 +277,7 @@
                                         <div id="aniimated-thumbnials" class="js-draggable list-unstyled row clearfix">
                                                 <c:forEach var="asset" items="${product.channelAssets['ASSETS']}" varStatus="s">
                                                     <c:set var="isDefault" value="${asset.defaultFlag eq 'Y'}" />
-                                                    <div class="js-draggable-item col-xl-4 col-lg-6 col-md-12 col-sm-12 m-b-30" rel="${s.count}">
+                                                    <div class="js-drag-item col-xl-4 col-lg-6 col-md-12 col-sm-12 m-b-30" rel="${asset.id}">
                                                         <div class="digital-asset-container front card overflowhidden">
                                                             <div class="header">
                                                                 <h2 class="truncate" style="padding-right: 60px;">
@@ -327,7 +327,6 @@
                                                     </div>
                                                 </c:forEach>
                                         </div>
-                                        <p id="output">1,2,3</p>
                                     </div>
                                 </div>
                             </div>

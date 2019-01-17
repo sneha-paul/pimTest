@@ -13,6 +13,7 @@ import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.ProductUtil;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.*;
 
@@ -422,16 +422,10 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
 
                     String _assetFamily = assetFamily.name();
                     //Get the assets list corresponding to the given assetFamily
-                    List<Object> productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
+                    List<Object> _productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
 
                     //order the list by sequenceNum ascending
-                    productAssets.sort((obj1, obj2) -> {
-                        Map<String, Object> a1 = (Map<String, Object>) obj1;
-                        Map<String, Object> a2 = (Map<String, Object>) obj2;
-                        int seq1 = (int) a1.get("sequenceNum");
-                        int seq2 = (int) a2.get("sequenceNum");
-                        return seq1 > seq2 ? 1 : -1;
-                    });
+                    List<Map<String, Object>> productAssets = ProductUtil.orderAssets(ConversionUtil.toGenericMap(_productAssets));
 
                     //List of all existing asset ids
                     List<String> existingAssetIds = new ArrayList<>();
@@ -440,11 +434,9 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                     int[] seq = {0};
 
                     productAssets.forEach(asset -> {
-                        Map<String, Object> assetMap = (Map<String, Object>)asset;
-                        assetMap.put("sequenceNum", seq[0] ++);
-
+                        asset.put("sequenceNum", seq[0] ++);
                         //Add the id to the existing ids list
-                        existingAssetIds.add((String)assetMap.get("id"));
+                        existingAssetIds.add((String)asset.get("id"));
                     });
 
 
@@ -462,7 +454,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                             });
 
 
-                    validateDefaultAsset(convert(productAssets));
+                    validateDefaultAsset(productAssets);
                     productAssetsForChannel.put(_assetFamily, productAssets);
                     product.setChannelAssets(productAssetsForChannel);
                     product.setGroup("ASSETS");
@@ -470,6 +462,30 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                     return product;
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + productId));
+    }
+
+    @Override
+    public Product reorderAssets(String productId, FindBy findBy, String channelId, String[] assetIds, FileAsset.AssetFamily assetFamily) {
+        return get(productId, findBy, false)
+                .map(product -> {
+                    product.setChannelId(channelId);
+
+                    //Existing product assets for the given channel
+                    Map<String, Object> productAssetsForChannel = product.getScopedAssets().containsKey(channelId) ? product.getChannelAssets() : new HashMap<>();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
+
+                    //AssetIds arrays contains the assetIds in the required order
+                    productAssetsForChannel.put(_assetFamily, reorderAssets(ConversionUtil.toGenericMap(productAssets), Arrays.asList(assetIds)));
+                    product.setChannelAssets(productAssetsForChannel);
+                    product.setGroup("ASSETS");
+                    update(productId, FindBy.EXTERNAL_ID, product);
+                    return product;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + productId));
+
     }
 
     @Override
@@ -486,7 +502,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                     List<Object> productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
 
 
-                    setDefaultAsset(convert(productAssets), assetId);
+                    setDefaultAsset(ConversionUtil.toGenericMap(productAssets), assetId);
                     productAssetsForChannel.put(_assetFamily, productAssets);
                     product.setChannelAssets(productAssetsForChannel);
                     product.setGroup("ASSETS");
@@ -509,8 +525,13 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         productAssets.forEach(asset -> asset.put("defaultFlag", "N"));
     }
 
-    private static List<Map <String, Object>> convert(List<Object> productAssets) {
-        return productAssets.stream().map(o -> (Map<String, Object>) o).collect(Collectors.toList());
+    private static List<Map<String, Object>> reorderAssets(List<Map<String, Object>> productAssets, List<String> assetIds){
+
+        //Set the sequence number with the index of their ids in the assetIds list
+        productAssets.forEach(asset -> asset.put("sequenceNum", assetIds.indexOf((String)asset.get("id"))));
+
+        //Order the assets by sequence number before saving to the database
+        return ProductUtil.orderAssets(productAssets);
     }
 
     private static void validateDefaultAsset(List<Map<String, Object>> productAssets) {

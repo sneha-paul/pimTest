@@ -2,12 +2,12 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.BeanUtil;
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.util.PIMConstants;
+import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Page;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
@@ -113,6 +113,7 @@ public class Product extends Entity<Product> {
     }
 
     public Map<String, Map<String, Object>> getScopedAssets() {
+        scopedAssets.forEach((channelId, assetFamilies) -> assetFamilies.forEach((family, assets) -> assetFamilies.put(family, ProductUtil.orderAssets(ConversionUtil.toGenericMap((List<Object>)assets)))));
         return scopedAssets;
     }
 
@@ -121,7 +122,7 @@ public class Product extends Entity<Product> {
     }
 
     public Map<String, Object> getChannelAssets() {
-        return scopedAssets.get(getChannelId());
+        return getScopedAssets().get(getChannelId());
     }
 
     public void setChannelAssets(Map<String, Object> assets) {

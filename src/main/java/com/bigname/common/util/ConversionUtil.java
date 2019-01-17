@@ -54,6 +54,10 @@ abstract public class ConversionUtil {
         return list;
     }
 
+    public static List<Map<String, Object>> toGenericMap(List<Object> listOfMap) {
+        return listOfMap.stream().map(o -> (Map<String, Object>) o).collect(Collectors.toList());
+    }
+
     public static String toJSONString(Object object) {
         try {
             return new ObjectMapper().writeValueAsString(object);
