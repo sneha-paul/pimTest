@@ -233,9 +233,9 @@
                 top:86px;
                 right:30px;
             }
-            .digital-asset .js-asset img {
+            /*.digital-asset .js-asset img {
                 width:100%;
-            }
+            }*/
         .card .footer .stats {
             cursor: default;
             list-style: none;
@@ -436,17 +436,18 @@
         }
 
         .digital-asset .image {
+            text-align: center;
             height: 350px;
         }
 
-        .file_manager .file .image img, .digital-asset .image img {
+        .file_manager .file .image img/*, .digital-asset .image img*/ {
             max-width:100%;
             max-height: 220px;
         }
 
-        .digital-asset .image img {
+        /*.digital-asset .image img {
             max-height: 330px;
-        }
+        }*/
 
         .file_manager .file .file-name {
             padding: 10px;

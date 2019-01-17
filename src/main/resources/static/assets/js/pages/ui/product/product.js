@@ -83,6 +83,16 @@ $( document ).ready(function() {
         };
         eModal.ajax(options);
     });
+    $.addModal({
+        selector: '#js-add-asset',
+        url: $.getURL('/pim/assetCollections/browser'),
+        name:'add-assets',
+        title:'Select Asset',
+        buttons: [
+            {text: 'ADD', style: 'primary', close: false, click: function(){$.ajaxSubmit({url: '/pim/products/{productId}/channels/{channelId}/assets', data: {assetFamily: 'ASSETS', assetIds: $.getSelectedItems()}});$.refreshPage({channelId: $.getPageAttribute('channelId')});$.closeModal();}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
 
     $('.js-channel-selector .js-channel').on('click', function(){
         var channelId = $(this).data('channel-id');

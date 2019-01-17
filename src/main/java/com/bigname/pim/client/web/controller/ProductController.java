@@ -104,7 +104,8 @@ public class ProductController extends BaseController<Product, ProductService>{
                     List<String> existingAssetIds = new ArrayList<>();
 
                     //reassign the sequenceNum, so that they are continuous
-                    int seq[] = {0};
+                    int[] seq = {0};
+
                     productAssets.forEach(asset -> {
                         Map<String, Object> assetMap = (Map<String, Object>)asset;
                         assetMap.put("sequenceNum", seq[0] ++);
@@ -126,6 +127,25 @@ public class ProductController extends BaseController<Product, ProductService>{
                                     }
                                 }
                             });
+
+                    // Check if there is one default asset available and also check if there are multiple default assets set for the given product.
+
+                    if(!productAssets.isEmpty()) {
+                        List<Integer> defaultIndices = new ArrayList<>();
+                        for (int i = 0; i < productAssets.size(); i++) {
+                            Map<String, Object> assetMap = (Map<String, Object>) productAssets.get(i);
+                            if ("Y".equals(assetMap.get("defaultFlag"))) {
+                                defaultIndices.add(i);
+                            }
+                        }
+                        if (defaultIndices.isEmpty()) { // No default asset available, so set the first one as the default
+                            ((Map<String, Object>)productAssets.get(0)).put("defaultFlag", "Y");
+                        } else if(defaultIndices.size() > 1) { // More than one default asset is available, so reset everything except the last one
+                            for(int i = 0; i < defaultIndices.size() - 1; i ++) {
+                                ((Map<String, Object>)productAssets.get(i)).put("defaultFlag", "Y");
+                            }
+                        }
+                    }
 
                     productAssetsForChannel.put(_assetFamily, productAssets);
                     product.setChannelAssets(productAssetsForChannel);

@@ -945,6 +945,7 @@
 
                     $('#js-body-container').fadeOut('fast', function(){
                         $('#js-body-container').html(data);
+                        $('[data-toggle="tooltip"]').tooltip();
                         if(hash) {
                             $('a.nav-link[href*="' + hash + '"]').trigger('click');
                         } else {

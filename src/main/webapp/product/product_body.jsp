@@ -291,7 +291,7 @@
                                                                     <span class="asset-type" title="template" style=""><i class="fa fa-file-pdf-o"></i></span>
                                                                 </c:otherwise>
                                                             </c:choose>
-                                                            ${asset.name}<small class="${isDefault ? '' : 'js-hidden'}" style="position:absolute;top:15px;left:3px"><code class="highlighter-rouge">DEFAULT</code></small>
+                                                            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="${asset.name}">${asset.name}</span><small class="${isDefault ? '' : 'js-hidden'}" style="position:absolute;top:15px;left:3px"><code class="highlighter-rouge">DEFAULT</code></small>
                                                         </h2>
                                                         <ul class="header-dropdown">
                                                             <li><span class="tab_btn active ${isDefault ? 'bg-success' : ''}">${s.count}</span></li>
@@ -731,7 +731,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>${product.channelId}
 <img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}', hash : '${param.hash}'});$.getScript('/assets/js/pages/ui/product/product.js');"/>
 
 <%--<script src="/assets/js/pages/ui/product/product.js"></script>--%>
@@ -745,17 +745,7 @@
         'catalogId' : '${param.catalogId}'
     });
 
-    $.addModal({
-        selector: '#js-add-asset',
-        url: $.getURL('/pim/assetCollections/browser'),
-//        data: {directoryId : '0d95fa63-b3f3-4cf6-9744-eb5cc9184eb4'},
-        name:'add-assets',
-        title:'Select Asset',
-        buttons: [
-            {text: 'ADD', style: 'primary', close: false, click: function(){$.ajaxSubmit({url: '/pim/products/{productId}/channels/{channelId}/assets', data: {assetFamily: 'ASSETS', assetIds: $.getSelectedItems()}});$.refreshPage();$.closeModal();}},
-            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-        ]
-    });
+
 </script>
 
 
