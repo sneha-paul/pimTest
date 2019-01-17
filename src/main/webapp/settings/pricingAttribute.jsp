@@ -15,11 +15,11 @@
                         <form method="post" action="/pim/pricingAttributes" data-method="POST" data-success-message='["Successfully created the pricing attribute", "Pricing Attribute Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
-                                    <div class="form-group">
+                                    <div class="form-group js-name">
                                         <label>Pricing Attribute Name</label>
                                         <input type="text" name="pricingAttributeName" class="form-control" />
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group js-external-id">
                                         <label>Pricing Attribute ID</label>
                                         <input type="text" name="pricingAttributeId" class="form-control" />
                                     </div>

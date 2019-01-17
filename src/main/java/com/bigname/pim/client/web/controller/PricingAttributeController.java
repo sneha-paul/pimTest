@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.PricingAttributeService;
@@ -108,6 +109,7 @@ public class PricingAttributeController extends  BaseController<PricingAttribute
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, PricingAttribute pricingAttribute) {
         Map<String, Object> model = new HashMap<>();
+        model.put("context", CollectionsUtil.toMap("id", id));
         if(isValid(pricingAttribute, model, pricingAttribute.getGroup().length == 1 && pricingAttribute.getGroup()[0].equals("DETAILS") ? PricingAttribute.DetailsGroup.class : null)) {
             pricingAttributeService.update(id, FindBy.EXTERNAL_ID, pricingAttribute);
             model.put("success", true);

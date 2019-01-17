@@ -23,7 +23,7 @@
                                                         <label for="pricingAttributeName">Pricing Attribute Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="pricingAttributeName" name="pricingAttributeName" value="${pricingAttribute.pricingAttributeName}" class="form-control" />
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div class="form-group js-external-id">
                                                         <label for="pricingAttributeId">Pricing ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="pricingAttributeId" name="pricingAttributeId" class="form-control" value="${pricingAttribute.pricingAttributeId}" />
                                                     </div>
