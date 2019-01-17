@@ -393,6 +393,11 @@
         .js-template, .js-hidden {
             display: none !important;
         }
+
+        .js-invisible {
+            visibility: hidden;
+        }
+
         .btn-label.secondary {
             color: #6c757d;
             background-color: #fafafa;

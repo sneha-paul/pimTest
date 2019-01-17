@@ -218,4 +218,5 @@ public class Product extends Entity<Product> {
             }
         });
     }
+
 }

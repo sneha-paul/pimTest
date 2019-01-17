@@ -1,4 +1,31 @@
 $( document ).ready(function() {
+
+    $.extend({
+        setAsDefaultAsset: function(assetId) {
+            $.ajaxSubmit({
+                url: '/pim/products/{productId}/channels/{channelId}/assets/setDefault',
+                data: {assetFamily: 'ASSETS', assetId: assetId},
+                method: 'PUT',
+                successMessage: ['Asset Updated', 'Successfully set the default asset'],
+                errorMessage: ['Error', 'Error occurred while setting the default asset'],
+                successCallback: function(data) {
+                    $.refreshPage({channelId: $.getPageAttribute('channelId')});
+                }
+            });
+        },
+        addAssets: function(assetIds) {
+            $.ajaxSubmit({
+                url: '/pim/products/{productId}/channels/{channelId}/assets',
+                data: {assetFamily: 'ASSETS', assetIds: assetIds},
+                successMessage: ['Assets Added', 'Successfully added the assets'],
+                errorMessage: ['Error', 'Error occurred while adding assets'],
+                successCallback: function(data) {
+                    $.refreshPage({channelId: $.getPageAttribute('channelId')});
+                    $.closeModal();
+                }
+            });
+        }
+    });
     var urlParams = {};
     if($.getPageAttribute('websiteId') !== '') {
         urlParams['websiteId'] = '{websiteId}';
@@ -89,7 +116,7 @@ $( document ).ready(function() {
         name:'add-assets',
         title:'Select Asset',
         buttons: [
-            {text: 'ADD', style: 'primary', close: false, click: function(){$.ajaxSubmit({url: '/pim/products/{productId}/channels/{channelId}/assets', data: {assetFamily: 'ASSETS', assetIds: $.getSelectedItems()}});$.refreshPage({channelId: $.getPageAttribute('channelId')});$.closeModal();}},
+            {text: 'ADD', style: 'primary', close: false, click: function(){$.addAssets($.getSelectedItems())}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });
@@ -110,8 +137,4 @@ $( document ).ready(function() {
 
     $('.datepicker').datepicker();
     // $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
-});
-
-$(function(){
-
 });

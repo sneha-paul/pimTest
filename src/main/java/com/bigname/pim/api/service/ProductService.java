@@ -1,9 +1,6 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.ProductCategory;
-import com.bigname.pim.api.domain.ProductVariant;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
@@ -117,4 +114,8 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
      * @return
      */
     Page<Map<String,Object>> getCategories(String productId, FindBy findBy, Pageable pageable, boolean... activeRequired);
+
+    Product addAssets(String productId, FindBy findBy, String channelId, String[] assetIds, FileAsset.AssetFamily assetFamily);
+
+    Product setAsDefaultAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily);
 }

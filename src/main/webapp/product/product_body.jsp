@@ -291,7 +291,7 @@
                                                                     <span class="asset-type" title="template" style=""><i class="fa fa-file-pdf-o"></i></span>
                                                                 </c:otherwise>
                                                             </c:choose>
-                                                            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="${asset.name}">${asset.name}</span><small class="${isDefault ? '' : 'js-hidden'}" style="position:absolute;top:15px;left:3px"><code class="highlighter-rouge">DEFAULT</code></small>
+                                                            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="${asset.name}">${asset.name}</span><small class="${isDefault ? '' : 'js-invisible'}" style="position:relative;"><code class="highlighter-rouge">DEFAULT</code></small>
                                                         </h2>
                                                         <ul class="header-dropdown">
                                                             <li><span class="tab_btn active ${isDefault ? 'bg-success' : ''}">${s.count}</span></li>
@@ -300,12 +300,15 @@
                                                                 <ul class="dropdown-menu dropdown-menu-right">
                                                                     <li><a href="javascript:void(0);" onclick="$(this).closest('.digital-asset-container').flip(true)">Edit</a></li>
                                                                     <li><a href="javascript:void(0);">Delete</a></li>
-                                                                    <li><a href="javascript:void(0);">Set as Default</a></li>
+                                                                    <c:if test="${not isDefault}">
+                                                                        <li><a href="javascript:$.setAsDefaultAsset('${asset.id}')">Set as Default</a></li>
+                                                                    </c:if>
+
                                                                 </ul>
                                                             </li>
                                                         </ul>
                                                     </div>
-                                                    <div class="body">
+                                                    <div class="body" style="position: relative;top: -30px">
                                                         <div class="digital-asset">
                                                             <div class="image">
                                                                 <a class="js-asset" href="/uploads/${asset.internalName}">

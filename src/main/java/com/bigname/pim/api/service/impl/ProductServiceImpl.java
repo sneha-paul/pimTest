@@ -4,14 +4,12 @@ import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.exception.GenericEntityException;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
-import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.api.service.ProductService;
-import com.bigname.pim.api.service.ProductVariantService;
+import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.*;
 
@@ -34,6 +33,7 @@ import static com.bigname.common.util.ValidationUtil.*;
 public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, ProductService> implements ProductService {
 
     private ProductVariantService productVariantService;
+    private VirtualFileService assetService;
     private ProductCategoryDAO productCategoryDAO;
     private CategoryProductDAO categoryProductDAO;
     private CategoryService categoryService;
@@ -42,11 +42,12 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
 
 
     @Autowired
-    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, ProductCategoryDAO productCategoryDAO, CategoryProductDAO categoryProductDAO, @Lazy CategoryService categoryService) {
+    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, VirtualFileService assetService, ProductCategoryDAO productCategoryDAO, CategoryProductDAO categoryProductDAO, @Lazy CategoryService categoryService) {
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
         this.productVariantService = productVariantService;
         this.familyService = productFamilyService;
+        this.assetService = assetService;
         this.productCategoryDAO = productCategoryDAO;
         this.categoryProductDAO = categoryProductDAO;
         this.categoryService = categoryService;
@@ -408,5 +409,127 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         return get(productId, findBy, false)
                 .map(catalog -> productDAO.getCategories(catalog.getId(), pageable.getPageRequest()))
                 .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
+    public Product addAssets(String productId, FindBy findBy, String channelId, String[] assetIds, FileAsset.AssetFamily assetFamily) {
+        return get(productId, findBy, false)
+                .map(product -> {
+                    product.setChannelId(channelId);
+
+                    //Existing product assets for the given channel
+                    Map<String, Object> productAssetsForChannel = product.getScopedAssets().containsKey(channelId) ? product.getChannelAssets() : new HashMap<>();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
+
+                    //order the list by sequenceNum ascending
+                    productAssets.sort((obj1, obj2) -> {
+                        Map<String, Object> a1 = (Map<String, Object>) obj1;
+                        Map<String, Object> a2 = (Map<String, Object>) obj2;
+                        int seq1 = (int) a1.get("sequenceNum");
+                        int seq2 = (int) a2.get("sequenceNum");
+                        return seq1 > seq2 ? 1 : -1;
+                    });
+
+                    //List of all existing asset ids
+                    List<String> existingAssetIds = new ArrayList<>();
+
+                    //reassign the sequenceNum, so that they are continuous
+                    int[] seq = {0};
+
+                    productAssets.forEach(asset -> {
+                        Map<String, Object> assetMap = (Map<String, Object>)asset;
+                        assetMap.put("sequenceNum", seq[0] ++);
+
+                        //Add the id to the existing ids list
+                        existingAssetIds.add((String)assetMap.get("id"));
+                    });
+
+
+                    assetService.getAll(assetIds, FindBy.INTERNAL_ID, null)
+                            .forEach(asset -> {
+                                //Only add, if the asset is a file, not a directory
+                                if(!"Y".equals(asset.getIsDirectory()) && "Y".equals(asset.getActive())) {
+                                    //Only add, if the asset won't exists already
+                                    if(!existingAssetIds.contains(asset.getId())) {
+                                        FileAsset productAsset = new FileAsset(asset, seq[0] ++);
+                                        productAssets.add(productAsset.toMap());
+                                        existingAssetIds.add(productAsset.getId());
+                                    }
+                                }
+                            });
+
+
+                    validateDefaultAsset(convert(productAssets));
+                    productAssetsForChannel.put(_assetFamily, productAssets);
+                    product.setChannelAssets(productAssetsForChannel);
+                    product.setGroup("ASSETS");
+                    update(productId, FindBy.EXTERNAL_ID, product);
+                    return product;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + productId));
+    }
+
+    @Override
+    public Product setAsDefaultAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily) {
+        return get(productId, findBy, false)
+                .map(product -> {
+                    product.setChannelId(channelId);
+
+                    //Existing product assets for the given channel
+                    Map<String, Object> productAssetsForChannel = product.getScopedAssets().containsKey(channelId) ? product.getChannelAssets() : new HashMap<>();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
+
+
+                    setDefaultAsset(convert(productAssets), assetId);
+                    productAssetsForChannel.put(_assetFamily, productAssets);
+                    product.setChannelAssets(productAssetsForChannel);
+                    product.setGroup("ASSETS");
+                    update(productId, FindBy.EXTERNAL_ID, product);
+                    return product;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + productId));
+    }
+
+    private static void setDefaultAsset(List<Map<String, Object>> productAssets, String assetId) {
+        resetDefaultAsset(productAssets);
+        productAssets.forEach(asset -> {
+            if(asset.get("id").equals(assetId)) {
+                asset.put("defaultFlag", "Y");
+            }
+        });
+    }
+
+    private static void resetDefaultAsset(List<Map<String, Object>> productAssets) {
+        productAssets.forEach(asset -> asset.put("defaultFlag", "N"));
+    }
+
+    private static List<Map <String, Object>> convert(List<Object> productAssets) {
+        return productAssets.stream().map(o -> (Map<String, Object>) o).collect(Collectors.toList());
+    }
+
+    private static void validateDefaultAsset(List<Map<String, Object>> productAssets) {
+        // Check if there is one default asset available and also check if there are multiple default assets set for the given product.
+        if(!productAssets.isEmpty()) {
+            List<Integer> defaultIndices = new ArrayList<>();
+            for (int i = 0; i < productAssets.size(); i++) {
+                Map<String, Object> assetMap = productAssets.get(i);
+                if ("Y".equals(assetMap.get("defaultFlag"))) {
+                    defaultIndices.add(i);
+                }
+            }
+            if (defaultIndices.isEmpty()) { // No default asset available, so set the first one as the default
+                productAssets.get(0).put("defaultFlag", "Y");
+            } else if(defaultIndices.size() > 1) { // More than one default asset is available, so reset everything except the last one
+                for(int i = 0; i < defaultIndices.size() - 1; i ++) {
+                    productAssets.get(i).put("defaultFlag", "N");
+                }
+            }
+        }
     }
 }

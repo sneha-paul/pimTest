@@ -77,85 +77,11 @@ public class ProductController extends BaseController<Product, ProductService>{
     public Map<String, Object> addAssets(@PathVariable(value = "id") String id,
                                          @PathVariable(value = "channelId") String channelId,
                                          @RequestParam(value="assetIds[]") String[] assetIds,
-                                         @RequestParam(value="assetFamily") String assetFamily,
-                                         HttpServletRequest request) {
+                                         @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        return productService.get(id, FindBy.EXTERNAL_ID, false)
-                .map(product -> {
-                    product.setChannelId(channelId);
-
-                    //Existing product assets for the given channel
-                    Map<String, Object> productAssetsForChannel = product.getScopedAssets().containsKey(channelId) ? product.getChannelAssets() : new HashMap<>();
-
-                    String _assetFamily = FileAsset.AssetFamily.getFamily(assetFamily).name();
-                    //Get the assets list corresponding to the given assetFamily
-                    List<Object> productAssets = productAssetsForChannel.containsKey(assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
-
-                    //order the list by sequenceNum ascending
-                    productAssets.sort((obj1, obj2) -> {
-                        Map<String, Object> a1 = (Map<String, Object>) obj1;
-                        Map<String, Object> a2 = (Map<String, Object>) obj2;
-                        int seq1 = (int) a1.get("sequenceNum");
-                        int seq2 = (int) a2.get("sequenceNum");
-                        return seq1 > seq2 ? 1 : -1;
-                    });
-
-                    //List of all existing asset ids
-                    List<String> existingAssetIds = new ArrayList<>();
-
-                    //reassign the sequenceNum, so that they are continuous
-                    int[] seq = {0};
-
-                    productAssets.forEach(asset -> {
-                        Map<String, Object> assetMap = (Map<String, Object>)asset;
-                        assetMap.put("sequenceNum", seq[0] ++);
-
-                        //Add the id to the existing ids list
-                        existingAssetIds.add((String)assetMap.get("id"));
-                    });
-
-
-                    assetService.getAll(assetIds, FindBy.INTERNAL_ID, null)
-                            .forEach(asset -> {
-                                //Only add, if the asset is a file, not a directory
-                                if(!"Y".equals(asset.getIsDirectory()) && "Y".equals(asset.getActive())) {
-                                    //Only add, if the asset won't exists already
-                                    if(!existingAssetIds.contains(asset.getId())) {
-                                        FileAsset productAsset = new FileAsset(asset, seq[0] ++);
-                                        productAssets.add(productAsset.toMap());
-                                        existingAssetIds.add(productAsset.getId());
-                                    }
-                                }
-                            });
-
-                    // Check if there is one default asset available and also check if there are multiple default assets set for the given product.
-
-                    if(!productAssets.isEmpty()) {
-                        List<Integer> defaultIndices = new ArrayList<>();
-                        for (int i = 0; i < productAssets.size(); i++) {
-                            Map<String, Object> assetMap = (Map<String, Object>) productAssets.get(i);
-                            if ("Y".equals(assetMap.get("defaultFlag"))) {
-                                defaultIndices.add(i);
-                            }
-                        }
-                        if (defaultIndices.isEmpty()) { // No default asset available, so set the first one as the default
-                            ((Map<String, Object>)productAssets.get(0)).put("defaultFlag", "Y");
-                        } else if(defaultIndices.size() > 1) { // More than one default asset is available, so reset everything except the last one
-                            for(int i = 0; i < defaultIndices.size() - 1; i ++) {
-                                ((Map<String, Object>)productAssets.get(i)).put("defaultFlag", "Y");
-                            }
-                        }
-                    }
-
-                    productAssetsForChannel.put(_assetFamily, productAssets);
-                    product.setChannelAssets(productAssetsForChannel);
-                    product.setGroup("ASSETS");
-                    productService.update(id, FindBy.EXTERNAL_ID, product);
-
-                    model.put("success", true);
-                    return model;
-                })
-                .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + id));
+        productService.addAssets(id, FindBy.EXTERNAL_ID, channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
     }
 
     /*@RequestMapping(value = "/{id}/channels/{channelId}/assets", method = RequestMethod.PUT)
@@ -169,14 +95,21 @@ public class ProductController extends BaseController<Product, ProductService>{
     public Map<String, Object> deleteAsset(@PathVariable(value = "id") String id, @PathVariable(value = "assetId") String assetId, HttpServletRequest request) {
 
     }
+    */
 
-    @RequestMapping(value = "/{id}/channels/{channelId}/assets/{assetId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/channels/{channelId}/assets/setDefault", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> defaultAsset(@PathVariable(value = "id") String id, @PathVariable(value = "assetId") String assetId, HttpServletRequest request) {
-
+    public Map<String, Object> setAsDefaultAsset(@PathVariable(value = "id") String id,
+                                                 @PathVariable(value = "channelId") String channelId,
+                                                 @RequestParam(value="assetId") String assetId,
+                                                 @RequestParam(value="assetFamily") String assetFamily) {
+        Map<String, Object> model = new HashMap<>();
+        productService.setAsDefaultAsset(id, FindBy.EXTERNAL_ID, channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
     }
 
-
+/*
     @RequestMapping(value = "/{id}/channels/{channelId}/assets/reorder", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> reorderAsset(@PathVariable(value = "id") String id,
