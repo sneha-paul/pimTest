@@ -60,13 +60,13 @@ public class WebsiteCatalog extends EntityAssociation<Website, Catalog> {
     }
 
     @Override
-    public Map<String, String> toMap() {
-        Map<String, String> map = new LinkedHashMap<>();
-        map.put("externalId", getChild().getCatalogId());
-        map.put("catalogName", getChild().getCatalogName());
-        map.put("active", getActive());
-        map.put("sequenceNum", Long.toString(getSequenceNum()));
-        map.put("subSequenceNum", Integer.toString(getSubSequenceNum()));
+    public Map<String, Object> toMap(Map<String, Object> attributeMap) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("externalId", attributeMap.get("externalId"));
+        map.put("catalogName", attributeMap.get("catalogName"));
+        map.put("active", attributeMap.get("active"));
+        map.put("sequenceNum", attributeMap.get("sequenceNum"));
+        map.put("subSequenceNum", attributeMap.get("subSequenceNum"));
         return map;
     }
 

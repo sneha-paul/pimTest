@@ -1,5 +1,8 @@
 $(function(){
-    var urlParams = {websiteId: '{websiteId}'};
+    var urlParams = {};
+    if($.getPageAttribute('websiteId') !== '') {
+        urlParams['websiteId'] = '{websiteId}';
+    }
     $.initAssociationsGrid({
         selector: '#paginatedCatalogsTable',
         names: ['websiteCatalogs', 'websiteCatalog'],

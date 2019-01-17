@@ -1,9 +1,10 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.util.FindBy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
+import java.util.Map;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -11,4 +12,5 @@ import java.util.Optional;
  */
 public interface WebsiteRepository extends GenericRepository<Website> {
 //    Optional<Website> findById(String id, FindBy findBy, Class<Website> clazz);
+Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, Pageable pageable);
 }

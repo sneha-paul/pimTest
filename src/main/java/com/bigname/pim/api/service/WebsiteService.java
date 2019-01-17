@@ -5,10 +5,11 @@ import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
@@ -18,13 +19,11 @@ public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
      *
      * @param websiteId Internal or External id of the Website
      * @param findBy Type of the website id, INTERNAL_ID or EXTERNAL_ID
-     * @param page page number
-     * @param size page size
-     * @param sort sort Object
+     * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<WebsiteCatalog> getWebsiteCatalogs(String websiteId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, FindBy findBy, Pageable pageable, boolean... activeRequired);
 
     /**
      * Method to get available catalogs of a website in paginated format.
