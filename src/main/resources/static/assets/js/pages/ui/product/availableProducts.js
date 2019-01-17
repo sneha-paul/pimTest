@@ -22,8 +22,7 @@ $( document ).ready(function() {
             dataType: 'json'
         }).done(function(data) {
             if(data.success === true) {
-                $.refreshDataTable('products');
-                $.refreshDataTable('availableProducts');
+                $.refreshDataTable('productsSortable,productsReorderable,availableProducts');
                 toastr.success('Successfully added the category product', 'Category product Added');
             } else {
                 toastr.success('Error occurred while adding the category product', 'Error Adding Category Product');
