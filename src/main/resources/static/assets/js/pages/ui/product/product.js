@@ -137,4 +137,43 @@ $( document ).ready(function() {
 
     $('.datepicker').datepicker();
     // $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
+
+    var adjustment;
+    $("div.js-draggable").sortable( "destroy" );
+    var group = $("div.js-draggable").sortable({
+        group: 'js-draggable',
+        itemSelector: 'div.js-draggable-item',
+        containerSelector: 'div.js-draggable',
+        vertical: false,
+        placeholder: '<div class="placeholder col-xl-4 col-lg-6 col-md-12 col-sm-12" />',
+        pullPlaceholder: false,
+
+        // set item relative to cursor position
+        onDragStart: function ($item, container, _super) { console.log('start');
+            var offset = $item.offset(),
+                pointer = container.rootGroup.pointer
+
+            adjustment = {
+                left: pointer.left - offset.left,
+                top: pointer.top - offset.top
+            };
+
+            _super($item, container)
+        },
+        onDrop: function (item, container, _super) { console.log('drop');
+            console.log(group.sortable("serialize").get());
+            $('#output').text(group.sortable("serialize").get().join("\n"))
+            _super(item, container)
+        },
+        onDrag: function ($item, position) { console.log('drag');
+            $item.addClass('col-xl-4 col-lg-6 col-md-12 col-sm-12');
+            $item.css({
+                left: position.left - adjustment.left,
+                top: position.top - adjustment.top
+            })
+        },
+        serialize: function (parent, children, isContainer) {
+            return isContainer ? children.join() : parent.attr('rel')
+        }
+    });
 });

@@ -9,6 +9,7 @@
 <c:set var="masterGroups" value="${product.productFamily.addonMasterGroups}"/>
 <c:set var="detailsMasterGroup" value="${product.productFamily.detailsMasterGroup}"/>
 <c:set var="featuresMasterGroup" value="${product.productFamily.featuresMasterGroup}"/>
+
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
@@ -273,59 +274,60 @@
                                         </div>
                                     </div>
                                     <div class="body">
-                                        <div id="aniimated-thumbnials" class="list-unstyled row clearfix">
-                                            <c:forEach var="asset" items="${product.channelAssets['ASSETS']}" varStatus="s">
-                                                <c:set var="isDefault" value="${asset.defaultFlag eq 'Y'}" />
-                                            <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12 m-b-30">
-                                                <div class="digital-asset-container front card overflowhidden">
-                                                    <div class="header">
-                                                        <h2 class="truncate" style="padding-right: 60px;">
-                                                            <c:choose>
-                                                                <c:when test="${asset.type eq 'IMAGE'}">
-                                                                    <span class="asset-type" title="image" style=""><i class="fa fa-file-image-o"></i></span>
-                                                                </c:when>
-                                                                <c:when test="${asset.type eq 'VIDEO'}">
-                                                                    <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <span class="asset-type" title="template" style=""><i class="fa fa-file-pdf-o"></i></span>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                            <span data-toggle="tooltip" data-placement="top" title="" data-original-title="${asset.name}">${asset.name}</span><small class="${isDefault ? '' : 'js-invisible'}" style="position:relative;"><code class="highlighter-rouge">DEFAULT</code></small>
-                                                        </h2>
-                                                        <ul class="header-dropdown">
-                                                            <li><span class="tab_btn active ${isDefault ? 'bg-success' : ''}">${s.count}</span></li>
-                                                            <li class="dropdown">
-                                                                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                                                <ul class="dropdown-menu dropdown-menu-right">
-                                                                    <li><a href="javascript:void(0);" onclick="$(this).closest('.digital-asset-container').flip(true)">Edit</a></li>
-                                                                    <li><a href="javascript:void(0);">Delete</a></li>
-                                                                    <c:if test="${not isDefault}">
-                                                                        <li><a href="javascript:$.setAsDefaultAsset('${asset.id}')">Set as Default</a></li>
-                                                                    </c:if>
+                                        <div id="aniimated-thumbnials" class="js-draggable list-unstyled row clearfix">
+                                                <c:forEach var="asset" items="${product.channelAssets['ASSETS']}" varStatus="s">
+                                                    <c:set var="isDefault" value="${asset.defaultFlag eq 'Y'}" />
+                                                    <div class="js-draggable-item col-xl-4 col-lg-6 col-md-12 col-sm-12 m-b-30" rel="${s.count}">
+                                                        <div class="digital-asset-container front card overflowhidden">
+                                                            <div class="header">
+                                                                <h2 class="truncate" style="padding-right: 60px;">
+                                                                    <c:choose>
+                                                                        <c:when test="${asset.type eq 'IMAGE'}">
+                                                                            <span class="asset-type" title="image" style=""><i class="fa fa-file-image-o"></i></span>
+                                                                        </c:when>
+                                                                        <c:when test="${asset.type eq 'VIDEO'}">
+                                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <span class="asset-type" title="template" style=""><i class="fa fa-file-pdf-o"></i></span>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="${asset.name}">${asset.name}</span><small class="${isDefault ? '' : 'js-invisible'}" style="position:relative;"><code class="highlighter-rouge">DEFAULT</code></small>
+                                                                </h2>
+                                                                <ul class="header-dropdown">
+                                                                    <li><span class="tab_btn active ${isDefault ? 'bg-success' : ''}">${s.count}</span></li>
+                                                                    <li class="dropdown">
+                                                                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                        <ul class="dropdown-menu dropdown-menu-right">
+                                                                            <li><a href="javascript:void(0);" onclick="$(this).closest('.digital-asset-container').flip(true)">Edit</a></li>
+                                                                            <li><a href="javascript:void(0);">Delete</a></li>
+                                                                            <c:if test="${not isDefault}">
+                                                                                <li><a href="javascript:$.setAsDefaultAsset('${asset.id}')">Set as Default</a></li>
+                                                                            </c:if>
 
+                                                                        </ul>
+                                                                    </li>
                                                                 </ul>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="body" style="position: relative;top: -30px">
-                                                        <div class="digital-asset">
-                                                            <div class="image">
-                                                                <a class="js-asset" href="/uploads/${asset.internalName}">
-                                                                    <img class="img-fluid" src="/uploads/${asset.internalName}" alt="">
-                                                                </a>
+                                                            </div>
+                                                            <div class="body" style="position: relative;top: -30px">
+                                                                <div class="digital-asset">
+                                                                    <div class="image">
+                                                                        <a class="js-asset" href="/uploads/${asset.internalName}">
+                                                                            <img class="img-fluid" src="/uploads/${asset.internalName}" alt="">
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="footer">
+                                                                <ul class="stats">
+                                                                    <li class="${not empty asset.description ? '' : 'js-hidden'}"><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="${asset.description}" data-original-title="Description" class="text-danger icon-bubbles">Description</a></li>
+                                                                </ul>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="footer">
-                                                        <ul class="stats">
-                                                            <li class="${not empty asset.description ? '' : 'js-hidden'}"><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="${asset.description}" data-original-title="Description" class="text-danger icon-bubbles">Description</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            </c:forEach>
+                                                </c:forEach>
                                         </div>
+                                        <p id="output">1,2,3</p>
                                     </div>
                                 </div>
                             </div>
@@ -747,7 +749,6 @@
         'hash': '${param.hash}',
         'catalogId' : '${param.catalogId}'
     });
-
 
 </script>
 

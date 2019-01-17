@@ -55,6 +55,7 @@
     <script src="/assets/js/pages/ui/page.js"></script>
     <script src="/assets/vendor/jquery-datatable/jquery.dataTables.min.js"></script>
     <script src="/assets/js/pages/ui/GridUtil.js"></script>
+    <script src="/assets/vendor/jquery/jquery-sortable.js"></script>
 
 
 <%-- PAGE LEVEL JS --%>
@@ -63,6 +64,33 @@
     </c:forEach>
 
     <style>
+
+        body.dragging, body.dragging * {
+            cursor: move !important;
+        }
+
+        .dragged {
+            position: absolute;
+            opacity: 0.5;
+            z-index: 2000;
+        }
+
+        div.js-draggable .placeholder:before {
+            position: absolute;
+        }
+
+        div.js-draggable .placeholder{
+            vertical-align: middle;
+            display: inline-block;
+            background-color: #CCC;
+            position: relative;
+            border: 2px dashed #000;
+            line-height: 1.428571429;
+            background-color: #fff;
+            border-radius: 4px;
+            padding: 4px;
+        }
+
         a:focus {outline:0;}
         .disable-select {
             -webkit-user-select: none;
