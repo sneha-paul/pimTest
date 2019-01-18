@@ -120,4 +120,6 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
     Product reorderAssets(String productId, FindBy findBy, String channelId, String[] assetIds, FileAsset.AssetFamily assetFamily);
 
     Product setAsDefaultAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily);
+
+    Product deleteAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily);
 }

@@ -465,6 +465,30 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     @Override
+    public Product deleteAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily) {
+        return get(productId, findBy, false)
+                .map(product -> {
+                    product.setChannelId(channelId);
+
+                    //Existing product assets for the given channel
+                    Map<String, Object> productAssetsForChannel = product.getScopedAssets().containsKey(channelId) ? product.getChannelAssets() : new HashMap<>();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> _productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
+
+                    List<Map<String, Object>> productAssets = ConversionUtil.toGenericMap(_productAssets);
+
+                    productAssetsForChannel.put(_assetFamily, deleteAsset(productAssets, assetId));
+                    product.setChannelAssets(productAssetsForChannel);
+                    product.setGroup("ASSETS");
+                    update(productId, FindBy.EXTERNAL_ID, product);
+                    return product;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + productId));
+    }
+
+    @Override
     public Product reorderAssets(String productId, FindBy findBy, String channelId, String[] assetIds, FileAsset.AssetFamily assetFamily) {
         return get(productId, findBy, false)
                 .map(product -> {
@@ -552,5 +576,19 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                 }
             }
         }
+    }
+
+    private static List<Map<String, Object>> deleteAsset(List<Map<String, Object>> productAssets, String assetId) {
+        //Find the index of the item that needs to be removed
+        int removeIdx = productAssets.indexOf(productAssets.stream().filter(asset -> asset.get("id").equals(assetId)).findFirst().orElse(null));
+        if(removeIdx > -1) {
+            // Remove the asset
+            productAssets.remove(removeIdx);
+            // Reset the sequence nums
+            productAssets = ProductUtil.orderAssets(productAssets);
+            // Validate the default asset, in case we removed the default asset
+            validateDefaultAsset(productAssets);
+        }
+        return productAssets;
     }
 }

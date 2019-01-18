@@ -36,6 +36,21 @@ $( document ).ready(function() {
                     $.refreshPage({channelId: $.getPageAttribute('channelId')});
                 }
             });
+        },
+        deleteAsset: function(assetId) {
+            $.confirmedAJAXRequest({
+                url: $.getURL('/pim/products/{productId}/channels/{channelId}/assets'),
+                data: 'assetFamily=ASSETS&assetId=' + assetId,
+                method: 'DELETE',
+                text: 'This will delete the asset',
+                confirmButtonText: 'Yes, delete it!',
+                confirmButtonColor: '#dc3545',
+                successTitle: 'Deleted!',
+                successText: 'The asset has been deleted.'
+            }, function(){
+                $.refreshPage({channelId: $.getPageAttribute('channelId')});
+            });
+
         }
     });
     var urlParams = {};

@@ -89,13 +89,19 @@ public class ProductController extends BaseController<Product, ProductService>{
     public Map<String, Object> updateAsset(@PathVariable(value = "id") String id, FileAsset asset, HttpServletRequest request) {
 
     }
-
-    @RequestMapping(value = "/{id}/channels/{channelId}/assets/{assetId}", method = RequestMethod.PUT)
+*/
+    @RequestMapping(value = "/{id}/channels/{channelId}/assets", method = RequestMethod.DELETE)
     @ResponseBody
-    public Map<String, Object> deleteAsset(@PathVariable(value = "id") String id, @PathVariable(value = "assetId") String assetId, HttpServletRequest request) {
-
+    public Map<String, Object> deleteAsset(@PathVariable(value = "id") String id,
+                                           @PathVariable(value = "channelId") String channelId,
+                                           @RequestParam(value="assetId") String assetId,
+                                           @RequestParam(value="assetFamily") String assetFamily) {
+        Map<String, Object> model = new HashMap<>();
+        productService.deleteAsset(id, FindBy.EXTERNAL_ID, channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
     }
-    */
+
 
     @RequestMapping(value = "/{id}/channels/{channelId}/assets/setDefault", method = RequestMethod.PUT)
     @ResponseBody

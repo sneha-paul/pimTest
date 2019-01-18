@@ -1147,7 +1147,7 @@
                             // Do the usual XHR stuff
                             var req = new XMLHttpRequest();
                             req.open(options.method, options.url);
-
+                            req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                             req.onload = function () {
                                 // This is called even on 404 etc
                                 // so check the status
@@ -1168,7 +1168,7 @@
                             };
 
                             // Make the request
-                            req.send();
+                            req.send(options.data || '');
                         });
                     }
                 }
@@ -1180,86 +1180,6 @@
                 }
             }, function(error) {
                 swal(options.errorTitle, options.errorText, options.errorType);
-            });
-        },
-        confirmedAJAXRequest1: function(options, callback) {
-            var defaultOptions = {
-                title: 'Are you sure?',
-                text: 'Do you want to continue?',
-                type: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'Yes!',
-                errorTitle: 'Error!',
-                errorText: 'The AJAX request failed!',
-                errorType: 'error',
-                successTitle: 'Done!',
-                successText: 'The AJAX request completed successfully!',
-                successType: 'success',
-            };
-            $.extend(true, options, defaultOptions);
-            swal({
-                title: options.title,
-                text: options.text,
-                type: options.type,
-                showCancelButton: options.showCancelButton,
-                confirmButtonColor: options.confirmButtonColor,
-                confirmButtonText: options.confirmButtonText,
-
-                preConfirm: (yes) => {
-                    return Promise.resolve($.ajax({
-                            url: options.url,
-                            data: {},
-                            method:'PUT'
-                        }));
-                        // resolve({result: {value: 'Manu'}});
-
-                    /*return new Promise(function(resolve, reject) {
-                            $.ajax({
-                                url: options.url,
-                                data: {},
-                                method:'PUT',
-                                success: function(data) {
-                                    /!*if(data.success) {
-                                        swal(options.successTitle, options.successText, options.successType);
-                                        resolve(true);
-                                    }*!/
-                                    return data;
-
-                                },
-                                error: function(err) {
-                                    swal(options.errorTitle, options.errorText, options.errorType);
-                                    reject(false);
-                                }
-                            });
-                            /!*axios.post(options.url, {})
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error(response.statusText);
-                                    }
-                                    return response.json()
-                                }).catch(error => {
-                                    swal(options.errorTitle, options.errorText, options.errorType);
-
-                            })*!/
-                    });*/
-                    /*return post(options.url).then(response => {
-                        if (!response.ok) {
-                            throw new Error(response.statusText);
-                        }
-                        return response.json()
-                    }).catch(error => {
-                        swal(options.errorTitle, options.errorText, options.errorType);
-                    })*/
-                }
-            }).then((result) => { console.log(result.value.success);
-                if (result.value.success) {
-                    swal(
-                        options.successTitle,
-                        options.successText,
-                        options.successType
-                    )
-                }
             });
         },
 
