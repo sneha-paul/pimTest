@@ -341,7 +341,7 @@
                     info: "_START_ to _END_ of _TOTAL_"
                 },
                 initComplete : function() {
-                    var input = $('.dataTables_filter input').unbind(),
+                    var input = $(options.selector + '_filter.dataTables_filter input').unbind(),
                         self = this.api(),
                         $searchButton = $('<button type="button" class="btn btn btn-primary search-btn"><i class="icon-magnifier"></i></button>')
 
