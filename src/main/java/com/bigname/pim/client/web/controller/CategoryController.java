@@ -5,7 +5,6 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ReflectionUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
@@ -172,7 +171,30 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping("/{id}/products/data")
     @ResponseBody
     public Result<Map<String, Object>> getCategoryProducts(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        return getAssociationGridData(categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), CategoryProduct.class, request);
+        Request dataTableRequest = new Request(request);
+        if(isEmpty(dataTableRequest.getSearch())) {
+            return getAssociationGridData(categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), CategoryProduct.class, request);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, Object>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort = null;
+            if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            }
+            List<Map<String, Object>> dataObjects = new ArrayList<>();
+            int seq[] = {1};
+            Page<Map<String, Object>> paginatedResult = categoryService.findAllCategoryProducts(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            EntityAssociation<Category, Product> association = new CategoryProduct();
+            paginatedResult.getContent().forEach(e -> {
+                e.put("sequenceNum", Integer.toString(seq[0] ++));
+                dataObjects.add(association.toMap(e));
+            });
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
+            return result;
+        }
     }
 
     @RequestMapping(value = "/{id}/products/data", method = RequestMethod.PUT)

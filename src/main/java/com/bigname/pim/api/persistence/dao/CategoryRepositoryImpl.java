@@ -184,4 +184,41 @@ public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category> impl
 
         return new PageImpl<>(results, pageable, results.size());
     }
+
+    @Override
+    public Page<Map<String, Object>> findAllCategoryProducts(String categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        Sort sort = pageable.getSort();
+        SortOperation sortOperation;
+        if(sort == null) {
+            sortOperation = sort(Sort.Direction.ASC, "sequenceNum").and(Sort.Direction.DESC, "subSequenceNum");
+        } else {
+            Sort.Order order = sort.iterator().next();
+            sortOperation = sort(order.getDirection(), order.getProperty());
+        }
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("categoryProduct");
+
+        keyword = "(?i)" + keyword;
+        Criteria searchCriteria = new Criteria();
+        searchCriteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
+        searchCriteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where("categoryId").is(categoryId)),
+                lookupOperation,
+                replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(categoryProduct, 0)")).mergeWith(ROOT)),
+                project().andExclude("description", "categoryProduct"),
+                match(searchCriteria),
+                sortOperation,
+                skip(pageable.getOffset()),
+                limit((long) pageable.getPageSize())
+        );
+
+        List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "categoryProduct", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
+
+        return new PageImpl<>(results, pageable, results.size());
+    }
 }

@@ -9,16 +9,16 @@ import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
-import com.bigname.pim.util.*;
+import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.PIMConstants;
+import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,6 +78,13 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     public Page<Map<String, Object>> findAllProducts(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
                 .map(category -> categoryDAO.findAllProducts(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
+    public Page<Map<String, Object>> findAllCategoryProducts(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, findBy, false)
+                .map(product -> categoryDAO.findAllCategoryProducts(product.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
