@@ -82,6 +82,13 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     }
 
     @Override
+    public Page<Category> findAvailableRootCategoriesForCatalog(String catalogId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(catalogId, findBy, false)
+                .map(category -> catalogDAO.findAvailableRootCategoriesForCatalog(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
     public Optional<Catalog> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
@@ -102,7 +109,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * @return
      */
     @Override
-    public Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort) {
+    public Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         Optional<Catalog> catalog = get(id, findBy, false);
         Set<String> categoryIds = new HashSet<>();
         catalog.ifPresent(catalog1 -> rootCategoryDAO.findByCatalogId(catalog1.getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId())));

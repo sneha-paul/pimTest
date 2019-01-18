@@ -20,6 +20,8 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
 //    Page<Catalog> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     boolean toggleRootCategory(String catalogId, FindBy catalogIdFindBy, String rootCategoryId, FindBy rootCategoryIdFindBy, Toggle active);
+
+    Page<Category> findAvailableRootCategoriesForCatalog(String catalogId, FindBy externalId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
     /**
      * Method to get categories of a Catalog in paginated format.
      *
@@ -55,7 +57,7 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
      * @param sort sort object
      * @return
      */
-    Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort);
+    Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to add category for a catalog.
