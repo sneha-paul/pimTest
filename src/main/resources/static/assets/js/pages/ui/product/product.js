@@ -97,6 +97,7 @@ $( document ).ready(function() {
         names: ['categories', 'category'],
         pageUrl: $.getURL('/pim/categories/{categoryId}/'),
         dataUrl: $.getURL('/pim/products/{productId}/categories/data'),
+        toggleUrl: '/pim/products/{productId}/categories/{externalId}/active/{active}',
         urlParams: urlParams1,
         reordering: false,
         columns: [

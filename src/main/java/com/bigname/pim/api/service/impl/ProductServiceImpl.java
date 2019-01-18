@@ -10,14 +10,12 @@ import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.service.*;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
-import com.bigname.pim.util.ProductUtil;
+import com.bigname.pim.util.*;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -395,6 +393,20 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         return null;
     }
 
+    @Override
+    public boolean toggleProductCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy, Toggle active) {
+        return get(productId, productIdFindBy, false)
+                .map(product -> categoryService.get(categoryId, categoryIdFindBy, false)
+                        .map(category -> productCategoryDAO.findFirstByProductIdAndCategoryId(product.getId(), category.getId())
+                                .map(productCategory -> {
+                                    productCategory.setActive(active.state());
+                                    productCategoryDAO.save(productCategory);
+                                    return true;
+                                })
+                                .orElse(false))
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + categoryId)))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id: " + productId));
+    }
     /**
      * Method to get categories of a Product in paginated format.
      *

@@ -120,8 +120,8 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                                     return true;
                                 })
                                 .orElse(false))
-                        .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id: " + rootCategoryId)))
-                .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + catalogId));
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + rootCategoryId)))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find catalog with id: " + catalogId));
     }
 
     /**

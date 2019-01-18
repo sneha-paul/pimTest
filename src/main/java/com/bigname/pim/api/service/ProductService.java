@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -103,6 +104,8 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
      * @return
      */
     ProductCategory addCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy);
+
+    boolean toggleProductCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy, Toggle active);
 
     /**
      * Method to get categories of a Product in paginated format.

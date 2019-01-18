@@ -11,6 +11,7 @@ import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -223,6 +224,16 @@ public class ProductController extends BaseController<Product, ProductService>{
         Map<String, Object> model = new HashMap<>();
         boolean success = productService.addCategory(id, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);
+        return model;
+    }
+
+    @RequestMapping(value = "/{id}/categories/{categoryId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleProductCategory(@PathVariable(value = "id") String productId,
+                                                  @PathVariable(value = "categoryId") String categoryId,
+                                                  @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", productService.toggleProductCategory(productId, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
     }
 }

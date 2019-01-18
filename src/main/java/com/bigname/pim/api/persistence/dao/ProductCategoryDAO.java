@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by sruthi on 08-11-2018.
@@ -13,4 +14,5 @@ import java.util.List;
 public interface ProductCategoryDAO extends BaseAssociationDAO<ProductCategory>, MongoRepository<ProductCategory, String> {
     Page<ProductCategory> findByProductIdAndActiveIn(String productId, String active[], Pageable pageable);
     List<ProductCategory> findByProductId(String productId);
+    Optional<ProductCategory> findFirstByProductIdAndCategoryId(String productId, String categoryId);
 }
