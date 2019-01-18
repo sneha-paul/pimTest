@@ -6,10 +6,7 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil2;
-import com.bigname.pim.api.domain.Catalog;
-import com.bigname.pim.api.domain.EntityAssociation;
-import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.api.domain.WebsiteCatalog;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
@@ -225,7 +222,8 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Catalog> paginatedResult = websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Catalog> paginatedResult = ValidationUtil2.isEmpty(dataTableRequest.getSearch()) ? websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+                : websiteService.findAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

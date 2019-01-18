@@ -62,6 +62,13 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     }
 
     @Override
+    public Page<Catalog> findAvailableCatalogsForWebsite(String websiteId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(websiteId, findBy, false)
+                .map(catalog -> websiteDAO.findAvailableCatalogsForWebsite(catalog.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
     public Optional<Website> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
@@ -87,12 +94,13 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
      * @return
      */
     @Override
-    public Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort) {
+    public Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         Optional<Website> website = get(id, findBy, false);
         Set<String> catalogIds = new HashSet<>();
         website.ifPresent(catalog1 -> websiteCatalogDAO.findByWebsiteId(catalog1.getId()).forEach(rc -> catalogIds.add(rc.getCatalogId())));
         return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
     }
+
 
     /**
      * Method to get catalogs of a website in paginated format.

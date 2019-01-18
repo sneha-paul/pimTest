@@ -14,6 +14,9 @@ import java.util.Optional;
 
 public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
 
+
+    Page<Catalog> findAvailableCatalogsForWebsite(String websiteId, FindBy externalId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+
     /**
      * Method to get catalogs of a website in paginated format.
      *
@@ -35,7 +38,7 @@ public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
      * @param sort sort object
      * @return
      */
-    Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort);
+    Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to add catalog for a website.
@@ -52,6 +55,7 @@ public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
     Optional<Website> getWebsiteByUrl(String url);
 
     Page<Map<String, Object>> findAllWebsiteCatalogs(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+
 
 
 }
