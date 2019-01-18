@@ -2,6 +2,8 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.CategoryProduct;
+import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.util.*;
 import org.springframework.data.domain.*;
@@ -219,6 +221,26 @@ public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category> impl
 
         List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "categoryProduct", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
 
+        return new PageImpl<>(results, pageable, results.size());
+    }
+
+    @Override
+    public List<CategoryProduct> getAllCategoryProducts(String categoryId, boolean... activeRequired) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("categoryId").is(categoryId).andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired)))));
+        return mongoTemplate.find(query, CategoryProduct.class);
+    }
+
+    @Override
+    public Page<Product> findAvailableProductsForCategory(String categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        List<String> excludeIds = getAllCategoryProducts(categoryId, false).stream().map(CategoryProduct::getProductId).collect(Collectors.toList());
+        Query query = new Query();
+        keyword = "(?i)" + keyword;
+        Criteria criteria = new Criteria();
+        criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
+        criteria.andOperator(Criteria.where("_id").nin(excludeIds),Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+        query.addCriteria(criteria).with(pageable);
+        List<Product> results = mongoTemplate.find(query, Product.class);
         return new PageImpl<>(results, pageable, results.size());
     }
 }

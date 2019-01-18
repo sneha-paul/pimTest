@@ -96,6 +96,12 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
+    public Page<Product> findAvailableProductsForCategory(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, findBy, false)
+                .map(product -> categoryDAO.findAvailableProductsForCategory(product.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+    @Override
     public Optional<Category> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }
@@ -535,7 +541,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      * @return
      */
     @Override
-    public Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort) {
+    public Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
         Optional<Category> category = get(id, findBy, false);
         Set<String> productIds = new HashSet<>();
         category.ifPresent(category1 -> categoryProductDAO.findByCategoryId(category1.getId()).forEach(cp -> productIds.add(cp.getProductId())));

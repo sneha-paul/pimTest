@@ -17,6 +17,8 @@ import java.util.Map;
 public interface CategoryService extends  BaseService<Category, CategoryDAO> {
 //    Page<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
+    Page<Product> findAvailableProductsForCategory(String categoryId, FindBy externalId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+
     Page<Category> findAvailableSubCategoriesForCategory(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
     List<Map<String, Object>> getCategoryHierarchy(boolean... activeRequired);
@@ -82,7 +84,7 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
      * @param sort sort object
      * @return
      */
-    Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort);
+    Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to add product for a category.

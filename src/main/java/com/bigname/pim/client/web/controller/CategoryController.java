@@ -5,6 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil2;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
@@ -276,7 +277,10 @@ public class CategoryController extends BaseController<Category, CategoryService
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Product> paginatedResult = categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Product> paginatedResult = ValidationUtil2.isEmpty(dataTableRequest.getSearch()) ? categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+                : categoryService.findAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+
+        //Page<Product> paginatedResult = categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
