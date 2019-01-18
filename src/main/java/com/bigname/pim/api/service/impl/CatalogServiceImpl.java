@@ -1,17 +1,23 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.CollectionsUtil;
-import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.domain.Catalog;
+import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.RelatedCategory;
+import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.*;
+import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.PimUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +25,9 @@ import javax.validation.Validator;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.pim.util.PIMConstants.*;
-import static com.bigname.pim.util.PIMConstants.ReorderingDirection.*;
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection;
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection.DOWN;
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection.UP;
 
 @Service
 public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, CatalogService> implements CatalogService {
@@ -63,6 +70,13 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     @Override
     public List<Catalog> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
         return catalogDAO.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
+    @Override
+    public Page<Map<String, Object>> findAllRootCategories(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(catalogId, findBy, false)
+                .map(category -> catalogDAO.findAllRootCategories(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
@@ -277,4 +291,6 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         }
         return null;
     }
+
+
 }

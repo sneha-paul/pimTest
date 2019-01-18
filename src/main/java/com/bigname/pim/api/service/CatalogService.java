@@ -6,13 +6,11 @@ import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
-import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Created by Manu on 8/9/2018.
@@ -66,4 +64,6 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
      * @return
      */
     RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2);
+
+    Page<Map<String, Object>> findAllRootCategories(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 }
