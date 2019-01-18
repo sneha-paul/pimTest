@@ -468,7 +468,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public boolean toggleProduct(String categoryId, FindBy categoryIdFindBy, String productId, FindBy productIdFindBy, Toggle active) {
         return get(categoryId, categoryIdFindBy, false)
-                .map(category -> get(productId, productIdFindBy, false)
+                .map(category -> productService.get(productId, productIdFindBy, false)
                         .map(product -> categoryProductDAO.findFirstByCategoryIdAndProductId(category.getId(), product.getId())
                                 .map(categoryProduct -> {
                                     categoryProduct.setActive(active.state());

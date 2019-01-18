@@ -22,7 +22,7 @@ $(function(){
         names: ['subCategoriesSortable', 'subCategory'],
         pageUrl: $.getURL('/pim/categories/'),
         dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
-        toggleUrl: '{categoryId}/subCategories/{externalId}/active/{active}',
+        toggleUrl: '/pim/categories/{categoryId}/subCategories/{externalId}/active/{active}',
         urlParams: urlParams,
         reordering: false,
         columns: [
@@ -37,7 +37,7 @@ $(function(){
         names: ['subCategoriesReorderable', 'subCategory'],
         pageUrl: $.getURL('/pim/categories/'),
         dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
-        toggleUrl: '/{categoryId}/subCategories/{externalId}/active/{active}',
+        toggleUrl: '/pim/categories/{categoryId}/subCategories/{externalId}/active/{active}',
         urlParams: urlParams,
         reordering: true,
         columns: [
@@ -87,6 +87,7 @@ $(function(){
         names: ['productsSortable', 'product'],
         pageUrl: $.getURL('/pim/products/'),
         dataUrl: $.getURL('/pim/categories/{categoryId}/products/data'),
+        toggleUrl: '/pim/categories/{categoryId}/products/{externalId}/active/{active}',
         urlParams: urlParams1,
         reordering: false,
         columns: [
@@ -101,6 +102,7 @@ $(function(){
         names: ['productsReorderable', 'product'],
         pageUrl: $.getURL('/pim/products/'),
         dataUrl: $.getURL('/pim/categories/{categoryId}/products/data'),
+        toggleUrl: '/pim/categories/{categoryId}/products/{externalId}/active/{active}',
         urlParams: urlParams1,
         reordering: true,
         columns: [

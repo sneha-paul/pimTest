@@ -51,7 +51,7 @@ public class CategoryProduct extends EntityAssociation<Category, Product> {
         return productId;
     }
 
-    public void setProductId(String catalogId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 

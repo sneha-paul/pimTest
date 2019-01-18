@@ -224,7 +224,7 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @RequestMapping(value = "/{id}/subCategories/{subCategoryId}/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> toggle(@PathVariable(value = "id") String categoryId,
+    public Map<String, Object> toggleSubCategory(@PathVariable(value = "id") String categoryId,
                                       @PathVariable(value = "subCategoryId") String subCategoryId,
                                       @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
@@ -263,10 +263,20 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @ResponseBody
     @RequestMapping(value = "/{id}/products/{productId}", method = RequestMethod.POST)
-    public Map<String, Object> addCatalog(@PathVariable(value = "id") String id, @PathVariable(value = "productId") String productId) {
+    public Map<String, Object> addProduct(@PathVariable(value = "id") String id, @PathVariable(value = "productId") String productId) {
         Map<String, Object> model = new HashMap<>();
         boolean success = categoryService.addProduct(id, FindBy.EXTERNAL_ID, productId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);
+        return model;
+    }
+
+    @RequestMapping(value = "/{id}/products/{productId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleProduct(@PathVariable(value = "id") String categoryId,
+                                                 @PathVariable(value = "productId") String productId,
+                                                 @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", categoryService.toggleProduct(categoryId, FindBy.EXTERNAL_ID, productId, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
     }
 
