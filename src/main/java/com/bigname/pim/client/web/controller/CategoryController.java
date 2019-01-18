@@ -190,6 +190,7 @@ public class CategoryController extends BaseController<Category, CategoryService
                 e.put("sequenceNum", Integer.toString(seq[0] ++));
                 dataObjects.add(association.toMap(e));
             });
+
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
             result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
