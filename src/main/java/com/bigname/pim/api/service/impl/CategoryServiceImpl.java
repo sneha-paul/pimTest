@@ -66,6 +66,19 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return categoryDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 
+    @Override
+    public Page<Map<String, Object>> findAllSubCategories(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, findBy, false)
+                .map(category -> categoryDAO.findAllSubCategories(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
+    public Page<Map<String, Object>> findAllProducts(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, findBy, false)
+                .map(category -> categoryDAO.findAllProducts(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
 
     @Override
     public Optional<Category> findOne(Map<String, Object> criteria) {

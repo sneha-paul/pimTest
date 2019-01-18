@@ -354,8 +354,8 @@
                                 input.val('');
                                 $searchButton.click();
                             });
-                    $('.dataTables_filter .search-btn').remove();
-                    $('.dataTables_filter').append($searchButton);
+                    $(options.selector + '_filter.dataTables_filter .search-btn').remove();
+                    $(options.selector + '_filter.dataTables_filter').append($searchButton);
                 },
                 ajax: {
                     url: options.url + (options.type !== 'TYPE_1' && options.type !== 'TYPE_1A' ? '' : 'list'),

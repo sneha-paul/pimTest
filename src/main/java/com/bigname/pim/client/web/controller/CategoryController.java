@@ -5,10 +5,8 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
-import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.CategoryProduct;
-import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.RelatedCategory;
+import com.bigname.common.util.ReflectionUtil;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
@@ -135,7 +133,30 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping("/{id}/subCategories/data")
     @ResponseBody
     public Result<Map<String, Object>> getSubCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        return getAssociationGridData(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), RelatedCategory.class, request);
+        Request dataTableRequest = new Request(request);
+        if(isEmpty(dataTableRequest.getSearch())) {
+            return getAssociationGridData(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), RelatedCategory.class, request);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, Object>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort = null;
+            if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            }
+            List<Map<String, Object>> dataObjects = new ArrayList<>();
+            int seq[] = {1};
+            Page<Map<String, Object>> paginatedResult = categoryService.findAllSubCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            EntityAssociation<Category, Category> association = new RelatedCategory();
+            paginatedResult.getContent().forEach(e -> {
+                e.put("sequenceNum", Integer.toString(seq[0] ++));
+                dataObjects.add(association.toMap(e));
+            });
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
+            return result;
+        }
     }
 
     @RequestMapping(value = "/{id}/subCategories/data", method = RequestMethod.PUT)
