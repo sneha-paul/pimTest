@@ -2,6 +2,7 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
@@ -440,6 +441,36 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean toggleSubCategory(String categoryId, FindBy categoryIdFindBy, String subCategoryId, FindBy subCategoryIdFindBy, Toggle active) {
+        return get(categoryId, categoryIdFindBy, false)
+                .map(category -> get(subCategoryId, subCategoryIdFindBy, false)
+                        .map(subCategory -> relatedCategoryDAO.findFirstByCategoryIdAndSubCategoryId(category.getId(), subCategory.getId())
+                                .map(relatedCategory -> {
+                                    relatedCategory.setActive(active.state());
+                                    relatedCategoryDAO.save(relatedCategory);
+                                    return true;
+                                })
+                                .orElse(false))
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find subCategory with id: " + subCategoryId)))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + categoryId));
+    }
+
+    @Override
+    public boolean toggleProduct(String categoryId, FindBy categoryIdFindBy, String productId, FindBy productIdFindBy, Toggle active) {
+        return get(categoryId, categoryIdFindBy, false)
+                .map(category -> get(productId, productIdFindBy, false)
+                        .map(product -> categoryProductDAO.findFirstByCategoryIdAndProductId(category.getId(), product.getId())
+                                .map(categoryProduct -> {
+                                    categoryProduct.setActive(active.state());
+                                    categoryProductDAO.save(categoryProduct);
+                                    return true;
+                                })
+                                .orElse(false))
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id: " + productId)))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + categoryId));
     }
 
     @Override

@@ -22,6 +22,7 @@ $(function(){
         names: ['subCategoriesSortable', 'subCategory'],
         pageUrl: $.getURL('/pim/categories/'),
         dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
+        toggleUrl: '{categoryId}/subCategories/{externalId}/active/{active}',
         urlParams: urlParams,
         reordering: false,
         columns: [
@@ -36,6 +37,7 @@ $(function(){
         names: ['subCategoriesReorderable', 'subCategory'],
         pageUrl: $.getURL('/pim/categories/'),
         dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
+        toggleUrl: '/{categoryId}/subCategories/{externalId}/active/{active}',
         urlParams: urlParams,
         reordering: true,
         columns: [

@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
@@ -51,6 +52,10 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
      * @return
      */
     RelatedCategory addSubCategory(String id, FindBy findBy1, String categoryId, FindBy findBy2);
+
+    boolean toggleSubCategory(String categoryId, FindBy categoryIdFindBy, String subCategoryId, FindBy subCategoryIdFindBy, Toggle active);
+
+    boolean toggleProduct(String categoryId, FindBy categoryIdFindBy, String productId, FindBy productIdFindBy, Toggle active);
 
     Page<CategoryProduct> getCategoryProducts(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 

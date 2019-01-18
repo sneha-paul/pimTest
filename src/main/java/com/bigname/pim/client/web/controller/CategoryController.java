@@ -13,6 +13,7 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -220,6 +221,15 @@ public class CategoryController extends BaseController<Category, CategoryService
         return model;
     }
 
+    @RequestMapping(value = "/{id}/subCategories/{subCategoryId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggle(@PathVariable(value = "id") String categoryId,
+                                      @PathVariable(value = "subCategoryId") String subCategoryId,
+                                      @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", categoryService.toggleSubCategory(categoryId, FindBy.EXTERNAL_ID, subCategoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
+    }
 
 
     @RequestMapping(value = "/{id}/products/available")

@@ -51,7 +51,7 @@
                 icon: 'icon-ban',
                 click: function(row){
                     $.toggleStatus(
-                        $.getURL(options.pageUrl + '{externalId}/active/{active}', {
+                        $.getURL(options.pageUrl + (typeof options.toggleUrl === 'undefined' || options.toggleUrl === '' ? '{externalId}/active/{active}' : options.toggleUrl), {
                             externalId: row.externalId,
                             active: row.active,
                             discontinued: row.discontinued
