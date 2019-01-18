@@ -5,7 +5,9 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil2;
 import com.bigname.pim.api.domain.Catalog;
+import com.bigname.pim.api.domain.EntityAssociation;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.exception.EntityNotFoundException;
@@ -162,7 +164,30 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
     @RequestMapping("/{id}/catalogs/data")
     @ResponseBody
     public Result<Map<String, Object>> getWebsiteCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        return getAssociationGridData(websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), WebsiteCatalog.class, request);
+        Request dataTableRequest = new Request(request);
+        if(ValidationUtil2.isEmpty(dataTableRequest.getSearch())) {
+            return getAssociationGridData(websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), WebsiteCatalog.class, request);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, Object>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort = null;
+            if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            }
+            List<Map<String, Object>> dataObjects = new ArrayList<>();
+            int seq[] = {1};
+            Page<Map<String, Object>> paginatedResult = websiteService.findAllWebsiteCatalogs(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            EntityAssociation<Website, Catalog> association = new WebsiteCatalog();
+            paginatedResult.getContent().forEach(e -> {
+                e.put("sequenceNum", Integer.toString(seq[0] ++));
+                dataObjects.add(association.toMap(e));
+            });
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
+            return result;
+        }
     }
 
     /**

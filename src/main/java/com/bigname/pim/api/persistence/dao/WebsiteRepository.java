@@ -12,5 +12,7 @@ import java.util.Map;
  */
 public interface WebsiteRepository extends GenericRepository<Website> {
 //    Optional<Website> findById(String id, FindBy findBy, Class<Website> clazz);
-Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, Pageable pageable);
+    Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, Pageable pageable);
+
+    Page<Map<String, Object>> findAllWebsiteCatalogs(String websiteId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 }
