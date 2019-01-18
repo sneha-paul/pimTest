@@ -6,6 +6,7 @@ import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
@@ -17,6 +18,8 @@ import java.util.Map;
  */
 public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
 //    Page<Catalog> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+
+    boolean toggleRootCategory(String catalogId, FindBy catalogIdFindBy, String rootCategoryId, FindBy rootCategoryIdFindBy, Toggle active);
     /**
      * Method to get categories of a Catalog in paginated format.
      *

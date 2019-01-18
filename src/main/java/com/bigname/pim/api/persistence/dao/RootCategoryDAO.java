@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by sruthi on 31-08-2018.
@@ -17,5 +18,6 @@ public interface RootCategoryDAO extends BaseAssociationDAO<RootCategory>, Mongo
     List<RootCategory> findByCatalogId(String catalogId);
     List<RootCategory> findByCatalogIdOrderBySequenceNumAscSubSequenceNumDesc(String catalogId);
     List<RootCategory> findByCatalogIdAndRootCategoryIdIn(String catalogId, String[] rootCategoryIds);
+    Optional<RootCategory> findFirstByCatalogIdAndRootCategoryId(String catalogId, String rootCategoryIds);
     List<RootCategory> findByCatalogIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(String catalogId, long sequenceNum, int subSequenceNum);
 }

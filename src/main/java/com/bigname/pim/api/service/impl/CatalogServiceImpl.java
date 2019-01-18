@@ -5,6 +5,7 @@ import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.domain.RootCategory;
+import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
@@ -14,6 +15,7 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -105,6 +107,21 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         Set<String> categoryIds = new HashSet<>();
         catalog.ifPresent(catalog1 -> rootCategoryDAO.findByCatalogId(catalog1.getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId())));
         return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
+    }
+
+    @Override
+    public boolean toggleRootCategory(String catalogId, FindBy catalogIdFindBy, String rootCategoryId, FindBy rootCategoryIdFindBy, Toggle active) {
+        return get(catalogId, catalogIdFindBy, false)
+                .map(catalog -> categoryService.get(rootCategoryId, rootCategoryIdFindBy, false)
+                        .map(rootCategory -> rootCategoryDAO.findFirstByCatalogIdAndRootCategoryId(catalog.getId(), rootCategory.getId())
+                                .map(rootCategory1 -> {
+                                    rootCategory1.setActive(active.state());
+                                    rootCategoryDAO.save(rootCategory1);
+                                    return true;
+                                })
+                                .orElse(false))
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id: " + rootCategoryId)))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + catalogId));
     }
 
     /**

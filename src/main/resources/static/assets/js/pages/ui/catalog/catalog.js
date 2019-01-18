@@ -11,6 +11,7 @@ $(function(){
         names: ['rootCategoriesSortable', 'rootCategory'],
         pageUrl: $.getURL('/pim/categories/'),
         dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
+        toggleUrl: '/pim/catalogs/{catalogId}/rootCategories/{externalId}/active/{active}',
         urlParams: urlParams,
         reordering: false,
         columns: [
@@ -25,6 +26,7 @@ $(function(){
         names: ['rootCategoriesReorderable', 'rootCategory'],
         pageUrl: $.getURL('/pim/categories/'),
         dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
+        toggleUrl: '/pim/catalogs/{catalogId}/rootCategories/{externalId}/active/{active}',
         urlParams: urlParams,
         reordering: true,
         reorderCallback: function() {$.refreshDataTable('categoriesHierarchy')},

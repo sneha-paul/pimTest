@@ -11,6 +11,7 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -199,6 +200,16 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         Map<String, Object> model = new HashMap<>();
         boolean success = catalogService.addRootCategory(id, FindBy.EXTERNAL_ID, rootCategoryId, FindBy.EXTERNAL_ID) != null;
         model.put("success", success);
+        return model;
+    }
+
+    @RequestMapping(value = "/{id}/rootCategories/{rootCategoryId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleRootCategory(@PathVariable(value = "id") String catalogId,
+                                             @PathVariable(value = "rootCategoryId") String rootCategoryId,
+                                             @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", catalogService.toggleRootCategory(catalogId, FindBy.EXTERNAL_ID, rootCategoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
     }
 
