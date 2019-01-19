@@ -332,7 +332,7 @@
             $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
                 serverSide: true,
-                pageLength: 25,
+                pageLength: options.pageLength ? options.pageLength : 25,
                 conditionalPaging: true,
                 searching: true,
                 ordering: !(typeof options.reordering !== 'undefined' && options.reordering),

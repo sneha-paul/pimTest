@@ -1,6 +1,6 @@
-<div class="card popup-content">
+<div class="popup-content">
     <div class="body">
-        <div class="table-responsive">
+        <div class="table-responsive modal-dt">
             <table id="paginatedAvailableSubCategoriesTable" class="table table-hover dataTable table-custom" style="width:100%">
                 <thead class="thead-dark">
 

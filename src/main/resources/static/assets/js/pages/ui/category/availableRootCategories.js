@@ -3,10 +3,10 @@ $( document ).ready(function() {
         selector: '#paginatedAvailableRootCategoriesTable',
         name: 'availableRootCategories',
         type: 'TYPE_3',
+        pageLength: 10,
         url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/available/list'),
         columns: [
-            { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
-            { data: 'externalId', name : 'externalId', title : 'Category ID' },
+            { data: 'categoryName', name : 'categoryName' , title : 'Category Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]
     });

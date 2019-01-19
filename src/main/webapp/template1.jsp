@@ -75,6 +75,45 @@
             z-index: 2000;
         }
 
+        .popup-content {
+            padding: 20px;
+        }
+
+        .modal-dt > div:first-of-type > div:nth-of-type(2) {
+            height: calc(55vh + 50px);
+            overflow: auto;
+            padding-bottom:25px;
+            border: 1px solid #00000;
+        }
+        .modal-dt > div:first-of-type > div:nth-of-type(3) {
+            position: fixed;
+            bottom: 14px;
+            width: 68%;
+        }
+
+        .modal-dt .dataTable {
+            margin-top:2px !important;
+            background-color: #f8f8f8;
+        }
+
+        .modal-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+            background-color: #ffffff;
+            padding: 1px;
+            box-shadow: none;
+        }
+
+        .modal-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar {
+            width: 10px;
+            background-color: #f8f8f8;
+        }
+
+        .modal-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar-thumb {
+            background-color: #7f7f7f;
+            border: 2px solid #ffffff;
+            border-radius: 5px;
+        }
+
         div.js-draggable .placeholder:before {
             position: absolute;
         }
@@ -408,6 +447,13 @@
         }
 
         .truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dt-column {
+            max-width:25%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;

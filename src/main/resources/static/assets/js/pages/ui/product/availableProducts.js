@@ -3,11 +3,11 @@ $( document ).ready(function() {
         selector: '#paginatedAvailableProductsTable',
         name: 'availableProducts',
         type: 'TYPE_3',
+        pageLength: 10,
         url: $.getURL('/pim/categories/{categoryId}/products/available/list'),
         columns: [
-            { data: 'productName', name : 'productName' , title : 'Product Name'},
-            { data: 'externalId', name : 'externalId', title : 'Product ID' },
-            { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family' },
+            { data: 'productName', name : 'productName' , title : 'Product Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
+            { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family', visible: false },
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
         ]
     });
