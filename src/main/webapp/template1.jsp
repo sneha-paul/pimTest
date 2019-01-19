@@ -75,6 +75,19 @@
             z-index: 2000;
         }
 
+        .dt-clear {
+            position: absolute;
+            right: 44px;
+            top:10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .dataTables_filter input {
+            padding-right:20px;
+        }
+
+
         .popup-content {
             padding: 20px;
         }

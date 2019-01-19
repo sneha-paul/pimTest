@@ -341,24 +341,35 @@
                     info: "_START_ to _END_ of _TOTAL_"
                 },
                 initComplete : function() {
-                    var input = $(options.selector + '_filter.dataTables_filter input').unbind(),
+                    var input = $(options.selector + '_filter.dataTables_filter input').unbind()
+                            .on('keyup', function() {
+                                if($(this).val() !== '') {
+                                    $(options.selector + '_filter.dataTables_filter .dt-clear').removeClass('js-hidden');
+                                } else {
+                                    $(options.selector + '_filter.dataTables_filter .dt-clear').addClass('js-hidden');
+                                }
+                            }),
                         self = this.api(),
                         $searchButton = $('<button type="button" class="btn btn btn-primary search-btn"><i class="icon-magnifier"></i></button>')
 
                             .click(function() {
                                 self.search(input.val()).draw();
+                                if(input.val() !== '') {
+                                    $(options.selector + '_filter.dataTables_filter .dt-clear').removeClass('js-hidden');
+                                } else {
+                                    $(options.selector + '_filter.dataTables_filter .dt-clear').addClass('js-hidden');
+                                }
                             }),
-                        $clearButton = $('<button>')
-                            .text('clear')
+                        $clearButton = $('<i class="fa fa-times-circle dt-clear text-danger js-hidden"></i>')
                             .click(function() {
                                 input.val('');
                                 $searchButton.click();
                             });
                     $(options.selector + '_filter.dataTables_filter .search-btn').remove();
-                    $(options.selector + '_filter.dataTables_filter').append($searchButton);
+                    $(options.selector + '_filter.dataTables_filter').append($clearButton, $searchButton);
                 },
                 ajax: {
-                    url: options.url + (options.type !== 'TYPE_1' && options.type !== 'TYPE_1A' ? '' : 'list'),
+                    url: options.url,
                     data: function ( data ) {
                         //process data before sent to server.
                     },
