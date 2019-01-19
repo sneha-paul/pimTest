@@ -17,7 +17,7 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="categoryGrid">
-                        <div id="categoryGridView" class="table-responsive js-grid-view">
+                        <div id="categoryGridView" class="table-responsive js-grid-view scrollable-dt">
                             <table id="paginatedCategoriesTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
                                 <thead class="thead-dark">
                                 </thead>
@@ -25,7 +25,7 @@
                         </div>
                     </div>
                     <div class="tab-pane" id="categoryTree">
-                        <div class="table-responsive no-filter">
+                        <div class="table-responsive no-filter scrollable-dt">
                             <table id="categoriesHierarchy" class="table table-hover dataTable treeDataTable table-custom m-b-0" style="width: 100% !important">
                                 <thead class="thead-dark">
                                 </thead>

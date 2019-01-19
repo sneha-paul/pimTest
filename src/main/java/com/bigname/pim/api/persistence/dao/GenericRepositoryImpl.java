@@ -3,11 +3,14 @@ package com.bigname.pim.api.persistence.dao;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.PimUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.util.Assert;
 
 import java.util.Arrays;
@@ -49,14 +52,17 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
         return mongoTemplate.find(query, entityClass);
     }
 
-    public List<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+    public Page<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         Query query = new Query();
         keyword = "(?i)" + keyword;
         Criteria criteria = new Criteria();
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
         criteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
         query.addCriteria(criteria).with(PageRequest.of(pageable.getPage(), pageable.getSize(), pageable.getSort()));
-        return mongoTemplate.find(query, entityClass);
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(query, entityClass),
+                pageable.getPageRequest(),
+                () -> mongoTemplate.count(query, entityClass));
     }
 
     public Optional<T> findOne(Map<String, Object> criteria) {

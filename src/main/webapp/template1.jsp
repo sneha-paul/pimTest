@@ -92,36 +92,49 @@
             padding: 20px;
         }
 
-        .modal-dt > div:first-of-type > div:nth-of-type(2) {
+        .scrollable-dt {
+            overflow: hidden;
+        }
+
+        .scrollable-dt > div:first-of-type > div:nth-of-type(2) {
             height: calc(55vh + 50px);
             overflow: auto;
             padding-bottom:25px;
             border: 1px solid #00000;
         }
-        .modal-dt > div:first-of-type > div:nth-of-type(3) {
-            position: fixed;
+        .scrollable-dt.modal-dt > div:first-of-type > div:nth-of-type(3) {
+            /*position: fixed;
             bottom: 14px;
             width: 68%;
+            right: auto;*/
         }
 
-        .modal-dt .dataTable {
+        .scrollable-dt > div:first-of-type > div:nth-of-type(3) {
+            position: relative;
+            bottom: -2px;
+            right: 10px;
+            padding-left: 10px;
+            width: 100%;
+        }
+
+        .scrollable-dt .dataTable {
             margin-top:2px !important;
             background-color: #f8f8f8;
         }
 
-        .modal-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar-track {
+        .scrollable-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
             background-color: #ffffff;
             padding: 1px;
             box-shadow: none;
         }
 
-        .modal-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar {
+        .scrollable-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar {
             width: 10px;
             background-color: #f8f8f8;
         }
 
-        .modal-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar-thumb {
+        .scrollable-dt > div:first-of-type > div:nth-of-type(2)::-webkit-scrollbar-thumb {
             background-color: #7f7f7f;
             border: 2px solid #ffffff;
             border-radius: 5px;

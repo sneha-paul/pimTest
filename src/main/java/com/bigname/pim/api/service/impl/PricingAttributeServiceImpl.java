@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
 import com.bigname.pim.api.service.PricingAttributeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ public class PricingAttributeServiceImpl extends BaseServiceSupport<PricingAttri
     }
 
     @Override
-    public List<PricingAttribute> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<PricingAttribute> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
         return pricingAttributeDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 

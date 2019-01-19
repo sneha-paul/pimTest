@@ -8,6 +8,7 @@ import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -48,8 +49,8 @@ public interface BaseService<T, DAO> {
 
     List<T> findAll(Criteria criteria);
 
-    default List<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return new ArrayList<>();  // TODO - Remove this default implementation after implementing search for all entities
+    default Page<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return new PageImpl<>(new ArrayList<>());  // TODO - Remove this default implementation after implementing search for all entities
     }
 
     Optional<T> findOne(Map<String, Object> criteria);

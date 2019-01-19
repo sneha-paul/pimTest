@@ -10,6 +10,7 @@ import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.PricingAttributeService;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,11 +68,11 @@ public class PricingAttributeController extends  BaseController<PricingAttribute
                 sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            List<PricingAttribute> paginatedResult = pricingAttributeService.findAll("pricingAttributeName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            Page<PricingAttribute> paginatedResult = pricingAttributeService.findAll("pricingAttributeName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
             paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.size()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.size()));
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
             return result;
         }
     }

@@ -23,6 +23,7 @@ $(function(){
         pageUrl: $.getURL('/pim/categories/'),
         dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
         toggleUrl: '/pim/categories/{categoryId}/subCategories/{externalId}/active/{active}',
+        pageLength: 10,
         urlParams: urlParams,
         reordering: false,
         columns: [

@@ -10,6 +10,7 @@ import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,11 +81,11 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                 sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            List<AssetCollection> paginatedResult = assetCollectionService.findAll("collectionName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            Page<AssetCollection> paginatedResult = assetCollectionService.findAll("collectionName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
             paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.size()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.size()));
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
             return result;
         }
     }

@@ -49,7 +49,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
     }
 
     @Override
-    public List<AttributeCollection> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<AttributeCollection> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
         return attributeCollectionDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 

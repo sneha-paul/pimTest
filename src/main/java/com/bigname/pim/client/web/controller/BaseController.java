@@ -81,7 +81,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
         return result;
     }
 
@@ -138,7 +138,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         });
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
         return result;
     }
 

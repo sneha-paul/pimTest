@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.support.PageableExecutionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,9 +57,11 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website> implem
                 limit((long) pageable.getPageSize())
         );
 
-        List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "websiteCatalog", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.aggregate(aggregation, "websiteCatalog", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList()),
+                pageable,
+                () -> mongoTemplate.count(new Query().addCriteria(Criteria.where("websiteId").is(websiteId)), WebsiteCatalog.class));
 
-        return new PageImpl<>(results, pageable, results.size());
     }
 
     @Override
@@ -87,6 +90,18 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website> implem
                 lookupOperation,
                 replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(websiteCatalog, 0)")).mergeWith(ROOT)),
                 project().andExclude("description", "websiteCatalog"),
+                match(searchCriteria)
+        );
+
+        //TODO - need to find an option to get the total count along with the paginated result, instead of running two separate aggregation queries
+        long totalCount = mongoTemplate.aggregate(aggregation, "websiteCatalog", Map.class).getMappedResults().size();
+
+
+        aggregation = newAggregation(
+                match(Criteria.where("websiteId").is(websiteId)),
+                lookupOperation,
+                replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(websiteCatalog, 0)")).mergeWith(ROOT)),
+                project().andExclude("description", "websiteCatalog"),
                 match(searchCriteria),
                 sortOperation,
                 skip(pageable.getOffset()),
@@ -95,7 +110,7 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website> implem
 
         List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "websiteCatalog", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
 
-        return new PageImpl<>(results, pageable, results.size());
+        return new PageImpl<>(results, pageable, totalCount);
     }
 
     @Override
@@ -114,7 +129,9 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website> implem
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
         criteria.andOperator(Criteria.where("_id").nin(excludeIds),Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
         query.addCriteria(criteria).with(pageable);
-        List<Catalog> results = mongoTemplate.find(query, Catalog.class);
-        return new PageImpl<>(results, pageable, results.size());
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(query, Catalog.class),
+                pageable,
+                () -> mongoTemplate.count(query, Catalog.class));
     }
 }

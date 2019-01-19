@@ -193,7 +193,7 @@ public class ProductVariantController extends ControllerSupport {
                 paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
                 result.setDataObjects(dataObjects);
                 result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-                result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+                result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
             });
         } else {
             //TODO - send error message
@@ -356,7 +356,7 @@ public class ProductVariantController extends ControllerSupport {
 
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(dataObjects.size()));
-        result.setRecordsFiltered(Long.toString(dataObjects.size())); //TODO - verify this logic
+        result.setRecordsFiltered(Long.toString(dataObjects.size()));
         return result;
     }
 

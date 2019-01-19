@@ -116,11 +116,11 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
                 sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            List<Catalog> paginatedResult = catalogService.findAll("catalogName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            Page<Catalog> paginatedResult = catalogService.findAll("catalogName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
             paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.size()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.size()));
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
             return result;
         }
     }
@@ -192,7 +192,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(pagination.hasFilters() ? paginatedResult.getContent().size() : paginatedResult.getTotalElements())); //TODO - verify this logic
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
         return result;
     }
 

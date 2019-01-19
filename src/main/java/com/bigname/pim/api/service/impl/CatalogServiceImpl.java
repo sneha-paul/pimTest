@@ -70,7 +70,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
 
 
     @Override
-    public List<Catalog> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Catalog> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
         return catalogDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 
