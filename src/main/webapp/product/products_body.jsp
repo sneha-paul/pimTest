@@ -34,7 +34,8 @@
                 {
                     data: 'productName', name : 'productName' , title : 'Product Name',
                     render: function ( data, type, row, meta ) {
-                        return '<div class="grid-image-holder pull-left rounded"><img  src="/uploads/' + row.imageName + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'
+                        let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
+                        return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'
                     }
                 },
                 { data: 'externalId', name : 'externalId', title : 'Product ID',
