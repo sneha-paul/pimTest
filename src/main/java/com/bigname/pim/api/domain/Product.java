@@ -129,6 +129,10 @@ public class Product extends Entity<Product> {
         setScopedAssets(getChannelId(), assets);
     }
 
+    public Map<String, Object> getDefaultAsset() {
+        return ProductUtil.getDefaultAsset(this, FileAsset.AssetFamily.ASSETS);
+    }
+
     void setExternalId() {
         this.productId = getExternalId();
     }
@@ -193,6 +197,12 @@ public class Product extends Entity<Product> {
         map.put("productName", getProductName());
         map.put("productFamilyId", ValidationUtil.isEmpty(getProductFamily()) ? "" : getProductFamily().getExternalId());
         map.put("active", getActive());
+        Map<String, Object> defaultAsset = getDefaultAsset();
+        if(isNotEmpty(defaultAsset)) {
+            map.put("imageName", (String) defaultAsset.get("internalName"));
+        } else {
+            map.put("imageName", "noimage.png");
+        }
         map.put("discontinued", getDiscontinued());
         return map;
     }

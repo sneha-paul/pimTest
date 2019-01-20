@@ -583,8 +583,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="table-responsive">
-                                            <table id="paginatedProductVariantsTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                        <div class="table-responsive scrollable-dt">
+                                            <table id="paginatedProductVariantsTable" class="table table-hover dataTable table-custom c_list" style="width: 100%">
                                                 <thead class="thead-dark"></thead>
                                             </table>
                                         </div>
@@ -619,7 +619,7 @@
             </div>
         </div>
     </div>
-</div>${product.channelId}
+</div>
 <img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}', hash : '${param.hash}'});$.getScript('/assets/js/pages/ui/product/product.js');"/>
 
 <%--<script src="/assets/js/pages/ui/product/product.js"></script>--%>

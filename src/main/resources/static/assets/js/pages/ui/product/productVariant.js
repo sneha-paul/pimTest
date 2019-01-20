@@ -78,7 +78,7 @@ $( document ).ready(function() {
         onDragStart: function ($item, container, _super) {
             startSequence = $("div.js-draggable").sortable("serialize").get();
             var offset = $item.offset(),
-                pointer = container.rootGroup.pointer
+                pointer = container.rootGroup.pointer;
 
             adjustment = {
                 left: pointer.left - offset.left,

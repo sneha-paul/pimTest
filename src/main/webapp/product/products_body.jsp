@@ -12,7 +12,7 @@
                     </div>
                 </div>
                 <div class="table-responsive scrollable-dt">
-                    <table id="paginatedProductsTable" class="table table-hover dataTable table-custom" style="width: 100% !important;">
+                    <table id="paginatedProductsTable" class="table table-hover dataTable table-custom c_list" style="width: 100% !important;">
                         <thead class="thead-dark">
 
                         </thead>
@@ -31,8 +31,22 @@
             pageUrl: '/pim/products/',
             dataUrl: '/pim/products/data',
             columns: [
-                { data: 'productName', name : 'productName' , title : 'Product Name' },
-                { data: 'externalId', name : 'externalId', title : 'Product ID' },
+                {
+                    data: 'productName', name : 'productName' , title : 'Product Name',
+                    render: function ( data, type, row, meta ) {
+                        return '<div class="grid-image-holder pull-left rounded"><img  src="/uploads/' + row.imageName + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'
+                    }
+                },
+                { data: 'externalId', name : 'externalId', title : 'Product ID',
+                    render: function ( data, type, row, meta ) {
+                        return '<ul class="list-unstyled team-info">' +
+                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
+                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
+                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
+                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
+                            '</ul><span>+ 3 more</span>';
+                    }
+                },
                 { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family' }
             ],
         });

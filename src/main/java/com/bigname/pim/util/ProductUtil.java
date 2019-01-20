@@ -1,8 +1,15 @@
 package com.bigname.pim.util;
 
+import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.pim.api.domain.FileAsset;
+import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.ProductVariant;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -74,6 +81,24 @@ public class ProductUtil {
             validateDefaultAsset(productAssets);
         }
         return productAssets;
+    }
+
+    public static Map<String, Object> getDefaultAsset(Product product, FileAsset.AssetFamily family) {
+        Map<String, Object> defaultAsset = null;
+        if(product.getChannelAssets() != null && product.getChannelAssets().containsKey(family.name())) {
+            List<Map<String, Object>> assets = ConversionUtil.toGenericMap(product.getChannelAssets().get(family.name()));
+            defaultAsset = assets.stream().filter(assetMap -> "Y".equals(assetMap.get("defaultFlag"))).findFirst().orElse(assets.isEmpty() ? null : assets.get(0));
+        }
+        return defaultAsset;
+    }
+
+    public static Map<String, Object> getDefaultAsset(ProductVariant productVariant, FileAsset.AssetFamily family) {
+        Map<String, Object> defaultAsset = null;
+        if(productVariant.getVariantAssets().containsKey(family.name())) {
+            List<Map<String, Object>> assets = ConversionUtil.toGenericMap(productVariant.getVariantAssets().get(family.name()));
+            defaultAsset = assets.stream().filter(assetMap -> "Y".equals(assetMap.get("defaultFlag"))).findFirst().orElse(assets.isEmpty() ? null : assets.get(0));
+        }
+        return defaultAsset;
     }
 
 }

@@ -79,7 +79,7 @@ $( document ).ready(function() {
         urlParams: urlParams,
         reordering: false,
         columns: [
-            { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name'},
+            { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name', render: function ( data, type, row, meta ) {return '<img src="/uploads/31268C8F-4C4A-4974-A26F-E6CA8CCDEE82.jpg" class="rounded-circle avatar" alt=""><p class="c_name">' + data + '</p>';}},
             { data: 'externalId', name : 'externalId', title : 'Variant ID' }
         ]
     });
@@ -180,7 +180,7 @@ $( document ).ready(function() {
         onDragStart: function ($item, container, _super) {
             startSequence = $("div.js-draggable").sortable("serialize").get();
             var offset = $item.offset(),
-                pointer = container.rootGroup.pointer
+                pointer = container.rootGroup.pointer;
 
             adjustment = {
                 left: pointer.left - offset.left,

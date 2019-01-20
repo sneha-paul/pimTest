@@ -54,6 +54,14 @@ abstract public class ConversionUtil {
         return list;
     }
 
+    public static List<Object> toGenericList(Object listObject) {
+        return listObject instanceof List ? (List<Object>) listObject : new ArrayList<>();
+    }
+
+    public static List<Map<String, Object>> toGenericMap(Object listOfMapObject) {
+        return toGenericMap(toGenericList(listOfMapObject));
+    }
+
     public static List<Map<String, Object>> toGenericMap(List<Object> listOfMap) {
         return listOfMap.stream().map(o -> (Map<String, Object>) o).collect(Collectors.toList());
     }

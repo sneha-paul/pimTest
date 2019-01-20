@@ -83,8 +83,29 @@
             cursor: pointer;
         }
 
+        .grid-image-holder {
+            text-align: center;
+            height:80px;
+            line-height: 78px;
+            overflow: hidden;
+            width:80px;
+            margin-right: 10px;
+            background: url(/assets/img/transparent_bg.png);
+            background-repeat: repeat;
+            background-size: 30px 30px;
+        }
+
+        .grid-main-img {
+            max-height:100%;
+            max-width: 100%;
+        }
+
         .dataTables_filter input {
             padding-right:20px;
+        }
+
+        .height35 {
+            height:35px;
         }
 
 
