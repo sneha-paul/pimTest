@@ -1,25 +1,22 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
-import com.bigname.pim.util.Toggle;
+import com.bigname.pim.api.service.VirtualFileService;
+import com.bigname.pim.util.*;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
@@ -30,13 +27,15 @@ import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 @Service
 public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant, ProductVariantDAO, ProductVariantService> implements ProductVariantService {
 
+    private VirtualFileService assetService;
     private ProductVariantDAO productVariantDAO;
     private ProductDAO productDAO;
 
 
     @Autowired
-    public ProductVariantServiceImpl(ProductVariantDAO productVariantDAO, Validator validator, ProductDAO productDAO) {
+    public ProductVariantServiceImpl(ProductVariantDAO productVariantDAO, Validator validator, ProductDAO productDAO, VirtualFileService assetService) {
         super(productVariantDAO, "productVariant", validator);
+        this.assetService = assetService;
         this.productVariantDAO = productVariantDAO;
         this.productDAO = productDAO;
     }
@@ -289,5 +288,123 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             return productVariants;
         }
         return new PageImpl<>(new ArrayList<>(), pageable, 0);
+    }
+
+    @Override
+    public ProductVariant addAssets(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String[] assetIds, FileAsset.AssetFamily assetFamily) {
+        return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
+                .map(productVariant -> {
+
+                    //Existing variant assets
+                    Map<String, Object> variantAssetsMap = productVariant.getVariantAssets();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> _variantAssets = variantAssetsMap.containsKey(_assetFamily) ? (List<Object>)variantAssetsMap.get(_assetFamily) : new ArrayList<>();
+
+                    //order the list by sequenceNum ascending
+                    List<Map<String, Object>> variantAssets = ProductUtil.orderAssets(ConversionUtil.toGenericMap(_variantAssets));
+
+                    //List of all existing asset ids
+                    List<String> existingAssetIds = new ArrayList<>();
+
+                    //reassign the sequenceNum, so that they are continuous
+                    int[] seq = {0};
+
+                    variantAssets.forEach(asset -> {
+                        asset.put("sequenceNum", seq[0] ++);
+                        //Add the id to the existing ids list
+                        existingAssetIds.add((String)asset.get("id"));
+                    });
+
+
+                    assetService.getAll(assetIds, FindBy.INTERNAL_ID, null)
+                            .forEach(asset -> {
+                                //Only add, if the asset is a file, not a directory
+                                if(!"Y".equals(asset.getIsDirectory()) && "Y".equals(asset.getActive())) {
+                                    //Only add, if the asset won't exists already
+                                    if(!existingAssetIds.contains(asset.getId())) {
+                                        FileAsset variantAsset = new FileAsset(asset, seq[0] ++);
+                                        variantAssets.add(variantAsset.toMap());
+                                        existingAssetIds.add(variantAsset.getId());
+                                    }
+                                }
+                            });
+
+
+                    ProductUtil.validateDefaultAsset(variantAssets);
+                    variantAssetsMap.put(_assetFamily, variantAssets);
+                    productVariant.setVariantAssets(variantAssetsMap);
+                    productVariant.setGroup("ASSETS");
+                    update(productVariantId, FindBy.EXTERNAL_ID, productVariant);
+                    return productVariant;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product variant with id:" + productVariantId));
+    }
+
+    @Override
+    public ProductVariant deleteAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily) {
+        return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
+                .map(productVariant -> {
+                    //Existing variant assets
+                    Map<String, Object> variantAssetsMap = productVariant.getVariantAssets();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> _variantAssets = variantAssetsMap.containsKey(_assetFamily) ? (List<Object>)variantAssetsMap.get(_assetFamily) : new ArrayList<>();
+
+                    List<Map<String, Object>> variantAssets = ConversionUtil.toGenericMap(_variantAssets);
+
+                    variantAssetsMap.put(_assetFamily, ProductUtil.deleteAsset(variantAssets, assetId));
+                    productVariant.setVariantAssets(variantAssetsMap);
+                    productVariant.setGroup("ASSETS");
+                    update(productVariantId, FindBy.EXTERNAL_ID, productVariant);
+                    return productVariant;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product variant with id:" + productId));
+    }
+
+    @Override
+    public ProductVariant reorderAssets(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String[] assetIds, FileAsset.AssetFamily assetFamily) {
+        return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
+                .map(productVariant -> {
+                    //Existing variant assets
+                    Map<String, Object> variantAssetsMap = productVariant.getVariantAssets();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> variantAssets = variantAssetsMap.containsKey(_assetFamily) ? (List<Object>)variantAssetsMap.get(_assetFamily) : new ArrayList<>();
+
+                    //AssetIds arrays contains the assetIds in the required order
+                    variantAssetsMap.put(_assetFamily, ProductUtil.reorderAssets(ConversionUtil.toGenericMap(variantAssets), Arrays.asList(assetIds)));
+                    productVariant.setVariantAssets(variantAssetsMap);
+                    productVariant.setGroup("ASSETS");
+                    update(productVariantId, FindBy.EXTERNAL_ID, productVariant);
+                    return productVariant;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product variant with id:" + productId));
+
+    }
+
+    @Override
+    public ProductVariant setAsDefaultAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily) {
+        return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
+                .map(productVariant -> {
+                    //Existing variant assets
+                    Map<String, Object> variantAssetsMap = productVariant.getVariantAssets();
+
+                    String _assetFamily = assetFamily.name();
+                    //Get the assets list corresponding to the given assetFamily
+                    List<Object> variantAssets = variantAssetsMap.containsKey(_assetFamily) ? (List<Object>)variantAssetsMap.get(_assetFamily) : new ArrayList<>();
+
+
+                    ProductUtil.setDefaultAsset(ConversionUtil.toGenericMap(variantAssets), assetId);
+                    variantAssetsMap.put(_assetFamily, variantAssets);
+                    productVariant.setVariantAssets(variantAssetsMap);
+                    productVariant.setGroup("ASSETS");
+                    update(productVariantId, FindBy.EXTERNAL_ID, productVariant);
+                    return productVariant;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find product variant with id:" + productId));
     }
 }

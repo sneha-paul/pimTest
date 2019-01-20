@@ -85,12 +85,6 @@ public class ProductController extends BaseController<Product, ProductService>{
         return model;
     }
 
-    /*@RequestMapping(value = "/{id}/channels/{channelId}/assets", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> updateAsset(@PathVariable(value = "id") String id, FileAsset asset, HttpServletRequest request) {
-
-    }
-*/
     @RequestMapping(value = "/{id}/channels/{channelId}/assets", method = RequestMethod.DELETE)
     @ResponseBody
     public Map<String, Object> deleteAsset(@PathVariable(value = "id") String id,

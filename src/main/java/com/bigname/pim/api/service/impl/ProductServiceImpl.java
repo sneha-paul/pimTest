@@ -466,7 +466,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                             });
 
 
-                    validateDefaultAsset(productAssets);
+                    ProductUtil.validateDefaultAsset(productAssets);
                     productAssetsForChannel.put(_assetFamily, productAssets);
                     product.setChannelAssets(productAssetsForChannel);
                     product.setGroup("ASSETS");
@@ -491,7 +491,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
 
                     List<Map<String, Object>> productAssets = ConversionUtil.toGenericMap(_productAssets);
 
-                    productAssetsForChannel.put(_assetFamily, deleteAsset(productAssets, assetId));
+                    productAssetsForChannel.put(_assetFamily, ProductUtil.deleteAsset(productAssets, assetId));
                     product.setChannelAssets(productAssetsForChannel);
                     product.setGroup("ASSETS");
                     update(productId, FindBy.EXTERNAL_ID, product);
@@ -514,7 +514,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                     List<Object> productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
 
                     //AssetIds arrays contains the assetIds in the required order
-                    productAssetsForChannel.put(_assetFamily, reorderAssets(ConversionUtil.toGenericMap(productAssets), Arrays.asList(assetIds)));
+                    productAssetsForChannel.put(_assetFamily, ProductUtil.reorderAssets(ConversionUtil.toGenericMap(productAssets), Arrays.asList(assetIds)));
                     product.setChannelAssets(productAssetsForChannel);
                     product.setGroup("ASSETS");
                     update(productId, FindBy.EXTERNAL_ID, product);
@@ -538,7 +538,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                     List<Object> productAssets = productAssetsForChannel.containsKey(_assetFamily) ? (List<Object>)productAssetsForChannel.get(_assetFamily) : new ArrayList<>();
 
 
-                    setDefaultAsset(ConversionUtil.toGenericMap(productAssets), assetId);
+                    ProductUtil.setDefaultAsset(ConversionUtil.toGenericMap(productAssets), assetId);
                     productAssetsForChannel.put(_assetFamily, productAssets);
                     product.setChannelAssets(productAssetsForChannel);
                     product.setGroup("ASSETS");
@@ -548,59 +548,5 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                 .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + productId));
     }
 
-    private static void setDefaultAsset(List<Map<String, Object>> productAssets, String assetId) {
-        resetDefaultAsset(productAssets);
-        productAssets.forEach(asset -> {
-            if(asset.get("id").equals(assetId)) {
-                asset.put("defaultFlag", "Y");
-            }
-        });
-    }
 
-    private static void resetDefaultAsset(List<Map<String, Object>> productAssets) {
-        productAssets.forEach(asset -> asset.put("defaultFlag", "N"));
-    }
-
-    private static List<Map<String, Object>> reorderAssets(List<Map<String, Object>> productAssets, List<String> assetIds){
-
-        //Set the sequence number with the index of their ids in the assetIds list
-        productAssets.forEach(asset -> asset.put("sequenceNum", assetIds.indexOf((String)asset.get("id"))));
-
-        //Order the assets by sequence number before saving to the database
-        return ProductUtil.orderAssets(productAssets);
-    }
-
-    private static void validateDefaultAsset(List<Map<String, Object>> productAssets) {
-        // Check if there is one default asset available and also check if there are multiple default assets set for the given product.
-        if(!productAssets.isEmpty()) {
-            List<Integer> defaultIndices = new ArrayList<>();
-            for (int i = 0; i < productAssets.size(); i++) {
-                Map<String, Object> assetMap = productAssets.get(i);
-                if ("Y".equals(assetMap.get("defaultFlag"))) {
-                    defaultIndices.add(i);
-                }
-            }
-            if (defaultIndices.isEmpty()) { // No default asset available, so set the first one as the default
-                productAssets.get(0).put("defaultFlag", "Y");
-            } else if(defaultIndices.size() > 1) { // More than one default asset is available, so reset everything except the last one
-                for(int i = 0; i < defaultIndices.size() - 1; i ++) {
-                    productAssets.get(i).put("defaultFlag", "N");
-                }
-            }
-        }
-    }
-
-    private static List<Map<String, Object>> deleteAsset(List<Map<String, Object>> productAssets, String assetId) {
-        //Find the index of the item that needs to be removed
-        int removeIdx = productAssets.indexOf(productAssets.stream().filter(asset -> asset.get("id").equals(assetId)).findFirst().orElse(null));
-        if(removeIdx > -1) {
-            // Remove the asset
-            productAssets.remove(removeIdx);
-            // Reset the sequence nums
-            productAssets = ProductUtil.orderAssets(productAssets);
-            // Validate the default asset, in case we removed the default asset
-            validateDefaultAsset(productAssets);
-        }
-        return productAssets;
-    }
 }

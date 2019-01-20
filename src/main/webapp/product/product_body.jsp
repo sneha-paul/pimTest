@@ -275,178 +275,62 @@
                                     </div>
                                     <div class="body">
                                         <div id="aniimated-thumbnials" class="js-draggable list-unstyled row clearfix">
-                                                <c:forEach var="asset" items="${product.channelAssets['ASSETS']}" varStatus="s">
-                                                    <c:set var="isDefault" value="${asset.defaultFlag eq 'Y'}" />
-                                                    <div class="js-drag-item col-xl-4 col-lg-6 col-md-12 col-sm-12 m-b-30" rel="${asset.id}">
-                                                        <div class="digital-asset-container front card overflowhidden">
-                                                            <div class="header">
-                                                                <h2 class="truncate" style="padding-right: 60px;">
-                                                                    <c:choose>
-                                                                        <c:when test="${asset.type eq 'IMAGE'}">
-                                                                            <span class="asset-type" title="image" style=""><i class="fa fa-file-image-o"></i></span>
-                                                                        </c:when>
-                                                                        <c:when test="${asset.type eq 'VIDEO'}">
-                                                                            <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <span class="asset-type" title="template" style=""><i class="fa fa-file-pdf-o"></i></span>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="${asset.name}">${asset.name}</span><small class="${isDefault ? '' : 'js-invisible'}" style="position:relative;"><code class="highlighter-rouge">DEFAULT</code></small>
-                                                                </h2>
-                                                                <ul class="header-dropdown">
-                                                                    <li><span class="tab_btn active ${isDefault ? 'bg-success' : ''}">${s.count}</span></li>
-                                                                    <li class="dropdown">
-                                                                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
-                                                                        <ul class="dropdown-menu dropdown-menu-right">
-                                                                            <li><a href="javascript:void(0);" onclick="$(this).closest('.digital-asset-container').flip(true)">Edit</a></li>
-                                                                            <li><a href="javascript:$.deleteAsset('${asset.id}');">Delete</a></li>
-                                                                            <c:if test="${not isDefault}">
-                                                                                <li><a href="javascript:$.setAsDefaultAsset('${asset.id}')">Set as Default</a></li>
-                                                                            </c:if>
+                                            <c:forEach var="asset" items="${product.channelAssets['ASSETS']}" varStatus="s">
+                                                <c:set var="isDefault" value="${asset.defaultFlag eq 'Y'}" />
+                                                <div class="js-drag-item col-xl-4 col-lg-6 col-md-12 col-sm-12 m-b-30" rel="${asset.id}">
+                                                    <div class="digital-asset-container front card overflowhidden">
+                                                        <div class="header">
+                                                            <h2 class="truncate" style="padding-right: 60px;">
+                                                                <c:choose>
+                                                                    <c:when test="${asset.type eq 'IMAGE'}">
+                                                                        <span class="asset-type" title="image" style=""><i class="fa fa-file-image-o"></i></span>
+                                                                    </c:when>
+                                                                    <c:when test="${asset.type eq 'VIDEO'}">
+                                                                        <span class="asset-type" title="video" style=""><i class="fa fa-file-video-o"></i></span>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="asset-type" title="template" style=""><i class="fa fa-file-pdf-o"></i></span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                                <span data-toggle="tooltip" data-placement="top" title="" data-original-title="${asset.name}">${asset.name}</span><small class="${isDefault ? '' : 'js-invisible'}" style="position:relative;"><code class="highlighter-rouge">DEFAULT</code></small>
+                                                            </h2>
+                                                            <ul class="header-dropdown">
+                                                                <li><span class="tab_btn active ${isDefault ? 'bg-success' : ''}">${s.count}</span></li>
+                                                                <li class="dropdown">
+                                                                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
+                                                                    <ul class="dropdown-menu dropdown-menu-right">
+                                                                        <li><a href="javascript:void(0);" onclick="$(this).closest('.digital-asset-container').flip(true)">Edit</a></li>
+                                                                        <li><a href="javascript:$.deleteAsset('${asset.id}');">Delete</a></li>
+                                                                        <c:if test="${not isDefault}">
+                                                                            <li><a href="javascript:$.setAsDefaultAsset('${asset.id}')">Set as Default</a></li>
+                                                                        </c:if>
 
-                                                                        </ul>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                            <div class="body" style="position: relative;top: -30px">
-                                                                <div class="digital-asset">
-                                                                    <div class="image">
-                                                                        <a class="js-asset" href="/uploads/${asset.internalName}">
-                                                                            <img class="img-fluid" src="/uploads/${asset.internalName}" alt="">
-                                                                        </a>
-                                                                    </div>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="body" style="position: relative;top: -30px">
+                                                            <div class="digital-asset">
+                                                                <div class="image">
+                                                                    <a class="js-asset" href="/uploads/${asset.internalName}">
+                                                                        <img class="img-fluid" src="/uploads/${asset.internalName}" alt="">
+                                                                    </a>
                                                                 </div>
                                                             </div>
-                                                            <div class="footer">
-                                                                <ul class="stats">
-                                                                    <li class="${not empty asset.description ? '' : 'js-hidden'}"><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="${asset.description}" data-original-title="Description" class="text-danger icon-bubbles">Description</a></li>
-                                                                </ul>
-                                                            </div>
+                                                        </div>
+                                                        <div class="footer">
+                                                            <ul class="stats">
+                                                                <li class="${not empty asset.description ? '' : 'js-hidden'}"><a href="javascript:void(0);" data-toggle="popover" data-trigger="hover" data-placement="left" title="" data-content="${asset.description}" data-original-title="Description" class="text-danger icon-bubbles">Description</a></li>
+                                                            </ul>
                                                         </div>
                                                     </div>
-                                                </c:forEach>
+                                                </div>
+                                            </c:forEach>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <%--<div class="row clearfix m-t-20">
-                            <div class="col-lg-12 col-md-12">
-                                <div class="card inner overflowhidden">
-                                    <div class="body">
-                                        <form method="post">
-                                            <div class="card inner group overflowhidden">
-                                                <div class="body">
-                                                        <fieldset>
-                                                            <legend>Fieldset Title</legend>
-                                                            <div class="panel panel-default">
-                                                                <div class="panel-body">
-                                                                    <div class="row">
-                                                                        <div class="col-md-6 col-sm-12">
-                                                                            <div class="form-group">
-                                                                                <label>Product Name</label><code
-                                                                                    class="highlighter-rouge m-l-10">*</code>
-                                                                                <input type="text"
-                                                                                       name="productName" value=""
-                                                                                       class="form-control"
-                                                                                       required="true"/>
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label>Product Name</label><code
-                                                                                    class="highlighter-rouge m-l-10">*</code>
-                                                                                <input type="text"
-                                                                                       name="productName" value=""
-                                                                                       class="form-control"
-                                                                                       required="true"/>
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label for="metaDescription">Meta Description</label><code class="highlighter-rouge m-l-10">*</code>
-                                                                                <textarea class="form-control" id="metaDescription" name="metaDescription" rows="5" cols="30" required="">${category.metaDescription}</textarea>
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label for="metaKeywords">Meta Keywords</label>
-                                                                                <textarea class="form-control" id="metaKeywords" name="metaKeywords" rows="5" cols="30" required="">${category.metaKeywords}</textarea>
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                            <label>ProductFamily</label>
-
-                                                                            <select class="form-control" name="productFamilyId">
-                                                                                <option value="">Select One</option>
-                                                                            </select>
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label>Status</label>
-                                                                                <br/>
-                                                                                <label class="fancy-checkbox">
-                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
-                                                                                    <span>Active</span>
-                                                                                </label>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label>Status</label>
-                                                                                <br/>
-                                                                                <label class="fancy-checkbox custom-color-blue">
-                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
-                                                                                    <span>Active</span>
-                                                                                </label>
-                                                                                <br/>
-                                                                                <label class="fancy-checkbox">
-                                                                                    <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
-                                                                                    <span>Active</span>
-                                                                                </label>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label>Status</label>
-                                                                                <br/>
-                                                                                <label class="fancy-radio"><input name="gender3" value="male" type="radio" checked=""><span><i></i>Male</span></label>
-                                                                                <label class="fancy-radio"><input name="gender3" value="male" type="radio" checked=""><span><i></i>Female</span></label>
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label>Date</label>
-                                                                                <div class="input-group date" data-date-autoclose="true" data-provide="datepicker">
-                                                                                    <input type="text" class="form-control datepicker">
-                                                                                    <div class="input-group-append">
-                                                                                        <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="form-group">
-                                                                                <label>Date Range</label>
-                                                                                <div class="input-daterange input-group" data-provide="datepicker">
-                                                                                    <input type="text" class="input-sm form-control datepicker" name="start">
-                                                                                    <div class="input-group-append">
-                                                                                        <button class="btn btn-secondary" style="border-bottom-right-radius: 0.25rem;border-top-right-radius: 0.25rem;" type="button"><i class="fa fa-calendar"></i></button>
-                                                                                    </div>
-                                                                                    <span class="input-group-addon text-center" style="width: 40px;">to</span>
-                                                                                    <input type="text" class="input-sm form-control datepicker" name="end">
-                                                                                    <div class="input-group-append">
-                                                                                        <button class="btn btn-secondary" type="button"><i class="fa fa-calendar"></i></button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </fieldset>
-                                                    </div>
-                                            </div>
-                                            <br>
-                                            <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
-                                            <a href="/pim/categories"><button type="button" class="btn btn-danger">Cancel</button></a>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>--%>
                     </div>
                     <c:forEach var="masterGroup" items="${masterGroups}" >
                         <c:if test="${masterGroup.id ne 'PRICING'}">

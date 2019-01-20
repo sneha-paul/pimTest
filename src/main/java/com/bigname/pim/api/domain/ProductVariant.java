@@ -1,5 +1,7 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.ConversionUtil;
+import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -9,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +40,8 @@ public class ProductVariant extends Entity<ProductVariant> {
     private Map<String, String> axisAttributes = new HashMap<>();
 
     private Map<String, Object> variantAttributes = new HashMap<>();
+
+    private Map<String, Object> variantAssets = new HashMap<>();
 
     private Map<String, Map<Integer, BigDecimal>> pricingDetails = new HashMap<>();
 
@@ -125,6 +130,15 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.variantAttributes = variantAttributes;
     }
 
+    public Map<String, Object> getVariantAssets() {
+        variantAssets.forEach((family, assets) -> variantAssets.put(family, ProductUtil.orderAssets(ConversionUtil.toGenericMap((List<Object>)assets))));
+        return variantAssets;
+    }
+
+    public void setVariantAssets(Map<String, Object> variantAssets) {
+        this.variantAssets = variantAssets;
+    }
+
     public Map<String, Map<Integer, BigDecimal>> getPricingDetails() {
         return pricingDetails;
     }
@@ -147,8 +161,11 @@ public class ProductVariant extends Entity<ProductVariant> {
                     this.setActive(productVariant.getActive());
                 break;
                 case "ASSETS":
-
-                break;
+                    if(isNotEmpty(productVariant.getVariantAssets())) {
+                        Map<String, Object> variantAssets = this.getVariantAssets();
+                        productVariant.getVariantAssets().forEach(variantAssets::put);//TODO - check this logic
+                    }
+                    break;
                 case "PRICING_DETAILS":
                     if(isNotEmpty(productVariant.getPricingDetails())) {
                         productVariant.getPricingDetails().forEach(pricingDetails::put);

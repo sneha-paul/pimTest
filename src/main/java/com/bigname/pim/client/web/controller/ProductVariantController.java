@@ -154,6 +154,59 @@ public class ProductVariantController extends ControllerSupport {
         return model;
     }
 
+    @RequestMapping(value = "/{productId}/variants/{variantId}/assets", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> addAssets(@PathVariable(value = "productId") String productId,
+                                         @PathVariable(value = "variantId") String variantId,
+                                         @RequestParam(name = "channelId") String channelId,
+                                         @RequestParam(value="assetIds[]") String[] assetIds,
+                                         @RequestParam(value="assetFamily") String assetFamily) {
+        Map<String, Object> model = new HashMap<>();
+        productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
+    }
+
+    @RequestMapping(value = "/{productId}/variants/{variantId}/assets", method = RequestMethod.DELETE)
+    @ResponseBody
+    public Map<String, Object> deleteAsset(@PathVariable(value = "productId") String productId,
+                                           @PathVariable(value = "variantId") String variantId,
+                                           @RequestParam(name = "channelId") String channelId,
+                                           @RequestParam(value="assetId") String assetId,
+                                           @RequestParam(value="assetFamily") String assetFamily) {
+        Map<String, Object> model = new HashMap<>();
+        productVariantService.deleteAsset(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
+    }
+
+
+    @RequestMapping(value = "/{productId}/variants/{variantId}/assets/setDefault", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> setAsDefaultAsset(@PathVariable(value = "productId") String productId,
+                                                 @PathVariable(value = "variantId") String variantId,
+                                                 @RequestParam(name = "channelId") String channelId,
+                                                 @RequestParam(value="assetId") String assetId,
+                                                 @RequestParam(value="assetFamily") String assetFamily) {
+        Map<String, Object> model = new HashMap<>();
+        productVariantService.setAsDefaultAsset(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
+    }
+
+    @RequestMapping(value = "/{productId}/variants/{variantId}/assets/reorder", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> reorderAsset(@PathVariable(value = "productId") String productId,
+                                            @PathVariable(value = "variantId") String variantId,
+                                            @RequestParam(name = "channelId") String channelId,
+                                            @RequestParam(value="assetIds[]") String[] assetIds,
+                                            @RequestParam(value="assetFamily") String assetFamily) {
+        Map<String, Object> model = new HashMap<>();
+        productVariantService.reorderAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        model.put("success", true);
+        return model;
+    }
+
     private void setVariantAttributeValues(ProductVariant productVariantDTO, HttpServletRequest request) {
         productService.get(productVariantDTO.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
             product.setChannelId(productVariantDTO.getChannelId());
