@@ -20,6 +20,7 @@ public interface BaseDAO<T> {
     Page<T> findByIdInAndActiveIn(String[] ids, String[] active, Pageable pageable);
     List<T> findByIdInAndActiveIn(String[] ids, String[] active);
     Page<T> findByExternalIdInAndActiveIn(String[] ids, String[] active, Pageable pageable);
+    List<T> findByExternalIdInAndActiveIn(String[] ids, String[] active);
 
     Optional<T> findById(String id);
     Optional<T> findByExternalId(String id);

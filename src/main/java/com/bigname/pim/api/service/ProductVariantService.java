@@ -23,6 +23,8 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, int page, int size, Sort sort, boolean... activeRequired);
 
+    List<ProductVariant> getAll(String[] productIds, FindBy productIdFindBy, String channelId, boolean... activeRequired);
+
     List<ProductVariant> getAll(String productId, FindBy productIdFindBy, String channelId, Sort sort, boolean... activeRequired);
 
     Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, String[] variantIds, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired);

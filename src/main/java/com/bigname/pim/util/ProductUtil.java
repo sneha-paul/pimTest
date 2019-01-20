@@ -6,10 +6,7 @@ import com.bigname.pim.api.domain.FileAsset;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -99,6 +96,43 @@ public class ProductUtil {
             defaultAsset = assets.stream().filter(assetMap -> "Y".equals(assetMap.get("defaultFlag"))).findFirst().orElse(assets.isEmpty() ? null : assets.get(0));
         }
         return defaultAsset;
+    }
+
+    public static Map<String, List<ProductVariant>> groupVariantsByProduct(List<ProductVariant> variants) {
+        Map<String, List<ProductVariant>> productVariantsMap = new HashMap<>();
+        variants.forEach(productVariant -> {
+            if(!productVariantsMap.containsKey(productVariant.getProductId())) {
+                productVariantsMap.put(productVariant.getProductId(), new ArrayList<>());
+            }
+            productVariantsMap.get(productVariant.getProductId()).add(productVariant);
+        });
+
+        return productVariantsMap;
+    }
+
+    public static Map<String, Map<String, Object>> getVariantDetailsForProducts(List<String> productIds, List<ProductVariant> variants, int maxCount) {
+        Map<String, Map<String, Object>> details = new HashMap<>();
+        Map<String, List<ProductVariant>> productVariantsMap = groupVariantsByProduct(variants);
+        productIds.forEach(productId -> {
+            List<ProductVariant> productVariants = productVariantsMap.get(productId);
+
+
+            Map<String, Object> info = new HashMap<>();
+            info.put("totalVariants", productVariants.size());
+            List<String> variantImages = new ArrayList<>();
+            for(int i = 0; i < productVariants.size() && i < maxCount; i ++) {
+                Map<String, Object> defaultAsset = productVariants.get(i).getDefaultAsset();
+                if(ValidationUtil.isNotEmpty(defaultAsset)) {
+                    variantImages.add((String) defaultAsset.get("internalName"));
+                } else {
+                    variantImages.add("noimage.png");
+                }
+            }
+            info.put("variantImages", variantImages);
+            details.put(productId, info);
+        });
+
+        return details;
     }
 
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
@@ -159,6 +160,17 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             }
         }
         return productVariantDAO.findByProductIdAndChannelIdAndActiveIn(productId, channelId, PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
+    }
+
+    @Override
+    public List<ProductVariant> getAll(String[] productIds, FindBy productIdFindBy,  String channelId, boolean... activeRequired) {
+        if(productIdFindBy == FindBy.EXTERNAL_ID) {
+            productIds = productDAO.findByExternalIdInAndActiveIn(productIds, PimUtil.getActiveOptions(activeRequired)).stream().map(Entity::getId).collect(Collectors.toList()).toArray(new String[0]);
+            if(productIds.length == 0) {
+                return null;
+            }
+        }
+        return productVariantDAO.findByProductIdInAndChannelIdAndActiveIn(productIds, channelId, PimUtil.getActiveOptions(activeRequired));
     }
 
     //Don't use this method, use the below method with productId and channelId instead

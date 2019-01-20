@@ -147,6 +147,10 @@ public class ProductVariant extends Entity<ProductVariant> {
         this.pricingDetails = pricingDetails;
     }
 
+    public Map<String, Object> getDefaultAsset() {
+        return ProductUtil.getDefaultAsset(this, FileAsset.AssetFamily.ASSETS);
+    }
+
     void setExternalId() {
         this.productVariantId = getExternalId();
     }

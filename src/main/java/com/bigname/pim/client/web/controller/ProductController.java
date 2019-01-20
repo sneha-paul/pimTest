@@ -5,13 +5,11 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.*;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.Pageable;
-import com.bigname.pim.util.Toggle;
+import com.bigname.pim.util.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -34,13 +32,15 @@ import static com.bigname.common.util.ValidationUtil.isEmpty;
 public class ProductController extends BaseController<Product, ProductService>{
 
     private ProductService productService;
+    private ProductVariantService productVariantService;
     private VirtualFileService assetService;
     private FamilyService productFamilyService;
     private ChannelService channelService;
 
-    public ProductController(ProductService productService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
+    public ProductController(ProductService productService, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
         super(productService, Product.class, websiteService, categoryService, catalogService);
         this.productService = productService;
+        this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;
         this.channelService = channelService;
         this.assetService = assetService;
@@ -155,26 +155,32 @@ public class ProductController extends BaseController<Product, ProductService>{
     @SuppressWarnings("unchecked")
     public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
         Request dataTableRequest = new Request(request);
-        if(isEmpty(dataTableRequest.getSearch())) {
-            return super.all(request, response, model);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, String>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort;
-            if(pagination.hasSorts()) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            } else {
-                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-            }
-            List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<Product> paginatedResult = productService.findAll("productName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<Product> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? productService.getAll(pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+                : productService.findAll("productName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+        List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
+        List<ProductVariant> productVariants = productVariantService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, false);
+        Map<String, Map<String, Object>> productsVariantsInfo = ProductUtil.getVariantDetailsForProducts(productIds, productVariants, 4);
+        paginatedResult.forEach(e -> {
+            Map<String, String> map = e.toMap();
+            Map<String, Object> productVariantsInfo = productsVariantsInfo.get(e.getId());
+            map.put("variantCount", Integer.toString((int)productVariantsInfo.get("totalVariants")));
+            map.put("variantImages", StringUtil.concatinate((List<String>)productVariantsInfo.get("variantImages"), "|"));
+            dataObjects.add(map);
+        });
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
     }
 
     @RequestMapping("/{id}/categories/data")

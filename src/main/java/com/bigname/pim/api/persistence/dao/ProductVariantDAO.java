@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -12,6 +13,7 @@ import java.util.Optional;
  */
 public interface ProductVariantDAO extends BaseDAO<ProductVariant>, MongoRepository<ProductVariant, String>, ProductVariantRepository {
     Page<ProductVariant> findByProductIdAndChannelIdAndActiveIn(String productId, String channelId, String active[], Pageable pageable);
+    List<ProductVariant> findByProductIdInAndChannelIdAndActiveIn(String productId[], String channelId, String active[]);
     Page<ProductVariant> findByProductIdAndChannelIdAndExternalIdInAndActiveIn(String productId, String channelId, String[] productVariantIds, String active[], Pageable pageable);
     Optional<ProductVariant> findByIdAndChannelIdAndActiveIn(String id, String channelId, String active[]);
     Optional<ProductVariant> findByExternalIdAndChannelIdAndActiveIn(String productVariantId, String channelId, String active[]);

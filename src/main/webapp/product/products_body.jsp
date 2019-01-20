@@ -38,14 +38,24 @@
                         return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'
                     }
                 },
-                { data: 'externalId', name : 'externalId', title : 'Product ID',
+//                { data: 'variantCount', name : 'variantCount', title: 'Variants'},
+//                { data: 'variantImages', name : 'variantImages', visible:false },
+                { data: 'variantCount', name : 'variantCount', title : 'Variants',
                     render: function ( data, type, row, meta ) {
-                        return '<ul class="list-unstyled team-info">' +
-                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
-                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
-                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
-                            '<li><img src="/assets/img/avatar.png" alt="Avatar"></li>' +
-                            '</ul><span>+ 3 more</span>';
+                        let content = '<ul class="list-unstyled team-info">';
+
+                        let variantImages = row.variantImages.split('|');
+                        const addlVariants = parseInt(data) - variantImages.length;
+                        $.each(variantImages, function(i, imageName){
+                            let imgUrl = imageName === 'noimage.png' ? '/assets/img/' + imageName : '/uploads/' + imageName;
+                            content += '<li><img src="' + imgUrl + '" alt=""></li>';
+                        });
+
+                        content += '</ul>';
+                        if(addlVariants > 0) {
+                            content += '<span>+ ' + addlVariants + ' more</span>';
+                        }
+                        return content;
                     }
                 },
                 { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family' }
