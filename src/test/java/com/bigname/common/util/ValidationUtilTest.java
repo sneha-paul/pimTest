@@ -21,7 +21,7 @@ public class ValidationUtilTest {
 
     @Test
     public void isNull() throws Exception {
-        assertTrue(ValidationUtil.isNull(""));
+        assertTrue(ValidationUtil.isNull(null));
         //assertTrue("Id must not be null",false);
         //assertTrue("Name must not be null",true);
     }
