@@ -15,6 +15,7 @@ import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
+import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
@@ -317,6 +318,17 @@ public class FamilyController extends BaseController<Family, FamilyService> {
             familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
             model.put("success", true);
         }
+        return model;
+    }
+
+    @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleVariantGroup(@PathVariable(value = "familyId") String familyId,
+                                            @PathVariable(value = "variantGroupId") String variantGroupId,
+                                            @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        familyService.get(familyId, FindBy.EXTERNAL_ID, false).ifPresent(family ->
+                model.put("success", familyService.toggleVariantGroup(family.getId(), FindBy.INTERNAL_ID, variantGroupId, FindBy.EXTERNAL_ID, Toggle.get(active))));
         return model;
     }
 

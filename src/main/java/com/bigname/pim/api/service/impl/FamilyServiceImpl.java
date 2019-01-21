@@ -1,9 +1,11 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,5 +199,17 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
         List<Family> families =  super.getAll(ids, findBy, sort, activeRequired);
         families.forEach(family -> family.getVariantGroups().forEach((k, variantGroup) -> variantGroup.setFamily(family)));
         return families;
+    }
+
+    @Override
+    public boolean toggleVariantGroup(String familyId, FindBy familyIdFindBy, String variantGroupId, FindBy variantGroupIdFindBy, Toggle active) {
+        return get(familyId, familyIdFindBy, false)
+                .map(family -> {
+                    family.getVariantGroups().get(variantGroupId).setActive(active.state());
+                    familyDAO.save(family);
+                    return true;
+                })
+
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find family with id: " + familyId));
     }
 }

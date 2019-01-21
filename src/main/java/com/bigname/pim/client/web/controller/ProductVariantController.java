@@ -371,7 +371,7 @@ public class ProductVariantController extends ControllerSupport {
                                             @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product ->
-                model.put("success", productVariantService.toggle(product.getId(), FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, Toggle.get(active))));
+                model.put("success", productVariantService.toggle(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, Toggle.get(active))));
         return model;
     }
 

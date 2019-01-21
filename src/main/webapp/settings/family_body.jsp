@@ -264,6 +264,7 @@
             names: 'variantGroups',
             pageUrl: $.getURL('/pim/families/{familyId}/variantGroups/'),
             dataUrl: $.getURL('/pim/families/{familyId}/variantGroups/list'),
+            toggleUrl: '/pim/families/{familyId}/variantGroups/{externalId}/active/{active}',
             urlParams: urlParams,
             columns: [
                 {data: 'name', name: 'name', title: 'Name'},

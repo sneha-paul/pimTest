@@ -76,6 +76,7 @@ $( document ).ready(function() {
         names: ['productVariants', 'productVariant'],
         pageUrl: $.getURL('/pim/products/{productId}/variants/'),
         dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
+        toggleUrl: '/pim/products/{productId}/channels/{channelId}/variants/{externalId}/active/{active}',
         urlParams: urlParams,
         reordering: false,
         columns: [

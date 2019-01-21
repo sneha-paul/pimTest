@@ -3,6 +3,7 @@ package com.bigname.pim.api.service;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.data.domain.Page;
@@ -32,4 +33,6 @@ public interface FamilyService extends BaseService<Family, FamilyDAO>  {
     List<FamilyAttribute> getAvailableVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort);
 
     List<Triplet<String, String, String>> getFamilyVariantGroups();
+
+    boolean toggleVariantGroup(String familyId, FindBy familyIdFindBy, String variantGroupId, FindBy variantGroupIdFindBy, Toggle active);
 }
