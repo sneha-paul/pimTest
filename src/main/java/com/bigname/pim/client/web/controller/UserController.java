@@ -108,7 +108,7 @@ public class UserController extends BaseController<User, UserService> {
         return new ModelAndView("user/users", model);
     }
 
-    @RequestMapping(value = {"/changePassword/{id}"})
+    @RequestMapping(value = {"/changePasswordView/{id}"})
     public ModelAndView changePassword(@PathVariable(value = "id", required = false) String id) {
         Optional<User> user = userService.get(id, FindBy.EXTERNAL_ID, false);
         Map<String, Object> model = new HashMap<>();

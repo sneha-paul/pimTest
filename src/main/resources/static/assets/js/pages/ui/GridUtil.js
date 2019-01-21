@@ -7,8 +7,12 @@
                 title: 'Change Password',
                 icon: 'icon-key',
                 click: function (row) {
-                    window.location.href = $.getURLWithRequestParams(options.pageUrl+'changePassword/' + row.externalId, options.urlParams || {});
-
+                   /* window.location.href = $.getURLWithRequestParams(options.pageUrl+'changePassword/' + row.externalId, options.urlParams || {});*/
+                    $.showModal({
+                        url: $.getURL(options.pageUrl+'changePasswordView/{id}', {'id': row.externalId}),
+                        name:'reset-password',
+                        title:'Reset Password',
+                    });
                 }
             };
         },
