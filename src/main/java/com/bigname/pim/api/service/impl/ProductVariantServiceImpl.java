@@ -52,6 +52,13 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
+    public Page<ProductVariant> findAll(String searchField, String keyword, String productId, FindBy findBy, String channelId, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return productDAO.findById(productId, findBy)
+                .map(product -> productVariantDAO.findAll(searchField, keyword, product.getId(), channelId, pageable, activeRequired))
+                .orElse(new PageImpl<ProductVariant>(new ArrayList<>()));
+    }
+
+    @Override
     public Optional<ProductVariant> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }

@@ -35,6 +35,8 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     List<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy,  String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired);
 
+    Page<ProductVariant> findAll(String searchField, String keyword, String productId, FindBy findBy, String channelId, com.bigname.pim.util.Pageable pageable, boolean... activeRequired);
+
     Optional<ProductVariant> get(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
 
     Optional<ProductVariant> get(String productVariantId, FindBy findBy, String channelId, boolean... activeRequired);
