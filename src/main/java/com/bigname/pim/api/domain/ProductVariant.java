@@ -191,6 +191,12 @@ public class ProductVariant extends Entity<ProductVariant> {
         map.put("externalId", getExternalId());
         map.put("productVariantName", getProductVariantName());
         map.put("active", getActive());
+        Map<String, Object> defaultAsset = getDefaultAsset();
+        if(isNotEmpty(defaultAsset)) {
+            map.put("imageName", (String) defaultAsset.get("internalName"));
+        } else {
+            map.put("imageName", "noimage.png");
+        }
         return map;
     }
 

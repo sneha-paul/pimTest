@@ -80,7 +80,9 @@ $( document ).ready(function() {
         urlParams: urlParams,
         reordering: false,
         columns: [
-            { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name', render: function ( data, type, row, meta ) {return '<img src="/uploads/31268C8F-4C4A-4974-A26F-E6CA8CCDEE82.jpg" class="rounded-circle avatar" alt=""><p class="c_name">' + data + '</p>';}},
+            { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name', render: function ( data, type, row, meta ) {
+                let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
+            return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
             { data: 'externalId', name : 'externalId', title : 'Variant ID' }
         ]
     });
