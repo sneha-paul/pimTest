@@ -82,4 +82,12 @@ public class StringUtil {
         }
         return idx > idx1 ? idx : idx1;
     }
+
+    public static String trim(String s) {
+        return s == null ? s : s.trim();
+    }
+
+    public static String trim(String s, boolean replaceNull) {
+        return s == null ? replaceNull ? "" : s : s.trim();
+    }
 }

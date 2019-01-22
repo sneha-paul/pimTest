@@ -4,14 +4,12 @@ import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.data.loader.CategoryLoader;
 import com.bigname.pim.data.loader.ProductLoader;
+import com.bigname.pim.data.loader.ProductLoader1;
 import com.bigname.pim.util.FindBy;
 import org.apache.commons.collections.map.AbstractHashedMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -28,6 +26,7 @@ public class FeedController {
 
     private CategoryLoader categoryLoader;
     private ProductLoader productLoader;
+    private ProductLoader1 productLoader1;
 
     @Value("${loader.productFeed.path:C:\\DevStudio\\Projects\\PIM\\src\\10_REGULAR.xlsx}")
     private String productFeedPath;
@@ -35,38 +34,51 @@ public class FeedController {
     @Value("${loader.categoryFeed.path:C:\\DevStudio\\Projects\\PIM\\src\\CATEGORIES.xlsx}")
     private String categoryFeedPath;
 
-    public FeedController(CategoryLoader categoryLoader, ProductLoader productLoader) {
+    @Value("${loader.api.key:80blacwood85}")
+    private String apiKey;
+
+    public FeedController(CategoryLoader categoryLoader, ProductLoader productLoader, ProductLoader1 productLoader1) {
         this.categoryLoader = categoryLoader;
         this.productLoader = productLoader;
+        this.productLoader1 = productLoader1;
     }
 
-    @RequestMapping(value = "/load/products", method = RequestMethod.GET)
-    public Map<String, Object> loadProductData(HttpServletRequest request) {
-        Map<String, Object> model = new HashMap<>();
-        productLoader.load(productFeedPath);
-        return model;
-    }
-
-    @RequestMapping(value = "/load/categories", method = RequestMethod.GET)
-    public Map<String, Object> loadCategoryData(HttpServletRequest request) {
-        Map<String, Object> model = new HashMap<>();
-        categoryLoader.load(categoryFeedPath);
-        return model;
-    }
-
-    /*@RequestMapping(value = "/{collectionId}/attribute", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "collectionId") String id, Attribute attribute) {
+    @RequestMapping(value = "/load/products", method = RequestMethod.GET)
+    public Map<String, Object> loadProductData(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false);
-        // TODO - cross field validation to see if one of attributeGroup ID and attributeGroup name is not empty
-        if(attributeCollection.isPresent() && isValid(attribute, model)) {
-            attributeCollection.get().setGroup("ATTRIBUTES");
-            attributeCollection.get().setGroup(attribute.getGroup());
-            attributeCollection.get().addAttribute(attribute);
-            attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection.get());
-
+        boolean success = false;
+        if(this.apiKey.equals(apiKey)) {
+            productLoader.load(productFeedPath);
+            success = true;
         }
+        model.put("success", success);
         return model;
-    }*/
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/load/products1", method = RequestMethod.GET)
+    public Map<String, Object> loadProductData1(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        if(this.apiKey.equals(apiKey)) {
+            productLoader1.load(productFeedPath);
+            success = true;
+        }
+        model.put("success", success);
+        return model;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/load/categories", method = RequestMethod.GET)
+    public Map<String, Object> loadCategoryData(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        if(this.apiKey.equals(apiKey)) {
+            categoryLoader.load(categoryFeedPath);
+            success = true;
+        }
+        model.put("success", success);
+        return model;
+    }
 }

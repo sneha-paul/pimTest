@@ -108,6 +108,15 @@ public class Family extends Entity<Family> {
         return attributesMap;
     }
 
+    public Map<String, FamilyAttribute> getAllAttributesMap(boolean cached) {
+        if(cached) {
+            return getAllAttributesMap();
+        } else {
+            attributesMap = FamilyAttributeGroup.getAllAttributesMap(this);
+            return attributesMap;
+        }
+    }
+
     public Collection<FamilyAttribute> getAllAttributes() {
         return getAllAttributesMap().values();
     }

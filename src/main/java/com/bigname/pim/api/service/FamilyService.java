@@ -18,6 +18,8 @@ import java.util.Map;
 public interface FamilyService extends BaseService<Family, FamilyDAO>  {
 
 
+    List<Family> saveAll(List<Family> families);
+
     Page<FamilyAttribute> getFamilyAttributes(String familyId, FindBy findBy, int page, int size, Sort sort);
 
     Page<VariantGroup> getVariantGroups(String familyId, FindBy findBy, int page, int size, Sort sort);

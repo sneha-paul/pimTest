@@ -38,6 +38,13 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
+    public List<Family> saveAll(List<Family> families) {
+        List<Family> _families = familyDAO.saveAll(families);
+        _families.forEach(family -> family.getVariantGroups().forEach((k, variantGroup) -> variantGroup.setFamily(family)));
+        return _families;
+    }
+
+    @Override
     public List<Family> findAll(Map<String, Object> criteria) {
         return dao.findAll(criteria);
     }
