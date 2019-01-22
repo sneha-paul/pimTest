@@ -33,11 +33,15 @@
                             </label>
                         </div>--%>
                     <button type="submit" class="btn btn-primary btn-lg btn-block">LOGIN</button>
-                    <div class="bottom">
+
+
+                <%-------------Registration disabled - Enable in 2nd phase----------------------------%>
+                    <div class="bottom" hidden>
                         <span class="helper-text m-b-10"><i class="fa fa-lock"></i> <a href="forgotPassword">Forgot password?</a></span>
                         <span>Don't have an account? <a href="pim/user/create">Register</a></span>
                     </div>
-                        <%--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>--%>
+
+
                     </form>
                     <div class="separator-linethrough"><span>OR</span></div>
                     <button class="btn btn-signin-social"><i class="fa fa-google google-color"></i> Sign in with Google</button>
