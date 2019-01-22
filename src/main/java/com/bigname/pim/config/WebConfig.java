@@ -3,6 +3,7 @@ package com.bigname.pim.config;
 import com.bigname.pim.api.domain.Channel;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.ChannelDAO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
@@ -17,9 +18,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Created by Manu on 8/3/2018.
  */
 public class WebConfig implements WebMvcConfigurer {
+    @Value("${upload.file.path}")
+    private String filePath;
+
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/uploads/**").addResourceLocations("file:/tmp/");
+        registry.addResourceHandler("/uploads/**").addResourceLocations("file:"+filePath);
         registry.addResourceHandler("/*.js/**").addResourceLocations("/static/");
         registry.addResourceHandler("/*.css/**").addResourceLocations("/static/");
         registry.addResourceHandler("/*.jpg/**").addResourceLocations("/static/");

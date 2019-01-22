@@ -10,6 +10,7 @@ import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,9 @@ import com.bigname.pim.util.Pageable;
 @Controller
 @RequestMapping("pim/assetCollections")
 public class AssetCollectionController extends BaseController<AssetCollection, AssetCollectionService> {
+
+    @Value("${upload.file.path}")
+    private String filePath;
 
     private AssetCollectionService assetCollectionService;
     private VirtualFileService assetService;
@@ -252,7 +256,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
             VirtualFile directory = assetService.get(assetGroupId, FindBy.INTERNAL_ID).orElseThrow(() -> new EntityNotFoundException("Unable to find the uploading directory wit id:" + assetGroupId));
             VirtualFile asset = new VirtualFile(file, directory.getId(), directory.getRootDirectoryId());
             //TODO validation
-            Files.write(Paths.get("/tmp/" + asset.getInternalFileName()), file.getBytes());
+            Files.write(Paths.get(filePath + asset.getInternalFileName()), file.getBytes());
             assetService.create(asset);
             success = true;
         } catch (Exception e) {
