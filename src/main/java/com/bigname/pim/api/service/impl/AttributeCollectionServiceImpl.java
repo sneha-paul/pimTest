@@ -29,7 +29,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
 
     @Autowired
     public AttributeCollectionServiceImpl(AttributeCollectionDAO attributeCollectionDAO, Validator validator) {
-        super(attributeCollectionDAO, "attributeCollection", validator);
+        super(attributeCollectionDAO, "attributeCollection", "collectionId", "Collection Id", validator);
         this.attributeCollectionDAO = attributeCollectionDAO;
     }
 
