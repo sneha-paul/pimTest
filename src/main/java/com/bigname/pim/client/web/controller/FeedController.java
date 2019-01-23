@@ -1,7 +1,10 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
+import com.bigname.pim.api.domain.VirtualFile;
+import com.bigname.pim.data.loader.AssetLoader;
 import com.bigname.pim.data.loader.CategoryLoader;
 import com.bigname.pim.data.loader.ProductLoader;
 import com.bigname.pim.data.loader.ProductLoader1;
@@ -28,10 +31,10 @@ public class FeedController {
     private ProductLoader productLoader;
     private ProductLoader1 productLoader1;
 
-    @Value("${loader.productFeed.path:C:\\DevStudio\\Projects\\PIM\\src\\10_REGULAR.xlsx}")
+    @Value("${loader.productFeed.path:/tmp/10_REGULAR.xlsx}")
     private String productFeedPath;
 
-    @Value("${loader.categoryFeed.path:C:\\DevStudio\\Projects\\PIM\\src\\CATEGORIES.xlsx}")
+    @Value("${loader.categoryFeed.path:/tmp/CATEGORIES.xlsx}")
     private String categoryFeedPath;
 
     @Value("${loader.api.key:80blacwood85}")

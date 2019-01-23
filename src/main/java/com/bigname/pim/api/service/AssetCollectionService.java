@@ -6,6 +6,7 @@ import com.bigname.pim.util.FindBy;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -13,4 +14,5 @@ import java.util.Map;
  */
 public interface AssetCollectionService extends BaseService<AssetCollection, AssetCollectionDAO> {
     List<Map<String, Object>> getAssetsHierarchy(String collectionId, FindBy findBy, String nodeId, boolean... activeRequired);
+    Optional<AssetCollection> getAssetCollection(String collectionName);
 }

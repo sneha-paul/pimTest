@@ -10,6 +10,7 @@ import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +39,9 @@ public class ProductLoader1 {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private AssetLoader assetLoader;
 
     //The attributeCollectionId that needs to be used for the import
     private String attributeCollectionId = "ENVELOPES";
@@ -692,6 +696,7 @@ public class ProductLoader1 {
                 Product product = null;
                 if(!_product.isPresent()) {
                     Product productDTO = new Product();
+                    product.setActive("Y");
                     productDTO.setProductId(productId);
                     productDTO.setProductName(productName);
                     productDTO.setProductFamilyId(familyId);
@@ -743,7 +748,7 @@ public class ProductLoader1 {
                     productVariant.setProductVariantId(variantId);
                     productVariant.setChannelId(channelId);
                     productVariant.setAxisAttributes(axisAttributes);
-                    productVariant.setActive("N");
+                    productVariant.setActive("Y");
                     productVariantService.create(productVariant);
                     productVariant.setLevel(1); //TODO - change for multi level variants support
                     setVariantAttributeValues(productVariant, variantAttributesMap);
@@ -751,6 +756,20 @@ public class ProductLoader1 {
                         productVariant.setGroup("DETAILS");
                         productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                     }
+                    AssetCollection productAssetsCollection = assetLoader.createCollection("PRODUCT_ASSETS");
+                    String assetFileName = variantId + ".png";
+                    if(new File(assetLoader.getSourceLocation() + assetFileName).isFile()) {
+                        VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
+                        VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
+                        VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
+                        productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[] {variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                        if(isEmpty(product.getChannelAssets())) {
+                            productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[] {variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                        }
+                    } else {
+                        System.out.println(assetFileName + " <======= Not Found");
+                    }
+
                     if(isNotEmpty(pricing)) {
                         try {
                             productVariant.setGroup("PRICING_DETAILS");

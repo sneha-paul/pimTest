@@ -104,4 +104,9 @@ public class AssetCollectionServiceImpl extends BaseServiceSupport<AssetCollecti
 
         return hierarchy;
     }
+
+    @Override
+    public Optional<AssetCollection> getAssetCollection(String collectionName) {
+        return assetCollectionDAO.findByCollectionName(collectionName);
+    }
 }
