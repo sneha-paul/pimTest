@@ -696,7 +696,7 @@ public class ProductLoader1 {
                 Product product = null;
                 if(!_product.isPresent()) {
                     Product productDTO = new Product();
-                    product.setActive("Y");
+                    productDTO.setActive("Y");
                     productDTO.setProductId(productId);
                     productDTO.setProductName(productName);
                     productDTO.setProductFamilyId(familyId);
