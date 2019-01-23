@@ -6,7 +6,6 @@ $(function(){
         name:'uploadFiles',
         title:'Upload Files',
         buttons: [
-            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable1('assetsHierarchy');$.closeModal();});}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });
