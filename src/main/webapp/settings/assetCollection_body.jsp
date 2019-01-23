@@ -43,7 +43,7 @@
                         <div class="row">
                             <div class="col">
                                 <c:forEach var="folder" items="${folders}">
-                                    <div id="${folder.id}" class="btn-label secondary js-folder">
+                                    <div id="${folder.id}" class="btn-label secondary js-folder" data-toggle="tooltip" data-placement="top" title="" data-original-title="${folder.fileName}">
                                         <i class="text-primary fa fa-folder p-r-10"></i>${folder.fileName}
                                     </div>
                                 </c:forEach>

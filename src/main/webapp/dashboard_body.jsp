@@ -3,8 +3,8 @@
         <div class="card text-center bg-info">
             <div class="body">
                 <div class="p-15 text-light">
-                    <h3>19</h3>
-                    <span>Today Works</span>
+                    <h3>3</h3>
+                    <span>Websites</span>
                 </div>
             </div>
         </div>
@@ -13,8 +13,8 @@
         <div class="card text-center bg-secondary">
             <div class="body">
                 <div class="p-15 text-light">
-                    <h3>15</h3>
-                    <span>Today Tasks</span>
+                    <h3>95</h3>
+                    <span>Categories</span>
                 </div>
             </div>
         </div>
@@ -23,8 +23,8 @@
         <div class="card text-center bg-warning">
             <div class="body">
                 <div class="p-15 text-light">
-                    <h3>125</h3>
-                    <span>Statistics</span>
+                    <h3>507</h3>
+                    <span>Products</span>
                 </div>
             </div>
         </div>
@@ -33,14 +33,14 @@
         <div class="card text-center bg-dark">
             <div class="body">
                 <div class="p-15 text-light">
-                    <h3>318</h3>
-                    <span>Analytics</span>
+                    <h3>5202</h3>
+                    <span>Product Variants</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<%--
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="card">
@@ -469,4 +469,4 @@
         </div>
     </div>
 
-</div>
+</div>--%>

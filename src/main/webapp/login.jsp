@@ -24,7 +24,7 @@
                     </div>
                     <div class="form-group">
                         <label for="password" class="control-label sr-only">Password</label>
-                        <input type="password" class="form-control" name="password" id="password" value="temppass" placeholder="Password">
+                        <input type="password" class="form-control" name="password" id="password" value="" placeholder="Password">
                     </div>
                         <%--<div class="form-group clearfix">
                             <label class="fancy-checkbox element-left">
