@@ -7,6 +7,8 @@ import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.POIUtil;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,8 @@ import static com.bigname.common.util.ValidationUtil.*;
  */
 @Component
 public class ProductLoader1 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductLoader1.class);
 
     @Autowired
     private AttributeCollectionService attributeCollectionService;
@@ -171,7 +175,7 @@ public class ProductLoader1 {
                     categoryDTO.setCategoryName(categoryId);
                     categoryDTO.setGroup("CREATE");
                     newCategories.put(categoryDTO.getCategoryId(), categoryDTO);
-                    System.out.println("New Root Category ======> " + categoryId);
+                    LOGGER.info("New Root Category ======> " + categoryId);
                 }
 
                 //If this is a new style, create a new category instance and add it to the newCategories map
@@ -182,7 +186,7 @@ public class ProductLoader1 {
                     categoryDTO.setCategoryName(style);
                     categoryDTO.setGroup("CREATE");
                     newCategories.put(categoryDTO.getCategoryId(), categoryDTO);
-                    System.out.println("New Style Category ======> " + style);
+                    LOGGER.info("New Style Category ======> " + style);
                 }
 
 
@@ -242,7 +246,7 @@ public class ProductLoader1 {
                         attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
                         attribute.setUiType(Attribute.UIType.get(attributeTypesMetadata.get(col)));
                         attribute.setName(attributeName);
-                        System.out.println(row + " :: Attribute---> " + attribute.toString());
+                        LOGGER.info(row + " :: Attribute---> " + attribute.toString());
                         attributeCollection.addAttribute(attribute);
                     }
 
@@ -631,17 +635,17 @@ public class ProductLoader1 {
                                 setPricingDetails(productVariant, pricing);
                                 productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                             } catch (Exception e) {
-                                System.out.println(pricing);
-                                System.out.println(productVariant.getProductVariantId());
+                                LOGGER.info(pricing);
+                                LOGGER.info(productVariant.getProductVariantId());
                                 e.printStackTrace();
                             }
                         }
                     }
                 }
                 if(row % 100 == 0) {
-                    System.out.println(row + " of " + variantsData.size());
+                    LOGGER.info(row + " of " + variantsData.size());
                 } else {
-                    System.out.print(".");
+                    LOGGER.info(".");
                 }
             }*/
 
@@ -767,7 +771,7 @@ public class ProductLoader1 {
                             productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[] {variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
                         }
                     } else {
-                        System.out.println(assetFileName + " <======= Not Found");
+                        LOGGER.info(assetFileName + " <======= Not Found");
                     }
 
                     if(isNotEmpty(pricing)) {
@@ -776,22 +780,22 @@ public class ProductLoader1 {
                             setPricingDetails(productVariant, pricing);
                             productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                         } catch (Exception e) {
-                            System.out.println(pricing);
-                            System.out.println(productVariant.getProductVariantId());
+                            LOGGER.info(pricing);
+                            LOGGER.info(productVariant.getProductVariantId());
                             e.printStackTrace();
                         }
                     }
                 }
                 if(row % 100 == 0) {
-                    System.out.println(row + " of " + variantsData.size());
+                    LOGGER.info(row + " of " + variantsData.size());
                 } else {
-                    System.out.print(".");
+                    LOGGER.info(".");
                 }
             }
 
 
 
-            System.out.println("Done");
+            LOGGER.info("Done");
         });
 
         return true;

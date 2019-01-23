@@ -6,7 +6,10 @@ import com.bigname.pim.api.persistence.dao.VerificationTokenDAO;
 import com.bigname.pim.api.service.RegistrationService;
 import com.bigname.pim.api.service.UserService;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.bigname.pim.data.loader.ProductLoader1;
 import com.bigname.pim.util.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,8 @@ import java.util.UUID;
 @Controller
 @RequestMapping("pim/user")
 public class RegistrationController extends BaseController<User,UserService>{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class);
 
     private UserService userService;
     private RegistrationService registrationService;
@@ -61,7 +66,7 @@ public class RegistrationController extends BaseController<User,UserService>{
 
             String confirmationUrl = appUrl + "/registrationConfirm?token=" + token;
 
-            System.out.println("Confirmation Url : " + confirmationUrl);
+            LOGGER.info("Confirmation Url : " + confirmationUrl);
 
             String recipientAddress = user.getEmail();
             String subject = "Registration Confirmation";

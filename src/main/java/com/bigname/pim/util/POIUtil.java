@@ -47,23 +47,18 @@ public class POIUtil {
                         if (currentCell.getCellType() == CellType.STRING) {
                             String cellData = currentCell.getStringCellValue().replaceAll("┬«", "®").replaceAll("Γäó", "™").replaceAll("ΓÇ¥", "”");
                             rowData.add(cellData);
-//                            System.out.print(currentCell.getStringCellValue().replaceAll("┬«", "®") + "--");
                         } else if (currentCell.getCellType() == CellType.NUMERIC) {
                             String cellData = String.valueOf(currentCell.getNumericCellValue());
                             rowData.add(cellData);
-//                            System.out.print(currentCell.getNumericCellValue() + "--");
                         } else {
                             rowData.add("");
                         }
 
                     }
-//                    System.out.println(rowData.size());
                     data.add(rowData);
-//                    System.out.println();
 
                 }
             }
-//            System.out.println(data);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

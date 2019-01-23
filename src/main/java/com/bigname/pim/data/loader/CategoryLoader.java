@@ -6,6 +6,8 @@ import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.POIUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class CategoryLoader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CategoryLoader.class);
+
     @Autowired
     private CategoryService categoryService;
 
@@ -41,8 +46,8 @@ public class CategoryLoader {
         Map<String, Category> categoriesLookupMap = categoryService.getAll(null, false).stream().collect(Collectors.toMap(Category::getCategoryId, e -> e));
         Map<String, RelatedCategory> relatedCategoriesLookupMap = relatedCategoryDAO.findAll().stream().collect(Collectors.toMap( e -> e.getCategoryId() + "|" + e.getSubCategoryId(), e -> e));
 
-        System.out.println("Categories to process -------------->"+  (data.size() - 1));
-        System.out.println("# of category attributes-------------->"+data.get(0).size());
+        LOGGER.info("Categories to process -------------->"+  (data.size() - 1));
+        LOGGER.info("# of category attributes-------------->"+data.get(0).size());
 
         List<String> attributeNamesMetadata = data.remove(0);
         // Sort categories data by PARENT_ID and NAME
@@ -106,7 +111,7 @@ public class CategoryLoader {
         }
         categoryDAO.saveAll(savableCategories);
         relatedCategoryDAO.saveAll(savableRelatedCategories);
-        System.out.println("skipped ---------->" + skippedItems.size());
+        LOGGER.info("skipped ---------->" + skippedItems.size());
         return true;
     }
 }

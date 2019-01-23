@@ -4,6 +4,8 @@ import com.bigname.common.util.ValidationUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,6 +17,9 @@ import static org.junit.Assert.*;
  * @since 1.0
  */
 public class AttributeGroupTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AttributeGroupTest.class);
+
     Map<String, AttributeGroup> groups = new LinkedHashMap<>();
     @Before
     public void setUp() throws Exception {
@@ -108,7 +113,7 @@ public class AttributeGroupTest {
         assertEquals(attribute6.getAttributeGroup().getAttributes().size(), 1);
         assertTrue(ValidationUtil.isNotEmpty(attribute6.getAttributeGroup().getParentGroup()));
         assertEquals(groups.size(), 3);
-        System.out.println(groups);
+        LOGGER.info("",groups);
 
 
     }

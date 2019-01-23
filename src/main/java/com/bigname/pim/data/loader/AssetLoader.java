@@ -11,6 +11,8 @@ import com.bigname.pim.api.service.BaseService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -36,6 +38,9 @@ import static com.bigname.common.util.ValidationUtil.isNotEmpty;
  */
 @Component
 public class AssetLoader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssetLoader.class);
+
     @Autowired
     AssetCollectionService assetCollectionService;
 
@@ -114,7 +119,7 @@ public class AssetLoader {
         try {
             Files.copy(source, dest);
         } catch (IOException e) {
-            System.out.println("Error uploading the file:" + fileName + "," + asset.getInternalFileName());
+            LOGGER.info("Error uploading the file:" + fileName + "," + asset.getInternalFileName());
         }
         return asset;
     }

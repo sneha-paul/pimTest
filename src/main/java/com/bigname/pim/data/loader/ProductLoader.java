@@ -8,6 +8,8 @@ import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.POIUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,9 @@ import static com.bigname.common.util.ValidationUtil.*;
  */
 @Component
 public class ProductLoader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductLoader.class);
+
     @Autowired
     private AttributeCollectionService attributeCollectionService;
 
@@ -71,8 +76,8 @@ public class ProductLoader {
         //Product variant data with metadata
         List<List<String>> data = POIUtil.readData(filePath);
 
-        System.out.println("size-------------->"+data.size());
-        System.out.println("size-------------->"+data.get(0).size());
+        LOGGER.info("size-------------->"+data.size());
+        LOGGER.info("size-------------->"+data.get(0).size());
 
         Map<String, Set<String>> familyVariantGroups = new LinkedHashMap<>();
         if(!attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).isPresent()) {
@@ -133,7 +138,7 @@ public class ProductLoader {
                     categoryDTO.setCategoryName(categoryId);
                     categoryDTO.setGroup("CREATE");
                     categoryService.create(categoryDTO);
-                    System.out.println("======>" + categoryId);
+                    LOGGER.info("======>" + categoryId);
                 }*/
 
                 if(isNotEmpty(style) && !categoryService.get(style, FindBy.EXTERNAL_ID, false).isPresent()) {
@@ -143,7 +148,7 @@ public class ProductLoader {
                     categoryDTO.setCategoryName(style);
                     categoryDTO.setGroup("CREATE");
                     categoryService.create(categoryDTO);
-                    System.out.println("======>" + style);
+                    LOGGER.info("======>" + style);
                 }
 
 
@@ -188,7 +193,7 @@ public class ProductLoader {
                         attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
                         attribute.setUiType(Attribute.UIType.get(attributeTypesMetadata.get(col)));
                         attribute.setName(attributeName);
-                        System.out.println(row + " :: Attribute---> " + attribute.toString());
+                        LOGGER.info(row + " :: Attribute---> " + attribute.toString());
 
                         //Add the attribute, if it won't exists already in the collection
                         if(!attributeCollection.getAttributes().containsKey(AttributeGroup.DEFAULT_GROUP_ID)
@@ -441,16 +446,16 @@ public class ProductLoader {
                             setPricingDetails(productVariant, pricing);
                             productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                         } catch (Exception e) {
-                            System.out.println(pricing);
-                            System.out.println(productVariant.getProductVariantId());
+                            LOGGER.info(pricing);
+                            LOGGER.info(productVariant.getProductVariantId());
                             e.printStackTrace();
                         }
                     }
                 }
                 if(row % 100 == 0) {
-                    System.out.println(row + " of " + variantsData.size());
+                    LOGGER.info(row + " of " + variantsData.size());
                 } else {
-                    System.out.print(".");
+                    LOGGER.info(".");
                 }
             }
         });
