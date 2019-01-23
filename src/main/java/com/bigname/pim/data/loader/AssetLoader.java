@@ -50,6 +50,9 @@ public class AssetLoader {
     @Value("${loader.product.asset.src.location:/assets/src/}")
     private String productAssetSrcLocation;
 
+    @Value("${upload.file.path}")
+    private String filePath;
+
     public AssetCollection createCollection(String collectionName) {
         if(isNotEmpty(collectionName)) {
             collectionName = trim(collectionName);
@@ -114,7 +117,7 @@ public class AssetLoader {
             asset.setType("IMAGE");
         }
         assetService.create(asset);
-        Path dest = Paths.get("/tmp/" + asset.getInternalFileName());
+        Path dest = Paths.get(filePath + asset.getInternalFileName());
         Path source = file.toPath();
         try {
             Files.copy(source, dest);

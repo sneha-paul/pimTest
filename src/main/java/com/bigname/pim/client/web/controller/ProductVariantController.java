@@ -135,17 +135,22 @@ public class ProductVariantController extends ControllerSupport {
         return model;
     }
 
-    @RequestMapping(value = "/{productId}/channels/{channelId}/variants/{variantId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{productId}/channels/{channelId}/variants/{productVariantId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "productId") String productId,
-                                      @PathVariable(value = "variantId") String variantId,
+                                      @PathVariable(value = "productVariantId") String productVariantId,
                                       ProductVariant productVariantDTO,
                                       HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
+
+        /*if(isEmpty(productVariantDTO.getProductVariantId())) {
+            productVariantService.get(variantId, FindBy.EXTERNAL_ID, productVariantDTO.getChannelId(), false)
+                    .ifPresent(productVariant -> productVariantDTO.setProductVariantId(productVariant.getProductVariantId()));
+        }*/
         productVariantDTO.setLevel(1); //TODO - make this dynamic
         setVariantAttributeValues(productVariantDTO, request);
         if(isValid(productVariantDTO, model, productVariantDTO.getGroup().length == 1 && productVariantDTO.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : null)) {
-            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariantDTO);
+            productVariantService.update(productVariantId, FindBy.EXTERNAL_ID, productVariantDTO);
             model.put("success", true);
         }
         return model;

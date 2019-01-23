@@ -119,6 +119,8 @@ public class ProductLoader1 {
             //Product variants data WITHOUT metadata, this will be a sublist of the complete data without the metadata rows
             List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
 
+            Map<String, List<List<String>>> variantsAssets = getProductAssets();
+
             //Map of valid attributeNames, grouped by familyId
             Map<String, Set<String>> familyAttributes = getFamilyAttributes(data);
 
@@ -648,13 +650,15 @@ public class ProductLoader1 {
                     LOGGER.info(".");
                 }
             }*/
-
+            int assetFoundCount = 0;
             final int[] $row = {0}, $col = {0};
             for (int row = 0; row < variantsData.size(); row++) {
                 $row[0] = row;
                 String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")),true).toUpperCase();
+                productId = convertCellValue("", productId);
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
                 String variantId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID")),true).toUpperCase();
+                variantId = convertCellValue("", variantId);
                 String familyId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID")),true).toUpperCase();
                 String categoryId = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Category")),true).toUpperCase();
                 String style = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Style")),true).toUpperCase();
@@ -686,6 +690,7 @@ public class ProductLoader1 {
                                 cellValue = cellValueOption.get().getId();
                             }
                         }
+                        cellValue = convertCellValue(attributeName, cellValue);
                         if(attributeLevel == 0) {
                             productAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
                         } else {
@@ -769,9 +774,31 @@ public class ProductLoader1 {
                         productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[] {variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
                         if(isEmpty(product.getChannelAssets())) {
                             productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[] {variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                            product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
                         }
                     } else {
-                        LOGGER.info(assetFileName + " <======= Not Found");
+//                        System.out.println(assetFileName + " <======= Not Found");
+                    }
+
+                    if(variantsAssets.containsKey(variantId)) {
+                        List<List<String>> variantAssets = variantsAssets.get(variantId);
+                        for(int i = 0; i < variantAssets.size(); i++) {
+                            List<String> variantAsset = variantAssets.get(i);
+                            assetFileName = variantAsset.get(2) + ".png";
+                            if(new File(assetLoader.getSourceLocation() + assetFileName).isFile()) {
+                                VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
+                                VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
+                                VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
+                                productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[] {variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                                if(isEmpty(product.getChannelAssets())) {
+                                    productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[] {variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                                    product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                                }
+                                assetFoundCount ++;
+                            } else {
+//                                System.out.println(assetFileName + " <======= Asset Not Found");
+                            }
+                        }
                     }
 
                     if(isNotEmpty(pricing)) {
@@ -793,9 +820,122 @@ public class ProductLoader1 {
                 }
             }
 
+            System.out.println("Asset found count:" + assetFoundCount);
+
+            System.out.println("Done");
+        });
+
+        return true;
+    }
+
+    public boolean validate(String filePath) {
+        String channelId = "ECOMMERCE";
+
+        //Product variant data WITH metadata
+        List<List<String>> data = POIUtil.readData(filePath);
+
+        List<List<String>> assetsData = POIUtil.readData("/usr/local/pim/uploads/data/import/Product_Assets.xlsx");
+        Map<String, List<List<String>>> assetMap = new LinkedHashMap<>();
+        ((ArrayList) assetsData).forEach(assetData -> {
+            if(((List<String>)assetData).get(1).equals("image")) {
+                String productId = ((List<String>) assetData).get(0);
+                if (!assetMap.containsKey(productId)) {
+                    assetMap.put(productId, new ArrayList<>());
+                }
+                assetMap.get(productId).add((List<String>) assetData);
+            }
+        });
 
 
-            LOGGER.info("Done");
+        //Create the attributeCollection if it won't already exists
+        if(!attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).isPresent()) {
+            AttributeCollection attributeCollection = new AttributeCollection();
+            attributeCollection.setCollectionId(attributeCollectionId);
+            attributeCollection.setCollectionName("Envelopes Attributes Collection");
+            attributeCollection.setActive("Y");
+            attributeCollectionService.create(attributeCollection);
+        }
+
+        //Map of all existing families
+        Map<String, Family> families = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getExternalId, e -> e));
+
+        //Map of all existing categories
+        Map<String, Category> existingCategories = categoryService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getExternalId, e -> e));
+
+        //Map of all existing and newly creating categories
+        Map<String, Category> newCategories = new HashMap<>();
+
+        //Map to store variant level attributes for each families
+        Map<String, Set<String>> familyVariantGroups = new LinkedHashMap<>();
+
+        //Load the attributeCollection from the database for the given collectionId
+        attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).ifPresent(attributeCollection -> {
+            // The metadata row containing the attribute names, this will be first row in the data sheet
+            List<String> attributeNamesMetadata = data.get(0);
+
+            // The metadata row containing the attributeType, this will be second row in the data sheet
+            List<String> attributeTypesMetadata = data.get(1);
+
+            // The metadata row containing the familyAttributeGroup name, this will be third row in the data sheet
+            List<String> familyAttributeGroupMetadata = data.get(2);
+
+            // The metadata row containing the familyAttributeSubGroup name, this will be fourth row in the data sheet
+            List<String> familyAttributeSubgroupMetadata = data.get(3);
+
+            // The metadata row containing the attribute level value of each attribute (0 - Product Level & 1 - Variant Level), this will be fourth row in the data sheet
+            List<String> attributeLevelMetadata = data.get(4);
+
+            //Number of metadata rows in the data sheet
+            int numOfMetadataRows = 5;
+
+            //Product variants data WITHOUT metadata, this will be a sublist of the complete data without the metadata rows
+            List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
+            Map<String, String> four04 = new LinkedHashMap<>();
+            int cnt = 0,cnt1 = 0;
+            String lastProductId = "";
+            //Process each of the variant data row in the data sheet
+            for(int row = 0; row < variantsData.size(); row ++) {
+
+                //ProductId
+                String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")), true).toUpperCase();
+
+                productId = convertCellValue("", productId);
+                //ProductName
+                String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
+                //VariantId
+                String variantId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID")), true);
+
+                variantId = convertCellValue("", variantId);
+                //FamilyId
+                String familyId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID")), true).toUpperCase();
+                //CategoryId
+                String categoryId = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Category")), true).toUpperCase();
+                //Style
+                String style = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Style")), true).toUpperCase();
+
+                //TODO - TEMP CODE - Skip folders category
+                if(categoryId.equals("FOLDERS")) {continue;}
+
+                //Skip the current variant row, if productId, productName, variantId or familyId is empty
+                if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
+                    continue;
+                }
+
+                String assetFileName = variantId + ".png";
+//                if(!lastProductId.equals(productId)) {
+                    if (new File(assetLoader.getSourceLocation() + assetFileName).isFile()) {
+                        cnt1++;
+                    } else {
+                        cnt++;
+                        four04.put(variantId, assetFileName);
+                    }
+                    lastProductId = productId;
+//                }
+
+            }
+            four04.forEach((k, v) ->  System.out.println(k + "   -------    " + v));
+            System.out.println(four04.size() + "(" + cnt + ")" + ", Found=" + cnt1);
+            System.out.println("Done");
         });
 
         return true;
@@ -888,6 +1028,21 @@ public class ProductLoader1 {
         });
     }
 
+    private static Map<String, List<List<String>>> getProductAssets() {
+        List<List<String>> assetsData = POIUtil.readData("/usr/local/pim/uploads/data/import/Product_Assets.xlsx");
+        Map<String, List<List<String>>> productAssets = new LinkedHashMap<>();
+        ((ArrayList) assetsData).forEach(assetData -> {
+            if(((List<String>)assetData).get(1).equals("image")) {
+                String productId = ((List<String>) assetData).get(0);
+                if (!productAssets.containsKey(productId)) {
+                    productAssets.put(productId, new ArrayList<>());
+                }
+                productAssets.get(productId).add((List<String>) assetData);
+            }
+        });
+        return productAssets;
+    }
+
     public List<Pair<String, String>> getAttributeGroupsIdNamePair(Family family) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
         FamilyAttributeGroup.getAllAttributeGroups(family.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), FamilyAttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > "))));
@@ -901,7 +1056,7 @@ public class ProductLoader1 {
     }
 
     private String convertCellValue(String name, String cellValue) {
-        if((name.equals("Base Quantity Price") || name.equals("Each Price")) && cellValue.endsWith(".0")) {
+        if((!name.equals("Base Quantity Price") && !name.equals("Each Price")) && cellValue.endsWith(".0")) {
             return cellValue.substring(0, cellValue.length() - 2);
         }
         return cellValue;

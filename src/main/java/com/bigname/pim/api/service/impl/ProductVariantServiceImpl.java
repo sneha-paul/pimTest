@@ -8,6 +8,7 @@ import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.util.*;
+import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
+import static com.bigname.pim.util.FindBy.INTERNAL_ID;
 
 /**
  * Created by sruthi on 20-09-2018.
@@ -70,6 +72,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
 
     @Override
     public ProductVariant update(String variantId, FindBy variantIdFindBy, ProductVariant productVariant) {
+        //Variant cannot be loading using the externalId alone at the base layer. So if the id is EXTERNAL, convert it to the INTERNAL one
         if(variantIdFindBy == FindBy.EXTERNAL_ID) {
             Optional<ProductVariant> _variant = get(productVariant.getProductId(), FindBy.INTERNAL_ID, productVariant.getChannelId(), variantId, variantIdFindBy, false);
             if(_variant.isPresent()) {
@@ -78,6 +81,8 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             } else {
                 throw new EntityNotFoundException("Unable to find product variant with variantId:" + variantId + ", productId:" + productVariant.getProductId() + ", channelId:" + productVariant.getChannelId());
             }
+        } else {
+            Preconditions.checkState(variantId.equals(productVariant.getId()), "Illegal operation");
         }
         return super.update(variantId, variantIdFindBy, productVariant);
     }

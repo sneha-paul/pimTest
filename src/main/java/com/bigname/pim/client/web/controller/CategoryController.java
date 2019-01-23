@@ -57,13 +57,13 @@ public class CategoryController extends BaseController<Category, CategoryService
         return model;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{categoryId}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, Category category) {
+    public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
         Map<String, Object> model = new HashMap<>();
-        model.put("context", CollectionsUtil.toMap("id", id));
+        model.put("context", CollectionsUtil.toMap("id", categoryId));
         if(isValid(category, model, category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null)) {
-            categoryService.update(id, FindBy.EXTERNAL_ID, category);
+            categoryService.update(categoryId, FindBy.EXTERNAL_ID, category);
             model.put("success", true);
         }
         return model;
