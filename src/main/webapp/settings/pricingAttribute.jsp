@@ -10,7 +10,6 @@
     <c:otherwise>
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
-                <div class="card">
                     <div class="body">
                         <form method="post" action="/pim/pricingAttributes" data-method="POST" data-success-message='["Successfully created the pricing attribute", "Pricing Attribute Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
@@ -30,7 +29,6 @@
                             <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
                         </form>
                     </div>
-                </div>
             </div>
         </div>
     </c:otherwise>

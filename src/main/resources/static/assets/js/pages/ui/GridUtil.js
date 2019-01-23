@@ -9,9 +9,14 @@
                 click: function (row) {
                    /* window.location.href = $.getURLWithRequestParams(options.pageUrl+'changePassword/' + row.externalId, options.urlParams || {});*/
                     $.showModal({
-                        url: $.getURL(options.pageUrl+'changePasswordView/{id}', {'id': row.externalId}),
+                        url: $.getURL(options.pageUrl+'changePasswordView'),
+                        data:{'id': row.externalId},
                         name:'reset-password',
                         title:'Reset Password',
+                        buttons: [
+                            {text: 'SAVE', style: 'primary', close: true, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){toastr.success('Password updated successfully', 'Password Changed');});}},
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ],
                     });
                 }
             };

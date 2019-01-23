@@ -17,10 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -108,17 +105,17 @@ public class UserController extends BaseController<User, UserService> {
         return new ModelAndView("user/users", model);
     }
 
-    @RequestMapping(value = {"/changePasswordView/{id}"})
-    public ModelAndView changePassword(@PathVariable(value = "id", required = false) String id) {
+    @RequestMapping(value = {"/changePasswordView"})
+    public ModelAndView changePassword(@RequestParam(value = "id", required = false) String id) {
         Optional<User> user = userService.get(id, FindBy.EXTERNAL_ID, false);
         Map<String, Object> model = new HashMap<>();
         model.put("user", user.get());
         model.put("breadcrumbs", new Breadcrumbs("Users", "Users", "/pim/users", user.get().getUserName(), ""));
         return new ModelAndView("user/changePassword", model);
     }
-   @RequestMapping(value = "/changePassword/{id}", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> changePassword(@PathVariable(value = "id") String id, User user) {
+   @RequestMapping(value = "/changePassword", method = RequestMethod.PUT)
+   @ResponseBody
+    public Map<String, Object> changePassword(@RequestParam(value = "id") String id, User user) {
         Map<String, Object> model = new HashMap<>();
         user.setExternalId(id);
         model.put("context", CollectionsUtil.toMap("id", id));

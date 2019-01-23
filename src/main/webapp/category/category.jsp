@@ -8,7 +8,6 @@
         </tiles:insertDefinition>
     </c:when>
     <c:otherwise>
-
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
                 <div class="card">
@@ -38,10 +37,8 @@
                             <input type="hidden" name="group" value="CREATE"/>
                             <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
                         </form>
-
                     </div>
-                </div>
-            </div>
-        </div>
+                 </div>
+             </div>
     </c:otherwise>
 </c:choose>
