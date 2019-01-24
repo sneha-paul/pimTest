@@ -11,7 +11,7 @@
             <li <c:if test="${active eq 'FAMILIES'}">class="active"</c:if>><a href="/pim/families"><i class="icon-list"></i>Families</a></li>
             <li <c:if test="${active eq 'SETTINGS'}">class="active"</c:if>><a href="/pim/pricingAttributes"><i class="icon-user"></i>Pricing Attributes</a></li>--%>
             <li <c:if test="${active eq 'USERS'}">class="active"</c:if>><a href="/pim/users"><i class="icon-users"></i>Users</a></li>
-            <c:set var="expanded" value="${active eq 'ATTRIBUTE_COLLECTIONS' or active eq 'FAMILIES' or active eq 'PRICING_ATTRIBUTES'}"/>
+            <c:set var="expanded" value="${active eq 'ASSET_COLLECTIONS' or active eq 'ATTRIBUTE_COLLECTIONS' or active eq 'FAMILIES' or active eq 'PRICING_ATTRIBUTES'}"/>
             <li <c:if test="${expanded}">class="active"</c:if>>
                 <a href="#Settings" class="has-arrow" aria-expanded="${expanded}"><i class="icon-settings"></i><span>Settings</span></a>
                 <ul aria-expanded="${expanded}" class="collapse <c:if test='${expanded}'>in</c:if>" style="height: 0px;">
