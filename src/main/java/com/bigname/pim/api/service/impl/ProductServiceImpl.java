@@ -72,6 +72,13 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     @Override
+    public Page<Map<String, Object>> findAllProductCategories(String productId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+        return get(productId, findBy, false)
+                .map(category -> productDAO.findAllProductCategories(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
     public Optional<Product> findOne(Map<String, Object> criteria) {
         return dao.findOne(criteria);
     }

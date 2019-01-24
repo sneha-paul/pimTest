@@ -5,7 +5,6 @@ import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
-import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
@@ -125,4 +124,7 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
     Product setAsDefaultAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily);
 
     Product deleteAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily);
+
+    Page<Map<String, Object>> findAllProductCategories(String productId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+
 }
