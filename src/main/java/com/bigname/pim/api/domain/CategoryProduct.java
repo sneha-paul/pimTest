@@ -62,6 +62,7 @@ public class CategoryProduct extends EntityAssociation<Category, Product> {
         map.put("productName", attributesMap.get("productName"));
         map.put("active", attributesMap.get("active"));
         map.put("sequenceNum", attributesMap.get("sequenceNum"));
+        map.put("imageName", "noimage.png");
         return map;
     }
 
