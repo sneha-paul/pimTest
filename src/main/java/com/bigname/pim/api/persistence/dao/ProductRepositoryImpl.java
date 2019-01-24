@@ -1,7 +1,9 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.ProductCategory;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.support.PageableExecutionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -106,5 +110,27 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product> implem
         List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "productCategory", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
 
         return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    @Override
+    public List<ProductCategory> getAllProductCategories(String productId, boolean... activeRequired) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("productId").is(productId).andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired)))));
+        return mongoTemplate.find(query, ProductCategory.class);
+    }
+
+    @Override
+    public Page<Category> findAvailableCategoriesForProduct(String productId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        List<String> excludeIds = getAllProductCategories(productId, false).stream().map(ProductCategory::getCategoryId).collect(Collectors.toList());
+        Query query = new Query();
+        keyword = "(?i)" + keyword;
+        Criteria criteria = new Criteria();
+        criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
+        criteria.andOperator(Criteria.where("_id").nin(excludeIds),Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+        query.addCriteria(criteria).with(pageable);
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(query, Category.class),
+                pageable,
+                () -> mongoTemplate.count(query, Category.class));
     }
 }

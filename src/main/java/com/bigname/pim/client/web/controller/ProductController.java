@@ -235,7 +235,8 @@ public class ProductController extends BaseController<Product, ProductService>{
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Category> paginatedResult = productService.getAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Category> paginatedResult = ValidationUtil2.isEmpty(dataTableRequest.getSearch()) ? productService.getAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+                : productService.findAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

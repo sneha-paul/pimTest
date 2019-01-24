@@ -16,6 +16,10 @@ import java.util.Optional;
  * Created by sruthi on 19-09-2018.
  */
 public interface ProductService extends BaseService<Product, ProductDAO> {
+
+
+    Page<Category> findAvailableCategoriesForProduct(String productId, FindBy externalId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+
     /**
      * Method to get variants of a product in paginated format.
      *
@@ -91,7 +95,7 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
      * @param sort sort object
      * @return
      */
-    Page<Category> getAvailableCategoriesForProduct(String productId, FindBy findBy, int page, int size, Sort sort);
+    Page<Category> getAvailableCategoriesForProduct(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to add category for a product.
