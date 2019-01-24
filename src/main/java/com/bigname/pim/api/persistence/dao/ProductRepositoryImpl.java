@@ -40,7 +40,7 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product> implem
         }
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("category")
-                .localField("productCategoryId")
+                .localField("categoryId")
                 .foreignField("_id")
                 .as("productCategory");
 
