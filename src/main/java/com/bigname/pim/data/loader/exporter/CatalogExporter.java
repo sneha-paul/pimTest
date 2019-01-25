@@ -1,4 +1,4 @@
-package com.bigname.pim.data.loader;
+package com.bigname.pim.data.loader.exporter;
 
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.service.CatalogService;

@@ -1,7 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.data.loader.CatalogExporter;
-import com.bigname.pim.data.loader.WebsiteExporter;
+import com.bigname.pim.data.loader.exporter.CatalogExporter;
+import com.bigname.pim.data.loader.exporter.WebsiteExporter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

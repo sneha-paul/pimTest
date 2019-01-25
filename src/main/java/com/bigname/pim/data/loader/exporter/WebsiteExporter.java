@@ -1,4 +1,4 @@
-package com.bigname.pim.data.loader;
+package com.bigname.pim.data.loader.exporter;
 
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
