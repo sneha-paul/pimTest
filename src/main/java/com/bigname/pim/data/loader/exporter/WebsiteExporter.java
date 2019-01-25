@@ -28,7 +28,7 @@ public class WebsiteExporter {
 
         List<Website> websitesData = websiteService.getAll(null,true);
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
-        data.put("1", new Object[]{"Website Id", "Website Name", "Url", "Id"});
+        data.put("1", new Object[]{"Website_Id", "Name", "Url", "Id"});
         int i=2;
         for (Iterator<Website> iter = websitesData.iterator(); iter.hasNext(); ) {
             Website element = iter.next();

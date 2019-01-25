@@ -25,6 +25,7 @@ public class FeedController {
     private CategoryLoader categoryLoader;
     private ProductLoader productLoader;
     private ProductLoader1 productLoader1;
+    private WebsiteLoader websiteLoader;
 
     @Value("${loader.catalogFeed.path:/DevStudio/Docs/PIM_ExcelFiles/catalogData.xlsx}")
     private String catalogFeedPath;
@@ -35,6 +36,10 @@ public class FeedController {
     @Value("${loader.categoryFeed.path:/tmp/CATEGORIES.xlsx}")
     private String categoryFeedPath;
 
+    @Value("${loader.websiteFeed.path:/DevStudio/Docs/PIM_ExcelFiles/WebsiteData.xlsx}")
+    private String websiteFeedPath;
+
+
     @Value("${loader.api.key:80blacwood85}")
     private String apiKey;
 
@@ -43,6 +48,7 @@ public class FeedController {
         this.categoryLoader = categoryLoader;
         this.productLoader = productLoader;
         this.productLoader1 = productLoader1;
+        this.websiteLoader = websiteLoader;
     }
 
     @ResponseBody
@@ -100,5 +106,19 @@ public class FeedController {
         model.put("success", success);
         return model;
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/load/websites", method = RequestMethod.GET)
+    public Map<String, Object> loadWebsiteData(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        if(this.apiKey.equals(apiKey)) {
+            websiteLoader.load(websiteFeedPath);
+            success = true;
+        }
+        model.put("success", success);
+        return model;
+    }
+
 
 }
