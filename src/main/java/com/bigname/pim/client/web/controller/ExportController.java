@@ -24,7 +24,7 @@ public class ExportController {
     @RequestMapping(value = "/catalogs" , method = RequestMethod.GET)
     public Map<String, Object> exportCatalogData(HttpServletRequest request) {
         Map<String, Object> model =new HashMap<>();
-        catalogExporter.exportData(  "C:\\Users\\Documents\\excel\\catalogData.xlsx");
+        catalogExporter.exportData(  "/DevStudio/Docs/PIM_ExcelFiles/catalogData.xlsx");
 
         return model;
     }
