@@ -43,7 +43,7 @@ public class FeedController {
     @Value("${loader.api.key:80blacwood85}")
     private String apiKey;
 
-    public FeedController(CatalogLoader catalogLoader, CategoryLoader categoryLoader, ProductLoader productLoader, ProductLoader1 productLoader1) {
+    public FeedController(CatalogLoader catalogLoader, CategoryLoader categoryLoader, ProductLoader productLoader, ProductLoader1 productLoader1, WebsiteLoader websiteLoader) {
         this.catalogLoader = catalogLoader;
         this.categoryLoader = categoryLoader;
         this.productLoader = productLoader;
