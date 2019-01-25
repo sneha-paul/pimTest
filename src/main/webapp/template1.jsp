@@ -273,6 +273,10 @@
             cursor: pointer;
         }
 
+        .btn-toggle-offcanvas {
+            cursor: pointer;
+        }
+
         select[disabled="disabled"] {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -596,6 +600,9 @@
             border-right: 4px solid #007bff;
             border-bottom: 4px solid #007bff;
         }
+        div#main-content {
+            min-height:calc(100vh - 67px);
+        }
 
     </style>
 
@@ -638,12 +645,12 @@
     </div>
     <div id="main-content">
         <div class="container-fluid">
-            <div class="block-header">
+            <div class="block-header p-l-25">
                 <div class="row">
                     <div>
                         <c:forEach items="${breadcrumbs.breadcrumbs}" var="breadcrumb" varStatus="crumbStatus">
-                            <c:if test="${crumbStatus.first}"><h2><a href="javascript:void(0);" class="btn btn-xs btn-link btn-toggle-fullwidth"><i class="fa fa-arrow-left"></i></a> ${breadcrumbs.title}</h2></c:if>
-                            <c:if test="${crumbStatus.first}"><ul class="breadcrumb"></c:if>
+                            <c:if test="${crumbStatus.first}"><h2>${breadcrumbs.title}</h2></c:if>
+                            <c:if test="${crumbStatus.first}"><ul class="breadcrumb" style="position: relative; top: 17px"></c:if>
                             <li class="breadcrumb-item"><c:if test="${breadcrumb[1] ne ''}"><a href="${breadcrumb[1]}"></c:if> <c:choose><c:when test="${breadcrumb[0] eq 'HOME'}"><i class="icon-home"></i></c:when><c:otherwise>${breadcrumb[0]}</c:otherwise></c:choose><c:if test="${breadcrumb[1] ne ''}"></a></c:if></li>
                             <c:if test="${crumbStatus.last}"></ul></c:if>
                         </c:forEach>
