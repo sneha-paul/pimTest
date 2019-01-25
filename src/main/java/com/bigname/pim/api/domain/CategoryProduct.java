@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.bigname.pim.api.domain.ValidatableEntity.isNotEmpty;
+
 /**
  * Created by sruthi on 26-09-2018.
  */
@@ -62,6 +64,12 @@ public class CategoryProduct extends EntityAssociation<Category, Product> {
         map.put("productName", attributesMap.get("productName"));
         map.put("active", attributesMap.get("active"));
         map.put("sequenceNum", attributesMap.get("sequenceNum"));
+       /* Map<String, Object> defaultAsset = getChild().getDefaultAsset();
+        if(isNotEmpty(defaultAsset)) {
+            map.put("imageName", (String) defaultAsset.get("internalName"));
+        } else {
+            map.put("imageName", "noimage.png");
+        }*/
         map.put("imageName", "noimage.png");
         return map;
     }
