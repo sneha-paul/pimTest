@@ -22,14 +22,14 @@ public class CatalogExporter {
     public boolean exportData(String filePath) {
         List<Catalog> catalogData = catalogService.getAll(null,true);
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
-        data.put("1", new Object[]{ "websiteName", "description","externalId" });
+        data.put("1", new Object[]{"CatalogId", "Catalog Name", "Description", "Id" });
         int i=2;
         for (Iterator<Catalog> iter = catalogData.iterator(); iter.hasNext(); ) {
             Catalog element = iter.next();
-            data.put(Integer.toString(i), new Object[]{element.getCatalogName(),element.getDescription(),element.getExternalId() });
+            data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getId() });
             i++;
         }
-        POIUtil.writeData(filePath,"catalog",data);
+        POIUtil.writeData(filePath, "catalog", data);
         return true;
     }
 }
