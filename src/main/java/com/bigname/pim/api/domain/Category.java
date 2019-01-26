@@ -132,10 +132,6 @@ public class Category extends Entity<Category> {
     @Override
     public void orchestrate() {
         super.orchestrate();
-        setDiscontinued(getDiscontinued());
-        if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
-            setActive("N");
-        }
     }
 
     @Override
@@ -159,7 +155,7 @@ public class Category extends Entity<Category> {
                     this.setDescription(category.getDescription());
                     this.setLongDescription(category.getLongDescription());
                     this.setActive(category.getActive());
-                    this.setDiscontinued(category.getDiscontinued());
+                    mergeBaseProperties(category);
                     break;
                 case "SEO":
                     this.setMetaTitle(category.getMetaTitle());
@@ -175,10 +171,8 @@ public class Category extends Entity<Category> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("externalId", getExternalId());
         map.put("categoryName", getCategoryName());
-        map.put("active", getActive());
-        map.put("discontinued", getDiscontinued());
+        map.putAll(getBasePropertiesMap());
         return map;
     }
 

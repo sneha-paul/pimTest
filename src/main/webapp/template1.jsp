@@ -20,21 +20,22 @@
     <link href="/assets/img/favicon.png" rel="shortcut icon" type="image/x-icon">
 
     <%-- VENDOR CSS --%>
-    <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
-    <link rel="stylesheet" href="/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
-    <%--<link rel="stylesheet" href="/assets/vendor/bootstrap-treeview/bootstrap-treeview.min.css">--%>
-    <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
-    <link rel="stylesheet" href="/assets/vendor/light-gallery/css/lightgallery.css">
-    <link rel="stylesheet" href="/assets/vendor/nestable/jquery-nestable.css">
-    <link rel="stylesheet" href="/assets/vendor/sweetalert/sweetalert.css"/>
-    <link rel="stylesheet" href="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="/assets/vendor/jquery-datatable/rowReorder.bootstrap4.css">
-    <link rel="stylesheet" href="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.css">
-    <link rel="stylesheet" href="/assets/vendor/parsleyjs/css/parsley.css">
-    <link rel="stylesheet" href="/assets/vendor/table-dragger/table-dragger.min.css">
-    <link rel="stylesheet" href="/assets/vendor/dropzone/css/dropzone.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css">
+    <%--<link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-treeview/bootstrap-treeview.min.css">--%>
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/light-gallery/css/lightgallery.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/nestable/jquery-nestable.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/sweetalert/sweetalert.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/jquery-datatable/rowReorder.bootstrap4.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/parsleyjs/css/parsley.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/table-dragger/table-dragger.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/dropzone/css/dropzone.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/gijgo/css/gijgo.min.css" />
 
     <%-- MAIN CSS --%>
     <link rel="stylesheet" href="/assets/css/main.css">
@@ -52,6 +53,9 @@
     <%--<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>--%>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.2/dist/sweetalert2.all.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
+    <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+    <script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="/assets/vendor/gijgo/js/gijgo.min.js" type="text/javascript"></script>
     <script src="/assets/js/pages/ui/page.js"></script>
     <script src="/assets/vendor/jquery-datatable/jquery.dataTables.min.js"></script>
     <script src="/assets/js/pages/ui/GridUtil.js"></script>
@@ -93,6 +97,12 @@
             background: url(/assets/img/transparent_bg.png);
             background-repeat: repeat;
             background-size: 30px 30px;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            padding-right: 0.1rem;
+            font-family: FontAwesome;
+            content: "\f105";
         }
 
         .grid-main-img {
@@ -683,12 +693,13 @@
 <script src="/assets/vendor/dropzone/js/dropzone.js"></script>
 
 
-<script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
-<script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+
 <%--<script src="/assets/vendor/bootstrap-treeview/bootstrap-treeview.js"></script>--%>
 <%--<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>--%>
 <%--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/1.6.2/jquery.mockjax.js"></script>--%>
 <script src="/assets/vendor/parsleyjs/js/parsley.min.js"></script>
+
 
 <script src="/assets/bundles/mainscripts.bundle.js"></script>
 

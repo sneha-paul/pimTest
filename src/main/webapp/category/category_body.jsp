@@ -28,7 +28,7 @@
                                                         <input type="text" id="categoryName" name="categoryName" value="${category.categoryName}" class="form-control" />
                                                     </div>
 
-                                                    <div class="form-group" js-external-id>
+                                                    <div class="form-group js-external-id">
                                                         <label for="categoryId">Category ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="categoryId" name="categoryId" class="form-control" value="${category.categoryId}" />
                                                     </div>
@@ -54,6 +54,17 @@
                                                             <input type="checkbox" id="discontinued" name="discontinued" value="Y" <c:if test="${category.discontinued eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Discontinued</span>
                                                         </label>
+                                                    </div>
+
+                                                    <div class="js-dateRange">
+                                                        <div class="form-group">
+                                                            <label>Discontinue From </label>
+                                                            <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${category.discontinuedFrom}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Discontinue To </label>
+                                                            <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${category.discontinuedTo}">
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -193,6 +204,7 @@
         'catalogId' : '${param.catalogId}'
     });
 </script>
+<img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
 <script src="/assets/js/pages/ui/category/category.js"></script>
 
 

@@ -675,7 +675,7 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${productVariant.product.productId}', productVariantId : '${productVariant.productVariantId}', channelId : '${productVariant.channelId}'});$.getScript('/assets/js/pages/ui/product/productVariant.js');"/>
+<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${productVariant.product.productId}', productVariantId : '${productVariant.productVariantId}', channelId : '${productVariant.channelId}'});$.getScript('/assets/js/pages/ui/product/productVariant.js');$.loadEvent()"/>
 
 <script>
     var cols = JSON.parse('${pricingGridColumns}');

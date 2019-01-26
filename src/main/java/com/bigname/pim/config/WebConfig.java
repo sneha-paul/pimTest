@@ -1,14 +1,14 @@
 package com.bigname.pim.config;
 
-import com.bigname.pim.api.domain.Channel;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.ChannelDAO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.repository.init.Jackson2RepositoryPopulatorFactoryBean;
+import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
+import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.format.support.FormattingConversionService;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -61,5 +61,18 @@ public class WebConfig implements WebMvcConfigurer {
             factory.setResources(new Resource[]{new ClassPathResource("data.json")});
         }
         return factory;
+    }
+
+
+    @Bean
+    public FormattingConversionService conversionService() {
+        DefaultFormattingConversionService conversionService =
+                new DefaultFormattingConversionService(false);
+        DateTimeFormatterRegistrar registrar = new DateTimeFormatterRegistrar();
+        registrar.setUseIsoFormat(true);
+//        registrar.setDateFormatter(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+//        registrar.setDateTimeFormatter(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+        registrar.registerFormatters(conversionService);
+        return conversionService;
     }
 }

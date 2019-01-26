@@ -62,22 +62,32 @@ public class CategoryController extends BaseController<Category, CategoryService
     public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("id", categoryId));
+        String active = category.getActive();
+        String discontinued = category.getDiscontinued();
+        String group = category.getGroup()[0].equals("DETAILS") ? "DETAILS" : "";
         if(isValid(category, model, category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null)) {
+
             categoryService.update(categoryId, FindBy.EXTERNAL_ID, category);
             model.put("success", true);
+            if(!categoryId.equals(category.getCategoryId())) {
+                model.put("refreshUrl", "/pim/categories/" + category.getCategoryId());
+            } else if(group.equals("DETAILS") && (!active.equals(category.getActive()) || !discontinued.equals(category.getDiscontinued()))) {
+                model.put("refresh", true);
+            }
         }
         return model;
     }
 
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "reload", required = false) boolean reload,
                                 @RequestParam Map<String, Object> parameterMap,
                                 HttpServletRequest request) {
 
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATEGORIES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "category/category");
+        model.put("view", "category/category"  + (reload ? "_body" : ""));
         return id == null ? super.details(model) : categoryService.get(id, FindBy.findBy(true), false)
                 .map(category -> {
                     if(parameterMap.containsKey("parentId")) {

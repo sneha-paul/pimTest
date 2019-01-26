@@ -97,7 +97,8 @@ public class WebsiteController extends BaseController<Website, WebsiteService>{
      * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
      */
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id, @RequestParam(name = "reload", required = false) boolean reload) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "reload", required = false) boolean reload) {
 
         Map<String, Object> model = new HashMap<>();
         model.put("active", "WEBSITES");

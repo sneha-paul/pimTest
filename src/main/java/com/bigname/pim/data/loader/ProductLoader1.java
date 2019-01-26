@@ -1,5 +1,6 @@
 package com.bigname.pim.data.loader;
 
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
@@ -711,11 +712,10 @@ public class ProductLoader1 {
                     productDTO.setProductFamilyId(familyId);
                     productService.create(productDTO);
                     product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
-                    product.setProductId(productId);
                     product.setChannelId(channelId);
-                    product.setGroup("DETAILS");
                     product.setAttributeValues(productAttributesMap);
-                    if(productService.validate(product, new HashMap<>(), Product.DetailsGroup.class).isEmpty()) {
+                    product.setGroup("DETAILS");
+                    if(productService.validate(product, CollectionsUtil.toMap("id", productId), Product.DetailsGroup.class).isEmpty()) {
                         productService.update(productId, FindBy.EXTERNAL_ID, product);
                         product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
                         product.setProductId(productId);
@@ -761,8 +761,8 @@ public class ProductLoader1 {
                     productVariantService.create(productVariant);
                     productVariant.setLevel(1); //TODO - change for multi level variants support
                     setVariantAttributeValues(productVariant, variantAttributesMap);
-                    if(productVariantService.validate(productVariant, new HashMap<>(), ProductVariant.DetailsGroup.class).isEmpty()) {
-                        productVariant.setGroup("DETAILS");
+                    productVariant.setGroup("DETAILS");
+                    if(productVariantService.validate(productVariant, CollectionsUtil.toMap("id", variantId), ProductVariant.DetailsGroup.class).isEmpty()) {
                         productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
                     }
                     AssetCollection productAssetsCollection = assetLoader.createCollection("PRODUCT_ASSETS");

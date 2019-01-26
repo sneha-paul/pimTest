@@ -83,7 +83,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
         if(!_t1.isPresent()) {
             throw new IllegalStateException("Illegal operation");
         } else {
-            if(findBy == INTERNAL_ID && !entityName.equals("productVariant")) { //TODO need to handle productVariant update from controller using INTERNALID
+            if(findBy == INTERNAL_ID && !entityName.equals("productVariant")) { //TODO need to handle productVariant update from controller using INTERNAL_ID
                 Preconditions.checkState(id.equals(t.getId()), "Illegal operation");
             }
             T t1 = _t1.get();
