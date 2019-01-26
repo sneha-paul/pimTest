@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ReflectionUtil;
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.EntityAssociation;
@@ -98,6 +99,23 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     public Map<String, Object> clone(@PathVariable(value = "id") String id, @PathVariable(value = "cloneType") String type) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", service.cloneInstance(id, FindBy.EXTERNAL_ID, Entity.CloneType.find(type)));
+        return model;
+    }
+
+    protected Map<String, Object> update(String id, T entity, String baseMapping, Class<?>... groups) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("context", CollectionsUtil.toMap("id", id));
+        String active = entity.getActive();
+        String discontinued = entity.getDiscontinued();
+        if(isValid(entity, model, groups)) {
+            service.update(id, FindBy.EXTERNAL_ID, entity);
+            model.put("success", true);
+            if(!id.equals(entity.getExternalId())) {
+                model.put("refreshUrl", baseMapping + entity.getExternalId());
+            } else if(entity.getGroup()[0].equals("DETAILS") && (!active.equals(entity.getActive()) || !discontinued.equals(entity.getDiscontinued()))) {
+                model.put("refresh", true);
+            }
+        }
         return model;
     }
 

@@ -60,22 +60,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{categoryId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("context", CollectionsUtil.toMap("id", categoryId));
-        String active = category.getActive();
-        String discontinued = category.getDiscontinued();
-        String group = category.getGroup()[0].equals("DETAILS") ? "DETAILS" : "";
-        if(isValid(category, model, category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null)) {
-
-            categoryService.update(categoryId, FindBy.EXTERNAL_ID, category);
-            model.put("success", true);
-            if(!categoryId.equals(category.getCategoryId())) {
-                model.put("refreshUrl", "/pim/categories/" + category.getCategoryId());
-            } else if(group.equals("DETAILS") && (!active.equals(category.getActive()) || !discontinued.equals(category.getDiscontinued()))) {
-                model.put("refresh", true);
-            }
-        }
-        return model;
+        return update(categoryId, category, "/pim/categories/", category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null);
     }
 
     @RequestMapping(value = {"/{id}", "/create"})
