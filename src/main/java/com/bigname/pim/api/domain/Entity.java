@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -33,6 +34,16 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate discontinuedTo;
+
+    private String createdUser;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime createdDateTime;
+
+    private String lastModifiedUser;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime lastModifiedDateTime;
 
     protected Entity() {
         this.id = UUID.randomUUID().toString();
@@ -97,6 +108,38 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
 
     public void setDiscontinuedTo(LocalDate discontinuedTo) {
         this.discontinuedTo = discontinuedTo;
+    }
+
+    public String getCreatedUser() {
+        return createdUser;
+    }
+
+    public void setCreatedUser(Optional<User> createdUser) {
+        this.createdUser = createdUser.map(user -> user.getId()).orElse("");
+    }
+
+    public LocalDateTime getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(LocalDateTime createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
+    public String getLastModifiedUser() {
+        return lastModifiedUser;
+    }
+
+    public void setLastModifiedUser(Optional<User> lastModifiedUser) {
+        this.lastModifiedUser = lastModifiedUser.map(user -> user.getId()).orElse("");
+    }
+
+    public LocalDateTime getLastModifiedDateTime() {
+        return lastModifiedDateTime;
+    }
+
+    public void setLastModifiedDateTime(LocalDateTime lastModifiedDateTime) {
+        this.lastModifiedDateTime = lastModifiedDateTime;
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Entity;
+import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.exception.DuplicateEntityException;
 import com.bigname.pim.api.exception.EntityCreateException;
@@ -22,9 +23,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,6 +75,8 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
                     .ifPresent(t1 ->    {
                         throw new DuplicateEntityException("Another " + entityName + " instance exists with the given " + entityName + " id:" + t.getExternalId());
                     });
+            t.setCreatedDateTime(LocalDateTime.now());
+            t.setCreatedUser(getCurrentUser());
             return createOrUpdate(t);
         } catch(Exception e) {
             throw new EntityCreateException("An error occurred while creating the " + entityName + " dut to: "+ e.getMessage(), e);
@@ -94,6 +102,8 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
                         });
             }
             t1.merge(t);
+            t1.setLastModifiedDateTime(LocalDateTime.now());
+            t1.setLastModifiedUser(getCurrentUser());
             return createOrUpdate(t1);
         }
     }
@@ -249,5 +259,13 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
         } catch (IllegalStateException e) {
             return (Service) this;
         }
+    }
+
+    private Optional<User> getCurrentUser() {
+        return Optional.ofNullable(SecurityContextHolder.getContext())
+                .map(SecurityContext::getAuthentication)
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getPrincipal)
+                .map(User.class::cast);
     }
 }
