@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,8 @@ public class WebsiteLoader {
 
                 //update this for batch saving
                 if (isValid(websiteService.validate(website, new HashMap<>(), Website.DetailsGroup.class))) {
+                    website.setLastModifiedDateTime(LocalDateTime.now());
+                    website.setLastModifiedUser(websiteService.getCurrentUser());
                     website.setActive("Y");
                     savableWebsites.add(website);
                 }
@@ -70,6 +73,8 @@ public class WebsiteLoader {
                 website.setWebsiteName(name);
                 website.setUrl(url);
                 if (isValid(websiteService.validate(website, new HashMap<>(), Website.CreateGroup.class))) {
+                    website.setCreatedDateTime(LocalDateTime.now());
+                    website.setCreatedUser(websiteService.getCurrentUser());
                     website.setActive("Y");
                     //Add this for batch saving
                     savableWebsites.add(website);

@@ -261,7 +261,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
         }
     }
 
-    private Optional<User> getCurrentUser() {
+    public Optional<User> getCurrentUser() {
         return Optional.ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)

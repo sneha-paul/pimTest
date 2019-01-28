@@ -1,6 +1,7 @@
 package com.bigname.pim.data.loader;
 
 import com.bigname.pim.api.domain.Catalog;
+import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.util.POIUtil;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,7 +57,7 @@ public class CatalogLoader {
             String description = data.get(i).get(attributeNamesMetadata.indexOf("DESCRIPTION"));
             boolean skip = false;
 
-            //Create the category is another one with the same CATALOG_ID won't exists
+            //Create the catalog is another one with the same CATALOG_ID won't exists
             if(catalogsLookupMap.containsKey(internalId)) {
                 Catalog catalog = catalogsLookupMap.get(internalId);
                 catalog.setCatalogId(catalogId);
@@ -66,6 +68,8 @@ public class CatalogLoader {
 
                 //update this for batch saving
                 if (isValid(catalogService.validate(catalog, new HashMap<>(), Catalog.DetailsGroup.class))) {
+                    catalog.setLastModifiedDateTime(LocalDateTime.now());
+                    catalog.setLastModifiedUser(catalogService.getCurrentUser());
                     savableCatalogs.add(catalog);
                 }
                 //SKIP without updating
@@ -80,6 +84,8 @@ public class CatalogLoader {
 
                 //Add this for batch saving
                 if (isValid(catalogService.validate(catalog, new HashMap<>(), Catalog.CreateGroup.class))) {
+                    catalog.setCreatedDateTime(LocalDateTime.now());
+                    catalog.setCreatedUser(catalogService.getCurrentUser());
                     savableCatalogs.add(catalog);
                 }
                 //Add this for checking duplicates in the feed

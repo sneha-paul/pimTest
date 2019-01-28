@@ -2,6 +2,7 @@ package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.Pageable;
@@ -58,5 +59,7 @@ public interface BaseService<T, DAO> {
     Optional<T> findOne(Criteria criteria);
 
     String getEntityName();
+
+    Optional<User> getCurrentUser();
 
 }
