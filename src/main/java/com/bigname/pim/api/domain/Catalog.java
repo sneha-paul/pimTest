@@ -121,4 +121,12 @@ public class Catalog extends Entity<Catalog> {
         map.put("discontinued", getDiscontinued());
         return map;
     }
+
+    @Override
+    public boolean equals(Catalog catalog) {
+        return this.getId().equals(catalog.getId())
+                && this.getCatalogId().equals(catalog.getCatalogId())
+                && this.getCatalogName().equals(catalog.getCatalogName())
+                && this.getDescription().equals(catalog.getDescription());
+    }
 }

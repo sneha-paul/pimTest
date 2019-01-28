@@ -111,6 +111,7 @@ public class Website extends Entity<Website> {
 
         return this.getId().equals(website.getId())
                 && this.getWebsiteId().equals(website.getWebsiteId())
-                && this.getWebsiteName().equals(website.getWebsiteName());
+                && this.getWebsiteName().equals(website.getWebsiteName())
+                && this.getUrl().equals(website.getUrl());
     }
 }

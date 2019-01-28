@@ -1,23 +1,12 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
-import org.javatuples.Pair;
-import org.javatuples.Triplet;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.validation.Errors;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-
-import static com.bigname.common.util.RegExBuilder.*;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -179,4 +168,12 @@ public class Category extends Entity<Category> {
 
 
     public interface SeoGroup {}
+
+    @Override
+    public boolean equals(Category category) {
+        return this.getId().equals(category.getId())
+                && this.getCategoryId().equals(category.getCategoryId())
+                && this.getCategoryName().equals(category.getCategoryName())
+                && this.getDescription().equals(category.getDescription());
+    }
 }
