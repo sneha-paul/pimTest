@@ -9,6 +9,9 @@ import javax.validation.constraints.NotEmpty;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.bigname.pim.api.domain.Catalog.Property.*;
+import static com.bigname.pim.api.domain.Catalog.Property.DESCRIPTION;
+
 /**
  * Created by Manu on 8/9/2018.
  */
@@ -31,6 +34,14 @@ public class Catalog extends Entity<Catalog> {
 
     public Catalog() {
         super();
+    }
+
+    public Catalog(Map<String, Object> properties) {
+        this.setCatalogName((String) properties.get(CATALOG_NAME.name()));
+        this.setCatalogId((String) properties.get(CATALOG_ID.name()));
+        this.setDescription((String) properties.get(DESCRIPTION.name()));
+        this.setActive((String) properties.get(ACTIVE.name()));
+        this.setDiscontinued((String) properties.get(DISCONTINUED.name()));
     }
 
     /*public Catalog(String externalId, String catalogName) {
