@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.aggregation.VariableOperators;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -259,5 +260,11 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     public boolean equals(T t) {
         return false;
     }
+
+    public boolean equals(Map<String,Object> t) {
+        return false;
+    }
+
+
 
 }

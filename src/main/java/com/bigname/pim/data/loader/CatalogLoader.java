@@ -49,6 +49,34 @@ public class CatalogLoader {
 
         List<String> attributeNamesMetadata = data.remove(0);
 
+        for(int i = 0; i < data.size(); i ++) {
+            String catalogId = data.get(i).get(attributeNamesMetadata.indexOf("CATALOG_ID")).toUpperCase();
+            String name = data.get(i).get(attributeNamesMetadata.indexOf("NAME"));
+            String internalId = data.get(i).get(attributeNamesMetadata.indexOf("Id"));
+            String description = data.get(i).get(attributeNamesMetadata.indexOf("DESCRIPTION"));
+            boolean skip = false;
+
+            //Create the catalog is another one with the same CATALOG_ID won't exists
+            if(catalogsLookupMap.containsKey(internalId)) {
+                Catalog catalog1 = catalogsLookupMap.get(internalId);
+                Catalog catalog = new Catalog();
+                catalog.setCatalogId(catalogId);
+                catalog.setCatalogName(name);
+                catalog.setDescription(description);
+                catalog.setActive("Y");
+                catalog.setDiscontinued("N");
+
+                if(!catalog1.equals(catalog)){
+
+                }
+                //SKIP without updating
+                // skip = true;
+            } else {
+
+            }
+
+        }
+
         //Skip the header row and process each category row.
         for(int i = 0; i < data.size(); i ++) {
             String catalogId = data.get(i).get(attributeNamesMetadata.indexOf("CATALOG_ID")).toUpperCase();

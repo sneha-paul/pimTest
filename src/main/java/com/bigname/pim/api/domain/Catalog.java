@@ -129,4 +129,16 @@ public class Catalog extends Entity<Catalog> {
                 && this.getCatalogName().equals(catalog.getCatalogName())
                 && this.getDescription().equals(catalog.getDescription());
     }
+
+    @Override
+    public boolean equals(Map<String, Object> catalogMap) {
+        return this.getId().equals(catalogMap.get(Property.ID.name()))
+                && this.getCatalogId().equals(catalogMap.get(Property.CATALOG_ID.name()))
+                && this.getCatalogName().equals(catalogMap.get(Property.CATALOG_NAME.name()))
+                && this.getDescription().equals(catalogMap.get(Property.DESCRIPTION.name()));
+    }
+
+    public enum Property{
+        ID, CATALOG_ID, CATALOG_NAME, DESCRIPTION, ACTIVE, DISCONTINUED
+    }
 }
