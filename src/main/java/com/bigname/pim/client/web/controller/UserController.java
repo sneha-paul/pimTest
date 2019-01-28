@@ -59,13 +59,11 @@ public class UserController extends BaseController<User, UserService> {
 
     /**
      * Handler method to update a user instance
-     *
-     * @param id   emailId of the user instance that needs to be updated
      * @param user The modified user instance corresponding to the given emailId
      * @return a map of model attributes
      */
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+   /* @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String id, User user) {
         Map<String, Object> model = new HashMap<>();
@@ -76,14 +74,22 @@ public class UserController extends BaseController<User, UserService> {
             model.put("success", true);
         }
         return model;
+    }*/
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> update(@PathVariable(value = "id") String userId, User user) {
+        return update(userId, user, "/pim/users/", user.getGroup().length == 1 && user.getGroup()[0].equals("DETAILS") ? User.DetailsGroup.class : null);
     }
 
+
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "USER");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "user/user");
+        model.put("view", "user/user"  + (reload ? "_body" : ""));
 
         return id == null ? super.details(model) : userService.get(id, FindBy.EXTERNAL_ID, false)
                 .map(user -> {
