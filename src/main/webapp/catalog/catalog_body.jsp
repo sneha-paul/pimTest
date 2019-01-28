@@ -143,5 +143,6 @@
         'websiteId': '<c:if test="${not empty param.websiteId}">${param.websiteId}</c:if>'
     });
 </script>
+<img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
 <script src="/assets/js/pages/ui/catalog/catalog.js"></script>
 

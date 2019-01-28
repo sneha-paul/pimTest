@@ -64,25 +64,21 @@ public class CatalogController extends BaseController<Catalog, CatalogService>{
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, Catalog catalog) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("context", CollectionsUtil.toMap("id", id));
-        if(isValid(catalog, model, catalog.getGroup().length == 1 && catalog.getGroup()[0].equals("DETAILS") ? Catalog.DetailsGroup.class : null)) {
-            catalogService.update(id, FindBy.EXTERNAL_ID, catalog);
-            model.put("success", true);
-        }
-        return model;
+    public Map<String, Object> update(@PathVariable(value = "id") String catalogId, Catalog catalog) {
+        return update(catalogId, catalog, "/pim/catalogs/", catalog.getGroup().length == 1 && catalog.getGroup()[0].equals("DETAILS") ? Catalog.DetailsGroup.class : null);
     }
+
 
     @RequestMapping(value = {"/{id}", "/create"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "reload", required = false) boolean reload,
                                 @RequestParam Map<String, Object> parameterMap,
                                 HttpServletRequest request) {
 
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATALOGS");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "catalog/catalog");
+        model.put("view", "catalog/catalog"  + (reload ? "_body" : ""));
         return id == null ? super.details(model) : catalogService.get(id, FindBy.findBy(true), false)
                 .map(catalog -> {
                     model.put("catalog", catalog);
