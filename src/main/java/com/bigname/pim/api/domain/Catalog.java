@@ -89,10 +89,10 @@ public class Catalog extends Entity<Catalog> {
     @Override
     public void orchestrate() {
         super.orchestrate();
-        setDiscontinued(getDiscontinued());
+       /* setDiscontinued(getDiscontinued());
         if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
             setActive("N");
-        }
+        }*/
     }
 
     @Override
@@ -104,7 +104,7 @@ public class Catalog extends Entity<Catalog> {
                     this.setCatalogName(catalog.getCatalogName());
                     this.setDescription(catalog.getDescription());
                     this.setActive(catalog.getActive());
-                    this.setDiscontinued(catalog.getDiscontinued());
+                    mergeBaseProperties(catalog);
                     break;
             }
         }
@@ -126,10 +126,8 @@ public class Catalog extends Entity<Catalog> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("externalId", getExternalId());
         map.put("catalogName", getCatalogName());
-        map.put("active", getActive());
-        map.put("discontinued", getDiscontinued());
+        map.putAll(getBasePropertiesMap());
         return map;
     }
 

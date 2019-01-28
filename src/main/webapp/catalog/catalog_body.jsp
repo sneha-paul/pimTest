@@ -61,6 +61,16 @@
                                                             <span>Discontinued</span>
                                                         </label>
                                                     </div>
+                                                    <div class="js-dateRange">
+                                                        <div class="form-group">
+                                                            <label>Discontinue From </label>
+                                                            <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${category.discontinuedFrom}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Discontinue To </label>
+                                                            <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${category.discontinuedTo}">
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <br>
