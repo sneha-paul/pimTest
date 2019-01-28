@@ -46,10 +46,10 @@ public class WebsiteLoader {
         for(int i = 0; i < data.size(); i ++) {
             LOGGER.info("----i---"+i);
 
-            String websiteId = data.get(i).get(attributeNamesMetadata.indexOf("Website_Id")).toUpperCase();
-            String name = data.get(i).get(attributeNamesMetadata.indexOf("Name"));
-            String url = data.get(i).get(attributeNamesMetadata.indexOf("Url"));
-            String internalId = data.get(i).get(attributeNamesMetadata.indexOf("Id"));
+            String websiteId = data.get(i).get(attributeNamesMetadata.indexOf("WEBSITE_ID")).toUpperCase();
+            String name = data.get(i).get(attributeNamesMetadata.indexOf("NAME"));
+            String url = data.get(i).get(attributeNamesMetadata.indexOf("URL"));
+            String internalId = data.get(i).get(attributeNamesMetadata.indexOf("ID"));
             boolean skip = false;
             //Create the website is another one with the same WEBSITE_ID won't exists
             if(websitesLookupMap.containsKey(internalId)) {
