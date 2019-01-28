@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.bigname.common.util.RegExBuilder.*;
+import static com.bigname.pim.api.domain.Website.Property.*;
 
 
 public class Website extends Entity<Website> {
@@ -34,6 +35,13 @@ public class Website extends Entity<Website> {
 
     public Website() {
         super();
+    }
+
+    public Website(Map<String, Object> properties) {
+        this.setWebsiteName((String) properties.get(WEBSITE_NAME.name()));
+        this.setWebsiteId((String) properties.get(WEBSITE_ID.name()));
+        this.setUrl((String) properties.get(URL.name()));
+        this.setActive((String) properties.get(ACTIVE.name()));
     }
 
     /*public Website(String externalId, String websiteName, String url) {
@@ -107,11 +115,15 @@ public class Website extends Entity<Website> {
     }
 
     @Override
-    public boolean equals(Website website) {
+    public boolean equals(Map<String, Object> websiteMap) {
+        return this.getId().equals(websiteMap.get(Property.ID.name()))
+                && this.getWebsiteId().equals(websiteMap.get(Property.WEBSITE_ID.name()))
+                && this.getWebsiteName().equals(websiteMap.get(Property.WEBSITE_NAME.name()))
+                && this.getUrl().equals(websiteMap.get(Property.URL.name()))
+                && this.getUrl().equals(websiteMap.get(Property.ACTIVE.name()));
+    }
 
-        return this.getId().equals(website.getId())
-                && this.getWebsiteId().equals(website.getWebsiteId())
-                && this.getWebsiteName().equals(website.getWebsiteName())
-                && this.getUrl().equals(website.getUrl());
+    public enum Property{
+        ID, WEBSITE_ID, WEBSITE_NAME, URL, ACTIVE
     }
 }
