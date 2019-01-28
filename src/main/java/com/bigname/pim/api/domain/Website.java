@@ -106,4 +106,11 @@ public class Website extends Entity<Website> {
         return map;
     }
 
+    @Override
+    public boolean equals(Website website) {
+
+        return this.getId().equals(website.getId())
+                && this.getWebsiteId().equals(website.getWebsiteId())
+                && this.getWebsiteName().equals(website.getWebsiteName());
+    }
 }

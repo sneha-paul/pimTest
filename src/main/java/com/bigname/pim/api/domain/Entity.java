@@ -256,4 +256,8 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
         }
     }
 
+    public boolean equals(T t) {
+        return false;
+    }
+
 }
