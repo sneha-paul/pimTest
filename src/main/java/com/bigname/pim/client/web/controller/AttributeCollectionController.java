@@ -106,7 +106,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
      *
      * @return a map of model attributes
      */
-  
+
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String collectionId, AttributeCollection attributeCollection) {
@@ -124,7 +124,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     /**
      * Handler method to load the attributeCollection details page or the create new attributeCollection page
      *
-     * @param id collectionId of the attributeCollection instance that needs to be loaded
+     * @param id collectionId of the attributeCollection instance that needs to be loadedgit 
      *
      * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
      */

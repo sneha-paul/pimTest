@@ -99,15 +99,10 @@ public class FamilyController extends BaseController<Family, FamilyService> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, Family family) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("context", CollectionsUtil.toMap("id", id));
-        if(isValid(family, model, family.getGroup().length == 1 && family.getGroup()[0].equals("DETAILS") ? Family.DetailsGroup.class : null)) {
-            familyService.update(id, FindBy.EXTERNAL_ID, family);
-            model.put("success", true);
-        }
-        return model;
+    public Map<String, Object> update(@PathVariable(value = "id") String familyId, Family family) {
+        return update(familyId, family, "/pim/families/", family.getGroup().length == 1 && family.getGroup()[0].equals("DETAILS") ? Family.DetailsGroup.class : null);
     }
+
 
     /*@RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
@@ -118,11 +113,12 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     }*/
 
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "FAMILIES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "settings/family");
+        model.put("view", "settings/family"  + (reload ? "_body" : ""));
        return id == null ? super.details(model) : familyService.get(id, FindBy.EXTERNAL_ID, false)
                .map(family -> {
                    model.put("family", family);
