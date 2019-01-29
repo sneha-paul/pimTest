@@ -124,7 +124,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     /**
      * Handler method to load the attributeCollection details page or the create new attributeCollection page
      *
-     * @param id collectionId of the attributeCollection instance that needs to be loadedgit 
+     * @param id collectionId of the attributeCollection instance that needs to be loaded
      *
      * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
      */
