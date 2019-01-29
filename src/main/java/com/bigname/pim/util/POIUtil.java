@@ -51,6 +51,11 @@ public class POIUtil {
                         }
 
                     }
+                    if(!data.isEmpty() && rowData.size() < data.get(0).size()){
+                        for(int x = rowData.size(); x < data.get(0).size(); x++){
+                            rowData.add(x, "");
+                        }
+                    }
                     data.add(rowData);
 
                 }
