@@ -60,22 +60,16 @@ public class ProductController extends BaseController<Product, ProductService>{
         return model;
     }
 
+
+
     @RequestMapping(value = "/{productId}/channels/{channelId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "productId") String productId, Product product, HttpServletRequest request) {
-        Map<String, Object> model = new HashMap<>();
         productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
-        /*if(isEmpty(product.getProductId())) {
-            product.setProductId(id);
-        }*/
         product.setAttributeValues(getAttributesMap(request));
-        model.put("context", CollectionsUtil.toMap("id", productId));
-        if(isValid(product, model, product.getGroup().length == 1 && product.getGroup()[0].equals("DETAILS") ? Product.DetailsGroup.class : null)) {
-            productService.update(productId, FindBy.EXTERNAL_ID, product);
-            model.put("success", true);
-        }
-        return model;
+        return update(productId, product, "/pim/products/", product.getGroup().length == 1 && product.getGroup()[0].equals("DETAILS") ? Product.DetailsGroup.class : null);
     }
+
     @RequestMapping(value = "/{id}/channels/{channelId}/assets", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> addAssets(@PathVariable(value = "id") String id,
