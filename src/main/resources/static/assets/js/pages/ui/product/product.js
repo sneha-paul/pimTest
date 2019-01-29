@@ -166,7 +166,7 @@ $( document ).ready(function() {
         trigger: 'manual'
     });
 
-    $('.datepicker').datepicker();
+   // $('.datepicker').datepicker();
     // $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
 
     var adjustment;

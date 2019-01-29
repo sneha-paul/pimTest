@@ -64,11 +64,11 @@
                                                     <div class="js-dateRange">
                                                         <div class="form-group">
                                                             <label>Discontinue From </label>
-                                                            <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${category.discontinuedFrom}">
+                                                            <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${catalog.discontinuedFrom}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label>Discontinue To </label>
-                                                            <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${category.discontinuedTo}">
+                                                            <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${catalog.discontinuedTo}">
                                                         </div>
                                                     </div>
                                                 </div>

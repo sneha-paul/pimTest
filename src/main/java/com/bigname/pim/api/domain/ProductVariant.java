@@ -156,6 +156,15 @@ public class ProductVariant extends Entity<ProductVariant> {
     }
 
     @Override
+    public void orchestrate() {
+        super.orchestrate();
+        // setDiscontinued(getDiscontinued());
+       /* if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
+            setActive("N");
+        }*/
+    }
+
+    @Override
     public ProductVariant merge(ProductVariant productVariant) {
         for(String group : productVariant.getGroup()) {
             switch(group) {
@@ -163,7 +172,9 @@ public class ProductVariant extends Entity<ProductVariant> {
                     this.setExternalId(productVariant.getExternalId());
                     this.setProductVariantName(productVariant.getProductVariantName());
                     this.setActive(productVariant.getActive());
-                break;
+                    mergeBaseProperties(productVariant);
+
+                    break;
                 case "ASSETS":
                     if(isNotEmpty(productVariant.getVariantAssets())) {
                         Map<String, Object> variantAssets = this.getVariantAssets();
@@ -188,9 +199,10 @@ public class ProductVariant extends Entity<ProductVariant> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("externalId", getExternalId());
+       // map.put("externalId", getExternalId());
         map.put("productVariantName", getProductVariantName());
-        map.put("active", getActive());
+        map.putAll(getBasePropertiesMap());
+        //   map.put("active", getActive());
         Map<String, Object> defaultAsset = getDefaultAsset();
         if(isNotEmpty(defaultAsset)) {
             map.put("imageName", (String) defaultAsset.get("internalName"));

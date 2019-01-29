@@ -152,12 +152,27 @@
                                                                         <div class="form-group">
                                                                             <label>Status</label>
                                                                             <br/>
-                                                                            <label class="fancy-checkbox">
-                                                                                <input type="checkbox" name="active" value="Y" <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
+                                                                            <label for="active" class="fancy-checkbox">
+                                                                                <input type="checkbox" id="active" name="active" value="Y"
+                                                                                       <c:if test="${product.active eq 'Y'}">checked="checked"</c:if>>
                                                                                 <span>Active</span>
                                                                             </label>
+                                                                            <label for="discontinued" class="fancy-checkbox">
+                                                                                <input type="checkbox" id="discontinued" name="discontinued" value="Y"
+                                                                                       <c:if test="${product.discontinued eq 'Y'}">checked="checked"</c:if>>
+                                                                                <span>Discontinued</span>
+                                                                            </label>
                                                                         </div>
-                                                                    </div>
+                                                                        <div class="js-dateRange">
+                                                                            <div class="form-group">
+                                                                                <label>Discontinue From </label>
+                                                                                <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${product.discontinuedFrom}">
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Discontinue To </label>
+                                                                                <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${product.discontinuedTo}">
+                                                                            </div>
+                                                                        </div>                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>

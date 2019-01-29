@@ -140,10 +140,10 @@ public class Product extends Entity<Product> {
     @Override
     public void orchestrate() {
         super.orchestrate();
-        setDiscontinued(getDiscontinued());
-        if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
+       // setDiscontinued(getDiscontinued());
+       /* if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
             setActive("N");
-        }
+        }*/
     }
 
     @Override
@@ -155,7 +155,7 @@ public class Product extends Entity<Product> {
                     this.setExternalId(product.getExternalId());
                     this.setProductName(product.getProductName());
                     this.setActive(product.getActive());
-                    this.setDiscontinued(product.getDiscontinued());
+                    mergeBaseProperties(product);
                     break;
 
                 case "ASSETS":
@@ -193,17 +193,17 @@ public class Product extends Entity<Product> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("externalId", getExternalId());
+      //  map.put("externalId", getExternalId());
         map.put("productName", getProductName());
         map.put("productFamilyId", ValidationUtil.isEmpty(getProductFamily()) ? "" : getProductFamily().getExternalId());
-        map.put("active", getActive());
+       /// map.put("active", getActive());
         Map<String, Object> defaultAsset = getDefaultAsset();
         if(isNotEmpty(defaultAsset)) {
             map.put("imageName", (String) defaultAsset.get("internalName"));
         } else {
             map.put("imageName", "noimage.png");
         }
-        map.put("discontinued", getDiscontinued());
+        map.putAll(getBasePropertiesMap());
         return map;
     }
 
