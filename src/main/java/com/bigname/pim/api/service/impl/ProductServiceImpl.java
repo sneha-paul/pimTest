@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.bigname.common.util.ValidationUtil.*;
@@ -185,6 +186,18 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         Optional<Product> product = super.get(id, findBy, activeRequired);
         product.ifPresent(product1 -> setProductFamily(product1, FindBy.INTERNAL_ID));
         return product;
+    }
+
+    @Override
+    public List<Product> create(List<Product> products) {
+        products.forEach(product -> {product.setCreatedUser(getCurrentUser());product.setCreatedDateTime(LocalDateTime.now());});
+        return productDAO.insert(products);
+    }
+
+    @Override
+    public List<Product> update(List<Product> products) {
+        products.forEach(product -> {product.setLastModifiedUser(getCurrentUser());product.setLastModifiedDateTime(LocalDateTime.now());});
+        return productDAO.saveAll(products);
     }
 
     /**

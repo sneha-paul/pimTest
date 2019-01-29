@@ -166,7 +166,19 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
 
     @Override
     public List<T> getAll(Sort sort, boolean... activeRequired) {
-        return getAll(0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
+        int totalPages;
+        int pageNum = 0;
+        if(sort == null) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+        }
+        List<T> content = new ArrayList<>();
+        do {
+            Page<T> pagedContent = getAll(pageNum, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired);
+            content.addAll(pagedContent.getContent());
+            totalPages = pagedContent.getTotalPages();
+        } while (pageNum ++ < totalPages - 1);
+
+        return content;
     }
 
     @Override
@@ -191,7 +203,7 @@ abstract class BaseServiceSupport<T extends Entity, DAO extends BaseDAO<T>, Serv
                     resultMap.put(id, map.get(id));
                 }
             }
-            return resultMap.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toList());
+            return resultMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
         }
     }
 

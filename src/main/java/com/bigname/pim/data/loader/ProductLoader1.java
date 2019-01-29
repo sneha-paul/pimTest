@@ -828,6 +828,583 @@ public class ProductLoader1 {
         return true;
     }
 
+    public boolean load1(String filePath) {
+        String channelId = "ECOMMERCE";
+
+        //Product variant data WITH metadata
+        List<List<String>> data = POIUtil.readData(filePath);
+
+        //Create the attributeCollection if it won't already exists
+        if(!attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).isPresent()) {
+            AttributeCollection attributeCollection = new AttributeCollection();
+            attributeCollection.setCollectionId(attributeCollectionId);
+            attributeCollection.setCollectionName("Envelopes Attributes Collection");
+            attributeCollection.setActive("Y");
+            attributeCollectionService.create(attributeCollection);
+        }
+
+        //Map of all existing families
+        Map<String, Family> families = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getExternalId, e -> e));
+
+        //Map of all existing categories
+        Map<String, Category> existingCategories = categoryService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getExternalId, e -> e));
+
+        //Map of all existing and newly creating categories
+        Map<String, Category> newCategories = new HashMap<>();
+
+        //Map to store variant level attributes for each families
+        Map<String, Set<String>> familyVariantGroups = new LinkedHashMap<>();
+
+        //Load the attributeCollection from the database for the given collectionId
+        attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).ifPresent(attributeCollection -> {
+            // The metadata row containing the attribute names, this will be first row in the data sheet
+            List<String> attributeNamesMetadata = data.get(0);
+
+            // The metadata row containing the attributeType, this will be second row in the data sheet
+            List<String> attributeTypesMetadata = data.get(1);
+
+            // The metadata row containing the familyAttributeGroup name, this will be third row in the data sheet
+            List<String> familyAttributeGroupMetadata = data.get(2);
+
+            // The metadata row containing the familyAttributeSubGroup name, this will be fourth row in the data sheet
+            List<String> familyAttributeSubgroupMetadata = data.get(3);
+
+            // The metadata row containing the attribute level value of each attribute (0 - Product Level & 1 - Variant Level), this will be fourth row in the data sheet
+            List<String> attributeLevelMetadata = data.get(4);
+
+            //Number of metadata rows in the data sheet
+            int numOfMetadataRows = 5;
+
+            //Product variants data WITHOUT metadata, this will be a sublist of the complete data without the metadata rows
+            List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
+
+            Map<String, List<List<String>>> variantsAssets = getProductAssets();
+
+            //Map of valid attributeNames, grouped by familyId
+            Map<String, Set<String>> familyAttributes = getFamilyAttributes(data);
+
+            //Create all new family instances and add them to the families map
+            familyAttributes.keySet().forEach(familyId -> {
+                if(!families.containsKey(familyId)) {
+                    Family family = new Family();
+                    family.setActive("Y");
+                    family.setFamilyName(familyId);
+                    family.setFamilyId(familyId);
+                    families.put(familyId, familyService.create(family));
+                }
+            });
+
+            //A collection attribute instances corresponding to each of the valid attribute values in the data sheet
+            List<List<FamilyAttribute>> familyAttributesGrid = new ArrayList<>();
+
+            //Process each of the variant data row in the data sheet
+            for(int row = 0; row < variantsData.size(); row ++) {
+
+                //The list to hold attribute instances for the current row
+                familyAttributesGrid.add(new ArrayList<>());
+
+                //Get the non-attribute values for the current productVariant from the variantsData
+
+                //ProductId
+                String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")), true).toUpperCase();
+                //ProductName
+                String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
+                //VariantId
+                String variantId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID")), true).toUpperCase();
+                //FamilyId
+                String familyId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID")), true).toUpperCase();
+                //CategoryId
+                String categoryId = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Category")), true).toUpperCase();
+                //Style
+                String style = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Style")), true).toUpperCase();
+
+                //TODO - TEMP CODE - Skip folders category
+                if(categoryId.equals("FOLDERS")) {continue;}
+
+                //Skip the current variant row, if productId, productName, variantId or familyId is empty
+                if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
+                    continue;
+                }
+
+                //Usually, Envelopes.com uses Categories as root categories and styles as subCategories
+
+                //If this is a new category, create a new category instance and add it to the newCategories map
+                if(isNotEmpty(categoryId) && !existingCategories.containsKey(categoryId) && !newCategories.containsKey(categoryId)) {
+                    Category categoryDTO = new Category();
+                    categoryDTO.setActive("Y");
+                    categoryDTO.setCategoryId(categoryId);
+                    categoryDTO.setCategoryName(categoryId);
+                    categoryDTO.setGroup("CREATE");
+                    newCategories.put(categoryDTO.getCategoryId(), categoryDTO);
+                    LOGGER.info("New Root Category ======> " + categoryId);
+                }
+
+                //If this is a new style, create a new category instance and add it to the newCategories map
+                if(isNotEmpty(style) && !existingCategories.containsKey(style) && !newCategories.containsKey(style)) {
+                    Category categoryDTO = new Category();
+                    categoryDTO.setActive("Y");
+                    categoryDTO.setCategoryId(style);
+                    categoryDTO.setCategoryName(style);
+                    categoryDTO.setGroup("CREATE");
+                    newCategories.put(categoryDTO.getCategoryId(), categoryDTO);
+                    LOGGER.info("New Style Category ======> " + style);
+                }
+
+
+
+
+                Family family = families.getOrDefault(familyId, null);
+
+                if(family == null) {
+                    family = new Family();
+                    family.setActive("Y");
+                    family.setFamilyName(familyId);
+                    family.setFamilyId(familyId);
+                }
+
+                resetLookupMap();
+                getAttributeGroupsIdNamePair(family).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
+                getParentAttributeGroupsIdNamePair(family).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
+
+
+                //The first column in the variants data is always empty
+                familyAttributesGrid.get(row).add(null);//for the first empty column
+
+                /*
+                Go through each column starting from the second column and add the attribute to the corresponding family's
+                attributes collection, if it is of known type and won't already exists
+                */
+
+                for (int col = 1; col < attributeNamesMetadata.size(); col++) {
+                    /*
+                    Add an empty attribute instance for the current column in the familyAttributesGrid to start with,
+                    will be replaced with the proper attribute instance down the line
+                     */
+                    familyAttributesGrid.get(row).add(null);
+
+                    //AttributeValue, which is the current cellValue
+                    String cellValue = variantsData.get(row).get(col);
+
+                    //AttributeName
+                    String attributeName = attributeNamesMetadata.get(col);
+
+                    //AttributeLevel - 0 for product level and 1 for variant level
+                    int attributeLevel = (int)Double.parseDouble(attributeLevelMetadata.get(col));
+
+                    //FamilyAttributesMap contains attributeNames of supported attribute types grouped by familyId.
+                    //Skip this attribute, if the attributeName is of a not supported attributeType
+                    if(!familyAttributes.get(familyId).contains(attributeName)) {
+                        continue;
+                    }
+
+                    //Add the attribute to the attributeCollection, if it won't exists already
+                    if(isEmpty(attributeCollection.getAttributes())
+                            || isEmpty(attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID))
+                            || isEmpty(attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().get(ValidatableEntity.toId(attributeName)))) {
+
+                        Attribute attribute = new Attribute();
+                        attribute.setActive("Y");
+                        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                        attribute.setUiType(Attribute.UIType.get(attributeTypesMetadata.get(col)));
+                        attribute.setName(attributeName);
+                        LOGGER.info(row + " :: Attribute---> " + attribute.toString());
+                        attributeCollection.addAttribute(attribute);
+                    }
+
+                    //Get the fully orchestrated attribute corresponding to the attribute name
+                    Attribute attribute = attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().get(ValidatableEntity.toId(attributeName));
+
+                    //If the attribute is of selectable type, one with selectable options
+                    boolean isSelectable = ConvertUtil.toBoolean(attribute.getSelectable());
+
+                    //Family attribute's groupName
+                    String familyAttributeGroupName = familyAttributeGroupMetadata.get(col);
+
+                    //Family attribute's subGroupName
+                    String familyAttributeSubgroupName = isNotEmpty(familyAttributeGroupName) ? familyAttributeSubgroupMetadata.get(col) : "";
+
+
+                    String lookupKey = isNotNull(familyAttributeGroupName) ? familyAttributeGroupName.trim() : "";
+
+                    if(isNotEmpty(lookupKey) && isNotEmpty(familyAttributeSubgroupName)) {
+                        lookupKey += " > " + familyAttributeSubgroupName.trim();
+                    }
+
+
+
+                    //TODO - Replace lookup with attributeName
+                    /*
+                    If this is a new family attribute, add the attribute to the corresponding attributeGroup and attributeSubGroup.
+                    If the attributeGroup and/or attributeSubGroup won't exist, add them as well
+                    */
+                    if(!family.getAllAttributesMap(false).containsKey(attribute.getId())) {
+                        //Starting with default familyAttributeGroups and subGroups, so lets assume not to update the lookup map
+                        boolean updateLookup = false;
+
+                        //The group for this new familyAttribute
+                        FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+
+                        //Set the new group to active
+                        familyAttributeGroup.setActive("Y");
+
+                        //If the lookupMap has the lookup key, this is an existing group
+                        if(familyAttributeGroupLookUp.containsKey(lookupKey)) { //Existing group
+                            //Set the new group's fullId to the same as that the existing group's fullId from the lookupMap
+                            familyAttributeGroup.setFullId(((String)familyAttributeGroupLookUp.get(lookupKey)));
+                        } else { //New Group
+                            //Check to see if this is a new masterGroup or a subGroup
+                            if(isEmpty(familyAttributeSubgroupName)) { //New Master Group
+                                familyAttributeGroup.setMasterGroup("Y");
+                            } else { // New Subgroup
+                                //Create the parentGroup for the subGroup
+                                FamilyAttributeGroup parentGroup = new FamilyAttributeGroup();
+                                //Mark as active
+                                parentGroup.setActive("Y");
+
+                                //If the masterGroup is also a new one, the lookup map won't contain the parent group's lookupKey - TODO - verify this logic
+                                if(!familyAttributeGroupLookUp.containsKey(familyAttributeGroupName + "^")) { //New masterGroup
+                                    //Set the name of the parentGroup
+                                    parentGroup.setName(familyAttributeGroupName);
+                                    //Set the id of the parentGroup
+                                    parentGroup.setId(parentGroup.getFullId());
+                                } else {
+                                    //Set the id of this parentGroup from the lookupMap
+                                    parentGroup.setId((String) familyAttributeGroupLookUp.get(familyAttributeGroupName + "^"));
+                                }
+                                //Set the parentGroup for the subGroup
+                                familyAttributeGroup.setParentGroup(parentGroup);
+                            }
+                            //Set the name of the newly creating group
+                            familyAttributeGroup.setName(isNotEmpty(familyAttributeSubgroupName) ? familyAttributeSubgroupName : familyAttributeGroupName);
+                            //Since we added a new group, the lookup map needs to be updated
+                            updateLookup = true;
+                        }
+
+                        //Create the new familyAttribute instance
+                        FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeName, null);
+                        familyAttributeDTO.setActive("Y");
+                        familyAttributeDTO.setCollectionId(attributeCollectionId);
+                        familyAttributeDTO.setUiType(attribute.getUiType());
+                        familyAttributeDTO.setScopable("Y");
+                        familyAttributeDTO.setAttributeId(attribute.getFullId());
+                        familyAttributeDTO.getScope().put(channelId, FamilyAttribute.Scope.OPTIONAL);
+                        familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                        familyAttributeDTO.setAttribute(attribute);
+
+                        //Add the family attribute to the family
+                        family.addAttribute(familyAttributeDTO);
+
+                        //If a new group or subGroup is added as part of the new familyAttributeCreation, we need to update the lookup map
+                        if(updateLookup) {
+                            resetLookupMap();
+                            getAttributeGroupsIdNamePair(family).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
+                            getParentAttributeGroupsIdNamePair(family).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
+                        }
+                    }
+
+                    //Get the fully orchestrated familyAttribute corresponding to the newly creating attribute - TODO - verify if this is required
+                    FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
+
+                    //Add it to the current index in attributesGrid for later lookup
+                    familyAttributesGrid.get(row).set(col, familyAttribute);
+                    //If the familyVariantGroups won't contain an entry for the current familyId, add an empty one
+                    if(!familyVariantGroups.containsKey(familyId)) {
+                        familyVariantGroups.put(familyId, new HashSet<>());
+                    }
+                    //If the current attribute is for variantLevel, add the current attribute's id to the familyVariantGroups map
+                    if(attributeLevel == 1) {
+                        familyVariantGroups.get(familyId).add(familyAttribute.getId());
+                    }
+
+                    //If the current attribute is selectable, add any new attribute options, if any
+                    if(isSelectable) {
+                        String attributeOptionValue = cellValue;
+
+                        // If the attribute option won't exist already for the attribute, add the attribute option to the attribute
+                        if (isNotEmpty(attributeOptionValue)) {
+                            if(!attribute.getOptions().containsKey(ValidatableEntity.toId(attributeOptionValue)))
+                            {
+                                AttributeOption attributeOption = new AttributeOption();
+                                attributeOption.setCollectionId(attributeCollectionId);
+                                attributeOption.setAttributeId(attribute.getFullId());
+                                attributeOption.setValue(attributeOptionValue);
+                                attributeOption.setActive("Y");
+                                attributeOption.orchestrate();
+                                attribute.getOptions().put(ValidatableEntity.toId(attributeOptionValue), attributeOption);
+                            }
+
+                            // If the familyAttribute option won't exist already for the familyAttribute, add the familyAttribute option to the familyAttribute
+                            AttributeOption attributeOption = attribute.getOptions().get(ValidatableEntity.toId(attributeOptionValue));
+                            if(!familyAttribute.getOptions().containsKey(attributeOption.getId())) {
+                                FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                                familyAttributeOption.setActive("Y");
+                                familyAttributeOption.setValue(attributeOption.getValue());
+                                familyAttributeOption.setId(attributeOption.getId());
+                                familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                                familyAttribute.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                            }
+                        }
+                    }
+
+
+                }
+
+            }
+
+            attributeCollection.setGroup("ATTRIBUTES");
+            //Update attribute collection with the newly added attributes and corresponding attribute options
+            attributeCollectionService.update(attributeCollectionId, FindBy.EXTERNAL_ID, attributeCollection);
+
+            //Attribute Collection updated with the new attributes and new options
+
+            //Update the familyVariantGroups for the corresponding families
+            familyVariantGroups.forEach((_familyId, variantAttributeIds) -> {
+                Family family = families.get(_familyId);
+                VariantGroup variantGroup = null;
+                if (!family.getVariantGroups().isEmpty() && family.getVariantGroups().containsKey(channelId)) {
+                    variantGroup = family.getVariantGroups().get(family.getChannelVariantGroups().get(channelId));
+                } else {
+                    variantGroup = new VariantGroup();
+                    variantGroup.setName("Color Name");
+                    variantGroup.setId("COLOR_NAME");
+                    variantGroup.setActive("Y");
+                    variantGroup.setLevel(1);
+                    variantGroup.setFamilyId(_familyId);
+                    variantGroup.getVariantAxis().put(1, Arrays.asList("COLOR_NAME"));
+                }
+                variantGroup.getVariantAttributes().put(1, new ArrayList<>(variantAttributeIds));
+                family.getVariantGroups().put(variantGroup.getId(), variantGroup);
+                family.getChannelVariantGroups().put(channelId, variantGroup.getId());
+            });
+
+            //TODO - Handle creation of related category mapping
+            newCategories.forEach((categoryId, category) -> existingCategories.put(categoryId, categoryService.create(category)));
+            newCategories.clear();
+
+            families.forEach((familyId, family) -> family.setGroup("ATTRIBUTES", "VARIANT_GROUPS"));
+
+            familyService.saveAll(families.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList())).forEach(family -> families.put(family.getId(), family));
+
+            //Map of all existing products
+            Map<String, Product> existingProducts = productService.getAll(null, false).stream()
+                    .map(product -> {
+                        product.setProductFamily(families.get(product.getProductFamilyId()));
+                        product.setChannelId(channelId);
+                        return product;
+                    })
+                    .collect(Collectors.toMap(Product::getProductId, p -> p));
+
+
+            //Map of all existing product variants grouped by productId
+            Map<String, Map<String, ProductVariant>> existingVariants = new HashMap<>();
+
+            productVariantService.getAll(new ArrayList<>(existingProducts.keySet()).toArray(new String[0]), FindBy.EXTERNAL_ID, channelId, false).forEach(productVariant -> {
+                String productId = productVariant.getProductId();
+                if(!existingVariants.containsKey(productId)) {
+                    existingVariants.put(productId, new HashMap<>());
+                }
+                existingVariants.get(productId).put(productVariant.getProductVariantId(), productVariant);
+            });
+
+            //Map of new products
+            Map<String, Product> newProducts = new HashMap<>();
+
+            //Map of updated products
+            Map<String, Product> modifiedProducts = new HashMap<>();
+
+            //Map of new product variants
+            Map<String, ProductVariant> newProductVariants = new HashMap<>();
+
+            //Map of updated product variants
+            Map<String, ProductVariant> modifiedProductVariants = new HashMap<>();
+
+            //Loop through each variants and check to se if the product already exists.
+            //If not, create the product with productLevel Attributes
+            final int[] $row1 = {0}, $col1 = {0};
+            for (int row = 0; row < variantsData.size(); row++) {
+                $row1[0] = row;
+                String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")),true).toUpperCase();
+                productId = convertCellValue("", productId);
+                String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
+                String variantId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID")),true).toUpperCase();
+                variantId = convertCellValue("", variantId);
+                String familyId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID")),true).toUpperCase();
+                String categoryId = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Category")),true).toUpperCase();
+                String style = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Style")),true).toUpperCase();
+                String pricing = variantsData.get(row).get(attributeNamesMetadata.indexOf("Pricing"));
+
+                //Skip the current variant row, if productId, productName, variantId or familyId is empty
+                if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
+                    continue;
+                }
+
+                //TODO - TEMP CODE - Skip folders category
+                if(categoryId.equals("FOLDERS")) {continue;}
+
+                Map<String, Object> productAttributesMap = new HashMap<>();
+
+                Map<String, Object> variantAttributesMap = new HashMap<>();
+                for (int col = 1; col < attributeNamesMetadata.size(); col++) {
+                    $col1[0] = col;
+                    String cellValue = variantsData.get(row).get(col);
+                    if (cellValue == null) {
+                        cellValue = "";
+                    }
+                    String attributeName = attributeNamesMetadata.get(col);
+                    int attributeLevel = (int) Double.parseDouble(attributeLevelMetadata.get(col));
+
+                    if (familyAttributes.get(familyId).contains(attributeName)) {
+                        FamilyAttribute familyAttribute = familyAttributesGrid.get(row).get(col);
+                        if (ConvertUtil.toBoolean(familyAttribute.getSelectable())) {
+                            Optional<FamilyAttributeOption> cellValueOption = familyAttributesGrid.get(row).get(col).getOptions().values().stream().filter(e -> e.getValue().equals(variantsData.get($row1[0]).get($col1[0]))).findFirst();
+                            if (cellValueOption.isPresent()) {
+                                cellValue = cellValueOption.get().getId();
+                            }
+                        }
+                        cellValue = convertCellValue(attributeName, cellValue);
+                        if (attributeLevel == 0) {
+                            productAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
+                        } else {
+                            variantAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
+
+                        }
+                    }
+
+                }
+                //TODO - make this conditional and dynamic
+                if(isEmpty(variantAttributesMap.get("COLOR_NAME"))) {
+                    continue;
+                }
+
+                //Product processing section
+                Product product = modifiedProducts.containsKey(productId) ? modifiedProducts.get(productId) : newProducts.getOrDefault(productId, null);
+                Map<String, ProductVariant> existingProductVariants = product == null ? new HashMap<>() : existingVariants.get(product.getId());
+                //If the product is already added to either the modifiedProducts or newProducts map, skip the product
+                if(product == null) {
+                    //If the product won't exist or not created yet, create a new product instance and add it to the newProductMap
+                    if (existingProducts.containsKey(productId)) {
+                        product = existingProducts.get(productId);
+                        product.setGroup("DETAILS");
+                        modifiedProducts.put(productId, product);
+                        existingProductVariants = existingVariants.get(product.getId());
+                    } else {
+                        product = new Product();
+                        product.setProductId(productId);
+                        product.setActive("Y");
+                        product.setChannelId(channelId);
+                        product.setProductName(productName);
+                        product.setProductFamilyId(familyId);
+                        product.setProductFamily(families.get(familyId));
+                        product.setAttributeValues(productAttributesMap);
+                        if (!newProducts.containsKey(productId) && !existingProducts.containsKey(productId)) {
+                            newProducts.put(productId, product);
+                        }
+                    }
+                }
+
+
+                //Variant processing section
+
+                String variantIdentifier = "COLOR_NAME|" + variantAttributesMap.get("COLOR_NAME"); //TODO - change this to support multiple axis attribute values
+                Family productVariantFamily = product.getProductFamily();
+                String variantGroupId = productVariantFamily.getChannelVariantGroups().get(channelId);
+                VariantGroup variantGroup = productVariantFamily.getVariantGroups().get(variantGroupId);
+                if(isNotEmpty(variantGroup) && isNotEmpty(variantGroup.getVariantAxis().get(1))) {
+                    List<String> axisAttributeTokens = StringUtil.splitPipeDelimitedAsList(variantIdentifier);
+                    Map<String, String> axisAttributes = new HashMap<>();
+                    StringBuilder tempName = new StringBuilder();
+                    for (int i = 0; i < axisAttributeTokens.size(); i = i + 2) {
+                        axisAttributes.put(axisAttributeTokens.get(i), axisAttributeTokens.get(i + 1));
+                        String nameToken = axisAttributeTokens.get(i + 1);
+                        FamilyAttribute axisAttribute = productVariantFamily.getAllAttributesMap().get(axisAttributeTokens.get(i));
+                        if (isNotEmpty(axisAttribute) && axisAttribute.getOptions().containsKey(axisAttributeTokens.get(i + 1))) {
+                            nameToken = axisAttribute.getOptions().get(axisAttributeTokens.get(i + 1)).getValue();
+                        }
+                        tempName.append(tempName.length() > 0 ? " - " : "").append(nameToken);
+                    }
+
+                    ProductVariant productVariant = null;
+                    if(existingProductVariants.containsKey(variantId)) {
+                        productVariant = existingProductVariants.get(variantId);
+                        productVariant.setGroup("DETAILS");
+                        modifiedProductVariants.put(variantId, productVariant);
+                    } else {
+
+                        productVariant = new ProductVariant(product);
+                        productVariant.setProductVariantId(variantId);
+                        productVariant.setChannelId(channelId);
+                        productVariant.setActive("Y");
+
+                        productVariant.setAxisAttributes(axisAttributes);
+                        newProductVariants.put(variantId, productVariant);
+                    }
+                    productVariant.setLevel(1); //TODO - change for multi level variants support
+                    productVariant.setProductVariantName(product.getProductName() + " - " + tempName.toString());
+                    setVariantAttributeValues(product, productVariant, variantAttributesMap);
+                }
+                if(row % 100 == 0) {
+                    System.out.println(row + " of " + variantsData.size());
+                } else {
+                    System.out.print(".");
+                }
+            }
+
+            //If there are new products that need to be created, create all of them and add the newly created products to the existing products map
+            if(!newProducts.isEmpty()) {
+                productService.create(newProducts.entrySet().stream()
+                        .map(Map.Entry::getValue).collect(Collectors.toList()))
+                        .forEach(product -> {
+//                            product.setChannelId(channelId);
+//                            product.setProductFamily(families.get(product.getProductFamilyId()));
+                            existingProducts.put(product.getProductId(), product);
+                        });
+            }
+            //If there are modified products that need to be updated, update all of them and put the updated products to the existing products map
+            if(!modifiedProducts.isEmpty()) {
+                productService.update(modifiedProducts.entrySet().stream()
+                        .map(Map.Entry::getValue).collect(Collectors.toList()))
+                        .forEach(product -> {
+//                            product.setChannelId(channelId);
+//                            product.setProductFamily(families.get(product.getProductFamilyId()));
+                            existingProducts.put(product.getProductId(), product);
+                        });
+            }
+
+            //If there are new productVariants that need to be created, create all of them and add the newly created productVariants to the existing variants map
+            if(!newProductVariants.isEmpty()) {
+                productVariantService.create(newProductVariants.entrySet().stream()
+                        .map(entry -> {
+                            ProductVariant productVariant = entry.getValue();
+                            if(isEmpty(productVariant.getProductId())) {
+                                productVariant.setProduct(existingProducts.get(productVariant.getProduct().getProductId()));
+                            }
+                            return productVariant;
+                        })
+                        .collect(Collectors.toList()))
+                        .forEach(productVariant -> {
+                            if(!existingVariants.containsKey(productVariant.getProductId())) {
+                                existingVariants.put(productVariant.getProductId(), new HashMap<>());
+                            }
+                            existingVariants.get(productVariant.getProductId()).put(productVariant.getProductVariantId(), productVariant);
+                        });
+            }
+            //If there are modified productVariants that need to be updated, update all of them and put the updated productVariants to the existing variants map
+            if(!modifiedProductVariants.isEmpty()) {
+                productVariantService.update(modifiedProductVariants.entrySet().stream()
+                        .map(Map.Entry::getValue).collect(Collectors.toList()))
+                        .forEach(productVariant -> {
+                            if(!existingVariants.containsKey(productVariant.getProductId())) {
+                                existingVariants.put(productVariant.getProductId(), new HashMap<>());
+                            }
+                            existingVariants.get(productVariant.getProductId()).put(productVariant.getProductVariantId(), productVariant);
+                        });
+            }
+            System.out.println("Done");
+        });
+
+        return true;
+    }
+
     public boolean validate(String filePath) {
         String channelId = "ECOMMERCE";
 
@@ -1026,6 +1603,20 @@ public class ProductLoader1 {
                 });
             }
         });
+    }
+
+    private void setVariantAttributeValues(Product product, ProductVariant productVariantDTO, Map<String, Object> attributesMap) {
+        Family productFamily = product.getProductFamily();
+        String variantGroupId = productFamily.getChannelVariantGroups().get(productVariantDTO.getChannelId());
+        VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
+        if(isNotEmpty(variantGroup)) {
+            List<String> variantAttributeIds = variantGroup.getVariantAttributes().get(productVariantDTO.getLevel());
+            variantAttributeIds.forEach(attributeId -> {
+                if(attributesMap.containsKey(attributeId)) {
+                    productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
+                }
+            });
+        }
     }
 
     private static Map<String, List<List<String>>> getProductAssets() {

@@ -59,6 +59,10 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
      */
     Optional<ProductVariant> getProductVariant(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
 
+    List<Product> create(List<Product> products);
+
+    List<Product> update(List<Product> products);
+
     /**
      * Method to get available variants of a product in paginated format.
      *

@@ -94,6 +94,20 @@ public class FeedController {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/load/products2", method = RequestMethod.GET)
+    public Map<String, Object> loadProductData12(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
+        LOGGER.info("LOADING PRODUCT11 DATA");
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        if(this.apiKey.equals(apiKey)) {
+            productLoader1.load1(productFeedPath); //TODO - change after testing
+            success = true;
+        }
+        model.put("success", success);
+        return model;
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/load/categories", method = RequestMethod.GET)
     public Map<String, Object> loadCategoryData(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
         LOGGER.info("LOADING CATEGORY DATA");

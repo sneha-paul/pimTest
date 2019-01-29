@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -140,6 +141,18 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         }
     }
 
+    @Override
+    public List<ProductVariant> create(List<ProductVariant> productVariants) {
+        productVariants.forEach(productVariant -> {productVariant.setCreatedUser(getCurrentUser());productVariant.setCreatedDateTime(LocalDateTime.now());});
+        return productVariantDAO.insert(productVariants);
+    }
+
+    @Override
+    public List<ProductVariant> update(List<ProductVariant> productVariants) {
+        productVariants.forEach(productVariant -> {productVariant.setLastModifiedUser(getCurrentUser());productVariant.setLastModifiedDateTime(LocalDateTime.now());});
+        return productVariantDAO.saveAll(productVariants);
+    }
+
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
     public ProductVariant cloneInstance(String id, FindBy findBy, Entity.CloneType type) {
@@ -179,7 +192,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         if(productIdFindBy == FindBy.EXTERNAL_ID) {
             productIds = productDAO.findByExternalIdInAndActiveIn(productIds, PimUtil.getActiveOptions(activeRequired)).stream().map(Entity::getId).collect(Collectors.toList()).toArray(new String[0]);
             if(productIds.length == 0) {
-                return null;
+                return new ArrayList<>();
             }
         }
         return productVariantDAO.findByProductIdInAndChannelIdAndActiveIn(productIds, channelId, PimUtil.getActiveOptions(activeRequired));
