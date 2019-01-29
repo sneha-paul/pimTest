@@ -14,10 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -100,23 +97,19 @@ public class PricingAttributeController extends  BaseController<PricingAttribute
     /**
      * Handler method to update a pricingAttribute instance
      *
-     * @param id pricingAttributeId of the pricingAttribute instance that needs to be updated
+     * @param  pricingAttributeId of the pricingAttribute instance that needs to be updated
      * @param pricingAttribute The modified pricingAttribute instance corresponding to the given pricingAttributeId
      *
      * @return a map of model attributes
      */
 
+ 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, PricingAttribute pricingAttribute) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("context", CollectionsUtil.toMap("id", id));
-        if(isValid(pricingAttribute, model, pricingAttribute.getGroup().length == 1 && pricingAttribute.getGroup()[0].equals("DETAILS") ? PricingAttribute.DetailsGroup.class : null)) {
-            pricingAttributeService.update(id, FindBy.EXTERNAL_ID, pricingAttribute);
-            model.put("success", true);
-        }
-        return model;
+    public Map<String, Object> update(@PathVariable(value = "id") String pricingAttributeId, PricingAttribute pricingAttribute) {
+        return update(pricingAttributeId, pricingAttribute, "/pim/pricingAttributes/", pricingAttribute.getGroup().length == 1 && pricingAttribute.getGroup()[0].equals("DETAILS") ? PricingAttribute.DetailsGroup.class : null);
     }
+
 
     /**
      * Handler method to load the pricingAttribute details page or the create new pricingAttribute page
@@ -126,11 +119,12 @@ public class PricingAttributeController extends  BaseController<PricingAttribute
      * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
      */
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id ,
+                                @RequestParam(name = "reload", required = false) boolean reload){
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRICING_ATTRIBUTES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "settings/pricingAttribute");
+        model.put("view", "settings/pricingAttribute"  + (reload ? "_body" : ""));
 
         return id == null ? super.details(model) : pricingAttributeService.get(id, FindBy.EXTERNAL_ID, false)
                 .map(pricingAttribute -> {
