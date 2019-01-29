@@ -16,10 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -104,21 +101,16 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     /**
      * Handler method to update a attributeCollection instance
      *
-     * @param id collectionId of the attributeCollection instance that needs to be updated
+     * @param   collectionId of the attributeCollection instance that needs to be updated
      * @param attributeCollection The modified website instance corresponding to the given collectionId
      *
      * @return a map of model attributes
      */
+  
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String id, AttributeCollection attributeCollection) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("context", CollectionsUtil.toMap("id", id));
-        if(isValid(attributeCollection, model, attributeCollection.getGroup().length == 1 && attributeCollection.getGroup()[0].equals("DETAILS") ? AttributeCollection.DetailsGroup.class : null)) {
-            attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection);
-            model.put("success", true);
-        }
-        return model;
+    public Map<String, Object> update(@PathVariable(value = "id") String collectionId, AttributeCollection attributeCollection) {
+        return update(collectionId, attributeCollection, "/pim/attributeCollections/", attributeCollection.getGroup().length == 1 && attributeCollection.getGroup()[0].equals("DETAILS") ? AttributeCollection.DetailsGroup.class : null);
     }
 
    /* @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
@@ -137,11 +129,15 @@ public class AttributeCollectionController extends BaseController<AttributeColle
      * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
      */
     @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id) {
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "reload", required = false) boolean reload){
+
+
         Map<String, Object> model = new HashMap<>();
         model.put("active", "ATTRIBUTE_COLLECTIONS");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "settings/attributeCollection");
+        model.put("view", "settings/attributeCollection" + (reload ? "_body" : ""));
+
         return id == null ? super.details(model) : attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false)
                 .map(attributeCollection -> {
                     model.put("attributeCollection", attributeCollection);
