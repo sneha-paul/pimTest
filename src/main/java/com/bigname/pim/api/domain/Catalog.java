@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -149,5 +150,22 @@ public class Catalog extends Entity<Catalog> {
 
     public enum Property{
         ID, CATALOG_ID, CATALOG_NAME, DESCRIPTION, ACTIVE, DISCONTINUED
+    }
+
+    public Map<String, Object> diff(Catalog catalog, boolean ... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if(!_ignoreInternalId && !this.getId().equals(catalog.getId())){
+            diff.put("internalId", catalog.getId());
+        }
+        if(!this.getId().equals(catalog.getCatalogName())){
+            diff.put("catalogName", catalog.getCatalogName());
+        }
+        if(!this.getId().equals(catalog.getDescription())){
+            diff.put("description", catalog.getDescription());
+        }
+
+
+        return diff;
     }
 }
