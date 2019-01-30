@@ -29,7 +29,8 @@ public class Family extends Entity<Family> {
 
     private Map<String, String> channelVariantGroups = new HashMap<>();
 
-    @Transient @JsonIgnore
+    @Transient
+    @JsonIgnore
     private Map<String, FamilyAttribute> attributesMap = new HashMap<>();
 
     public Family() {
@@ -65,7 +66,7 @@ public class Family extends Entity<Family> {
         Map<String, FamilyAttributeGroup> familyAttributeGroups = getAttributes();
         FamilyAttribute attribute = new FamilyAttribute(attributeDTO, familyAttributeGroups);
         boolean added = FamilyAttributeGroup.addAttribute(attribute, familyAttributeGroups);
-        if(!added) { /*Adding the attribute failed */ }
+        if (!added) { /*Adding the attribute failed */ }
         return this;
     }
 
@@ -102,14 +103,14 @@ public class Family extends Entity<Family> {
     }*/
 
     public Map<String, FamilyAttribute> getAllAttributesMap() {
-        if(isNull(attributesMap) || attributesMap.isEmpty()) {
+        if (isNull(attributesMap) || attributesMap.isEmpty()) {
             attributesMap = FamilyAttributeGroup.getAllAttributesMap(this);
         }
         return attributesMap;
     }
 
     public Map<String, FamilyAttribute> getAllAttributesMap(boolean cached) {
-        if(cached) {
+        if (cached) {
             return getAllAttributesMap();
         } else {
             attributesMap = FamilyAttributeGroup.getAllAttributesMap(this);
@@ -129,19 +130,19 @@ public class Family extends Entity<Family> {
     @Override
     public Family merge(Family family) {
         for (String group : family.getGroup()) {
-            switch(group) {
+            switch (group) {
                 case "DETAILS":
                     this.setExternalId(family.getExternalId());
                     this.setFamilyName(family.getFamilyName());
                     this.setActive(family.getActive());
-                break;
+                    break;
                 case "ATTRIBUTES":
                     this.setAttributes(family.getAttributes());
-                break;
+                    break;
                 case "VARIANT_GROUPS":
                     this.setVariantGroups(family.getVariantGroups());
                     this.setChannelVariantGroups(family.getChannelVariantGroups());
-                break;
+                    break;
 
             }
         }
@@ -154,7 +155,7 @@ public class Family extends Entity<Family> {
         clone.setActive("N");
         clone.setExternalId(cloneValue(getExternalId()));
         clone.setFamilyName(cloneValue(getFamilyName()));
-       // clone.setFamilyAttributes(cloneValue(getFamilyAttributes()));
+        // clone.setFamilyAttributes(cloneValue(getFamilyAttributes()));
         return clone;
     }
 
@@ -171,8 +172,8 @@ public class Family extends Entity<Family> {
         Map<String, FamilyAttributeGroup> attributeGroupsMap = getAttributes();
         return attributeGroupsMap.entrySet().stream()
                 .filter(e -> e.getValue().getMasterGroup().equals("Y") &&
-                !e.getKey().equals(FamilyAttributeGroup.DETAILS_GROUP_ID) &&
-                !e.getKey().equals(FamilyAttributeGroup.FEATURES_GROUP_ID)).map(Map.Entry::getValue).collect(Collectors.toList());
+                        !e.getKey().equals(FamilyAttributeGroup.DETAILS_GROUP_ID) &&
+                        !e.getKey().equals(FamilyAttributeGroup.FEATURES_GROUP_ID)).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
     public FamilyAttributeGroup getDetailsMasterGroup() {
@@ -193,7 +194,7 @@ public class Family extends Entity<Family> {
     }
 
     public boolean addVariantGroup(VariantGroup variantGroup) {
-        if(getVariantGroups().containsKey(variantGroup.getId())) {
+        if (getVariantGroups().containsKey(variantGroup.getId())) {
             return false;
         } else {
             getVariantGroups().put(variantGroup.getId(), variantGroup);
@@ -232,7 +233,7 @@ public class Family extends Entity<Family> {
         Map<String, List<FamilyAttribute>> variantGroupAxisAttributes = new LinkedHashMap<>();
 
         for (Map.Entry<Integer, List<String>> entry : variantGroup.getVariantAxis().entrySet()) {
-            variantGroupAxisAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(),entry.getValue().stream().map(familyAttributes::get).collect(Collectors.toList()));
+            variantGroupAxisAttributes.put("AXIS_ATTRIBUTES_L" + entry.getKey(), entry.getValue().stream().map(familyAttributes::get).collect(Collectors.toList()));
             availableAxisAttributes.removeAll(variantGroupAxisAttributes.get("AXIS_ATTRIBUTES_L" + entry.getKey()));
         }
 
@@ -245,13 +246,13 @@ public class Family extends Entity<Family> {
         VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
         String[][] variantAttributeIds = new String[variantGroup.getLevel()][];
         variantAttributeIds[0] = variantLevel1AttributeIds;
-        if(variantAttributeIds.length > 1) {
+        if (variantAttributeIds.length > 1) {
             variantAttributeIds[1] = variantLevel2AttributeIds;
         }
         int level = 0;
-        for(String[] variantLevelAttributeIds : variantAttributeIds) {
-            level ++;
-            if(!variantGroup.getVariantAttributes().containsKey(level)) {
+        for (String[] variantLevelAttributeIds : variantAttributeIds) {
+            level++;
+            if (!variantGroup.getVariantAttributes().containsKey(level)) {
                 variantGroup.getVariantAttributes().put(level, new ArrayList<>());
             }
             List<String> variantAttributes = variantGroup.getVariantAttributes().get(level);
@@ -270,12 +271,12 @@ public class Family extends Entity<Family> {
     public Family updateVariantGroupAxisAttributes(String variantGroupId, String[] axisLevel1AttributeIds, String[] axisLevel2AttributeIds) {
         VariantGroup variantGroup = getVariantGroups().get(variantGroupId);
         String[][] axesAttributeIds = new String[variantGroup.getLevel()][];
-        if(isNull(axisLevel1AttributeIds)) {
+        if (isNull(axisLevel1AttributeIds)) {
             axisLevel1AttributeIds = new String[0];
         }
         axesAttributeIds[0] = axisLevel1AttributeIds;
-        if(axesAttributeIds.length > 1) {
-            if(isNull(axisLevel2AttributeIds)) {
+        if (axesAttributeIds.length > 1) {
+            if (isNull(axisLevel2AttributeIds)) {
                 axisLevel2AttributeIds = new String[0];
             }
             axesAttributeIds[1] = axisLevel2AttributeIds;
@@ -285,9 +286,9 @@ public class Family extends Entity<Family> {
                 .filter(attribute -> attribute.getActive().equals("Y") && attribute.getSelectable().equals("Y") /*&& attribute.getScopable().equals("N")*/)
                 .forEach(attribute -> familyAxisAttributes.put(attribute.getId(), attribute));
         int level = 0;
-        for(String[] axisAttributeIds : axesAttributeIds) {
-            level ++;
-            if(isNotNull(axisAttributeIds)) {
+        for (String[] axisAttributeIds : axesAttributeIds) {
+            level++;
+            if (isNotNull(axisAttributeIds)) {
                 if (!variantGroup.getVariantAxis().containsKey(level)) {
                     variantGroup.getVariantAxis().put(level, new ArrayList<>());
                 }
@@ -299,5 +300,26 @@ public class Family extends Entity<Family> {
             }
         }
         return this;
+    }
+
+    public Map<String, Object> diff(Family family, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(family.getId())) {
+            diff.put("internalId", family.getId());
+        }
+        if ( !this.getFamilyName().equals(family.getFamilyName())) {
+            diff.put("familyName", family.getFamilyName());
+        }
+        if ( !this.getAttributes().equals(family.getAttributes())) {
+            diff.put("attributes", family.getAttributes());
+        }
+        if ( !this.getVariantGroups().equals(family.getVariantGroups())) {
+            diff.put("variantGroups", family.getVariantGroups());
+        }
+        if ( !this.getChannelVariantGroups().equals(family.getChannelVariantGroups())) {
+            diff.put("channelvariantGroups", family.getChannelVariantGroups());
+        }
+        return diff;
     }
 }
