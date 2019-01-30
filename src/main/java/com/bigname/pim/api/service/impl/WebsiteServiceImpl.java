@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -81,6 +82,18 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     @Override
     public Website createOrUpdate(Website website) {
         return websiteDAO.save(website);
+    }
+
+    @Override
+    public List<Website> create(List<Website> websites) {
+        websites.forEach(website -> {website.setCreatedUser(getCurrentUser());website.setCreatedDateTime(LocalDateTime.now());});
+        return websiteDAO.insert(websites);
+    }
+
+    @Override
+    public List<Website> update(List<Website> websites) {
+        websites.forEach(website -> {website.setLastModifiedUser(getCurrentUser());website.setLastModifiedDateTime(LocalDateTime.now());});
+        return websiteDAO.saveAll(websites);
     }
 
     /**

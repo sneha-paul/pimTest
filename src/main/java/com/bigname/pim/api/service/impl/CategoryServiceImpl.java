@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,18 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public Category createOrUpdate(Category category) {
         return categoryDAO.save(category);
+    }
+
+    @Override
+    public List<Category> create(List<Category> categories) {
+        categories.forEach(category -> {category.setCreatedUser(getCurrentUser());category.setCreatedDateTime(LocalDateTime.now());});
+        return categoryDAO.insert(categories);
+    }
+
+    @Override
+    public List<Category> update(List<Category> categories) {
+        categories.forEach(category -> {category.setLastModifiedUser(getCurrentUser());category.setLastModifiedDateTime(LocalDateTime.now());});
+        return categoryDAO.saveAll(categories);
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,18 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     @Override
     public Catalog createOrUpdate(Catalog catalog) {
         return catalogDAO.save(catalog);
+    }
+
+    @Override
+    public List<Catalog> create(List<Catalog> catalogs) {
+        catalogs.forEach(catalog -> {catalog.setCreatedUser(getCurrentUser());catalog.setCreatedDateTime(LocalDateTime.now());});
+        return catalogDAO.insert(catalogs);
+    }
+
+    @Override
+    public List<Catalog> update(List<Catalog> catalogs) {
+        catalogs.forEach(catalog -> {catalog.setLastModifiedUser(getCurrentUser());catalog.setLastModifiedDateTime(LocalDateTime.now());});
+        return catalogDAO.saveAll(catalogs);
     }
 
     @Override

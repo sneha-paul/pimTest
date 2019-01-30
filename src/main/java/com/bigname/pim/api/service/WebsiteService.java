@@ -9,6 +9,7 @@ import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,6 +57,8 @@ public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
 
     Page<Map<String, Object>> findAllWebsiteCatalogs(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
+    List<Website> create(List<Website> websites);
 
+    List<Website> update(List<Website> websites);
 
 }

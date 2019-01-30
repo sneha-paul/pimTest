@@ -124,5 +124,9 @@ public interface CategoryService extends  BaseService<Category, CategoryDAO> {
     Page<Map<String, Object>> findAllSubCategories(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
     Page<Map<String, Object>> findAllCategoryProducts(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+
+    List<Category> create(List<Category> categories);
+
+    List<Category> update(List<Category> categories);
 }
 

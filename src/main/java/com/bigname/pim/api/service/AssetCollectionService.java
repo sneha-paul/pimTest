@@ -15,4 +15,8 @@ import java.util.Optional;
 public interface AssetCollectionService extends BaseService<AssetCollection, AssetCollectionDAO> {
     List<Map<String, Object>> getAssetsHierarchy(String collectionId, FindBy findBy, String nodeId, boolean... activeRequired);
     Optional<AssetCollection> getAssetCollection(String collectionName);
+
+    List<AssetCollection> create(List<AssetCollection> assetCollections);
+
+    List<AssetCollection> update(List<AssetCollection> assetCollections);
 }

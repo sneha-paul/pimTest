@@ -22,11 +22,11 @@ public class CatalogExporter {
     public boolean exportData(String filePath) {
         List<Catalog> catalogData = catalogService.getAll(null,true);
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
-        data.put("1", new Object[]{"CATALOG_ID", "NAME", "DESCRIPTION", "Id" });
+        data.put("1", new Object[]{"CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID" });
         int i=2;
         for (Iterator<Catalog> iter = catalogData.iterator(); iter.hasNext(); ) {
             Catalog element = iter.next();
-            data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getId() });
+            data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getActive(), element.getDiscontinued(), element.getId() });
             i++;
         }
         POIUtil.writeData(filePath, "catalog", data);

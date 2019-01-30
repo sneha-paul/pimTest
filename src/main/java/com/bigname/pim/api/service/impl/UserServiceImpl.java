@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,18 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserServi
     @Override
     public User createOrUpdate(User user) {
         return userDAO.save(user);
+    }
+
+    @Override
+    public List<User> create(List<User> users) {
+        users.forEach(user -> {user.setCreatedUser(getCurrentUser());user.setCreatedDateTime(LocalDateTime.now());});
+        return userDAO.insert(users);
+    }
+
+    @Override
+    public List<User> update(List<User> users) {
+        users.forEach(user -> {user.setLastModifiedUser(getCurrentUser());user.setLastModifiedDateTime(LocalDateTime.now());});
+        return userDAO.saveAll(users);
     }
 
     @Override

@@ -72,4 +72,8 @@ public interface AttributeCollectionService extends BaseService<AttributeCollect
      * @return
      */
     Optional<AttributeOption> findAttributeOption(FamilyAttribute familyAttribute, String attributeOptionId);
+
+    List<AttributeCollection> create(List<AttributeCollection> attributeCollections);
+
+    List<AttributeCollection> update(List<AttributeCollection> attributeCollections);
 }

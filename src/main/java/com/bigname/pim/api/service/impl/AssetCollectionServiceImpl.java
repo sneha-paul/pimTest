@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -59,6 +60,18 @@ public class AssetCollectionServiceImpl extends BaseServiceSupport<AssetCollecti
     @Override
     protected AssetCollection createOrUpdate(AssetCollection assetCollection) {
         return assetCollectionDAO.save(assetCollection);
+    }
+
+    @Override
+    public List<AssetCollection> create(List<AssetCollection> assetCollections) {
+        assetCollections.forEach(assetCollection -> {assetCollection.setCreatedUser(getCurrentUser());assetCollection.setCreatedDateTime(LocalDateTime.now());});
+        return assetCollectionDAO.insert(assetCollections);
+    }
+
+    @Override
+    public List<AssetCollection> update(List<AssetCollection> assetCollections) {
+        assetCollections.forEach(assetCollection -> {assetCollection.setLastModifiedUser(getCurrentUser());assetCollection.setLastModifiedDateTime(LocalDateTime.now());});
+        return assetCollectionDAO.saveAll(assetCollections);
     }
 
     @Override

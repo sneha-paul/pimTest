@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,18 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
     @Override
     public AttributeCollection createOrUpdate(AttributeCollection attributeCollection) {
         return attributeCollectionDAO.save(attributeCollection);
+    }
+
+    @Override
+    public List<AttributeCollection> create(List<AttributeCollection> attributeCollections) {
+        attributeCollections.forEach(attributeCollection -> {attributeCollection.setCreatedUser(getCurrentUser());attributeCollection.setCreatedDateTime(LocalDateTime.now());});
+        return attributeCollectionDAO.insert(attributeCollections);
+    }
+
+    @Override
+    public List<AttributeCollection> update(List<AttributeCollection> attributeCollections) {
+        attributeCollections.forEach(attributeCollection -> {attributeCollection.setLastModifiedUser(getCurrentUser());attributeCollection.setLastModifiedDateTime(LocalDateTime.now());});
+        return attributeCollectionDAO.saveAll(attributeCollections);
     }
 
     @Override

@@ -37,4 +37,9 @@ public interface FamilyService extends BaseService<Family, FamilyDAO>  {
     List<Triplet<String, String, String>> getFamilyVariantGroups();
 
     boolean toggleVariantGroup(String familyId, FindBy familyIdFindBy, String variantGroupId, FindBy variantGroupIdFindBy, Toggle active);
+
+    List<Family> create(List<Family> families);
+
+    List<Family> update(List<Family> families);
+
 }

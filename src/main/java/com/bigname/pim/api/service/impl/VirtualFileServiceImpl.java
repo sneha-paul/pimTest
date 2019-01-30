@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +58,18 @@ public class VirtualFileServiceImpl extends BaseServiceSupport<VirtualFile, Virt
     @Override
     protected VirtualFile createOrUpdate(VirtualFile virtualFile) {
         return virtualFileDAO.save(virtualFile);
+    }
+
+    @Override
+    public List<VirtualFile> create(List<VirtualFile> virtualFiles) {
+        virtualFiles.forEach(virtualFile -> {virtualFile.setCreatedUser(getCurrentUser());virtualFile.setCreatedDateTime(LocalDateTime.now());});
+        return virtualFileDAO.insert(virtualFiles);
+    }
+
+    @Override
+    public List<VirtualFile> update(List<VirtualFile> virtualFiles) {
+        virtualFiles.forEach(virtualFile -> {virtualFile.setLastModifiedUser(getCurrentUser());virtualFile.setLastModifiedDateTime(LocalDateTime.now());});
+        return virtualFileDAO.saveAll(virtualFiles);
     }
 
     @Override

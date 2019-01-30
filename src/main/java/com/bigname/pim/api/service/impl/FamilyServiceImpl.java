@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,18 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     @Override
     public Family createOrUpdate(Family family) {
         return familyDAO.save(family);
+    }
+
+    @Override
+    public List<Family> create(List<Family> families) {
+        families.forEach(family -> {family.setCreatedUser(getCurrentUser());family.setCreatedDateTime(LocalDateTime.now());});
+        return familyDAO.insert(families);
+    }
+
+    @Override
+    public List<Family> update(List<Family> families) {
+        families.forEach(family -> {family.setLastModifiedUser(getCurrentUser());family.setLastModifiedDateTime(LocalDateTime.now());});
+        return familyDAO.saveAll(families);
     }
 
     @Override

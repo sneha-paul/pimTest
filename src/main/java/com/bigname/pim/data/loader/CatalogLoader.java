@@ -2,8 +2,6 @@ package com.bigname.pim.data.loader;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Catalog;
-import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.util.POIUtil;
 import org.javatuples.Pair;
@@ -30,17 +28,13 @@ public class CatalogLoader {
     @Autowired
     private CatalogService catalogService;
 
-    @Autowired
-    private CatalogDAO catalogDAO;
-
-    private static List<String> header = Arrays.asList(ID.name(), CATALOG_ID.name(), CATALOG_NAME.name(), DESCRIPTION.name(), ACTIVE.name(), DISCONTINUED.name());
-
+    private static List<String> header = Arrays.asList(CATALOG_ID.name(), CATALOG_NAME.name(), DESCRIPTION.name(), ACTIVE.name(), DISCONTINUED.name(), ID.name());
 
     public boolean load(String filePath) {
 
-        Set<Catalog> savableCatalogs = new LinkedHashSet<>();
+        List<Catalog> newSavableCatalogs = new ArrayList<>();
 
-      //  Map<String, Integer> sequenceMap = new HashMap<>();
+        List<Catalog> modifiedSavableCatalogs = new ArrayList<>();
 
         Map<Integer, List<String>> skippedItems = new LinkedHashMap<>();
 
@@ -58,6 +52,8 @@ public class CatalogLoader {
 
         if(!validHeader) {
             //TODO - throw invalid data exception
+            LOGGER.info("Invalid Headers");
+            LOGGER.error("Invalid Header Array");
             return false;
         }
 
@@ -81,8 +77,10 @@ public class CatalogLoader {
 
         // Catalogs with invalid internal Ids
         List<List<String>> invalidCatalogs = data.stream().filter(row -> !catalogsLookupMap.containsKey(row.get(metadataRow.indexOf(ID.name())))).collect(Collectors.toList());
-
+        //Remove invalidCatalogs from the list
         data.removeAll(invalidCatalogs);
+
+        //Modified catalogs
         List<List<String>> modifiedCatalogsData = new ArrayList<>();
 
         List<Catalog> modifiedCatalogs = data.stream().filter(row -> {
@@ -96,13 +94,19 @@ public class CatalogLoader {
             return !catalogsLookupMap.get(internalId).equals(CollectionsUtil.toMap(ID.name(), internalId, CATALOG_NAME, name, CATALOG_ID, catalogId, ACTIVE, active, DISCONTINUED, discontinued, DESCRIPTION, description));
 
         }).map(row -> {
-            String name = row.get(metadataRow.indexOf(CATALOG_NAME.name()));
             String catalogId = row.get(metadataRow.indexOf(CATALOG_ID.name())).toUpperCase();
+            String name = row.get(metadataRow.indexOf(CATALOG_NAME.name()));
             String active = row.get(metadataRow.indexOf(ACTIVE.name())).toUpperCase();
             String discontinued = row.get(metadataRow.indexOf(DISCONTINUED.name())).toUpperCase();
             String description = row.get(metadataRow.indexOf(DESCRIPTION.name()));
             modifiedCatalogsData.add(row);
-            return new Catalog(CollectionsUtil.toMap(CATALOG_NAME, name, CATALOG_ID, catalogId, ACTIVE, active, DISCONTINUED, discontinued, DESCRIPTION, description));
+            Catalog existingCatalog = catalogsLookupMap.get(row.get(metadataRow.indexOf(ID.name())));
+            existingCatalog.setCatalogId(catalogId);
+            existingCatalog.setCatalogName(name);
+            existingCatalog.setActive(active);
+            existingCatalog.setDiscontinued(discontinued);
+            existingCatalog.setDescription(description);
+            return existingCatalog;
         }).collect(Collectors.toList());
 
         data.removeAll(modifiedCatalogsData);
@@ -114,107 +118,41 @@ public class CatalogLoader {
             Map<String, Pair<String, Object>> validationResult = catalogService.validate(catalog, new HashMap<>(), Catalog.CreateGroup.class);
             if(!isValid(validationResult)) {
                 // Build a map with Row index as the Key and proper validation error message as the value
+                LOGGER.error("ERROR--newCatalogs--->"+validationResult.values());
+            }
+            else{
+                    catalog.setCreatedDateTime(LocalDateTime.now());
+                    catalog.setCreatedUser(catalogService.getCurrentUser());
+                    newSavableCatalogs.add(catalog);
             }
         });
 
         //Validating modified catalogs
         modifiedCatalogs.forEach(catalog -> {
-            Map<String, Pair<String, Object>> validationResult = catalogService.validate(catalog, CollectionsUtil.toMap("id", catalog.getCatalogId()), Catalog.CreateGroup.class, Catalog.DetailsGroup.class);
+            Map<String, Pair<String, Object>> validationResult = catalogService.validate(catalog, CollectionsUtil.toMap("id", catalog.getCatalogId()), Catalog.DetailsGroup.class);
             if(!isValid(validationResult)) {
+                LOGGER.error("ERROR--modifiedCatalogs-->"+validationResult.values());
                 // Build a map with Row index as the Key and proper validation error message as the value
+            }else{
+                    catalog.setLastModifiedDateTime(LocalDateTime.now());
+                    catalog.setLastModifiedUser(catalogService.getCurrentUser());
+                    modifiedSavableCatalogs.add(catalog);
             }
         });
         //If invalid catalogs and greater than 0, send the Map as response to the controller
 
-
-        
-
         LOGGER.info("Catalogs to process -------------->"+  (data.size() - 1));
-        LOGGER.info("# of catalog attributes-------------->"+data.get(0).size());
+      //  LOGGER.info("# of catalog attributes-------------->"+data.get(0).size());
 
-        List<String> attributeNamesMetadata = data.remove(0);
-
-        for(int i = 0; i < data.size(); i ++) {
-            String catalogId = data.get(i).get(attributeNamesMetadata.indexOf("CATALOG_ID")).toUpperCase();
-            String name = data.get(i).get(attributeNamesMetadata.indexOf("NAME"));
-            String internalId = data.get(i).get(attributeNamesMetadata.indexOf("Id"));
-            String description = data.get(i).get(attributeNamesMetadata.indexOf("DESCRIPTION"));
-            boolean skip = false;
-
-            //Create the catalog is another one with the same CATALOG_ID won't exists
-            if(catalogsLookupMap.containsKey(internalId)) {
-                Catalog catalog1 = catalogsLookupMap.get(internalId);
-                Catalog catalog = new Catalog();
-                catalog.setCatalogId(catalogId);
-                catalog.setCatalogName(name);
-                catalog.setDescription(description);
-                catalog.setActive("Y");
-                catalog.setDiscontinued("N");
-
-                if(!catalog1.equals(catalog)){
-
-                }
-                //SKIP without updating
-                // skip = true;
-            } else {
-
-            }
-
-        }
-
-        //Skip the header row and process each category row.
-        for(int i = 0; i < data.size(); i ++) {
-            String catalogId = data.get(i).get(attributeNamesMetadata.indexOf("CATALOG_ID")).toUpperCase();
-            String name = data.get(i).get(attributeNamesMetadata.indexOf("NAME"));
-            String internalId = data.get(i).get(attributeNamesMetadata.indexOf("Id"));
-            String description = data.get(i).get(attributeNamesMetadata.indexOf("DESCRIPTION"));
-            boolean skip = false;
-
-            //Create the catalog is another one with the same CATALOG_ID won't exists
-            if(catalogsLookupMap.containsKey(internalId)) {
-                Catalog catalog = catalogsLookupMap.get(internalId);
-                catalog.setCatalogId(catalogId);
-                catalog.setCatalogName(name);
-                catalog.setDescription(description);
-                catalog.setActive("Y");
-                catalog.setDiscontinued("N");
-
-                //update this for batch saving
-                if (isValid(catalogService.validate(catalog, new HashMap<>(), Catalog.DetailsGroup.class))) {
-                    catalog.setLastModifiedDateTime(LocalDateTime.now());
-                    catalog.setLastModifiedUser(catalogService.getCurrentUser());
-                    savableCatalogs.add(catalog);
-                }
-                //SKIP without updating
-               // skip = true;
-            } else {
-                Catalog catalog = new Catalog();
-                catalog.setCatalogId(catalogId);
-                catalog.setCatalogName(name);
-                catalog.setDescription(description);
-                catalog.setActive("Y");
-                catalog.setDiscontinued("N");
-
-                //Add this for batch saving
-                if (isValid(catalogService.validate(catalog, new HashMap<>(), Catalog.CreateGroup.class))) {
-                    catalog.setCreatedDateTime(LocalDateTime.now());
-                    catalog.setCreatedUser(catalogService.getCurrentUser());
-                    savableCatalogs.add(catalog);
-                }
-                //Add this for checking duplicates in the feed
-                catalogsLookupMap.put(catalogId, catalog);
-            }
-            if(skip) {
-                skippedItems.put(i, data.get(i));
-            }
-        }
-        catalogDAO.saveAll(savableCatalogs);
+        catalogService.create(newSavableCatalogs);
+        catalogService.update(modifiedSavableCatalogs);
         LOGGER.info("skipped ---------->" + skippedItems.size());
         return true;
     }
 
     protected boolean isValid(Map<String, Pair<String, Object>> validationResult) {
-        return isEmpty(validationResult.get("fieldErrors"));
+        LOGGER.error("ERROR----->"+validationResult.values());
+        return isEmpty(validationResult);
     }
 
 }

@@ -2,7 +2,6 @@ package com.bigname.pim.data.loader;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.util.POIUtil;
 import org.javatuples.Pair;
@@ -30,24 +29,19 @@ public class WebsiteLoader {
     @Autowired
     private WebsiteService websiteService;
 
-    @Autowired
-    private WebsiteDAO websiteDAO;
-
     private static List<String> header = Arrays.asList(ID.name(), WEBSITE_ID.name(), WEBSITE_NAME.name(), URL.name(), ACTIVE.name());
 
     public boolean load(String filePath) {
 
-        Set<Website> newSavableWebsites = new LinkedHashSet<>();
+        List<Website> newSavableWebsites = new ArrayList<>();
 
-        Set<Website> modifiedSavableWebsites = new LinkedHashSet<>();
-
-       // Map<String, Integer> sequenceMap = new HashMap<>();
+        List<Website> modifiedSavableWebsites = new ArrayList<>();
 
         Map<Integer, List<String>> skippedItems = new LinkedHashMap<>();
 
         List<List<String>> fullData = POIUtil.readData(filePath);
 
-        List<List<String>> data = POIUtil.readData(filePath);
+        List<List<String>> data = new ArrayList<>(fullData);
 
         Map<String, Website> websitesLookupMap = websiteService.getAll(null, false).stream().collect(Collectors.toMap(Website::getId, e -> e));
 
@@ -59,6 +53,8 @@ public class WebsiteLoader {
 
         if(!validHeader) {
             //TODO - throw invalid data exception
+            LOGGER.info("Invalid Headers");
+            LOGGER.error("Invalid Header Array");
             return false;
         }
 
@@ -81,8 +77,9 @@ public class WebsiteLoader {
 
         // Websites with invalid internal Ids
         List<List<String>> invalidWebsites = data.stream().filter(row -> !websitesLookupMap.containsKey(row.get(metadataRow.indexOf(ID.name())))).collect(Collectors.toList());
-
+        //Remove invalid websites from the list
         data.removeAll(invalidWebsites);
+
         List<List<String>> modifiedWebsitesData = new ArrayList<>();
 
         List<Website> modifiedWebsites = data.stream().filter(row -> {
@@ -100,7 +97,12 @@ public class WebsiteLoader {
             String active = row.get(metadataRow.indexOf(ACTIVE.name())).toUpperCase();
             String url = row.get(metadataRow.indexOf(URL.name())).toUpperCase();
             modifiedWebsitesData.add(row);
-            return new Website(CollectionsUtil.toMap(WEBSITE_NAME, name, WEBSITE_ID, websiteId, ACTIVE, active, URL, url));
+            Website existingWebsite = websitesLookupMap.get(row.get(metadataRow.indexOf(ID.name())));
+            existingWebsite.setWebsiteId(websiteId);
+            existingWebsite.setWebsiteName(name);
+            existingWebsite.setActive(active);
+            existingWebsite.setUrl(url);
+            return existingWebsite;
         }).collect(Collectors.toList());
 
         data.removeAll(modifiedWebsitesData);
@@ -112,6 +114,7 @@ public class WebsiteLoader {
             Map<String, Pair<String, Object>> validationResult = websiteService.validate(website, new HashMap<>(), Website.CreateGroup.class);
             if(!isValid(validationResult)) {
                 // Build a map with Row index as the Key and proper validation error message as the value
+                LOGGER.error("ERROR--newWebsites--->"+validationResult.values());
             } else{
                 website.setCreatedDateTime(LocalDateTime.now());
                 website.setCreatedUser(websiteService.getCurrentUser());
@@ -123,79 +126,32 @@ public class WebsiteLoader {
 
         //Validating modified websites
         modifiedWebsites.forEach(website -> {
-            Map<String, Pair<String, Object>> validationResult = websiteService.validate(website, CollectionsUtil.toMap("id", website.getWebsiteId()), Website.CreateGroup.class, Website.DetailsGroup.class);
+            Map<String, Pair<String, Object>> validationResult = websiteService.validate(website, CollectionsUtil.toMap("id", website.getWebsiteId()), Website.DetailsGroup.class);
             if(!isValid(validationResult)) {
                 // Build a map with Row index as the Key and proper validation error message as the value
+                LOGGER.error("ERROR--modifiedWebsites--->"+validationResult.values());
             } else{
-                website.setCreatedDateTime(LocalDateTime.now());
-                website.setCreatedUser(websiteService.getCurrentUser());
+                website.setLastModifiedDateTime(LocalDateTime.now());
+                website.setLastModifiedUser(websiteService.getCurrentUser());
                 website.setActive("Y");
                 //Add this for batch saving
                 modifiedSavableWebsites.add(website);
-                websiteDAO.saveAll(modifiedSavableWebsites);
             }
         });
         //If invalid websites and greater than 0, send the Map as response to the controller
 
-
-
-
         LOGGER.info("Websites to process -------------->"+  (data.size() - 1));
-        LOGGER.info("# of websites attributes-------------->"+data.get(0).size());
+       // LOGGER.info("# of websites attributes-------------->"+data.get(0).size());
 
-
-       /* List<String> attributeNamesMetadata = data.remove(0);
-        for(int i = 0; i < data.size(); i ++) {
-            LOGGER.info("----i---"+i);
-
-            String websiteId = data.get(i).get(attributeNamesMetadata.indexOf("WEBSITE_ID")).toUpperCase();
-            String name = data.get(i).get(attributeNamesMetadata.indexOf("NAME"));
-            String url = data.get(i).get(attributeNamesMetadata.indexOf("URL"));
-            String internalId = data.get(i).get(attributeNamesMetadata.indexOf("ID"));
-            boolean skip = false;
-            //Create the website is another one with the same WEBSITE_ID won't exists
-            if(websitesLookupMap.containsKey(internalId)) {
-                //SKIP without updating
-                Website website = websitesLookupMap.get(internalId);
-                website.setWebsiteId(websiteId);
-                website.setWebsiteName(name);
-                website.setUrl(url);
-
-                //update this for batch saving
-                if (isValid(websiteService.validate(website, new HashMap<>(), Website.DetailsGroup.class))) {
-                    website.setLastModifiedDateTime(LocalDateTime.now());
-                    website.setLastModifiedUser(websiteService.getCurrentUser());
-                    website.setActive("Y");
-                    savableWebsites.add(website);
-                }
-
-            } else {
-                Website website = new Website();
-                website.setWebsiteId(websiteId);
-                website.setWebsiteName(name);
-                website.setUrl(url);
-                if (isValid(websiteService.validate(website, new HashMap<>(), Website.CreateGroup.class))) {
-                    website.setCreatedDateTime(LocalDateTime.now());
-                    website.setCreatedUser(websiteService.getCurrentUser());
-                    website.setActive("Y");
-                    //Add this for batch saving
-                    savableWebsites.add(website);
-                }
-                //Add this for checking duplicates in the feed
-                websitesLookupMap.put(websiteId, website);
-            }
-            if(skip) {
-                skippedItems.put(i, data.get(i));
-            }
-        }
-*/
-        websiteDAO.saveAll(newSavableWebsites);
+        websiteService.create(newSavableWebsites);
+        websiteService.update(modifiedSavableWebsites);
         LOGGER.info("skipped ---------->" + skippedItems.size());
         return true;
     }
 
     protected boolean isValid(Map<String, Pair<String, Object>> validationResult) {
-        return isEmpty(validationResult.get("fieldErrors"));
+        LOGGER.error("ERROR----->"+validationResult.values());
+        return isEmpty(validationResult);
     }
 
 }

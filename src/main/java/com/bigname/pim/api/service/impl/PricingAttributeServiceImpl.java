@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +32,18 @@ public class PricingAttributeServiceImpl extends BaseServiceSupport<PricingAttri
 
     @Override
     public PricingAttribute createOrUpdate(PricingAttribute pricingAttribute) {return pricingAttributeDAO.save(pricingAttribute);}
+
+    @Override
+    public List<PricingAttribute> create(List<PricingAttribute> pricingAttributes) {
+        pricingAttributes.forEach(pricingAttribute -> {pricingAttribute.setCreatedUser(getCurrentUser());pricingAttribute.setCreatedDateTime(LocalDateTime.now());});
+        return pricingAttributeDAO.insert(pricingAttributes);
+    }
+
+    @Override
+    public List<PricingAttribute> update(List<PricingAttribute> pricingAttributes) {
+        pricingAttributes.forEach(pricingAttribute -> {pricingAttribute.setLastModifiedUser(getCurrentUser());pricingAttribute.setLastModifiedDateTime(LocalDateTime.now());});
+        return pricingAttributeDAO.saveAll(pricingAttributes);
+    }
 
     @Override
     public List<PricingAttribute> findAll(Map<String, Object> criteria) {
