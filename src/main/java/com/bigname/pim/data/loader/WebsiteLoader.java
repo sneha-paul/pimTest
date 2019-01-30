@@ -37,7 +37,9 @@ public class WebsiteLoader {
 
     public boolean load(String filePath) {
 
-        Set<Website> savableWebsites = new LinkedHashSet<>();
+        Set<Website> newSavableWebsites = new LinkedHashSet<>();
+
+        Set<Website> modifiedSavableWebsites = new LinkedHashSet<>();
 
        // Map<String, Integer> sequenceMap = new HashMap<>();
 
@@ -110,6 +112,12 @@ public class WebsiteLoader {
             Map<String, Pair<String, Object>> validationResult = websiteService.validate(website, new HashMap<>(), Website.CreateGroup.class);
             if(!isValid(validationResult)) {
                 // Build a map with Row index as the Key and proper validation error message as the value
+            } else{
+                website.setCreatedDateTime(LocalDateTime.now());
+                website.setCreatedUser(websiteService.getCurrentUser());
+                website.setActive("Y");
+                //Add this for batch saving
+                newSavableWebsites.add(website);
             }
         });
 
@@ -118,6 +126,13 @@ public class WebsiteLoader {
             Map<String, Pair<String, Object>> validationResult = websiteService.validate(website, CollectionsUtil.toMap("id", website.getWebsiteId()), Website.CreateGroup.class, Website.DetailsGroup.class);
             if(!isValid(validationResult)) {
                 // Build a map with Row index as the Key and proper validation error message as the value
+            } else{
+                website.setCreatedDateTime(LocalDateTime.now());
+                website.setCreatedUser(websiteService.getCurrentUser());
+                website.setActive("Y");
+                //Add this for batch saving
+                modifiedSavableWebsites.add(website);
+                websiteDAO.saveAll(modifiedSavableWebsites);
             }
         });
         //If invalid websites and greater than 0, send the Map as response to the controller
@@ -129,7 +144,7 @@ public class WebsiteLoader {
         LOGGER.info("# of websites attributes-------------->"+data.get(0).size());
 
 
-        List<String> attributeNamesMetadata = data.remove(0);
+       /* List<String> attributeNamesMetadata = data.remove(0);
         for(int i = 0; i < data.size(); i ++) {
             LOGGER.info("----i---"+i);
 
@@ -173,8 +188,8 @@ public class WebsiteLoader {
                 skippedItems.put(i, data.get(i));
             }
         }
-
-        websiteDAO.saveAll(savableWebsites);
+*/
+        websiteDAO.saveAll(newSavableWebsites);
         LOGGER.info("skipped ---------->" + skippedItems.size());
         return true;
     }

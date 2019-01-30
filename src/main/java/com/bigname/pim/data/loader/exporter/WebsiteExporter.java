@@ -28,11 +28,11 @@ public class WebsiteExporter {
 
         List<Website> websitesData = websiteService.getAll(null,true);
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
-        data.put("1", new Object[]{"WEBSITE_ID", "NAME", "URL", "ID"});
+        data.put("1", new Object[]{"WEBSITE_ID", "WEBSITE_NAME", "URL", "ACTIVE" , "ID"});
         int i=2;
         for (Iterator<Website> iter = websitesData.iterator(); iter.hasNext(); ) {
             Website element = iter.next();
-            data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getWebsiteName(), element.getUrl(), element.getId()});
+            data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getWebsiteName(), element.getUrl(), element.getActive() , element.getId()});
             i++;
         }
         POIUtil.writeData(filePath,"Website",data);
