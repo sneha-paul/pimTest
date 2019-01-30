@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,7 +31,8 @@ public class Website extends Entity<Website> {
     @NotEmpty(message = "Website URL cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String url;
 
-    @Transient @JsonIgnore
+    @Transient
+    @JsonIgnore
     private Page<WebsiteCatalog> catalogs;
 
     public Website() {
@@ -92,7 +94,7 @@ public class Website extends Entity<Website> {
     @Override
     public Website merge(Website website) {
         for (String group : website.getGroup()) {
-            switch(group) {
+            switch (group) {
                 case "DETAILS":
                     this.setExternalId(website.getExternalId());
                     this.setWebsiteName(website.getWebsiteName());
@@ -123,7 +125,25 @@ public class Website extends Entity<Website> {
                 && this.getUrl().equals(websiteMap.get(Property.ACTIVE.name()));
     }
 
-    public enum Property{
+    public enum Property {
         ID, WEBSITE_ID, WEBSITE_NAME, URL, ACTIVE
+    }
+
+    public Map<String, Object> diff(Website website, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(website.getId())) {
+            diff.put("internalId", website.getId());
+        }
+        if (!this.getId().equals(website.getWebsiteName())) {
+            diff.put("websiteName", website.getWebsiteName());
+        }
+        if (!this.getId().equals(website.getUrl())) {
+            diff.put("url", website.getUrl());
+        }
+
+
+
+        return diff;
     }
 }
