@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,25 +23,32 @@ public class PricingAttribute extends Entity<PricingAttribute> {
     private String pricingAttributeName;
 
 
-
     public PricingAttribute() {
         super();
     }
 
 
-    public String getPricingAttributeId() {return getExternalId();}
+    public String getPricingAttributeId() {
+        return getExternalId();
+    }
 
     public void setPricingAttributeId(String pricingAttributeId) {
         this.pricingAttributeId = pricingAttributeId;
         setExternalId(pricingAttributeId);
     }
 
-    public String getPricingAttributeName() {return pricingAttributeName;}
+    public String getPricingAttributeName() {
+        return pricingAttributeName;
+    }
 
-    public void setPricingAttributeName(String pricingAttributeName) {this.pricingAttributeName = pricingAttributeName;}
+    public void setPricingAttributeName(String pricingAttributeName) {
+        this.pricingAttributeName = pricingAttributeName;
+    }
 
     @Override
-    void setExternalId() {this.pricingAttributeId=getExternalId();}
+    void setExternalId() {
+        this.pricingAttributeId = getExternalId();
+    }
 
     @Override
     public PricingAttribute cloneInstance() {
@@ -54,7 +62,7 @@ public class PricingAttribute extends Entity<PricingAttribute> {
     @Override
     public PricingAttribute merge(PricingAttribute pricingAttribute) {
         for (String group : pricingAttribute.getGroup()) {
-            switch(group) {
+            switch (group) {
                 case "DETAILS":
                     this.setExternalId(pricingAttribute.getExternalId());
                     this.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
@@ -72,5 +80,17 @@ public class PricingAttribute extends Entity<PricingAttribute> {
         map.put("pricingAttributeName", getPricingAttributeName());
         map.put("active", getActive());
         return map;
+    }
+
+    public Map<String, Object> diff(PricingAttribute pricingAttribute, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(pricingAttribute.getId())) {
+            diff.put("internalId", pricingAttribute.getId());
+        }
+        if (!this.getPricingAttributeName().equals(pricingAttribute.getPricingAttributeName())) {
+            diff.put("pricingAttributeName", pricingAttribute.getPricingAttributeName());
+        }
+        return diff;
     }
 }
