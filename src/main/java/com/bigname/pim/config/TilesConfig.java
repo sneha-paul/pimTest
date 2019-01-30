@@ -23,7 +23,7 @@ public class TilesConfig {
     public TilesConfigurer tilesConfigurer() {
         TilesConfigurer tiles = new TilesConfigurer();
         tiles.setUseMutableTilesContainer(true);
-        tiles.setDefinitions("/tiles.xml");
+        tiles.setDefinitions("/WEB-INF/tiles.xml");
         return tiles;
     }
 }
