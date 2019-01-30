@@ -23,7 +23,8 @@ public class AttributeCollection extends Entity<AttributeCollection> {
 
     private Map<String, AttributeGroup> attributes = new LinkedHashMap<>();
 
-    @Transient @JsonIgnore
+    @Transient
+    @JsonIgnore
     private List<Attribute> allAttributes = new ArrayList<>();
 
     public AttributeCollection() {
@@ -89,15 +90,15 @@ public class AttributeCollection extends Entity<AttributeCollection> {
     @Override
     public AttributeCollection merge(AttributeCollection collection) {
         for (String group : collection.getGroup()) {
-            switch (group){
+            switch (group) {
                 case "DETAILS":
                     this.setExternalId(collection.getExternalId());
                     this.setCollectionName(collection.getCollectionName());
                     this.setActive(collection.getActive());
-                 break;
+                    break;
                 case "ATTRIBUTES":
                     this.setAttributes(collection.getAttributes());
-                break;
+                    break;
             }
         }
         return this;
@@ -120,4 +121,21 @@ public class AttributeCollection extends Entity<AttributeCollection> {
                         e.getKey().equals(groupId)).map(Map.Entry::getValue).collect(Collectors.toList());
         return isNotEmpty(list) ? list.get(0) : null;
     }*/
+
+    public Map<String, Object> diff(AttributeCollection attributeCollection, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(attributeCollection.getId())) {
+            diff.put("internalId", attributeCollection.getId());
+        }
+        if ( !this.getCollectionName().equals(attributeCollection.getCollectionName())) {
+            diff.put("collectionName", attributeCollection.getCollectionName());
+        }
+
+        if ( !this.getAttributes().equals(attributeCollection.getAttributes())) {
+            diff.put("attributes", attributeCollection.getAttributes());
+        }
+
+        return diff;
+    }
 }
