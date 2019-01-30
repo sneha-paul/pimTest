@@ -1,13 +1,18 @@
 package com.bigname.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.bigname.common.util.ValidationUtil.isNotNull;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -72,6 +77,20 @@ abstract public class ConversionUtil {
         } catch (JsonProcessingException e) {
             //TODO - log exception
             return "";
+        }
+    }
+
+    public static Map<String, Object> toJSONMap(Object object) {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = "";
+        try {
+            jsonString = mapper.writeValueAsString(object);
+            return mapper.readValue(jsonString, new TypeReference<HashMap<String, Object>>(){});
+        } catch (JsonProcessingException e) {
+            //TODO - log exception
+            return new HashMap<>();
+        } catch (IOException e1){
+            return CollectionsUtil.toMap("jsonData", jsonString);
         }
     }
 
