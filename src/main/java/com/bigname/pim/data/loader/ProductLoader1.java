@@ -7,6 +7,7 @@ import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.POIUtil;
+import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -918,9 +920,6 @@ public class ProductLoader1 {
                 //Style
                 String style = trim(variantsData.get(row).get(attributeNamesMetadata.indexOf("Style")), true).toUpperCase();
 
-                //TODO - TEMP CODE - Skip folders category
-                if(categoryId.equals("FOLDERS")) {continue;}
-
                 //Skip the current variant row, if productId, productName, variantId or familyId is empty
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
@@ -1218,6 +1217,8 @@ public class ProductLoader1 {
             //Map of updated product variants
             Map<String, ProductVariant> modifiedProductVariants = new HashMap<>();
 
+            Map<String, String> productCategoryMap = new HashMap<>();
+
             //Loop through each variants and check to se if the product already exists.
             //If not, create the product with productLevel Attributes
             final int[] $row1 = {0}, $col1 = {0};
@@ -1237,9 +1238,6 @@ public class ProductLoader1 {
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
                 }
-
-                //TODO - TEMP CODE - Skip folders category
-                if(categoryId.equals("FOLDERS")) {continue;}
 
                 Map<String, Object> productAttributesMap = new HashMap<>();
 
@@ -1278,7 +1276,7 @@ public class ProductLoader1 {
 
                 //Product processing section
                 Product product = modifiedProducts.containsKey(productId) ? modifiedProducts.get(productId) : newProducts.getOrDefault(productId, null);
-                Map<String, ProductVariant> existingProductVariants = product == null ? new HashMap<>() : existingVariants.get(product.getId());
+                Map<String, ProductVariant> existingProductVariants = product == null || !existingVariants.containsKey(product.getId()) ? new HashMap<>() : existingVariants.get(product.getId());
                 //If the product is already added to either the modifiedProducts or newProducts map, skip the product
                 if(product == null) {
                     //If the product won't exist or not created yet, create a new product instance and add it to the newProductMap
@@ -1298,6 +1296,7 @@ public class ProductLoader1 {
                         product.setAttributeValues(productAttributesMap);
                         if (!newProducts.containsKey(productId) && !existingProducts.containsKey(productId)) {
                             newProducts.put(productId, product);
+                            productCategoryMap.put(productId, style);
                         }
                     }
                 }
@@ -1334,13 +1333,16 @@ public class ProductLoader1 {
                         productVariant.setProductVariantId(variantId);
                         productVariant.setChannelId(channelId);
                         productVariant.setActive("Y");
-
                         productVariant.setAxisAttributes(axisAttributes);
                         newProductVariants.put(variantId, productVariant);
                     }
                     productVariant.setLevel(1); //TODO - change for multi level variants support
                     productVariant.setProductVariantName(product.getProductName() + " - " + tempName.toString());
                     setVariantAttributeValues(product, productVariant, variantAttributesMap);
+                    if(isNotEmpty(pricing)) {
+                        productVariant.setGroup("PRICING_DETAILS");
+                        setPricingDetails(productVariant, pricing);
+                    }
                 }
                 if(row % 100 == 0) {
                     System.out.println(row + " of " + variantsData.size());
@@ -1354,11 +1356,22 @@ public class ProductLoader1 {
                 productService.create(newProducts.entrySet().stream()
                         .map(Map.Entry::getValue).collect(Collectors.toList()))
                         .forEach(product -> {
-//                            product.setChannelId(channelId);
-//                            product.setProductFamily(families.get(product.getProductFamilyId()));
+                            String idOfProduct = product.getId();
+                            if(productCategoryMap.containsKey(product.getProductId()) && existingCategories.containsKey(productCategoryMap.get(product.getProductId()))) {
+                                Category category = existingCategories.get(productCategoryMap.get(product.getProductId()));
+                                List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 300, null, false).getContent();
+                                CategoryProduct categoryProduct = categoryProducts.stream().filter(categoryProduct1 -> categoryProduct1.getProductId().equals(idOfProduct)).findFirst().orElse(null);
+                                if (isNull(categoryProduct)) {
+                                    categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
+                                }
+                            } else {
+                                System.out.println("=================##############" + product.getProductId() + "," + productCategoryMap.get(product.getProductId()));
+                            }
                             existingProducts.put(product.getProductId(), product);
+
                         });
             }
+
             //If there are modified products that need to be updated, update all of them and put the updated products to the existing products map
             if(!modifiedProducts.isEmpty()) {
                 productService.update(modifiedProducts.entrySet().stream()
@@ -1398,6 +1411,84 @@ public class ProductLoader1 {
                             }
                             existingVariants.get(productVariant.getProductId()).put(productVariant.getProductVariantId(), productVariant);
                         });
+            }
+
+            for (int row = 0; row < variantsData.size(); row++) {
+                String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")), true).toUpperCase();
+                productId = convertCellValue("", productId);
+                String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
+                String variantId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("VARIANT_ID")), true).toUpperCase();
+                variantId = convertCellValue("", variantId);
+                String familyId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("FAMILY_ID")), true).toUpperCase();
+
+
+                //Skip the current variant row, if productId, productName, variantId or familyId is empty
+                if (isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId) || "FOLDER_STYLE".equalsIgnoreCase(productId)) {
+                    continue;
+                }
+                Product product = existingProducts.get(productId);
+                AssetCollection productAssetsCollection = assetLoader.createCollection("PRODUCT_ASSETS");
+                String assetFileName = variantId + ".png";
+                List<String> assetNames = new ArrayList<>();
+                if (new File(assetLoader.getSourceLocation() + assetFileName).isFile()) {
+                    VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
+                    VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
+                    VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
+                    productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                    assetNames.add(assetFileName);
+                    if (isEmpty(product.getChannelAssets())) {
+                        productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                        product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                    }
+                } else {
+                    //                        System.out.println(assetFileName + " <======= Not Found");
+                }
+
+                if (variantsAssets.containsKey(variantId)) {
+                    List<List<String>> variantAssets = variantsAssets.get(variantId);
+                    for (int i = 0; i < variantAssets.size(); i++) {
+                        List<String> variantAsset = variantAssets.get(i);
+                        assetFileName = variantAsset.get(2) + ".png";
+                        if (new File(assetLoader.getSourceLocation() + assetFileName).isFile()) {
+                            VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
+                            VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
+                            VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
+                            productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                            assetNames.add(assetFileName);
+                            if (isEmpty(product.getChannelAssets())) {
+                                productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                                product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                            }
+                        } else {
+                            //                                System.out.println(assetFileName + " <======= Asset Not Found");
+                        }
+                    }
+                }
+
+                File[] files = getFileNames(new File(assetLoader.getSourceLocation()), variantId + "_");
+                for(int x = 0; x < files.length; x ++) {
+                    assetFileName = files[x].getName();
+                    if(!assetNames.contains(assetFileName)) {
+                        assetNames.add(assetFileName);
+                        if (x == 0 && isEmpty(product.getChannelAssets())) {
+                            VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
+                            VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
+                            VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
+                            productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                            productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                            existingProducts.put(productId, productService.get(productId, FindBy.EXTERNAL_ID, false).get());
+                        } else {
+                            VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
+                            VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
+                            VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
+                            productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                            if (isEmpty(product.getChannelAssets())) {
+                                productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                                existingProducts.put(productId, productService.get(productId, FindBy.EXTERNAL_ID, false).get());
+                            }
+                        }
+                    }
+                }
             }
             System.out.println("Done");
         });
@@ -1651,5 +1742,10 @@ public class ProductLoader1 {
             return cellValue.substring(0, cellValue.length() - 2);
         }
         return cellValue;
+    }
+
+    private File[] getFileNames(File dir, String prefix) {
+        FileFilter fileFilter = new RegexFileFilter("^" + prefix + ".*.png$");
+        return dir.listFiles(fileFilter);
     }
 }
