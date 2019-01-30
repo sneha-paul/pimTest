@@ -8,16 +8,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by sruthi on 05-11-2018.
  */
 @Document
-public class User extends Entity<User> implements UserDetails{
+public class User extends Entity<User> implements UserDetails {
 
     @Indexed(unique = true)
     @NotEmpty(message = "{user.email.empty}", groups = {CreateGroup.class, DetailsGroup.class})
@@ -62,9 +59,13 @@ public class User extends Entity<User> implements UserDetails{
         this.password = password;
     }
 
-    public String getConfirmPassword() {return confirmPassword;}
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
 
-    public void setConfirmPassword(String confirmPassword) {this.confirmPassword = confirmPassword;}
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
 
     public String getAvatar() {
         return avatar;
@@ -89,8 +90,8 @@ public class User extends Entity<User> implements UserDetails{
 
     @Override
     public User merge(User user) {
-        for(String group : user.getGroup()){
-            switch(group) {
+        for (String group : user.getGroup()) {
+            switch (group) {
                 case "DETAILS":
                     this.setExternalId(user.getExternalId());
                     this.setEmail(user.getEmail());
@@ -153,5 +154,32 @@ public class User extends Entity<User> implements UserDetails{
         return "Y".equals(getActive());
     }
 
-    public interface ChangePasswordGroup {}
+    public interface ChangePasswordGroup {
+    }
+
+    public Map<String, Object> diff(User user, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(user.getId())) {
+            diff.put("internalId", user.getId());
+        }
+        if (!this.getEmail().equals(user.getEmail())) {
+            diff.put("email", user.getEmail());
+        }
+        if (!this.getUserName().equals(user.getUsername())) {
+            diff.put("userName", user.getUserName());
+        }
+        if (!this.getPassword().equals(user.getPassword())) {
+            diff.put("password", user.getPassword());
+        }
+
+        if (!this.getAvatar().equals(user.getAvatar())) {
+            diff.put("avatar", user.getAvatar());
+        }
+        if (!this.getStatus().equals(user.getStatus())) {
+            diff.put("status", user.getStatus());
+        }
+        return diff;
+    }
 }
+

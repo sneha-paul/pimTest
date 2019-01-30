@@ -158,10 +158,10 @@ public class Catalog extends Entity<Catalog> {
         if(!_ignoreInternalId && !this.getId().equals(catalog.getId())){
             diff.put("internalId", catalog.getId());
         }
-        if(!this.getId().equals(catalog.getCatalogName())){
+        if(!this.getCatalogName().equals(catalog.getCatalogName())){
             diff.put("catalogName", catalog.getCatalogName());
         }
-        if(!this.getId().equals(catalog.getDescription())){
+        if(!this.getDescription().equals(catalog.getDescription())){
             diff.put("description", catalog.getDescription());
         }
 

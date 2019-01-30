@@ -135,10 +135,10 @@ public class Website extends Entity<Website> {
         if (!_ignoreInternalId && !this.getId().equals(website.getId())) {
             diff.put("internalId", website.getId());
         }
-        if (!this.getId().equals(website.getWebsiteName())) {
+        if (!this.getWebsiteName().equals(website.getWebsiteName())) {
             diff.put("websiteName", website.getWebsiteName());
         }
-        if (!this.getId().equals(website.getUrl())) {
+        if (!this.getUrl().equals(website.getUrl())) {
             diff.put("url", website.getUrl());
         }
 
