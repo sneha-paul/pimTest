@@ -114,8 +114,7 @@ public class ProductUtil {
         Map<String, Map<String, Object>> details = new HashMap<>();
         Map<String, List<ProductVariant>> productVariantsMap = groupVariantsByProduct(variants);
         productIds.forEach(productId -> {
-            List<ProductVariant> productVariants = productVariantsMap.get(productId);
-
+            List<ProductVariant> productVariants = productVariantsMap.containsKey(productId) ? productVariantsMap.get(productId) : new ArrayList<>();
 
             Map<String, Object> info = new HashMap<>();
             info.put("totalVariants", productVariants.size());
