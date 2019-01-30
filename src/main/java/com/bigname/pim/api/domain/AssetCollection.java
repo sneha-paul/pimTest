@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class AssetCollection extends Entity<AssetCollection> {
     @Override
     public AssetCollection merge(AssetCollection collection) {
         for (String group : collection.getGroup()) {
-            switch (group){
+            switch (group) {
                 case "DETAILS":
                     this.setExternalId(collection.getExternalId());
                     this.setCollectionName(collection.getCollectionName());
@@ -90,5 +91,20 @@ public class AssetCollection extends Entity<AssetCollection> {
         map.put("isDirectory", "Y");
         map.put("active", getActive());
         return map;
+    }
+
+    public Map<String, Object> diff(AssetCollection assetCollection, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(assetCollection.getId())) {
+            diff.put("internalId", assetCollection.getId());
+        }
+        if (!this.getCollectionName().equals(assetCollection.getCollectionName())) {
+            diff.put("collectionName", assetCollection.getCollectionName());
+        }
+        if (!this.getRootId().equals(assetCollection.getRootId())) {
+            diff.put("rootId", assetCollection.getRootId());
+        }
+        return diff;
     }
 }
