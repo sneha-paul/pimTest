@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,11 +18,11 @@ public class Category extends Entity<Category> {
 
     @Transient
     @NotEmpty(message = "Category Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-   // @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "category.categoryId.invalid")
+    // @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "category.categoryId.invalid")
     private String categoryId;
 
     @NotEmpty(message = "Category Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-   // @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "category.categoryName.invalid")
+    // @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "category.categoryName.invalid")
     private String categoryName;
 
     private String description;
@@ -137,7 +138,7 @@ public class Category extends Entity<Category> {
     @Override
     public Category merge(Category category) {
         for (String group : category.getGroup()) {
-            switch(group) {
+            switch (group) {
                 case "DETAILS":
                     this.setExternalId(category.getExternalId());
                     this.setCategoryName(category.getCategoryName());
@@ -166,8 +167,8 @@ public class Category extends Entity<Category> {
     }
 
 
-
-    public interface SeoGroup {}
+    public interface SeoGroup {
+    }
 
     @Override
     public boolean equals(Category category) {
@@ -176,4 +177,36 @@ public class Category extends Entity<Category> {
                 && this.getCategoryName().equals(category.getCategoryName())
                 && this.getDescription().equals(category.getDescription());
     }
-}
+
+
+    public Map<String, Object> diff(Category category, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(category.getId())) {
+            diff.put("internalId", category.getId());
+        }
+        if (!this.getCategoryName().equals(category.getCategoryName())) {
+            diff.put("categoryName", category.getCategoryName());
+            }
+        if (!this.getDescription().equals(category.getDescription())) {
+            diff.put("description", category.getDescription());
+        }
+        if (!this.getLongDescription().equals(category.getLongDescription())) {
+            diff.put("longDescription", category.getLongDescription());
+        }
+        if (!this.getMetaTitle().equals(category.getMetaTitle())) {
+            diff.put("metaTitle", category.getMetaTitle());
+                        }
+        if (!this.getMetaDescription().equals(category.getMetaDescription())) {
+            diff.put("metaDescription", category.getMetaDescription());
+        }
+        if (!this.getMetaKeywords().equals(category.getMetaKeywords())) {
+            diff.put("metaKeywords", category.getMetaKeywords());
+
+        }
+
+
+            return diff;
+        }
+    }
+
