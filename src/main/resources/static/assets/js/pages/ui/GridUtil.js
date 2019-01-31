@@ -119,9 +119,20 @@
                 });
             }
             var columns = options.columns;
-            columns[columns.length] = { data: 'active', name : 'active' , title : 'Status', orderable: false, render: function(data, type, row, meta){return $.renderStatusColumn(row);}};
-            columns[columns.length] = { data: 'actions', name : 'actions' , title : 'Actions', orderable: false};
-
+            if(!options.hideStatus) {
+                columns[columns.length] = {
+                    data: 'active',
+                    name: 'active',
+                    title: 'Status',
+                    orderable: false,
+                    render: function (data, type, row, meta) {
+                        return $.renderStatusColumn(row);
+                    }
+                };
+            }
+            if(!options.hideActions) {
+                columns[columns.length] = {data: 'actions', name: 'actions', title: 'Actions', orderable: false};
+            }
             $.initGrid(Object.assign(options, {
                 columns: columns,
                 buttons: buttons.length > 0 ? buttons : [
