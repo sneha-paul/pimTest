@@ -27,7 +27,7 @@ public class Product extends Entity<Product> {
     @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     String productId;
 
-//    @Indexed(unique = true)
+    //    @Indexed(unique = true)
     @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productName;
 
@@ -140,7 +140,7 @@ public class Product extends Entity<Product> {
     @Override
     public void orchestrate() {
         super.orchestrate();
-       // setDiscontinued(getDiscontinued());
+        // setDiscontinued(getDiscontinued());
        /* if (booleanValue(getActive()) && booleanValue(getDiscontinued())){
             setActive("N");
         }*/
@@ -193,10 +193,10 @@ public class Product extends Entity<Product> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-      //  map.put("externalId", getExternalId());
+        //  map.put("externalId", getExternalId());
         map.put("productName", getProductName());
         map.put("productFamilyId", ValidationUtil.isEmpty(getProductFamily()) ? "" : getProductFamily().getExternalId());
-       /// map.put("active", getActive());
+        /// map.put("active", getActive());
         Map<String, Object> defaultAsset = getDefaultAsset();
         if(isNotEmpty(defaultAsset)) {
             map.put("imageName", (String) defaultAsset.get("internalName"));
@@ -221,7 +221,7 @@ public class Product extends Entity<Product> {
             if(familyAttributesMap.containsKey(attributeId)) {
 //                FamilyAttribute familyAttribute = familyAttributesMap.get(attributeId);
 //                if(booleanValue(familyAttribute.getScopable())) {
-                    scopedFamilyAttributes.put(attributeId, attributeValue);
+                scopedFamilyAttributes.put(attributeId, attributeValue);
                 /*} else {
                     scopedFamilyAttributes.remove(attributeId);
                     familyAttributes.put(attributeId, attributeValue);
@@ -229,5 +229,32 @@ public class Product extends Entity<Product> {
             }
         });
     }
+    CollectionsUtil collectionsUtil = new CollectionsUtil();
 
+    public Map<String, Object> diff(Product product, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(product.getId())) {
+            diff.put("internalId", product.getId());
+        }
+        if (!this.getProductName().equals(product.getProductName())) {
+            diff.put("productName", product.getProductName());
+        }
+        if (!this.getProductFamilyId().equals(product.getProductFamilyId())) {
+            diff.put("productFamilyId", product.getProductFamilyId());
+        }
+        if (!this.getChannelId().equals(product.getChannelId())) {
+            diff.put("channelId", product.getChannelId());
+        }
+        Object scopedFamilyAttributesDiff = collectionsUtil.compareMaps(product.getScopedFamilyAttributes(),this.getScopedFamilyAttributes());
+        if(scopedFamilyAttributesDiff.equals(""))
+        {
+            diff.put("scopedFamilyAttributes", scopedFamilyAttributesDiff);
+        }
+        if (!this.getScopedAssets().equals(product.getScopedAssets())) {
+            diff.put("scopedAssets", product.getScopedAssets());
+        }
+
+        return diff;
+    }
 }
