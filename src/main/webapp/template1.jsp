@@ -99,13 +99,66 @@
             background-size: 30px 30px;
         }
 
+        .grid-tiny-image-holder {
+            text-align: center;
+            height:40px;
+            line-height: 39px;
+            overflow: hidden;
+            width:40px;
+            background: url(/assets/img/transparent_bg.png);
+            background-repeat: repeat;
+            background-size: 30px 30px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.2);
+        }
+
         .breadcrumb-item + .breadcrumb-item::before {
             padding-right: 0.1rem;
             font-family: FontAwesome;
             content: "\f105";
         }
 
-        .grid-main-img {
+        .variant-info {
+            margin-top:5px;
+            margin:0 !important;
+        }
+
+        .variant-info li {
+            display:inline-block;
+        }
+
+        .variant-info li{
+            transition:all .25s ease;
+            -webkit-transition:all .25s ease;
+            -o-transition:all .25s ease;
+            -moz-transition:all .25s ease
+        }
+
+        .variant-info li:hover{
+            -webkit-transform:translateY(-4px) scale(2.02);
+            -moz-transform:translateY(-4px) scale(2.02);
+            -ms-transform:translateY(-4px) scale(2.02);
+            -o-transform:translateY(-4px) scale(2.02);
+            transform:translateY(-4px) scale(2.02);
+            margin-right: 20px;
+            z-index:999
+        }
+
+        .variant-info li:hover img{
+            -webkit-box-shadow:0 14px 24px rgba(62,57,107,0.2);
+            box-shadow:0 14px 24px rgba(62,57,107,0.2)
+        }
+
+        .variant-info li+li{
+            margin-left:-10px
+        }
+
+        .variant-info li+li:hover{
+            margin-left: 10px;
+        }
+
+        .grid-main-img, .grid-tiny-image {
             max-height:100%;
             max-width: 100%;
         }

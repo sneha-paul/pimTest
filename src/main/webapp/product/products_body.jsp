@@ -42,13 +42,13 @@
 //                { data: 'variantImages', name : 'variantImages', visible:false },
                 { data: 'variantCount', name : 'variantCount', title : 'Variants',
                     render: function ( data, type, row, meta ) {
-                        let content = '<ul class="list-unstyled team-info">';
+                        let content = '<ul class="list-unstyled variant-info">';
 
                         let variantImages = row.variantImages.split('|');
                         const addlVariants = parseInt(data) - variantImages.length;
                         $.each(variantImages, function(i, imageName){
                             let imgUrl = imageName === 'noimage.png' ? '/assets/img/' + imageName : '/uploads/' + imageName;
-                            content += '<li><img src="' + imgUrl + '" alt=""></li>';
+                            content += '<li><div class="grid-tiny-image-holder"><img class="grid-tiny-image" src="' + imgUrl + '" alt=""/></div></li>';
                         });
 
                         content += '</ul>';
