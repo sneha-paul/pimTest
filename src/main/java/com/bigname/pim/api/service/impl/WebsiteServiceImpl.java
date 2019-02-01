@@ -14,6 +14,7 @@ import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
@@ -51,21 +52,21 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     }
 
     @Override
-    public Page<Website> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Website> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return websiteDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 
     @Override
-    public Page<Map<String, Object>> findAllWebsiteCatalogs(String websiteId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Map<String, Object>> findAllWebsiteCatalogs(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(websiteId, findBy, false)
-                .map(catalog -> websiteDAO.findAllWebsiteCatalogs(catalog.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(catalog -> websiteDAO.findAllWebsiteCatalogs(catalog.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public Page<Catalog> findAvailableCatalogsForWebsite(String websiteId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Catalog> findAvailableCatalogsForWebsite(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(websiteId, findBy, false)
-                .map(catalog -> websiteDAO.findAvailableCatalogsForWebsite(catalog.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(catalog -> websiteDAO.findAvailableCatalogsForWebsite(catalog.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
@@ -125,9 +126,9 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, FindBy findBy, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(websiteId, findBy, false)
-                .map(website -> websiteDAO.getWebsiteCatalogs(website.getId(), pageable.getPageRequest()))
+                .map(website -> websiteDAO.getWebsiteCatalogs(website.getId(), pageable))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 

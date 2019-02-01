@@ -4,15 +4,14 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -70,7 +69,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                 sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<AttributeCollection> paginatedResult = attributeCollectionService.findAll("collectionName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            Page<AttributeCollection> paginatedResult = attributeCollectionService.findAll("collectionName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
             paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

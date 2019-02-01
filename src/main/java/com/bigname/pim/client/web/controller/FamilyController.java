@@ -4,7 +4,6 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.*;
@@ -14,10 +13,10 @@ import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,7 +74,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                 sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<Family> paginatedResult = familyService.findAll("familyName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            Page<Family> paginatedResult = familyService.findAll("familyName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
             paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

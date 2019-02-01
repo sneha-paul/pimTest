@@ -1,8 +1,8 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.ProductVariant;
-import com.bigname.pim.util.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;

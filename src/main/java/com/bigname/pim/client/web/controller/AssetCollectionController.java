@@ -12,6 +12,7 @@ import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.FindBy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +36,6 @@ import com.bigname.common.datatable.model.SortOrder;
 import java.util.stream.Collectors;
 import static com.bigname.common.util.ValidationUtil.isEmpty;
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
-
-import com.bigname.pim.util.Pageable;
-
-
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -85,7 +82,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                 sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<AssetCollection> paginatedResult = assetCollectionService.findAll("collectionName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            Page<AssetCollection> paginatedResult = assetCollectionService.findAll("collectionName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
             paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

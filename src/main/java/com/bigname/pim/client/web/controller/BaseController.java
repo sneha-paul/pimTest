@@ -13,24 +13,21 @@ import com.bigname.pim.api.service.BaseService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -167,7 +164,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
-        return new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort);
+        return PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort);
     }
 
 

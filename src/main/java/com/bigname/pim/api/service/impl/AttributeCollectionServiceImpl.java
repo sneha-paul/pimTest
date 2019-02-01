@@ -10,6 +10,7 @@ import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
     }
 
     @Override
-    public Page<AttributeCollection> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<AttributeCollection> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return attributeCollectionDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 

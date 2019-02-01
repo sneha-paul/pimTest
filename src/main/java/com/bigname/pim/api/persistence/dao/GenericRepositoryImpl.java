@@ -1,12 +1,10 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -58,10 +56,10 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
         Criteria criteria = new Criteria();
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
         criteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
-        query.addCriteria(criteria).with(PageRequest.of(pageable.getPage(), pageable.getSize(), pageable.getSort()));
+        query.addCriteria(criteria).with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()));
         return PageableExecutionUtils.getPage(
                 mongoTemplate.find(query, entityClass),
-                pageable.getPageRequest(),
+                pageable,
                 () -> mongoTemplate.count(query, entityClass));
     }
 

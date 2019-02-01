@@ -6,6 +6,7 @@ import com.bigname.pim.api.persistence.dao.EventDAO;
 import com.bigname.pim.api.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +55,7 @@ public class EventServiceImpl extends BaseServiceSupport<Event, EventDAO, EventS
     }
 
     @Override
-    public Page<Map<String, Object>> getEventData(com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
-        return eventDAO.getEventData(pageable.getPageRequest());
+    public Page<Map<String, Object>> getEventData(Pageable pageable, boolean... activeRequired) {
+        return eventDAO.getEventData(pageable);
     }
 }

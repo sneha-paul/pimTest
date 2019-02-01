@@ -13,11 +13,11 @@ import com.bigname.pim.api.service.*;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.apache.commons.collections4.MapUtils;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -244,7 +244,7 @@ public class ProductVariantController extends ControllerSupport {
                     sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
                 }
                 Page<ProductVariant> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false):
-                        productVariantService.findAll("productVariantName", dataTableRequest.getSearch(),product.getId(), FindBy.INTERNAL_ID, channelId, new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+                        productVariantService.findAll("productVariantName", dataTableRequest.getSearch(),product.getId(), FindBy.INTERNAL_ID, channelId, PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
                 List<Map<String, String>> dataObjects = new ArrayList<>();
                 paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
                 result.setDataObjects(dataObjects);

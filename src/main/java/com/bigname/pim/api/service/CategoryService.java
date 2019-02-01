@@ -3,9 +3,9 @@ package com.bigname.pim.api.service;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;

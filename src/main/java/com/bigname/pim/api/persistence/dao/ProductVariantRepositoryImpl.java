@@ -2,12 +2,10 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.ProductVariant;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -39,10 +37,10 @@ public class ProductVariantRepositoryImpl extends GenericRepositoryImpl<ProductV
         Criteria criteria = new Criteria();
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
         criteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))), Criteria.where("productId").regex(productId),Criteria.where("channelId").regex(channelId));
-        query.addCriteria(criteria).with(PageRequest.of(pageable.getPage(), pageable.getSize(), pageable.getSort()));
+        query.addCriteria(criteria).with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()));
         return PageableExecutionUtils.getPage(
                 mongoTemplate.find(query, ProductVariant.class),
-                pageable.getPageRequest(),
+                pageable,
                 () -> mongoTemplate.count(query, ProductVariant.class));
     }
 

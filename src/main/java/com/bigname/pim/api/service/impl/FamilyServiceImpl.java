@@ -10,6 +10,7 @@ import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
@@ -68,7 +69,7 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public Page<Family> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Family> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return familyDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 

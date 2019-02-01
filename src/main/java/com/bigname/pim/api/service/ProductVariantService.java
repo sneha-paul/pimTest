@@ -5,9 +5,9 @@ import com.bigname.pim.api.domain.FileAsset;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     List<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy,  String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired);
 
-    Page<ProductVariant> findAll(String searchField, String keyword, String productId, FindBy findBy, String channelId, com.bigname.pim.util.Pageable pageable, boolean... activeRequired);
+    Page<ProductVariant> findAll(String searchField, String keyword, String productId, FindBy findBy, String channelId, Pageable pageable, boolean... activeRequired);
 
     Optional<ProductVariant> get(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
 

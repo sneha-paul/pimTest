@@ -13,12 +13,12 @@ import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
@@ -83,21 +83,21 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
 
 
     @Override
-    public Page<Catalog> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Catalog> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return catalogDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 
     @Override
     public Page<Map<String, Object>> findAllRootCategories(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(catalogId, findBy, false)
-                .map(category -> catalogDAO.findAllRootCategories(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(category -> catalogDAO.findAllRootCategories(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public Page<Category> findAvailableRootCategoriesForCatalog(String catalogId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Category> findAvailableRootCategoriesForCatalog(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(catalogId, findBy, false)
-                .map(category -> catalogDAO.findAvailableRootCategoriesForCatalog(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(category -> catalogDAO.findAvailableRootCategoriesForCatalog(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
@@ -154,9 +154,9 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(catalogId, findBy, false)
-                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), pageable.getPageRequest()))
+                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), pageable))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 

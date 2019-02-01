@@ -12,6 +12,7 @@ import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -163,7 +164,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
         Page<Product> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? productService.getAll(pagination.getPageNumber(), pagination.getPageSize(), sort, false)
-                : productService.findAll("productName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+                : productService.findAll("productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
         List<ProductVariant> productVariants = productVariantService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, false);
         Map<String, Map<String, Object>> productsVariantsInfo = ProductUtil.getVariantDetailsForProducts(productIds, productVariants, 4);
@@ -196,7 +197,7 @@ public class ProductController extends BaseController<Product, ProductService>{
             }
             List<Map<String, Object>> dataObjects = new ArrayList<>();
             int seq[] = {1};
-            Page<Map<String, Object>> paginatedResult = productService.findAllProductCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            Page<Map<String, Object>> paginatedResult = productService.findAllProductCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
             EntityAssociation<Product, Category> association = new ProductCategory();
             paginatedResult.getContent().forEach(e -> {
                 e.put("sequenceNum", Integer.toString(seq[0] ++));
@@ -230,7 +231,7 @@ public class ProductController extends BaseController<Product, ProductService>{
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
         Page<Category> paginatedResult = ValidationUtil2.isEmpty(dataTableRequest.getSearch()) ? productService.getAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
-                : productService.findAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), new Pageable(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+                : productService.findAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));

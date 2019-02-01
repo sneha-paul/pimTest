@@ -76,35 +76,35 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public Page<Category> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Category> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return categoryDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 
     @Override
-    public Page<Map<String, Object>> findAllSubCategories(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Map<String, Object>> findAllSubCategories(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.findAllSubCategories(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(category -> categoryDAO.findAllSubCategories(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public Page<Map<String, Object>> findAllCategoryProducts(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Map<String, Object>> findAllCategoryProducts(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(product -> categoryDAO.findAllCategoryProducts(product.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(product -> categoryDAO.findAllCategoryProducts(product.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public Page<Category> findAvailableSubCategoriesForCategory(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Category> findAvailableSubCategoriesForCategory(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(category -> categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public Page<Product> findAvailableProductsForCategory(String categoryId, FindBy findBy, String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Product> findAvailableProductsForCategory(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(product -> categoryDAO.findAvailableProductsForCategory(product.getId(), searchField, keyword, pageable.getPageRequest(), activeRequired))
+                .map(product -> categoryDAO.findAvailableProductsForCategory(product.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
     @Override
@@ -299,9 +299,9 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.getSubCategories(category.getId(), pageable.getPageRequest()))
+                .map(category -> categoryDAO.getSubCategories(category.getId(), pageable))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
@@ -530,9 +530,9 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getCategoryProducts(String categoryId, FindBy findBy, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<Map<String, Object>> getCategoryProducts(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.getProducts(category.getId(), pageable.getPageRequest()))
+                .map(category -> categoryDAO.getProducts(category.getId(), pageable))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 

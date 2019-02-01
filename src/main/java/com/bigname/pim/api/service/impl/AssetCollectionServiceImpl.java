@@ -9,6 +9,7 @@ import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.util.FindBy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ public class AssetCollectionServiceImpl extends BaseServiceSupport<AssetCollecti
     }
 
     @Override
-    public Page<AssetCollection> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<AssetCollection> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return assetCollectionDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 

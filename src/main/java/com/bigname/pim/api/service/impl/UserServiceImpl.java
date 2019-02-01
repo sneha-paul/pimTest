@@ -7,6 +7,7 @@ import com.bigname.pim.api.service.UserService;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,7 +63,7 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserServi
     }
 
     @Override
-    public Page<User> findAll(String searchField, String keyword, com.bigname.pim.util.Pageable pageable, boolean... activeRequired) {
+    public Page<User> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return userDAO.findAll(searchField, keyword, pageable, activeRequired);
     }
 
