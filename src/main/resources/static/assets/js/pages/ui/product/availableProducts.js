@@ -1,22 +1,20 @@
 $( document ).ready(function() {
-    $.initDataTable({
+    $.initGrid({
         selector: '#paginatedAvailableProductsTable',
-        name: 'availableProducts',
-        type: 'TYPE_3',
+        names: ['availableProducts', 'availableProduct'],
         pageLength: 10,
-        url: $.getURL('/pim/categories/{categoryId}/products/available/list'),
+        dataUrl: $.getURL('/pim/categories/{categoryId}/products/available/list'),
         columns: [
             { data: 'productName', name : 'productName' , title : 'Product Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
             { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family', visible: false },
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
+        ],
+        buttons: [$.addItemButton({action: addProduct})]
     });
 
-    $('#paginatedAvailableProductsTable').on('click', '.js-add', function(){
-        var productId = $(this).data('external-id');
-
+    function addProduct(row) {
         $.ajax({
-            url: $.getURL('/pim/categories/{categoryId}/products/{productId}', {'productId': productId}),
+            url: $.getURL('/pim/categories/{categoryId}/products/{productId}', {'productId': row.externalId}),
             data: {},
             method: 'POST',
             dataType: 'json'
@@ -31,5 +29,5 @@ $( document ).ready(function() {
         }).fail(function(jqXHR, status) {
             toastr.success('Error occurred while adding the category product', 'Error Adding Category Product');
         });
-    });
+    }
 });

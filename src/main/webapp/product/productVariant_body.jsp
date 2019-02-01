@@ -694,16 +694,5 @@
 <img src="/assets/img/tiny.png" onload="$.initPage({productId : '${productVariant.product.productId}', productVariantId : '${productVariant.productVariantId}', channelId : '${productVariant.channelId}'});$.getScript('/assets/js/pages/ui/product/productVariant.js');$.loadEvent()"/>
 
 <script>
-    var cols = JSON.parse('${pricingGridColumns}');
-    cols[cols.length] = {  data : 'actions' , title : 'Actions', orderable: false };
-    $( document ).ready(function() {
-        $.initDataTable({
-            selector: '#paginatedPricingTable',
-            name: 'variantPricing',
-            type: 'TYPE_4',
-            url: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{productVariantId}/pricing'),
-            columns: cols
-        });
-
-    });
+    var columns = JSON.parse('${pricingGridColumns}');
 </script>

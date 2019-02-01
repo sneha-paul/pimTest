@@ -1,21 +1,19 @@
 $( document ).ready(function() {
-    $.initDataTable({
+    $.initGrid({
         selector: '#paginatedAvailableCatalogsTable',
-        name: 'availableCatalogs',
-        type: 'TYPE_3',
-        url: $.getURL('/pim/websites/{websiteId}/catalogs/available/list'),
+        names: ['availableCatalogs', 'availableCatalog'],
+        dataUrl: $.getURL('/pim/websites/{websiteId}/catalogs/available/list'),
         columns: [
             { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
             { data: 'externalId', name : 'externalId', title : 'Catalog ID' },
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
+        ],
+        buttons: [$.addItemButton({action: addCatalog})]
     });
 
-    $('#paginatedAvailableCatalogsTable').on('click', '.js-add', function(){
-        var catalogId = $(this).data('external-id');
-
+    function addCatalog(row) {
         $.ajax({
-            url: $.getURL('/pim/websites/{websiteId}/catalogs/{catalogId}', {'catalogId': catalogId}),
+            url: $.getURL('/pim/websites/{websiteId}/catalogs/{catalogId}', {'catalogId': row.externalId}),
             data: {},
             method: 'POST',
             dataType: 'json'
@@ -31,5 +29,5 @@ $( document ).ready(function() {
         }).fail(function(jqXHR, status) {
             toastr.success('Error occurred while adding the website catalog', 'Error Adding Website Catalog');
         });
-    });
+    }
 });

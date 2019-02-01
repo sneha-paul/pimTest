@@ -1,27 +1,4 @@
 $(function(){
-    /*$.addModal({
-        selector: '.js-add-axisAttribute',
-        url: $.getURL('/pim/families/{familyId}/variantGroups/{variantGroupId}/axisAttributes/available'),
-        name:'axis-attribute',
-        title:'Available Variant Axis Attributes',
-        buttons: [
-            // {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('axisAttributes');$.closeModal();});}},
-            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-        ]
-    });*/
-
-    /*$.initDataTable({
-        selector: '#paginatedAxisAttributesTable',
-        name: 'axisAttributes',
-        type: 'TYPE_2',
-        buttonGroup: 'GROUP_4A',
-        url: $.getURL('/pim/families/{familyId}/variantGroups/{variantGroupId}/axisAttributes'),
-        columns: [
-            {data: 'name', name: 'name', title: 'Attribute Name'},
-            {data: 'id', name: 'id', title: 'Attribute ID'},
-            {data: 'actions', name: 'actions', title: 'Actions'}
-        ]
-    });*/
 
     function saveVariantGroupAxisAttributes() {
         var url = '/pim/families/{familyId}/variantGroups/{variantGroupId}/axisAttributes';

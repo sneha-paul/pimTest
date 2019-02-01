@@ -134,19 +134,6 @@ $(function(){
         }
     });
 
-    /*$.initDataTable({
-        selector: '#paginatedProductsTable',
-        name: 'products',
-        type: 'TYPE_2',
-        url: $.getURL('/pim/categories/{categoryId}/products'),
-        columns: [
-            { data: 'productName', name : 'productName' , title : 'Product Name'},
-            { data: 'productId', name : 'productId', title : 'Product ID' },
-            { data: 'active', name : 'active' , title : 'Status', orderable: false},
-            { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
-    });*/
-
     $('.js-add-subCategory').on('click', function(){
         //var eventA = function(){};
         var eventB = function(){};

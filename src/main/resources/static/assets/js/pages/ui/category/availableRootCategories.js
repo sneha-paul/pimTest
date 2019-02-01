@@ -1,21 +1,19 @@
 $( document ).ready(function() {
-    $.initDataTable({
+    $.initGrid({
         selector: '#paginatedAvailableRootCategoriesTable',
-        name: 'availableRootCategories',
-        type: 'TYPE_3',
+        names: ['availableRootCategories', 'availableRootCategory'],
         pageLength: 10,
-        url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/available/list'),
+        dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/available/list'),
         columns: [
             { data: 'categoryName', name : 'categoryName' , title : 'Category Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
+        ],
+        buttons: [$.addItemButton({action: addRootCategory})]
     });
 
-    $('#paginatedAvailableRootCategoriesTable').on('click', '.js-add', function(){
-        var rootCategoryId = $(this).data('external-id');
-
+    function addRootCategory(row) {
         $.ajax({
-            url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/{rootCategoryId}', {'rootCategoryId': rootCategoryId}),
+            url: $.getURL('/pim/catalogs/{catalogId}/rootCategories/{rootCategoryId}', {'rootCategoryId': row.externalId}),
             data: {},
             method: 'POST',
             dataType: 'json'
@@ -31,5 +29,5 @@ $( document ).ready(function() {
         }).fail(function(jqXHR, status) {
             toastr.success('Error occurred while adding the root category', 'Error Adding Root Category');
         });
-    });
+    }
 });

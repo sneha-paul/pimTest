@@ -64,6 +64,16 @@ $( document ).ready(function() {
         ]
     });
 
+
+    columns[columns.length] = {  data : 'actions' , title : 'Actions', orderable: false };
+    $.initGrid({
+        selector: '#paginatedPricingTable',
+        names: ['variantPricing', 'variantPricing'],
+        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{productVariantId}/pricing'),
+        columns: columns,
+        buttons: [$.pricingAttributeDetailsButton()]
+    });
+
     var adjustment;
     var startSequence = "";
     $("div.js-draggable").sortable({
