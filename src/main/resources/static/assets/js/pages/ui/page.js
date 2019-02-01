@@ -526,18 +526,6 @@
 
         },
 
-        refreshDataTable1: function(names) {
-            let _names = names.split(',');
-            $.each(_names, function(i, name){
-                name = name.trim();
-                //If this is a treeDataTable, reload the treeDataTable, otherwise refresh the data
-                if(!$.reloadTreeDataTable1(name)) {
-                    $.getDataTable(name).ajax.reload(null, false);
-                }
-            });
-
-        },
-
         /**
          * Reloads the dataTable. Will reload the data, reset sorting, page size and page number
          * to the initial configuration default
@@ -552,18 +540,6 @@
                 name = name.trim();
                 //If this is a treeDataTable, reload the treeDataTable, otherwise reload the dataTable
                 if(!$.reloadTreeDataTable(name)) {
-                    $.destroyDataTable(name);
-                    $.initDataTable($.getDataTableOptions(name));
-                }
-            });
-        },
-
-        reloadDataTable1: function(names) {
-            let _names = names.split(',');
-            $.each(_names, function(i, name){
-                name = name.trim();
-                //If this is a treeDataTable, reload the treeDataTable, otherwise reload the dataTable
-                if(!$.reloadTreeDataTable1(name)) {
                     $.destroyDataTable(name);
                     $.initDataTable($.getDataTableOptions(name));
                 }
@@ -594,17 +570,6 @@
             if(treeDataTable) {
                 $.getDataTable(name).destroy();
                 $.initTreeDataTable(options);
-                return true;
-            }
-            return false;
-        },
-
-        reloadTreeDataTable1: function(name) {
-            var options = $.getDataTableOptions(name) || {};
-            var treeDataTable = typeof options.treeDataTable !== 'undefined' || false;
-            if(treeDataTable) {
-                $.getDataTable(name).destroy();
-                $.initTreeDataTable1(options);
                 return true;
             }
             return false;
