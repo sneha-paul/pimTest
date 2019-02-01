@@ -20,12 +20,12 @@ public class CategoryExporter {
     public boolean exportData(String filepath){
         List<Category> categoryData = categoryService.getAll(null,true);
         Map<String,Object[]>data = new TreeMap<>();
-        data.put("1", new Object[]{"CATEGORY_ID","CATEGORY_NAME","DESCRIPTION","LONG_DESCRIPTION","META_TITLE","META_DESCRIPTION","META_KEYWORDS","ACTIVE","DISCONTINUED" });
+        data.put("1", new Object[]{"CATEGORY_ID","CATEGORY_NAME","DESCRIPTION",/*"LONG_DESCRIPTION","META_TITLE","META_DESCRIPTION","META_KEYWORDS",*/"ACTIVE","DISCONTINUED","ID" });
 
         int i=2;
         for (Iterator<Category> iter = categoryData.iterator(); iter.hasNext(); ) {
             Category element = iter.next();
-            data.put(Integer.toString(i), new Object[]{element.getCategoryId(), element.getCategoryName(),element.getDescription(), element.getLongDescription(),element.getMetaTitle(),element.getMetaDescription(),element.getMetaKeywords(),element.getActive(),element.getDiscontinued() });
+            data.put(Integer.toString(i), new Object[]{element.getCategoryId(), element.getCategoryName(),element.getDescription(), /*element.getLongDescription(),element.getMetaTitle(),element.getMetaDescription(),element.getMetaKeywords(),*/element.getActive(),element.getDiscontinued(),element.getId() });
             i++;
         }
         POIUtil.writeData(filepath,"category",data);
