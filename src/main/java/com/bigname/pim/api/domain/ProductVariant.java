@@ -1,10 +1,10 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
@@ -24,7 +24,7 @@ public class ProductVariant extends Entity<ProductVariant> {
     @NotEmpty(message = "ProductVariant Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productVariantId;
 
-//    @Indexed(unique = true)
+    //    @Indexed(unique = true)
     @NotEmpty(message = "ProductVariant Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String productVariantName;
 
@@ -185,7 +185,7 @@ public class ProductVariant extends Entity<ProductVariant> {
                     if(isNotEmpty(productVariant.getPricingDetails())) {
                         productVariant.getPricingDetails().forEach(pricingDetails::put);
                     }
-                break;
+                    break;
             }
 
             if(isNotEmpty(productVariant.getVariantAttributes())) {
@@ -199,7 +199,7 @@ public class ProductVariant extends Entity<ProductVariant> {
     @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-       // map.put("externalId", getExternalId());
+        // map.put("externalId", getExternalId());
         map.put("productVariantName", getProductVariantName());
         map.putAll(getBasePropertiesMap());
         //   map.put("active", getActive());
@@ -210,6 +210,47 @@ public class ProductVariant extends Entity<ProductVariant> {
             map.put("imageName", "noimage.png");
         }
         return map;
+    }
+    CollectionsUtil collectionsUtil = new CollectionsUtil();
+
+    public Map<String, Object> diff(ProductVariant productVariant, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(productVariant.getId())) {
+            diff.put("internalId", productVariant.getId());
+        }
+        if (!this.getProductVariantName().equals(productVariant.getProductVariantName())) {
+            diff.put("productVariantName", productVariant.getProductVariantName());
+        }
+        if (!this.getProductId().equals(productVariant.getProductId())) {
+            diff.put("productId", productVariant.getProductId());
+        }
+        Object axisAttributesDiff = collectionsUtil.compareMaps(productVariant.getAxisAttributes(),this.getAxisAttributes());
+        if(axisAttributesDiff.equals(""))
+        {
+            diff.put("axisAttributes", axisAttributesDiff);
+        }
+
+        Object variantAttributesDiff = collectionsUtil.compareMaps(productVariant.getVariantAttributes(),this.getVariantAttributes());
+        if(axisAttributesDiff.equals(""))
+        {
+            diff.put("variantAttributes", variantAttributesDiff);
+        }
+        Object variantAssetsDiff = collectionsUtil.compareMaps(productVariant.getVariantAssets(),this.getVariantAssets());
+        if(axisAttributesDiff.equals(""))
+        {
+            diff.put("variantAssets", variantAssetsDiff);
+        }
+        Object pricingDetailsDiff = collectionsUtil.compareMaps(productVariant.getPricingDetails(),this.getPricingDetails());
+        if(pricingDetailsDiff.equals(""))
+        {
+            diff.put("pricingDetails", pricingDetailsDiff);
+        }
+        if (!this.getChannelId().equals(productVariant.getChannelId())) {
+            diff.put("channelId", productVariant.getChannelId());
+        }
+
+        return diff;
     }
 
     public interface SeoGroup {}

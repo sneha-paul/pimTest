@@ -195,66 +195,77 @@
         'familyId': '${family.familyId}'
     });
     $(document).ready(function () {
-        $.initDataTable({
+        $.initGrid({
             selector: '#paginatedFamilyAttributesTable',
-            name: 'familyAttributes',
-            type: 'TYPE_2',
-            buttonGroup: 'GROUP_4A',
-            url: $.getURL('/pim/families/{familyId}/attributes'),
+            names: ['familyAttributes', 'familyAttribute'],
+            dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
             columns: [
                 {data: 'name', name: 'name', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.id + '</code><small>'}},
                 {data: 'uiType', name: 'uiType', title: 'UI Type'},
                 {data: 'group', name: 'group', title: 'Attribute Group'},
-                {data: 'scopable', name: 'scopable', title: 'Scopable'},
                 {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
-            ]
+            ],
+            buttons: [$.attributeOptionsButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}/options'})]
         });
 
         var columns = [];
         columns[0] = {data: 'name', name: 'name', title: 'Attribute Name'};
-        columns[1] = {data: 'scopable', name: 'scopable', title: 'Scopable'};
-        var idx = 1;
-        for(var channelId in channels) {
+        columns[1] = {
+            data: 'scopable',
+            name: 'scopable',
+            title: 'Scopable',
+            selector: 'js-scopable',
+            click: function(row) {
+                $.scopableClickEvent(row, function(data) {$.refreshDataTable('familyAttributesScopes');});
+            },
+            render: function (data, type, row, meta) {
+                return $.renderScopable(row);
+            }
+        };
+        let idx = 1;
+        for(let channelId in channels) {
             if(channels.hasOwnProperty(channelId)) {
                 columns[++idx] = {
                     data: 'channel_' + channelId,
                     name: 'channel_' + channelId,
                     title: channels[channelId],
-                    orderable: false
+                    orderable: false,
+                    render: function (data, type, row, meta) {
+                        return $.renderScopeSelector(row, channelId);
+                    }
                 };
             }
         }
 
-        $.initDataTable({
+        $.initGrid({
             selector: '#paginatedFamilyAttributesScopeTable',
-            name: 'familyAttributesScope',
-            type: 'TYPE_2',
-            buttonGroup: 'GROUP_4B',
-            url: $.getURL('/pim/families/{familyId}/attributes'),
+            names: ['familyAttributesScopes', 'familyAttributesScope'],
+            dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
             columns: columns
         });
 
         columns = [];
         columns[0] = {data: 'name', name: 'name', title: 'Attribute Name'};
-        var idx = 0;
-        for(var channelId in channels) {
+        idx = 0;
+        for(let channelId in channels) {
             if(channels.hasOwnProperty(channelId)) {
                 columns[++idx] = {
                     data: 'channel_' + channelId,
                     name: 'channel_' + channelId,
                     title: channels[channelId],
-                    orderable: false
+                    orderable: false,
+                    render: function (data, type, row, meta) {
+                        return $.renderChannelSelector(row, channelId);
+                    }
                 };
             }
         }
 
-        $.initDataTable({
+        $.initGrid({
             selector: '#paginatedChannelVariantGroupsTable',
-            name: 'channelVariantGroups',
-            type: 'TYPE_2',
-            buttonGroup: 'GROUP_4C',
-            url: $.getURL('/pim/families/{familyId}/variantGroups'),
-            paging: false,
+            names: ['channelVariantGroups', "channelVariantGroup"],
+            dataUrl: $.getURL('/pim/families/{familyId}/variantGroups'),
+            searching: false,
             columns: columns
         });
 

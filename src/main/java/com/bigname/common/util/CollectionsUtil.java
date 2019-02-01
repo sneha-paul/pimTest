@@ -1,9 +1,6 @@
 package com.bigname.common.util;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -61,5 +58,30 @@ public class CollectionsUtil {
             map.put(objects[i].toString(), objects[++i]);
         }
         return map;
+
+    }
+
+    public static <K, V> Map<K, V> compareMaps(Map<K, V> map1, Map<K, V> map2){
+        Map<K, V> difference = new HashMap<>();
+        Set<K> keySet1 = map1.keySet();
+        for(K key : keySet1) {
+            Set<K> keySet2 = map2.keySet();
+            if(keySet2.contains(key)) {
+                if(map1.get(key) instanceof Map) {
+                    Map<K, V> value1 = (Map<K, V>) map1.get(key);
+                    Map<K, V> value2 = (Map<K, V>) map2.get(key);
+                    difference = compareMaps(value1, value2);
+                }else {
+                    V value1 = map1.get(key);
+                    V value2 = map2.get(key);
+                    if(!value1.equals(value2)) {
+                        difference.put(key, value1);
+                    }
+                }
+            }else {
+                difference.put(key, map1.get(key));
+            }
+        }
+        return difference;
     }
 }

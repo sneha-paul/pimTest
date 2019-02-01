@@ -160,6 +160,7 @@
                     $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
             });
         },
+        //TODO - need to standardize initTreeDataTable. Currently initTreeDataTable is coupled to category hierarchy
         initTreeDataTable1: function(options) {
             options.treeDataTable = options.treeDataTable || true;
             var displayed = new Set([]);
@@ -334,7 +335,7 @@
                 serverSide: true,
                 pageLength: options.pageLength ? options.pageLength : 25,
                 conditionalPaging: true,
-                searching: true,
+                searching: typeof options.searching === 'undefined' ?  true : options.searching,
                 ordering: !(typeof options.reordering !== 'undefined' && options.reordering),
                 rowReorder: typeof options.reordering !== 'undefined' && options.reordering ? {snapX: 10} : false,
                 language: {
@@ -375,6 +376,17 @@
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
+
+                            if(typeof value.group !== 'undefined') {
+                                var groups = value.group.split('|');
+                                if(groups.length > 0) {
+                                    value.group = groups[0];
+                                }
+                                for(var i = 1; i < groups.length; i ++) {
+                                    value.group += '<i class="text-primary p-l-5 p-r-5 fa fa-caret-right"></i>' + groups[i];
+                                }
+                            }
+
                             value.seq = 1;
                             value.actions = '';
                             $.each(options.buttons, function(index, button){
@@ -391,114 +403,14 @@
                                         }
                                         break;
                                 }
-                                value.actions += '<button type="button" class="btn btn-sm btn-' + button.style + ' js-' + button.name + '" title="' + button.title + '"><i class="' + button.icon + '"></i></button> ';
-                            });
-                            if('GROUP_4' === options.buttonGroup || 'GROUP_4A' === options.buttonGroup) {
-                                value.actions = '';
-                                if('Y' === value.selectable) {
-                                    value.actions = '<button type="button" class="btn btn-outline-primary js-attribute-options" data-name="' + value.name + '" data-external-id="' + value.fullId + '" title="Show Attribute Options"><i class="fa fa-list"></i></button>';
-                                }
-                                if('GROUP_4A' === options.buttonGroup) {
-                                    if (value.scopable === 'Y') {
-                                        value.scopable = '<span class="badge badge-success">Yes</span>';
-                                    } else {
-                                        value.scopable = '<span class="badge badge-danger">No</span>';
-                                    }
-                                }
-                            } else if('TYPE_4' === options.type) {
-                                value.actions = '<button type="button" class="btn btn-sm btn-secondary js-edit-pricing-attribute-data" data-external-id="' + value.externalId + '" title="Edit"><i class="fa fa-edit"></i></button> '/* +
-                                                '<button type="button" class="btn btn-sm btn-danger js-sweetalert" title="Delete" data-type="confirm"><i class="fa fa-trash-o"></i></button> '*/;
-                            } else if(options.type === 'TYPE_1' || options.type === 'TYPE_1A') {
-                                /*var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
-                                if('Y' !== value.active) {
-                                    icon = 'icon-check';
-                                    action = 'Enable';
-                                    btnClass = 'btn-success';
-                                }
-                                value.actions = '<a href="' + (options.url2 ? options.url2 : options.url) + value.externalId + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ';
-                                if(options.type === 'TYPE_1') {
-                                    value.actions += '<button type="button" class="btn btn-sm btn-primary js-clone" data-external-id="' + value.externalId + '" title="Clone"><i class="icon-docs"></i></button> ';
-                                }
-                                value.actions += '<button type="button" class="btn btn-sm ' + btnClass + ' js-toggle-status" data-external-id="' + value.externalId + '" data-active="' + value.active + '" title="' + action + '"><i class="' + icon + '"></i></button>';*/
-                            } else if(options.type === 'TYPE_2') {
-
-                                if('GROUP_4B' === options.buttonGroup) {
-                                    var icon = 'fa-square-o', color = '', title = 'No';
-                                    if('Y' === value.scopable) {
-                                        title = 'Yes';
-                                        icon = 'fa-check-square-o';
-                                        color = ' text-success';
-                                    }
-                                    value.scopable = '<span class="js-scopable' + color + '" title="' + title + '" data-scopable="' + value.scopable + '" data-id="' + value.id + '"><i class="fa ' + icon + '"></i></span>';
-
-                                    for(var channelId in $.getPageAttribute('channels')) {
-                                        if($.getPageAttribute('channels').hasOwnProperty(channelId)) {
-                                            if (_.isEmpty(value.scope[channelId]) || value.scope[channelId] === 'OPTIONAL') {
-                                                value['channel_' + channelId] = '<span class="js-scope-selector" title="Optional" data-channel="' + channelId + '" data-scope="OPTIONAL" data-id="' + value.id + '"><i class="fa fa-square-o"></i></span>';
-                                            } else if (value.scope[channelId] === 'REQUIRED') {
-                                                value['channel_' + channelId] = '<span class="js-scope-selector text-success" title="Required" data-channel="' + channelId + '" data-scope="REQUIRED" data-id="' + value.id + '"><i class="fa fa-check-square-o"></i></span>';
-                                            } else if (value.scope[channelId] === 'LOCKED') {
-                                                value['channel_' + channelId] = '<span class="text-primary" title="Variant Axis"><i class="icon-target"></i></span>';
-                                            } else {
-                                                value['channel_' + channelId] = '<span class="js-scope-selector text-danger" title="Not Applicable" data-channel="' + channelId + '" data-scope="NOT_APPLICABLE" data-id="' + value.id + '"><i class="icon-ban" style="font-weight: bold"></i></span>';
-                                            }
-                                        }
-                                    }
-                                } else if('GROUP_4C' === options.buttonGroup) {
-                                    /*var icon = 'fa-square-o', color = '', title = 'No';
-                                    if('Y' === value.scopable) {
-                                        title = 'Yes';
-                                        icon = 'fa-check-square-o';
-                                        color = ' text-success';
-                                    }
-                                    value.scopable = '<span class="js-scopable' + color + '" title="' + title + '" data-scopable="' + value.scopable + '" data-id="' + value.id + '"><i class="fa ' + icon + '"></i></span>';
-*/
-                                    for(var channelId in $.getPageAttribute('channels')) {
-                                        if($.getPageAttribute('channels').hasOwnProperty(channelId)) {
-                                            if (value.externalId !== value.channelVariantGroup[channelId]) {
-                                                value['channel_' + channelId] = '<span class="js-channel-selector" data-channel="' + channelId + '" data-id="' + value.externalId + '"><i class="fa fa-square-o"></i></span>';
-                                            } else if (value.externalId === value.channelVariantGroup[channelId]) {
-                                                value['channel_' + channelId] = '<span class="text-success" data-channel="' + channelId + '" data-id="' + value.externalId + '"><i class="fa fa-check-square-o"></i></span>';
-                                            } /*else {
-                                                value['channel_' + channelId] = '<span class="js-scope-selector text-danger" title="Not Applicable" data-channel="' + channelId + '" data-scope="NOT_APPLICABLE" data-id="' + value.id + '"><i class="icon-ban" style="font-weight: bold"></i></span>';
-                                            }*/
-                                        }
+                                if(typeof button.check === 'function') {
+                                    if(button.check(value)) {
+                                        value.actions += '<button type="button" class="btn btn-sm btn-' + button.style + ' js-' + button.name + '" title="' + button.title + '"><i class="' + button.icon + '"></i></button> ';
                                     }
                                 } else {
-                                    value.actions = '<a href="' + $.getURLWithRequestParams((options.url2 ? options.url2 : options.url) + value.externalId, options.urlParams) + '" class="btn btn-sm btn-info" title="Details"><i class="icon-eye"></i></a> ' +
-                                    '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Enable/Disable" data-type="confirm"><i class="icon-ban"></i></a> ';
-                                        // '<a href="javascript:void(0);" class="btn btn-sm btn-outline-danger js-sweetalert" title="Disable" data-type="confirm"><i class="icon-trash"></i></a>';
+                                    value.actions += '<button type="button" class="btn btn-sm btn-' + button.style + ' js-' + button.name + '" title="' + button.title + '"><i class="' + button.icon + '"></i></button> ';
                                 }
-                            } else if(options.type === 'TYPE_3') {
-                                value.actions = '<button type="button" class="btn btn-success js-add" data-external-id="' + value.externalId + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
-                            } else if(options.type === 'TYPE_3A') {
-                                value.actions = '<button type="button" class="btn btn-success js-add" data-id="' + value.id + '" title="Add"><span class="sr-only">Add</span> <i class="fa fa-save"></i></button>';
-                            }
-
-                            if(/*options.type === 'TYPE_1' || */options.type === 'TYPE_2') {
-                                //alert(value.discontinued)
-                                if(value.discontinued === 'Y'){
-                                    value.active = '<span class="badge badge-warning">Discontinued</span>';
-                                }else{
-                                    if (value.active === 'Y') {
-                                        value.active = '<span class="badge badge-success">Active</span>';
-                                    } else {
-                                        value.active = '<span class="badge badge-danger">Inactive</span>';
-                                    }
-                                }
-
-                            }
-
-                            if(typeof value.group !== 'undefined') {
-                                var groups = value.group.split('|');
-                                if(groups.length > 0) {
-                                    value.group = groups[0];
-                                }
-                                for(var i = 1; i < groups.length; i ++) {
-                                    value.group += '<i class="text-primary p-l-5 p-r-5 fa fa-caret-right"></i>' + groups[i];
-                                }
-                            }
-
+                            });
                         });
                         return json.data;
                     },
@@ -510,14 +422,24 @@
                 },
                 columns: options.columns
             }));
+
             const dataTableName = typeof options.names === 'undefined' ? options.name : options.names[0];
             $.each(options.buttons, function(index, button){
-                $(options.selector).on('click', '.js-' + button.name, function () {
+                $(options.selector).off().on('click', '.js-' + button.name, function () {
                     let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
                     if(button.click) {
                         button.click(row.data());
                     }
                 });
+            });
+
+            $.each(options.columns, function(index, column){
+                if(typeof column.click === 'function') {
+                    $(options.selector).off().on('click', '.' + column.selector, function () {
+                        let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
+                        column.click(row.data());
+                    });
+                }
             });
 
             $.getDataTable(dataTableName).on( 'row-reorder', function ( e, diff, edit ) {
@@ -548,24 +470,10 @@
                 }
             });
 
-            /*$(options.selector).on('click', '.js-toggle-status', function () {
-                if('TYPE_1' === options.type) {
-                    $.toggleStatus(
-                        $.getURL(options.url + '{externalId}/active/{active}', {
-                            externalId: $(this).data('external-id'),
-                            active: $(this).data('active'),
-                            discontinued: $(this).data('discontinued')
-                        }),
-                        typeof options.names !== 'undefined' ? options.names[1] : 'entity',
-                        $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
-                }
-            });*/
-
             $(options.selector).on('click', '.js-scope-selector', function () {
                 var url = $.getURL(options.url + '/{familyAttributeId}/scope/{scope}', {
                     familyAttributeId: $(this).data('id'),
                     scope: $(this).data('scope'),
-
                 });
                 var data = {channelId: $(this).data('channel')};
                 $.ajaxSubmit({
@@ -584,7 +492,6 @@
                 var url = $.getURL(options.url + '/{variantGroupId}/channels/{channelId}', {
                     variantGroupId: $(this).data('id'),
                     channelId: $(this).data('channel'),
-
                 });
                 var data = {};
                 $.ajaxSubmit({
@@ -599,83 +506,6 @@
                     }
                 });
             });
-
-            $(options.selector).on('click', '.js-scopable', function () {
-                var url = $.getURL(options.url + '/{familyAttributeId}/scopable/{scopable}', {
-                    familyAttributeId: $(this).data('id'),
-                    scopable: $(this).data('scopable'),
-
-                });
-                var data = {};
-                $.ajaxSubmit({
-                    url: url,
-                    data: data,
-                    method: 'PUT',
-                    successMessage: [],
-                    errorMessage: ['Error Setting the Scope', 'An error occurred while setting the attribute scope'],
-                    successCallback: function(data) {
-                        $.refreshDataTable(typeof options.names === 'undefined' ? options.name : options.names[0]);
-                    }
-                });
-            });
-
-            /*$(options.selector).on('click', '.js-clone', function () {
-                if('TYPE_1' === options.type) {
-                    $.cloneInstance(
-                        $.getURL(options.url + '{externalId}/clone/{cloneType}', {
-                            externalId: $(this).data('external-id'),
-                            cloneType: 'LIGHT'
-                        }),
-                        typeof options.names !== 'undefined' ? options.names[1] : 'entity',
-                        $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]));
-                }
-            });*/
-
-            $(options.selector).on('click', '.js-attribute-options', function(){
-                if('GROUP_4' === options.buttonGroup) {
-                    $.showModal({
-                        url: $.getURL('/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
-                        name:'attribute-options',
-                        title: $(this).data('name') + ' Options',
-                        buttons: [
-                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-                        ]
-                    });
-                } else if('GROUP_4A' === options.buttonGroup) {
-                    $.showModal({
-                        url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
-                        name:'attribute-options',
-                        title:$(this).data('name') + ' Options',
-                        buttons: [
-                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-                        ]
-                    });
-                }
-            });
-            $(options.selector).on('click', '.js-edit-pricing-attribute-data', function(){
-                $.showModal({
-                    url: $.getURL('/pim/products/{productId}/variants/{productVariantId}/pricingDetails/{pricingAttributeId}?ts=' + new Date().getTime(), {'pricingAttributeId': $(this).data('external-id')}),
-                    data: {channelId: $.getPageAttribute('channelId')},
-                    name:'edit-pricing-details',
-                    title:'Edit Pricing Details',
-                    buttons: [
-                        {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(data){data.refreshPage ? $.refreshPage() : $.reloadDataTable('variantPricing');$.closeModal();});}},
-                        {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-                    ]
-                });
-            });
-            /*$(options.selector).on('click', '.js-attribute-options', function(){
-                if('GROUP_4' === options.buttonGroup) {
-                    $.showModal({
-                        url: $.getURL('/pim/productFamilies/{productFamilyId}/attributes/{attributeId}/options', {'attributeId': $(this).data('external-id')}),
-                        name:'attribute-options',
-                        title:'Attribute Options',
-                        buttons: [
-                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
-                        ]
-                    });
-                }
-            });*/
         },
         /**
          * Refreshes the dataTable data only. All current parameters will be preserved, including
@@ -697,18 +527,6 @@
 
         },
 
-        refreshDataTable1: function(names) {
-            let _names = names.split(',');
-            $.each(_names, function(i, name){
-                name = name.trim();
-                //If this is a treeDataTable, reload the treeDataTable, otherwise refresh the data
-                if(!$.reloadTreeDataTable1(name)) {
-                    $.getDataTable(name).ajax.reload(null, false);
-                }
-            });
-
-        },
-
         /**
          * Reloads the dataTable. Will reload the data, reset sorting, page size and page number
          * to the initial configuration default
@@ -723,18 +541,6 @@
                 name = name.trim();
                 //If this is a treeDataTable, reload the treeDataTable, otherwise reload the dataTable
                 if(!$.reloadTreeDataTable(name)) {
-                    $.destroyDataTable(name);
-                    $.initDataTable($.getDataTableOptions(name));
-                }
-            });
-        },
-
-        reloadDataTable1: function(names) {
-            let _names = names.split(',');
-            $.each(_names, function(i, name){
-                name = name.trim();
-                //If this is a treeDataTable, reload the treeDataTable, otherwise reload the dataTable
-                if(!$.reloadTreeDataTable1(name)) {
                     $.destroyDataTable(name);
                     $.initDataTable($.getDataTableOptions(name));
                 }
@@ -765,17 +571,6 @@
             if(treeDataTable) {
                 $.getDataTable(name).destroy();
                 $.initTreeDataTable(options);
-                return true;
-            }
-            return false;
-        },
-
-        reloadTreeDataTable1: function(name) {
-            var options = $.getDataTableOptions(name) || {};
-            var treeDataTable = typeof options.treeDataTable !== 'undefined' || false;
-            if(treeDataTable) {
-                $.getDataTable(name).destroy();
-                $.initTreeDataTable1(options);
                 return true;
             }
             return false;

@@ -1,21 +1,19 @@
 $( document ).ready(function() {
-    $.initDataTable({
+    $.initGrid({
         selector: '#paginatedAvailableSubCategoriesTable',
-        name: 'availableSubCategories',
-        type: 'TYPE_3',
+        names: ['availableSubCategories', 'availableSubCategory'],
         pageLength: 10,
-        url: $.getURL('/pim/categories/{categoryId}/subCategories/available/list'),
+        dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/available/list'),
         columns: [
             { data: 'categoryName', name : 'categoryName' , title : 'Category Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
+        ],
+        buttons: [$.addItemButton({action: addSubCategory})]
     });
 
-    $('#paginatedAvailableSubCategoriesTable').on('click', '.js-add', function(){
-        var subCategoryId = $(this).data('external-id');
-
+    function addSubCategory(row) {
         $.ajax({
-            url: $.getURL('/pim/categories/{categoryId}/subCategories/{subCategoryId}', {'subCategoryId': subCategoryId}),
+            url: $.getURL('/pim/categories/{categoryId}/subCategories/{subCategoryId}', {'subCategoryId': row.externalId}),
             data: {},
             method: 'POST',
             dataType: 'json'
@@ -30,5 +28,5 @@ $( document ).ready(function() {
         }).fail(function(jqXHR, status) {
             toastr.success('Error occurred while adding the sub category', 'Error Adding Sub Category');
         });
-    });
+    }
 });

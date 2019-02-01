@@ -1,14 +1,20 @@
 $(function(){
 
-    $.initDataTable({
+    $.initGrid({
         selector: '#paginatedAttributeOptionsTable',
-        name: 'attributeOptions',
-        type: 'TYPE_2',
-        url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/list'),
+        names: ['attributeOptions', 'attributeOptions'],
+        dataUrl: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/list'),
         columns: [
             { data: 'value', name : 'value' , title : 'Value'},
             { data: 'id', name : 'id', title : 'ID' },
-            { data: 'active', name : 'active' , title : 'Active'}
+            {
+                data: 'active',
+                name : 'active' ,
+                title : 'Status',
+                render: function ( data, type, row, meta ) {
+                    return $.renderStatusColumn(row);
+                }
+            }
         ]
     });
 

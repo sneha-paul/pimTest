@@ -106,19 +106,18 @@
         'collectionId': '${attributeCollection.collectionId}'
     });
     $(document).ready(function () {
-        $.initDataTable({
+        $.initGrid({
             selector: '#paginatedAttributesTable',
-            name: 'attributes',
-            type: 'TYPE_2',
-            buttonGroup: 'GROUP_4',
-            url: $.getURL('/pim/attributeCollections/{collectionId}/attributes'),
+            names: ['attributes', 'attribute'],
+            dataUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes'),
             columns: [
                 {data: 'name', name: 'name', title: 'Attribute Name'},
                 {data: 'id', name: 'id', title: 'Attribute ID'},
                 {data: 'group', name: 'group', title: 'Attribute Group'},
                 {data: 'selectable', name: 'selectable', title: 'Selectable'},
                 {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
-            ]
+            ],
+            buttons: [$.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
         });
 
 

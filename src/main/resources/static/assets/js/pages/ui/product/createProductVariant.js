@@ -8,19 +8,17 @@ $( document ).ready(function() {
         }
     }
     columns[i] = { data: 'actions', name : 'actions' , title : 'Actions', orderable: false};
-    $.initDataTable({
+    $.initGrid({
         selector: '#paginatedAvailableProductVariantsTable',
-        name: 'availableProductVariants',
-        type: 'TYPE_3A',
-        url: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/available/list'),
-        columns: columns
+        names: ['availableProductVariants', 'availableProductVariant'],
+        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/available/list'),
+        columns: columns,
+        buttons: [$.addItemButton({action: createVariant})]
     });
 
-    $('#paginatedAvailableProductVariantsTable').on('click', '.js-add', function(){
-        var variantIdentifier = $(this).data('id');
-
+    function createVariant(row) {
         $.ajax({
-            url: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{variantIdentifier}', {'variantIdentifier': variantIdentifier}),
+            url: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{variantIdentifier}', {'variantIdentifier': row.id}),
             data: {},
             method: 'POST',
             dataType: 'json'
@@ -36,5 +34,5 @@ $( document ).ready(function() {
         }).fail(function(jqXHR, status) {
             toastr.success('Error occurred while creating the variant', 'Error Creating Variant');
         });
-    });
+    }
 });

@@ -1,5 +1,7 @@
 (function(){
     $.extend({
+
+        /** Buttons **/
         changePasswordButton: function(options){
             return {
                 name: 'CHANGE_PASSWORD',
@@ -7,7 +9,6 @@
                 title: 'Change Password',
                 icon: 'icon-key',
                 click: function (row) {
-                   /* window.location.href = $.getURLWithRequestParams(options.pageUrl+'changePassword/' + row.externalId, options.urlParams || {});*/
                     $.showModal({
                         url: $.getURL(options.pageUrl+'changePasswordView'),
                         data:{'id': row.externalId},
@@ -71,6 +72,62 @@
             };
         },
 
+        attributeOptionsButton: function(options) {
+          return {
+              name: 'ATTRIBUTE_OPTIONS',
+              style: 'primary',
+              title: 'Show Attribute Options',
+              icon: 'fa fa-list',
+              check: function(row) {
+                return 'Y' === row.selectable;
+              },
+              click: function(row) {
+                  $.showModal({
+                      url: $.getURL(options.actionUrl, {'attributeId': row.fullId}),
+                      name:'attribute-options',
+                      title:row.name + ' Options',
+                      buttons: [
+                          {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                      ]
+                  });
+              }
+          }
+        },
+
+        addItemButton: function(options) {
+            return {
+                name: 'ADD_ITEM',
+                style: 'success',
+                title: 'Add',
+                icon: 'fa fa-save',
+                click: function(row) {
+                    options.action(row);
+                }
+            }
+        },
+
+        pricingAttributeDetailsButton: function() {
+            return {
+                name: 'PRICING_ATTRIBUTE_DETAILS',
+                style: 'secondary',
+                title: 'Edit',
+                icon: 'fa fa-edit',
+                click: function(row) {
+                    $.showModal({
+                        url: $.getURL('/pim/products/{productId}/variants/{productVariantId}/pricingDetails/{pricingAttributeId}?ts=' + new Date().getTime(), {'pricingAttributeId': row.externalId}),
+                        data: {channelId: $.getPageAttribute('channelId')},
+                        name:'edit-pricing-details',
+                        title:'Edit Pricing Details',
+                        buttons: [
+                            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(data){data.refreshPage ? $.refreshPage() : $.reloadDataTable('variantPricing');$.closeModal();});}},
+                            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+                        ]
+                    });
+                }
+            }
+        },
+
+        /** Renderers **/
         renderStatusColumn: function(data) {
             if (data.discontinued === 'Y') {
                 return '<span class="badge badge-warning">Discontinued</span>';
@@ -83,11 +140,63 @@
             }
         },
 
+        renderChannelSelector: function(data, channelId) {
+            if (data.externalId !== data.channelVariantGroup[channelId]) {
+                return '<span class="js-channel-selector" data-channel="' + channelId + '" data-id="' + data.externalId + '"><i class="fa fa-square-o"></i></span>'
+            } else if (data.externalId === data.channelVariantGroup[channelId]) {
+                return '<span class="text-success" data-channel="' + channelId + '" data-id="' + data.externalId + '"><i class="fa fa-check-square-o"></i></span>'
+            }
+        },
+
+        renderScopable: function(data) {
+            let icon = 'fa-square-o', color = '', title = 'No';
+            if('Y' === data.scopable) {
+                title = 'Yes';
+                icon = 'fa-check-square-o';
+                color = ' text-success';
+            }
+            return '<span class="js-scopable' + color + '" title="' + title + '" data-scopable="' + data.scopable + '" data-id="' + data.id + '"><i class="fa ' + icon + '"></i></span>';
+        },
+
+        renderScopeSelector: function(data, channelId) {
+            if (_.isEmpty(data.scope[channelId]) || data.scope[channelId] === 'OPTIONAL') {
+                return '<span class="js-scope-selector" title="Optional" data-channel="' + channelId + '" data-scope="OPTIONAL" data-id="' + data.id + '"><i class="fa fa-square-o"></i></span>';
+            } else if (data.scope[channelId] === 'REQUIRED') {
+                return '<span class="js-scope-selector text-success" title="Required" data-channel="' + channelId + '" data-scope="REQUIRED" data-id="' + data.id + '"><i class="fa fa-check-square-o"></i></span>';
+            } else if (data.scope[channelId] === 'LOCKED') {
+                return '<span class="text-primary" title="Variant Axis"><i class="icon-target"></i></span>';
+            } else {
+                return '<span class="js-scope-selector text-danger" title="Not Applicable" data-channel="' + channelId + '" data-scope="NOT_APPLICABLE" data-id="' + data.id + '"><i class="icon-ban" style="font-weight: bold"></i></span>';
+            }
+        },
+
+        /** Events **/
+        scopableClickEvent: function(row, successCallback) {
+            var url = $.getURL('/pim/families/{familyId}/attributes/{familyAttributeId}/scopable/{scopable}', {
+                familyAttributeId: row.id,
+                scopable: row.scopable
+            });
+            $.ajaxSubmit({
+                url: url,
+                data: {},
+                method: 'PUT',
+                successMessage: [],
+                errorMessage: ['Error Setting the Scope', 'An error occurred while setting the attribute scope'],
+                successCallback: function(data) {
+                    if(typeof successCallback === 'function') {
+                        successCallback(data);
+                    }
+                }
+            });
+        },
+
+        /** Grids **/
         initGrid: function(options) {
             $.initDataTable({
                 selector: options.selector,
                 names: options.names,
                 url: options.dataUrl,
+                searching: typeof options.searching === 'undefined' ?  true : options.searching,
                 pageLength: options.pageLength,
                 reorderCallback: options.reorderCallback || function(){},
                 reordering: options.reordering,
@@ -169,6 +278,5 @@
                 ]
             }));
         }
-
     });
 })();

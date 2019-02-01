@@ -1,21 +1,19 @@
 $( document ).ready(function() {
-    $.initDataTable({
+    $.initGrid({
         selector: '#paginatedAvailableAttributeOptionsTable',
-        name: 'availableAttributeOptions',
-        type: 'TYPE_3A',
-        url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/available/list'),
+        names: ['availableAttributeOptions', 'availableAttributeOption'],
+        dataUrl: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/available/list'),
         columns: [
             { data: 'value', name : 'value' , title : 'Value'},
             { data: 'id', name : 'id', title : 'ID' },
             { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ]
+        ],
+        buttons: [$.addItemButton({action: addOption})]
     });
 
-    $('#paginatedAvailableAttributeOptionsTable').on('click', '.js-add', function(){
-        var optionId = $(this).data('id');
-
+    function addOption(row) {
         $.ajax({
-            url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/{optionId}', {'optionId': optionId}),
+            url: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/{optionId}', {'optionId': row.id}),
             data: {},
             method: 'POST',
             dataType: 'json'
@@ -31,5 +29,5 @@ $( document ).ready(function() {
         }).fail(function(jqXHR, status) {
             toastr.success('Error occurred while adding the attribute option', 'Error Adding Option');
         });
-    });
+    }
 });
