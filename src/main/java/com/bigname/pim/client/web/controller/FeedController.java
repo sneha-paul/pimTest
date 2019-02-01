@@ -26,6 +26,7 @@ public class FeedController {
     private ProductLoader productLoader;
     private ProductLoader1 productLoader1;
     private WebsiteLoader websiteLoader;
+    private  CategoryLoader1 categoryLoader1;
 
     @Value("${loader.catalogFeed.path:/DevStudio/Docs/PIM_ExcelFiles/catalogData.xlsx}")
     private String catalogFeedPath;
@@ -33,8 +34,10 @@ public class FeedController {
     @Value("${loader.productFeed.path:/tmp/10_REGULAR.xlsx}")
     private String productFeedPath;
 
+    // @Value("${loader.websiteFeed.path:/DevStudio/Docs/PIM_ExcelFiles/CategoryData.xlsx}")
     @Value("${loader.categoryFeed.path:/tmp/CATEGORIES.xlsx}")
     private String categoryFeedPath;
+
 
     @Value("${loader.websiteFeed.path:/DevStudio/Docs/PIM_ExcelFiles/WebsiteData.xlsx}")
     private String websiteFeedPath;
@@ -43,12 +46,13 @@ public class FeedController {
     @Value("${loader.api.key:80blacwood85}")
     private String apiKey;
 
-    public FeedController(CatalogLoader catalogLoader, CategoryLoader categoryLoader, ProductLoader productLoader, ProductLoader1 productLoader1, WebsiteLoader websiteLoader) {
+    public FeedController(CatalogLoader catalogLoader, CategoryLoader categoryLoader, ProductLoader productLoader, ProductLoader1 productLoader1, WebsiteLoader websiteLoader, CategoryLoader1 categoryLoader1) {
         this.catalogLoader = catalogLoader;
         this.categoryLoader = categoryLoader;
         this.productLoader = productLoader;
         this.productLoader1 = productLoader1;
         this.websiteLoader = websiteLoader;
+        this.categoryLoader1 = categoryLoader1;
     }
 
     @ResponseBody
@@ -115,6 +119,21 @@ public class FeedController {
         boolean success = false;
         if(this.apiKey.equals(apiKey)) {
             categoryLoader.load(categoryFeedPath);
+            success = true;
+        }
+        model.put("success", success);
+        return model;
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "/load/categories1", method = RequestMethod.GET)
+    public Map<String, Object> loadCategoryData1(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
+        LOGGER.info("LOADING CATEGORY DATA1");
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        if(this.apiKey.equals(apiKey)) {
+            categoryLoader1.load(categoryFeedPath);
             success = true;
         }
         model.put("success", success);

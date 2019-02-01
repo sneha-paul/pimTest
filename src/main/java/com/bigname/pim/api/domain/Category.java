@@ -9,6 +9,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.bigname.pim.api.domain.Catalog.Property.ACTIVE;
+import static com.bigname.pim.api.domain.Catalog.Property.DISCONTINUED;
+import static com.bigname.pim.api.domain.Category.Property.*;
+import static com.bigname.pim.api.domain.Category.Property.DESCRIPTION;
+
 /**
  * Created by sruthi on 29-08-2018.
  */
@@ -44,6 +49,21 @@ public class Category extends Entity<Category> {
     public Category() {
         super();
     }
+
+    public Category(Map<String, Object> properties) {
+        this.setCategoryId((String) properties.get(CATEGORY_ID.name()));
+        this.setCategoryName((String) properties.get(CATEGORY_NAME.name()));
+        this.setDescription((String) properties.get(DESCRIPTION.name()));
+        this.setActive((String) properties.get(ACTIVE.name()));
+        this.setDiscontinued((String) properties.get(DISCONTINUED.name()));
+    }
+
+
+    /* this.setLongDescription((String) properties.get(LONG_DESCRIPTION.name()));
+        this.setMetaTitle((String) properties.get(META_TITLE.name()));
+        this.setMetaDescription((String) properties.get(META_DESCRIPTION.name()));
+        this.setMetaKeywords((String) properties.get(META_KEYWORDS.name()));*/
+
 
     /*public Category(String externalId, String categoryName) {
         super(externalId);
@@ -178,6 +198,24 @@ public class Category extends Entity<Category> {
                 && this.getDescription().equals(category.getDescription());
     }
 
+    @Override
+    public boolean equals(Map<String, Object> categoryMap) {
+        return this.getId().equals(categoryMap.get(Property.ID.name()))
+                && this.getCategoryId().equals(categoryMap.get(Property.CATEGORY_ID.name()))
+                && this.getCategoryName().equals(categoryMap.get(Property.CATEGORY_NAME.name()))
+                && this.getDescription().equals(categoryMap.get(Property.DESCRIPTION.name()));
+
+    }
+
+      /*&& this.getLongDescription().equals(categoryMap.get(Property.LONG_DESCRIPTION.name()))
+            && this.getMetaTitle().equals(categoryMap.get(Property.META_TITLE.name()))
+            && this.getMetaDescription().equals(categoryMap.get(Property.META_DESCRIPTION.name()))
+            && this.getMetaKeywords().equals(categoryMap.get(Property.META_KEYWORDS.name()));*/
+
+    public enum Property{
+        ID, CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ACTIVE, DISCONTINUED
+    }
+    /*LONG_DESCRIPTION, META_TITLE, META_DESCRIPTION, META_KEYWORDS,*/
 
     public Map<String, Object> diff(Category category, boolean... ignoreInternalId) {
         boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
@@ -191,7 +229,7 @@ public class Category extends Entity<Category> {
         if (!this.getDescription().equals(category.getDescription())) {
             diff.put("description", category.getDescription());
         }
-        if (!this.getLongDescription().equals(category.getLongDescription())) {
+        /*if (!this.getLongDescription().equals(category.getLongDescription())) {
             diff.put("longDescription", category.getLongDescription());
         }
         if (!this.getMetaTitle().equals(category.getMetaTitle())) {
@@ -203,7 +241,7 @@ public class Category extends Entity<Category> {
         if (!this.getMetaKeywords().equals(category.getMetaKeywords())) {
             diff.put("metaKeywords", category.getMetaKeywords());
 
-        }
+        }*/
 
 
             return diff;
