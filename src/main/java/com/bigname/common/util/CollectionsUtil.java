@@ -84,4 +84,66 @@ public class CollectionsUtil {
         }
         return difference;
     }
+    public static <K, V> Map<K, V> flattenMap(Map<K, V> map){
+        Map<K, V> flatten = new HashMap<>();
+        Set<K> keySet = map.keySet();
+        for(K key : keySet) {
+        Map<K, V> value = (Map<K, V>) map.get(key);
+            Set<K> nestedKeyset = value.keySet();
+            for(K nestedkey : nestedKeyset) {
+                flatten.put(nestedkey,value.get(nestedkey));
+            }
+        }
+        return  flatten ;
+        }
+
+/*    public static void main(String[] args) {
+        Map<String, Map<String, Object>> input = new HashMap<>();
+        Map<String, Map<String, Object>> plan = new HashMap<>();
+        Map<String, Object> objInput=new HashMap<>();
+        Map<String, Object> objInput1=new HashMap<>();
+        Map<String, Object> objInput2=new HashMap<>();
+        Map<String, Object> objInput3=new HashMap<>();
+
+        objInput.put("50",9);
+        objInput.put("25",6);
+        objInput.put("10",3);
+        input.put("plan",objInput);
+
+        objInput1.put("50",4);
+        objInput1.put("25",45);
+        objInput1.put("10",66);
+        input.put("map1",objInput1);
+
+        objInput2.put("50",3);
+        objInput2.put("25",77);
+        objInput2.put("10",6);
+        input.put("map2",objInput2);
+
+        objInput3.put("50",1);
+        objInput3.put("25",2);
+        objInput3.put("10",3);
+        input.put("map3",objInput3);
+
+        System.out.println("Input : "+input);
+        System.out.println(buildMapString(input,0).toString());
+    }*/
+//buildMapString(input,0) -- pass 0 index at first time
+    private static <K, V> StringBuilder buildMapString(Map<K, V> map, int index) {
+        StringBuilder builder = new StringBuilder();
+        Set<K> keySet = map.keySet();
+        for (K key : keySet) {
+            if (map.get(key) instanceof Map) {
+                Map<K, V> value = (Map<K, V>) map.get(key);
+                builder.append(buildMapString(value,index));
+                index++;
+            } else {
+                V value = map.get(key);
+                builder.append(key + ",");
+                builder.append(index + ",");
+                builder.append(value + ";");
+            }
+        }
+        return builder;
+    }
 }
