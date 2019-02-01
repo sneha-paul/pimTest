@@ -160,6 +160,7 @@
                     $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
             });
         },
+        //TODO - need to standardize initTreeDataTable. Currently initTreeDataTable is coupled to category hierarchy
         initTreeDataTable1: function(options) {
             options.treeDataTable = options.treeDataTable || true;
             var displayed = new Set([]);
