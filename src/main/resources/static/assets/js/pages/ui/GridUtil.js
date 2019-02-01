@@ -192,7 +192,7 @@
 
         /** Grids **/
         initGrid: function(options) {
-            $.initDataTable({
+            return $.initDataTable({
                 selector: options.selector,
                 names: options.names,
                 url: options.dataUrl,
@@ -242,7 +242,7 @@
             if(!options.hideActions) {
                 columns[columns.length] = {data: 'actions', name: 'actions', title: 'Actions', orderable: false};
             }
-            $.initGrid(Object.assign(options, {
+            return $.initGrid(Object.assign(options, {
                 columns: columns,
                 buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),

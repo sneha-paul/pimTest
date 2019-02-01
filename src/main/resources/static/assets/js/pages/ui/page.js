@@ -330,7 +330,7 @@
             });
         },
         initDataTable: function(options) {
-            $.bindDataTable(options, $(options.selector).DataTable( {
+            var dt = $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
                 serverSide: true,
                 pageLength: options.pageLength ? options.pageLength : 25,
@@ -425,7 +425,7 @@
 
             const dataTableName = typeof options.names === 'undefined' ? options.name : options.names[0];
             $.each(options.buttons, function(index, button){
-                $(options.selector).off().on('click', '.js-' + button.name, function () {
+                $(options.selector).on('click', '.js-' + button.name, function () {
                     let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
                     if(button.click) {
                         button.click(row.data());
@@ -433,14 +433,14 @@
                 });
             });
 
-            $.each(options.columns, function(index, column){
+            /*$.each(options.columns, function(index, column){
                 if(typeof column.click === 'function') {
-                    $(options.selector).off().on('click', '.' + column.selector, function () {
+                    $(options.selector).on('click', '.' + column.selector, function () {
                         let row = $.getDataTable(dataTableName).row($(this).closest('tr'));
                         column.click(row.data());
                     });
                 }
-            });
+            });*/
 
             $.getDataTable(dataTableName).on( 'row-reorder', function ( e, diff, edit ) {
                 const oTable = $.getDataTable(dataTableName);
@@ -506,6 +506,26 @@
                     }
                 });
             });
+
+            $(options.selector).on('click', '.js-scopable', function () {
+                var url = $.getURL(options.url + '/{familyAttributeId}/scopable/{scopable}', {
+                    familyAttributeId: $(this).data('id'),
+                    scopable: $(this).data('scopable'),
+
+                });
+                var data = {};
+                $.ajaxSubmit({
+                    url: url,
+                    data: data,
+                    method: 'PUT',
+                    successMessage: [],
+                    errorMessage: ['Error Setting the Scope', 'An error occurred while setting the attribute scope'],
+                    successCallback: function(data) {
+                        $.refreshDataTable(typeof options.names === 'undefined' ? options.name : options.names[0]);
+                    }
+                });
+            });
+            return dt;
         },
         /**
          * Refreshes the dataTable data only. All current parameters will be preserved, including
