@@ -5,11 +5,13 @@ import com.bigname.pim.api.domain.FileAsset;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.util.FindBy;
+import com.bigname.pim.util.Pageable;
 import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -54,4 +56,6 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
     ProductVariant reorderAssets(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String[] assetIds, FileAsset.AssetFamily assetFamily);
 
     ProductVariant setAsDefaultAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily);
+
+    List<Map<String,Object>> getAll();
 }

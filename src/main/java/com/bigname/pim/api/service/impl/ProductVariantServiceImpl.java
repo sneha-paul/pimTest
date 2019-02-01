@@ -444,4 +444,15 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Unable to find product variant with id:" + productId));
     }
+
+
+    /**
+     * Method to get productVariants of a Product in paginated format.
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> getAll() {
+        return productVariantDAO.getAll();
+    }
 }
