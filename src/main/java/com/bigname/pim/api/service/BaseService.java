@@ -30,6 +30,21 @@ public interface BaseService<T, DAO> {
 
     T cloneInstance(String id, FindBy findBy, Entity.CloneType type);
 
+    /**
+     * activeRequired vararg combinations
+     * 			                    -	active
+     *           true			    -	active
+     *           false			    -	active, inactive
+     *           false, true		-	inactive
+     *           false, false, true	-	discontinued
+     *           false, true, true	-	inactive, discontinued
+     *           true, true, true	-	active, inactive, discontinued
+     * @param page
+     * @param size
+     * @param sort
+     * @param activeRequired
+     * @return
+     */
     Page<T> getAll(int page, int size, Sort sort, boolean... activeRequired);
 
     List<T> getAll(Sort sort, boolean... activeRequired);

@@ -330,7 +330,7 @@
             });
         },
         initDataTable: function(options) {
-            var dt = $.bindDataTable(options, $(options.selector).DataTable( {
+            $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
                 serverSide: true,
                 pageLength: options.pageLength ? options.pageLength : 25,
@@ -339,7 +339,9 @@
                 ordering: !(typeof options.reordering !== 'undefined' && options.reordering),
                 rowReorder: typeof options.reordering !== 'undefined' && options.reordering ? {snapX: 10} : false,
                 language: {
-                    info: "_START_ to _END_ of _TOTAL_"
+                    info: "_START_ to _END_ of _TOTAL_",
+                    lengthMenu: "_MENU_",
+                    search: ''
                 },
                 initComplete : function() {
                     var input = $(options.selector + '_filter.dataTables_filter input').unbind()
@@ -372,6 +374,8 @@
                 ajax: {
                     url: options.url,
                     data: function ( data ) {
+                        // data.columns[3].search.value='ACTIVE';
+                        // console.log(data);
                         //process data before sent to server.
                     },
                     dataSrc: function(json) {
@@ -525,7 +529,6 @@
                     }
                 });
             });
-            return dt;
         },
         /**
          * Refreshes the dataTable data only. All current parameters will be preserved, including
