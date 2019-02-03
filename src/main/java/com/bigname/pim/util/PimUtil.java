@@ -1,8 +1,8 @@
 package com.bigname.pim.util;
 
 import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.Entity;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.util.FindBy;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.*;

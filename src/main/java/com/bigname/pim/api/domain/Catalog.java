@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -11,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.bigname.pim.api.domain.Catalog.Property.*;
-import static com.bigname.pim.api.domain.Catalog.Property.DESCRIPTION;
 
 /**
  * Created by Manu on 8/9/2018.
@@ -83,7 +83,7 @@ public class Catalog extends Entity<Catalog> {
         this.rootCategories = rootCategories;
     }
 
-    void setExternalId() {
+    protected void setExternalId() {
         this.catalogId = getExternalId();
     }
 

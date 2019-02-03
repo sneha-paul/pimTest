@@ -1,10 +1,10 @@
-package com.bigname.pim.api.service;
+package com.bigname.core.service;
 
-import com.bigname.pim.api.domain.Entity;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.domain.ValidatableEntity;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,8 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 
-import javax.validation.ConstraintViolation;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by manu on 8/18/18.

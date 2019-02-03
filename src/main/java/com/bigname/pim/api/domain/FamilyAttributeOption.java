@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.ValidatableEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 

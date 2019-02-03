@@ -1,10 +1,13 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.ValidatableEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

@@ -2,6 +2,8 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.service.BaseServiceSupport;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
@@ -9,7 +11,6 @@ import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

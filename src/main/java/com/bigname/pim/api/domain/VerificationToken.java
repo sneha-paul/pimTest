@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * Created by sruthi on 12-11-2018.
  */
-public class VerificationToken extends Entity<VerificationToken>{
+public class VerificationToken extends Entity<VerificationToken> {
 
     @Transient
     private String verificationId;
@@ -64,7 +65,7 @@ public class VerificationToken extends Entity<VerificationToken>{
     }
 
     @Override
-    void setExternalId() {
+    protected void setExternalId() {
         this.verificationId = getExternalId();
 
     }

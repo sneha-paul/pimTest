@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service;
 
+import com.bigname.core.service.BaseService;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 

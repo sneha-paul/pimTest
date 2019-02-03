@@ -1,8 +1,5 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 

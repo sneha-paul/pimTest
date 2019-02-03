@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,7 +13,6 @@ import java.util.Map;
 import static com.bigname.pim.api.domain.Catalog.Property.ACTIVE;
 import static com.bigname.pim.api.domain.Catalog.Property.DISCONTINUED;
 import static com.bigname.pim.api.domain.Category.Property.*;
-import static com.bigname.pim.api.domain.Category.Property.DESCRIPTION;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -58,18 +58,6 @@ public class Category extends Entity<Category> {
         this.setDiscontinued((String) properties.get(DISCONTINUED.name()));
     }
 
-
-    /* this.setLongDescription((String) properties.get(LONG_DESCRIPTION.name()));
-        this.setMetaTitle((String) properties.get(META_TITLE.name()));
-        this.setMetaDescription((String) properties.get(META_DESCRIPTION.name()));
-        this.setMetaKeywords((String) properties.get(META_KEYWORDS.name()));*/
-
-
-    /*public Category(String externalId, String categoryName) {
-        super(externalId);
-        this.categoryName = categoryName;
-    }
-*/
     public String getCategoryId() {
         return getExternalId();
     }
@@ -135,7 +123,7 @@ public class Category extends Entity<Category> {
         this.metaKeywords = metaKeywords;
     }
 
-    void setExternalId() {
+    protected void setExternalId() {
         this.categoryId = getExternalId();
     }
 

@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -84,7 +85,7 @@ public class User extends Entity<User> implements UserDetails {
     }
 
     @Override
-    void setExternalId() {
+    protected void setExternalId() {
         this.email = getExternalId();
     }
 

@@ -1,4 +1,4 @@
-package com.bigname.pim.api.persistence.dao;
+package com.bigname.core.persistence.dao;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

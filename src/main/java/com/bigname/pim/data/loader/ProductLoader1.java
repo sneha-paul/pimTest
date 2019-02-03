@@ -2,10 +2,12 @@ package com.bigname.pim.data.loader;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.StringUtil;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
-import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.POIUtil;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.javatuples.Pair;
@@ -20,7 +22,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.StringUtil.*;
+import static com.bigname.common.util.StringUtil.trim;
 import static com.bigname.common.util.ValidationUtil.*;
 
 /**

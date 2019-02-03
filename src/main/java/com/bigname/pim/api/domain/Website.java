@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
@@ -46,12 +47,6 @@ public class Website extends Entity<Website> {
         this.setActive((String) properties.get(ACTIVE.name()));
     }
 
-    /*public Website(String externalId, String websiteName, String url) {
-        super(externalId);
-        this.websiteName = websiteName;
-        this.url = url;
-    }*/
-
     public String getWebsiteId() {
         return getExternalId();
     }
@@ -77,7 +72,7 @@ public class Website extends Entity<Website> {
         this.url = url;
     }
 
-    void setExternalId() {
+    protected void setExternalId() {
         this.websiteId = getExternalId();
     }
 

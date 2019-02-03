@@ -1,4 +1,4 @@
-package com.bigname.pim.api.exception;
+package com.bigname.core.exception;
 
 /**
  * Created by manu on 8/18/18.

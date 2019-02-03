@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.EntityAssociation;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.LinkedHashMap;
@@ -8,7 +9,7 @@ import java.util.Map;
 /**
  * Created by sruthi on 31-08-2018.
  */
-public class RootCategory extends  EntityAssociation<Catalog, Category> {
+public class RootCategory extends EntityAssociation<Catalog, Category> {
 
     /**
      * Internal id of the Catalog document, not the externalId (catalogId) attribute

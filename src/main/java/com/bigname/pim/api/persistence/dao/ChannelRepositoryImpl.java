@@ -1,5 +1,6 @@
 package com.bigname.pim.api.persistence.dao;
 
+import com.bigname.core.persistence.dao.GenericRepositoryImpl;
 import com.bigname.pim.api.domain.Channel;
 import org.springframework.data.mongodb.core.MongoTemplate;
 

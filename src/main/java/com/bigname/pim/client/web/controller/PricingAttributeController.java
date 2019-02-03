@@ -4,10 +4,11 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.PricingAttribute;
-import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.PricingAttributeService;
-import com.bigname.pim.util.FindBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,7 +32,7 @@ import static com.bigname.common.util.ValidationUtil.isEmpty;
 
 @Controller
 @RequestMapping("pim/pricingAttributes")
-public class PricingAttributeController extends  BaseController<PricingAttribute,PricingAttributeService>{
+public class PricingAttributeController extends BaseController<PricingAttribute,PricingAttributeService> {
 
     private PricingAttributeService pricingAttributeService;
 

@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.Event;
 import com.bigname.pim.api.service.EventService;
 import org.springframework.data.domain.Page;

@@ -1,7 +1,6 @@
 package com.bigname.pim.config;
 
-import com.bigname.pim.api.domain.Entity;
-import com.bigname.pim.api.service.BaseService;
+import com.bigname.core.service.BaseService;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.util.StringUtils;
 

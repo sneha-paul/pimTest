@@ -1,6 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.core.persistence.dao.GenericRepositoryImpl;
 import com.bigname.pim.api.domain.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 /**
  * Created by dona on 30-01-2019.
  */
-public class EventRepositoryImpl extends  GenericRepositoryImpl<Event> implements EventRepository {
+public class EventRepositoryImpl extends GenericRepositoryImpl<Event> implements EventRepository {
 
     public EventRepositoryImpl(MongoTemplate mongoTemplate) {super(mongoTemplate, Event.class);}
 

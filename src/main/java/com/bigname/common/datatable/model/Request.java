@@ -1,7 +1,5 @@
 package com.bigname.common.datatable.model;
 
-import com.bigname.common.util.ValidationUtil;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -9,7 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * The datatable request class

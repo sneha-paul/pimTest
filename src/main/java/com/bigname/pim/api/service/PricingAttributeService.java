@@ -1,8 +1,8 @@
 package com.bigname.pim.api.service;
 
+import com.bigname.core.service.BaseService;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 

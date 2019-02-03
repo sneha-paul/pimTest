@@ -1,5 +1,6 @@
 package com.bigname.pim.api.persistence.dao;
 
+import com.bigname.core.persistence.dao.BaseAssociationDAO;
 import com.bigname.pim.api.domain.ProductCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -54,7 +55,7 @@ public class AssetCollection extends Entity<AssetCollection> {
     }
 
     @Override
-    void setExternalId() {
+    protected void setExternalId() {
         this.collectionId = getExternalId();
     }
 

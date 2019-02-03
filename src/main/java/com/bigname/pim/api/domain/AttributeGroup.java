@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.ValidatableEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 

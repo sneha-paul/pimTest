@@ -1,8 +1,9 @@
 package com.bigname.pim.api.service;
 
+import com.bigname.core.service.BaseService;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
-import com.bigname.pim.util.FindBy;
 
 import java.util.List;
 import java.util.Map;

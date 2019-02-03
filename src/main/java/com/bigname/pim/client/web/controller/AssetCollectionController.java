@@ -1,15 +1,19 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.common.datatable.model.Pagination;
+import com.bigname.common.datatable.model.Request;
+import com.bigname.common.datatable.model.Result;
+import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.AssetCollection;
-import com.bigname.pim.api.domain.Entity;
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.model.Breadcrumbs;
-import com.bigname.pim.util.FindBy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,16 +28,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import javax.servlet.http.HttpServletResponse;
-import com.bigname.common.datatable.model.Pagination;
-import com.bigname.common.datatable.model.Request;
-import com.bigname.common.datatable.model.Result;
-import com.bigname.common.datatable.model.SortOrder;
 import java.util.stream.Collectors;
+
 import static com.bigname.common.util.ValidationUtil.isEmpty;
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 

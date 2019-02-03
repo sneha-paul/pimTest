@@ -1,7 +1,7 @@
-package com.bigname.pim.api.domain;
+package com.bigname.core.domain;
 
+import com.bigname.pim.api.domain.User;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.aggregation.VariableOperators;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -161,7 +161,7 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
         return result;
     }
 
-    abstract void setExternalId();
+    abstract protected void setExternalId();
 
     public T cloneInstance() {
         return null;

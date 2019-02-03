@@ -1,12 +1,10 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.service.BaseServiceSupport;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

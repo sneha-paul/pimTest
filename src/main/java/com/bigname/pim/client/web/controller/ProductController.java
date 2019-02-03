@@ -4,13 +4,18 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil2;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.EntityAssociation;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
+import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.*;
-import com.bigname.pim.util.*;
+import com.bigname.pim.util.PIMConstants;
+import com.bigname.pim.util.ProductUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,7 +26,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isEmpty;
@@ -31,7 +39,7 @@ import static com.bigname.common.util.ValidationUtil.isEmpty;
  */
 @Controller
 @RequestMapping("pim/products")
-public class ProductController extends BaseController<Product, ProductService>{
+public class ProductController extends BaseController<Product, ProductService> {
 
     private ProductService productService;
     private ProductVariantService productVariantService;

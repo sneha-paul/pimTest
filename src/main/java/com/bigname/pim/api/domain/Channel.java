@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -41,7 +42,7 @@ public class Channel extends Entity<Channel> {
     }
 
     @Override
-    void setExternalId() {
+    protected void setExternalId() {
         this.channelId = getExternalId();
     }
 

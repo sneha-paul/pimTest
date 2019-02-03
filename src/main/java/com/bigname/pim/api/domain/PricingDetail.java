@@ -1,8 +1,9 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.ValidatableEntity;
+
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 

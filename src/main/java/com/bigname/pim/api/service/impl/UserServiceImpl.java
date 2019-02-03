@@ -1,6 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.service.BaseServiceSupport;
 import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.persistence.dao.UserDAO;
 import com.bigname.pim.api.service.UserService;

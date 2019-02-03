@@ -5,15 +5,16 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil2;
+import com.bigname.core.domain.EntityAssociation;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
+import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.EntityAssociation;
 import com.bigname.pim.api.domain.RootCategory;
-import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -38,7 +39,7 @@ import static com.bigname.common.util.ValidationUtil2.isEmpty;
  */
 @Controller
 @RequestMapping("pim/catalogs")
-public class CatalogController extends BaseController<Catalog, CatalogService>{
+public class CatalogController extends BaseController<Catalog, CatalogService> {
 
     private CatalogService catalogService;
     private WebsiteService websiteService;

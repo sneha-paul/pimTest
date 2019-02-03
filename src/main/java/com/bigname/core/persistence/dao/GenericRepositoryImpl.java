@@ -1,6 +1,6 @@
-package com.bigname.pim.api.persistence.dao;
+package com.bigname.core.persistence.dao;
 
-import com.bigname.pim.util.FindBy;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,13 +12,16 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
+abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
 
     protected final MongoTemplate mongoTemplate;
     private Class<T> entityClass;

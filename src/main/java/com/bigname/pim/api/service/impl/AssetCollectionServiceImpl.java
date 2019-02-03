@@ -1,13 +1,13 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.service.BaseServiceSupport;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
-import com.bigname.pim.util.FindBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;

@@ -1,4 +1,4 @@
-package com.bigname.pim.api.exception;
+package com.bigname.core.exception;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

@@ -1,10 +1,7 @@
 package com.bigname.common.util;
 
-import org.javatuples.Pair;
-import org.springframework.validation.BindingResult;
-
-import javax.validation.ConstraintViolation;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

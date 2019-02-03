@@ -1,6 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 
+import com.bigname.core.service.BaseServiceSupport;
 import com.bigname.pim.api.domain.Event;
 import com.bigname.pim.api.persistence.dao.EventDAO;
 import com.bigname.pim.api.service.EventService;

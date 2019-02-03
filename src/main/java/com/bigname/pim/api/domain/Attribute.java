@@ -1,14 +1,13 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.StringUtil;
+import com.bigname.core.domain.ValidatableEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.javatuples.Pair;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

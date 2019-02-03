@@ -1,6 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.core.persistence.dao.GenericRepositoryImpl;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductCategory;

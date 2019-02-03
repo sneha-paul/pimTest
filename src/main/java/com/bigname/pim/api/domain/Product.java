@@ -4,6 +4,7 @@ import com.bigname.common.util.BeanUtil;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.Entity;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -133,7 +134,7 @@ public class Product extends Entity<Product> {
         return ProductUtil.getDefaultAsset(this, FileAsset.AssetFamily.ASSETS);
     }
 
-    void setExternalId() {
+    protected void setExternalId() {
         this.productId = getExternalId();
     }
 

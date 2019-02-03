@@ -1,18 +1,23 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.core.service.BaseServiceSupport;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.api.service.VirtualFileService;
-import com.bigname.pim.util.*;
+import com.bigname.pim.util.PIMConstants;
+import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.util.ProductUtil;
 import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +27,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
-import static com.bigname.pim.util.FindBy.INTERNAL_ID;
 
 /**
  * Created by sruthi on 20-09-2018.

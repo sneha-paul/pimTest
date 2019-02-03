@@ -2,11 +2,12 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.service.BaseServiceSupport;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 import com.bigname.pim.api.service.VirtualFileService;
-import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;

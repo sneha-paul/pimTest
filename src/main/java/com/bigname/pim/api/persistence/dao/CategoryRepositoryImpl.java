@@ -1,13 +1,16 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.core.persistence.dao.GenericRepositoryImpl;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.CategoryProduct;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.RelatedCategory;
-import com.bigname.pim.util.*;
-import org.springframework.data.domain.*;
+import com.bigname.pim.util.PimUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -20,7 +23,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

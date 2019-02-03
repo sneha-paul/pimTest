@@ -1,4 +1,4 @@
-package com.bigname.pim.api.domain;
+package com.bigname.core.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;

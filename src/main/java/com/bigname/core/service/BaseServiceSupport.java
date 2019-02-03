@@ -1,19 +1,18 @@
-package com.bigname.pim.api.service.impl;
+package com.bigname.core.service;
 
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
-import com.bigname.pim.api.domain.Entity;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.exception.DuplicateEntityException;
+import com.bigname.core.exception.EntityCreateException;
+import com.bigname.core.persistence.dao.GenericDAO;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.domain.ValidatableEntity;
-import com.bigname.pim.api.exception.DuplicateEntityException;
-import com.bigname.pim.api.exception.EntityCreateException;
-import com.bigname.pim.api.service.BaseService;
-import com.bigname.pim.api.persistence.dao.GenericDAO;
-import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
-import com.bigname.pim.util.Toggle;
 import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
 import org.springframework.aop.framework.AopContext;
@@ -28,13 +27,13 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.pim.util.FindBy.EXTERNAL_ID;
-import static com.bigname.pim.util.FindBy.INTERNAL_ID;
+import static com.bigname.core.util.FindBy.EXTERNAL_ID;
+import static com.bigname.core.util.FindBy.INTERNAL_ID;
 
 /**
  * Created by manu on 8/18/18.
  */
-abstract class BaseServiceSupport<T extends Entity, DAO extends GenericDAO<T>, Service extends BaseService<T, DAO>> implements BaseService<T, DAO > {
+abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDAO<T>, Service extends BaseService<T, DAO>> implements BaseService<T, DAO > {
 
     protected DAO dao;
     protected String entityName;

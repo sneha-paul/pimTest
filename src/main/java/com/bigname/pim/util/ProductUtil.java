@@ -6,7 +6,10 @@ import com.bigname.pim.api.domain.FileAsset;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

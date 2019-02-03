@@ -3,10 +3,12 @@ package com.bigname.pim.client.util;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.URLUtil;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.service.BaseService;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.client.model.Breadcrumbs;
-import com.bigname.pim.util.FindBy;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -14,8 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.*;
-import static com.bigname.pim.util.PIMConstants.Character.*;
+import static com.bigname.common.util.ValidationUtil.isEmpty;
+import static com.bigname.common.util.ValidationUtil.isNotEmpty;
+import static com.bigname.pim.util.PIMConstants.Character.EQUALS;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

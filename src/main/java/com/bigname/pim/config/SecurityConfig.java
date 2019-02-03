@@ -1,5 +1,6 @@
 package com.bigname.pim.config;
 
+import com.bigname.core.config.AjaxAwareAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

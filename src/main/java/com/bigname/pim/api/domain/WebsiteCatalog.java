@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.EntityAssociation;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.LinkedHashMap;

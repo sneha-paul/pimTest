@@ -1,21 +1,24 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.pim.api.domain.*;
+import com.bigname.core.service.BaseService;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
+import com.bigname.pim.api.domain.Family;
+import com.bigname.pim.api.domain.FamilyAttribute;
+import com.bigname.pim.api.domain.FamilyAttributeOption;
+import com.bigname.pim.api.domain.VariantGroup;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Toggle;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by manu on 9/4/18.
  */
-public interface FamilyService extends BaseService<Family, FamilyDAO>  {
+public interface FamilyService extends BaseService<Family, FamilyDAO> {
 
 
     List<Family> saveAll(List<Family> families);

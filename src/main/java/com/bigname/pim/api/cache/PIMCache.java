@@ -1,6 +1,6 @@
 package com.bigname.pim.api.cache;
 
-import com.bigname.pim.api.domain.Entity;
+import com.bigname.core.domain.Entity;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

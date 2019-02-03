@@ -10,14 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
 
-
-import static com.bigname.pim.api.domain.Category.Property.ID;
 import static com.bigname.common.util.ValidationUtil.isEmpty;
 import static com.bigname.pim.api.domain.Category.Property.*;
 

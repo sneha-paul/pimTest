@@ -5,13 +5,18 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.ValidationUtil2;
-import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.exception.EntityNotFoundException;
+import com.bigname.core.domain.EntityAssociation;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
+import com.bigname.core.web.controller.BaseController;
+import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.CategoryProduct;
+import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,7 +39,7 @@ import static com.bigname.common.util.ValidationUtil2.isEmpty;
  */
 @Controller
 @RequestMapping("pim/categories")
-public class CategoryController extends BaseController<Category, CategoryService>{
+public class CategoryController extends BaseController<Category, CategoryService> {
 
     private CategoryService categoryService;
 

@@ -1,8 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.Entity;
-import com.bigname.pim.api.domain.ValidatableEntity;
-import com.bigname.pim.api.service.BaseService;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.service.BaseService;
 import org.javatuples.Pair;
 
 import javax.servlet.http.HttpServletRequest;

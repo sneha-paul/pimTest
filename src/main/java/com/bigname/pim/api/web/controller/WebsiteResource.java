@@ -2,20 +2,17 @@ package com.bigname.pim.api.web.controller;
 
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.Defaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import static com.bigname.pim.util.ConvertUtil.*;
-import static com.bigname.pim.util.Defaults.*;
-import static com.bigname.pim.util.FindBy.findBy;
-
-import java.util.List;
 import java.util.Optional;
+
+import static com.bigname.core.util.FindBy.findBy;
+import static com.bigname.pim.util.ConvertUtil.toBoolean;
+import static com.bigname.pim.util.Defaults.PAGE_SIZE;
+import static com.bigname.pim.util.Defaults.PAGE_SIZES;
 
 @RestController
 @RequestMapping("pim/api/websites")

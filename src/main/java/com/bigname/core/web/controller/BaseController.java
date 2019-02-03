@@ -1,4 +1,4 @@
-package com.bigname.pim.client.web.controller;
+package com.bigname.core.web.controller;
 
 import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
@@ -6,14 +6,15 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ReflectionUtil;
-import com.bigname.pim.api.domain.Entity;
-import com.bigname.pim.api.domain.EntityAssociation;
-import com.bigname.pim.api.domain.ValidatableEntity;
-import com.bigname.pim.api.service.BaseService;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.EntityAssociation;
+import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.service.BaseService;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Toggle;
+import com.bigname.pim.client.web.controller.ControllerSupport;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -121,21 +122,21 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return service.validate(e, context, groups);
     }
 
-    ModelAndView details(String id, Map<String, Object> parameterMap, HttpServletRequest request, Map<String, Object> model) {
+    protected ModelAndView details(String id, Map<String, Object> parameterMap, HttpServletRequest request, Map<String, Object> model) {
         model.put("breadcrumbs", buildBreadcrumbs(id, request, parameterMap));
         return details(model);
     }
 
-    ModelAndView details(String id, Map<String, Object> model) {
+    protected ModelAndView details(String id, Map<String, Object> model) {
         model.put("breadcrumbs", buildBreadcrumbs(id, null, null));
         return details(model);
     }
 
-    ModelAndView details(Map<String, Object> model) {
+    protected ModelAndView details(Map<String, Object> model) {
         return new ModelAndView((String)model.remove("view"), model);
     }
 
-    Result<Map<String, Object>> getAssociationGridData(Page<Map<String, Object>> paginatedResult, Class<? extends EntityAssociation<T, ?>> associationClass, HttpServletRequest request) {
+    protected Result<Map<String, Object>> getAssociationGridData(Page<Map<String, Object>> paginatedResult, Class<? extends EntityAssociation<T, ?>> associationClass, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, Object>> result = new Result<>();
@@ -157,7 +158,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return result;
     }
 
-    Pageable getPaginationRequest(HttpServletRequest request) {
+    protected Pageable getPaginationRequest(HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Sort sort = null;

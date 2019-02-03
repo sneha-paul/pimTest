@@ -1,7 +1,5 @@
 package com.bigname.common.datatable.model;
 
-import java.util.Map;
-
 /**
  * The Pagination model class
  *

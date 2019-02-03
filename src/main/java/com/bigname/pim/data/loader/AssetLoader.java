@@ -1,15 +1,11 @@
 package com.bigname.pim.data.loader;
 
 import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.AssetCollection;
-import com.bigname.pim.api.domain.ValidatableEntity;
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.service.AssetCollectionService;
-import com.bigname.pim.api.service.BaseService;
 import com.bigname.pim.api.service.VirtualFileService;
-import com.bigname.pim.util.FindBy;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +14,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

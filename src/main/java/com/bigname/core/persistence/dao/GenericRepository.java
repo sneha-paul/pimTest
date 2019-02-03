@@ -1,6 +1,6 @@
-package com.bigname.pim.api.persistence.dao;
+package com.bigname.core.persistence.dao;
 
-import com.bigname.pim.util.FindBy;
+import com.bigname.core.util.FindBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;

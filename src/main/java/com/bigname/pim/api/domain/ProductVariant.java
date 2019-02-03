@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.core.domain.Entity;
 import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
@@ -151,7 +152,7 @@ public class ProductVariant extends Entity<ProductVariant> {
         return ProductUtil.getDefaultAsset(this, FileAsset.AssetFamily.ASSETS);
     }
 
-    void setExternalId() {
+    protected void setExternalId() {
         this.productVariantId = getExternalId();
     }
 

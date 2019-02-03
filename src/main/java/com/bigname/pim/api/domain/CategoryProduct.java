@@ -1,11 +1,10 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.EntityAssociation;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static com.bigname.pim.api.domain.ValidatableEntity.isNotEmpty;
 
 /**
  * Created by sruthi on 26-09-2018.

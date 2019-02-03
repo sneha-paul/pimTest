@@ -1,4 +1,4 @@
-package com.bigname.pim.api.domain;
+package com.bigname.core.domain;
 
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
@@ -56,19 +56,19 @@ abstract public class ValidatableEntity<T> implements Serializable {
         return 0;
     }
 
-    static boolean isEmpty(Object object) {
+    protected static boolean isEmpty(Object object) {
         return ValidationUtil.isEmpty(object);
     }
 
-    static boolean isNotEmpty(Object object) {
+    protected static boolean isNotEmpty(Object object) {
         return ValidationUtil.isNotEmpty(object);
     }
 
-    static boolean isNull(Object object) {
+    protected static boolean isNull(Object object) {
         return ValidationUtil.isNull(object);
     }
 
-    static boolean isNotNull(Object object) {
+    protected static boolean isNotNull(Object object) {
         return ValidationUtil.isNotNull(object);
     }
 
@@ -76,7 +76,7 @@ abstract public class ValidatableEntity<T> implements Serializable {
         return ConversionUtil.toId(value);
     }
 
-    static String toYesNo(String value, String checkFor) {
+    protected static String toYesNo(String value, String checkFor) {
         switch(checkFor) {
             case "Y":
                 return "Y".equalsIgnoreCase(value)  ? "Y" : "N";
@@ -91,15 +91,15 @@ abstract public class ValidatableEntity<T> implements Serializable {
         }
     }
 
-    static List<String> getPipedValues(String value) {
+    protected static List<String> getPipedValues(String value) {
         return StringUtil.splitPipeDelimitedAsList(value);
     }
 
-    static boolean booleanValue(String value) {
+    protected static boolean booleanValue(String value) {
         return "Y".equals(value);
     }
 
-    static String toJSONString(Object value) {
+    protected static String toJSONString(Object value) {
         return ConversionUtil.toJSONString(value);
     }
 

@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -46,7 +47,7 @@ public class PricingAttribute extends Entity<PricingAttribute> {
     }
 
     @Override
-    void setExternalId() {
+    protected void setExternalId() {
         this.pricingAttributeId = getExternalId();
     }
 

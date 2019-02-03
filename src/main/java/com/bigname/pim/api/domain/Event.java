@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.core.domain.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -91,7 +92,7 @@ public class Event extends Entity<Event> {
     }
 
     @Override
-    void setExternalId() {
+    protected void setExternalId() {
 
     }
 

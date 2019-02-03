@@ -1,5 +1,6 @@
 package com.bigname.pim.api.persistence.dao;
 
+import com.bigname.core.persistence.dao.GenericRepository;
 import com.bigname.pim.api.domain.AttributeCollection;
 
 /**

@@ -1,5 +1,6 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.core.service.BaseServiceSupport;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
 import com.bigname.pim.api.service.PricingAttributeService;

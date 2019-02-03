@@ -1,9 +1,13 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.pim.api.domain.*;
+import com.bigname.core.service.BaseService;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
+import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.CategoryProduct;
+import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.util.FindBy;
-import com.bigname.pim.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,7 +18,7 @@ import java.util.Map;
 /**
  * Created by sruthi on 29-08-2018.
  */
-public interface CategoryService extends  BaseService<Category, CategoryDAO> {
+public interface CategoryService extends BaseService<Category, CategoryDAO> {
 //    Page<Category> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     Page<Product> findAvailableProductsForCategory(String categoryId, FindBy externalId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);

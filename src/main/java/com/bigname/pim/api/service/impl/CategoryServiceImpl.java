@@ -1,18 +1,21 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.EntityAssociation;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.core.service.BaseServiceSupport;
+import com.bigname.core.util.FindBy;
+import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.exception.EntityNotFoundException;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
-import com.bigname.pim.util.FindBy;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
-import com.bigname.pim.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.query.Criteria;

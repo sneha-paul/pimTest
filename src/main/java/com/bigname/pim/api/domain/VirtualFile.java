@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.core.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -166,7 +167,7 @@ public class VirtualFile extends Entity<VirtualFile> {
     }
 
     @Override
-    void setExternalId() {
+    protected void setExternalId() {
         this.fileId = getExternalId();
     }
 
