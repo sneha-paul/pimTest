@@ -12,12 +12,40 @@ import java.util.stream.Collectors;
  * Created by Manu on 8/6/2018.
  */
 public class PimUtil {
-    public static String[] getActiveOptions(boolean... activeOnly) {
-        if(getValue(Boolean.TRUE, activeOnly)) {
-            return new String[] {"Y"};
-        } else {
-            return new String[] {"Y", "N"};
+    public static String[] getActiveOptions(boolean... activeOption) {
+        boolean[] activeFlags = getActiveFlags(activeOption);
+        List<String> options = new ArrayList<>();
+        if(activeFlags[0]) {
+            options.add("Y");
         }
+        if(activeFlags[1]) {
+            options.add("N");
+        }
+
+        return options.toArray(new String[0]);
+
+    }
+
+    public static boolean showDiscontinued(boolean... activeOption) {
+        return getActiveFlags(activeOption)[2];
+    }
+
+    public static boolean[] getActiveFlags(boolean... activeFlags) {
+        boolean flag1, flag2, flag3;
+        if(getLength(activeFlags) < 2) {
+            flag1 = true;
+            flag2 = !getValue(Boolean.TRUE, activeFlags);
+            flag3 = false;
+        } else {
+            flag1 = getValue(0, activeFlags).orElse(false);
+            flag2 = getValue(1, activeFlags).orElse(false);
+            flag3 = getValue(2, activeFlags).orElse(false);
+        }
+        return new boolean[] {flag1, flag2, flag3};
+    }
+
+    public static int getLength(boolean... booleanVarArg) {
+        return booleanVarArg == null ? 0 : booleanVarArg.length;
     }
 
     public static Optional<Boolean> getValue(boolean... booleanVarArg) {
@@ -25,6 +53,18 @@ public class PimUtil {
             return Optional.empty();
         } else {
             return Optional.of(booleanVarArg[0]);
+        }
+    }
+
+    public static Optional<Boolean> getValue(int idx, boolean... booleanVarArg) {
+        if(idx == 0) {
+            return getValue(booleanVarArg);
+        }
+
+        if(idx < 0 || booleanVarArg == null || booleanVarArg.length < idx + 1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(booleanVarArg[idx]);
         }
     }
 
@@ -37,11 +77,12 @@ public class PimUtil {
     }
 
     public static boolean getValue(boolean defaultValue, boolean... booleanVarArg) {
-        if(booleanVarArg == null || booleanVarArg.length == 0) {
+        return getValue(booleanVarArg).orElse(defaultValue);
+        /*if(booleanVarArg == null || booleanVarArg.length == 0) {
             return defaultValue;
         } else {
             return booleanVarArg[0];
-        }
+        }*/
     }
 
     public static Collection<? extends Entity> sort(List<? extends Entity> source, List<String> sortedIds) {

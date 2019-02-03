@@ -14,11 +14,11 @@ import java.util.Optional;
  * @since 1.0
  */
 public interface GenericRepository<T> {
-    //Test method using mongoTemplate
     Optional<T> findById(String id, FindBy findBy);
     List<T> findAll(Map<String, Object> criteria);
     List<T> findAll(Criteria criteria);
     Page<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired);
     Optional<T> findOne(Map<String, Object> criteria);
     Optional<T> findOne(Criteria criteria);
+    Page<T> findAll(Pageable pageable, boolean... activeRequired);
 }

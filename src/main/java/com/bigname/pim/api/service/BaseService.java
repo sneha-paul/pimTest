@@ -48,6 +48,8 @@ public interface BaseService<T, DAO> {
 
     List<T> getAll(Sort sort, boolean... activeRequired);
 
+    Page<T> findAll(Pageable pageable, boolean... activeRequired);
+
     Page<T> getAll(String[] ids, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
 
     List<T> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired);

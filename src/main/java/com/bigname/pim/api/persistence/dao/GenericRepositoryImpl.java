@@ -11,10 +11,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -74,5 +72,60 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T>{
         return t == null ? Optional.empty() : Optional.of(t);
     }
 
+    /**
+     * activeRequired vararg combinations
+     * 			                    -	active
+     *           true			    -	active
+     *           false			    -	active, inactive
+     *           false, true		-	inactive
+     *           false, false, true	-	discontinued
+     *           false, true, true	-	inactive, discontinued
+     *           true, true, true	-	active, inactive, discontinued
+     *
+     * */
+    @Override
+    public Page<T> findAll(Pageable pageable, boolean... activeRequired) {
 
+        Query query = new Query();
+        Criteria criteria = new Criteria();
+        String[] activeOptions = PimUtil.getActiveOptions(activeRequired);
+        Criteria activeCriteria = Criteria.where("active").in(Arrays.asList(activeOptions));
+
+        boolean showDiscontinued = PimUtil.showDiscontinued(activeRequired);
+        if(showDiscontinued) {
+            //Discontinued
+            // (start == null && end == null && disc = 'Y') or
+            // (start != null && end != null && start <= now && end >= now) or
+            // (start != null && end == null && start <= now) or
+            // (start == null && end != null && end >= now)
+            Criteria discontinueCriteria = new Criteria();
+            discontinueCriteria.orOperator(
+                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").is(null).and("discontinued").is("N"),
+                    Criteria.where("discontinuedFrom").ne(null).lte(LocalDateTime.now()).and("discontinuedTo").ne(null).gte(LocalDateTime.now()),
+                    Criteria.where("discontinuedFrom").ne(null).lte(LocalDateTime.now()).and("discontinuedTo").is(null),
+                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).gte(LocalDateTime.now())
+            );
+            criteria.orOperator(activeCriteria, discontinueCriteria);
+        } else {
+            //Not discontinued
+            // (start == null && end == null && disc != 'Y') or
+            // (start != null && end != null && start > now && end < now) or
+            // (start != null && end == null && start > now) or
+            // (start == null && end != null && end < now)
+
+            Criteria discontinueCriteria = new Criteria();
+            discontinueCriteria.orOperator(
+                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").is(null).and("discontinued").is("N"),
+                    Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()).and("discontinuedTo").ne(null).lt(LocalDateTime.now()),
+                    Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()).and("discontinuedTo").is(null),
+                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).lt(LocalDateTime.now())
+            );
+            criteria.andOperator(activeCriteria, discontinueCriteria);
+        }
+        query.addCriteria(criteria).with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()));
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(query, entityClass),
+                pageable,
+                () -> mongoTemplate.count(query, entityClass));
+    }
 }

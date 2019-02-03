@@ -3,7 +3,6 @@ package com.bigname.pim.api.persistence.dao;
 import com.bigname.pim.api.domain.ProductVariant;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +10,7 @@ import java.util.Optional;
 /**
  * Created by sruthi on 20-09-2018.
  */
-public interface ProductVariantDAO extends BaseDAO<ProductVariant>, MongoRepository<ProductVariant, String>, ProductVariantRepository {
+public interface ProductVariantDAO extends GenericDAO<ProductVariant>, ProductVariantRepository {
     Page<ProductVariant> findByProductIdAndChannelIdAndActiveIn(String productId, String channelId, String active[], Pageable pageable);
     List<ProductVariant> findByProductIdInAndChannelIdAndActiveIn(String productId[], String channelId, String active[]);
     Page<ProductVariant> findByProductIdAndChannelIdAndExternalIdInAndActiveIn(String productId, String channelId, String[] productVariantIds, String active[], Pageable pageable);
