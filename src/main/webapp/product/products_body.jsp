@@ -8,11 +8,6 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
                             <button id="js-create-product" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Product</span></button>
-                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary"><i class="fa fa-upload"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary"><i class="fa fa-download"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-sm btn-success"><i class="icon-check"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-sm btn-danger"><i class="icon-ban"></i></a>
-                            <a href="javascript:void(0);" class="btn btn-sm btn-outline-warning"><i class="icon-trash"></i></a>
                         </div>
                     </div>
                 </div>

@@ -87,6 +87,22 @@
             cursor: pointer;
         }
 
+        .dt-toolbar {
+            text-align: right;
+        }
+
+        .dt-buttons {
+            display: inline-block;
+        }
+
+        .dt-buttons .btn {
+            margin: -3px 1px 0 1px;
+        }
+
+        .dt-filter {
+            display: inline-block;
+        }
+
         .grid-image-holder {
             text-align: center;
             height:80px;
@@ -737,7 +753,7 @@
 
 <%--<script src="/assets/bundles/datatablescripts.bundle.js"></script>--%>
 
-<script src="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.js"></script>
+<script src="/assets/vendor/jquery-datatable/dataTables.bootstrap4.js"></script>
 <script src="/assets/vendor/jquery-datatable/dataTables.rowReorder.js"></script>
 
 <script src="/assets/js/pages/tables/jquery-datatable-conditional-paging.js"></script>

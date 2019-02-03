@@ -338,6 +338,7 @@
                 searching: typeof options.searching === 'undefined' ?  true : options.searching,
                 ordering: !(typeof options.reordering !== 'undefined' && options.reordering),
                 rowReorder: typeof options.reordering !== 'undefined' && options.reordering ? {snapX: 10} : false,
+                // dom: "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-10 dt-toolbar'<'dt-buttons'><'dt-filter'f>>>",
                 language: {
                     info: "_START_ to _END_ of _TOTAL_",
                     lengthMenu: "_MENU_",
@@ -370,6 +371,13 @@
                             });
                     $(options.selector + '_filter.dataTables_filter .search-btn').remove();
                     $(options.selector + '_filter.dataTables_filter').append($clearButton, $searchButton);
+
+                    let importButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary"><i class="fa fa-download"></i></a>');
+                    let exportButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary"><i class="fa fa-upload"></i></a>');
+                    let activeButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-success"><i class="icon-check"></i></a>');
+                    let inactiveButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-danger"><i class="icon-ban"></i></a>');
+                    let discontinuedButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-outline-warning"><i class="icon-trash"></i></a>');
+                    $('.dt-buttons').append(importButton, exportButton, activeButton, inactiveButton, discontinuedButton);
                 },
                 ajax: {
                     url: options.url,
