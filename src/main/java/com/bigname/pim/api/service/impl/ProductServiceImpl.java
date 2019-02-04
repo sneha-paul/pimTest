@@ -57,26 +57,6 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     @Override
-    public Product createOrUpdate(Product product) {
-        return productDAO.save(product);
-    }
-
-    @Override
-    public List<Product> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<Product> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<Product> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return productDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
     public Page<Map<String, Object>> findAllProductCategories(String productId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(productId, findBy, false)
                 .map(category -> productDAO.findAllProductCategories(category.getId(), searchField, keyword, pageable, activeRequired))
@@ -90,15 +70,6 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
-    @Override
-    public Optional<Product> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<Product> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
-    }
 
     /**
      * Use this method to get variants of a product with activeRequired options for both product and variants. Otherwise use productVariantService.getAll().
@@ -190,18 +161,6 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         Optional<Product> product = super.get(id, findBy, activeRequired);
         product.ifPresent(product1 -> setProductFamily(product1, FindBy.INTERNAL_ID));
         return product;
-    }
-
-    @Override
-    public List<Product> create(List<Product> products) {
-        products.forEach(product -> {product.setCreatedUser(getCurrentUser());product.setCreatedDateTime(LocalDateTime.now());});
-        return productDAO.insert(products);
-    }
-
-    @Override
-    public List<Product> update(List<Product> products) {
-        products.forEach(product -> {product.setLastModifiedUser(getCurrentUser());product.setLastModifiedDateTime(LocalDateTime.now());});
-        return productDAO.saveAll(products);
     }
 
     /**

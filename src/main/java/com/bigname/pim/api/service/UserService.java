@@ -11,8 +11,4 @@ import java.util.List;
  */
 public interface UserService extends BaseService<User, UserDAO> {
 
-    List<User> create(List<User> users);
-
-    List<User> update(List<User> users);
-
 }

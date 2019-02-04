@@ -37,48 +37,6 @@ public class UserServiceImpl extends BaseServiceSupport<User, UserDAO, UserServi
     }
 
     @Override
-    public User createOrUpdate(User user) {
-        return userDAO.save(user);
-    }
-
-    @Override
-    public List<User> create(List<User> users) {
-        users.forEach(user -> {user.setCreatedUser(getCurrentUser());user.setCreatedDateTime(LocalDateTime.now());});
-        return userDAO.insert(users);
-    }
-
-    @Override
-    public List<User> update(List<User> users) {
-        users.forEach(user -> {user.setLastModifiedUser(getCurrentUser());user.setLastModifiedDateTime(LocalDateTime.now());});
-        return userDAO.saveAll(users);
-    }
-
-    @Override
-    public List<User> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<User> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<User> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return userDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
-    public Optional<User> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<User> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException, DisabledException {
         final User user = userDAO.findByEmail(email.toUpperCase());
 

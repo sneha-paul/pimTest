@@ -52,38 +52,6 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public Category createOrUpdate(Category category) {
-        return categoryDAO.save(category);
-    }
-
-    @Override
-    public List<Category> create(List<Category> categories) {
-        categories.forEach(category -> {category.setCreatedUser(getCurrentUser());category.setCreatedDateTime(LocalDateTime.now());});
-        return categoryDAO.insert(categories);
-    }
-
-    @Override
-    public List<Category> update(List<Category> categories) {
-        categories.forEach(category -> {category.setLastModifiedUser(getCurrentUser());category.setLastModifiedDateTime(LocalDateTime.now());});
-        return categoryDAO.saveAll(categories);
-    }
-
-    @Override
-    public List<Category> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<Category> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<Category> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return categoryDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
     public Page<Map<String, Object>> findAllSubCategories(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
                 .map(category -> categoryDAO.findAllSubCategories(category.getId(), searchField, keyword, pageable, activeRequired))
@@ -109,15 +77,6 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         return get(categoryId, findBy, false)
                 .map(product -> categoryDAO.findAvailableProductsForCategory(product.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
-    }
-    @Override
-    public Optional<Category> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<Category> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
     }
 
     @Override

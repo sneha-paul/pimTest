@@ -32,43 +32,4 @@ public class PricingAttributeServiceImpl extends BaseServiceSupport<PricingAttri
 
     }
 
-    @Override
-    public PricingAttribute createOrUpdate(PricingAttribute pricingAttribute) {return pricingAttributeDAO.save(pricingAttribute);}
-
-    @Override
-    public List<PricingAttribute> create(List<PricingAttribute> pricingAttributes) {
-        pricingAttributes.forEach(pricingAttribute -> {pricingAttribute.setCreatedUser(getCurrentUser());pricingAttribute.setCreatedDateTime(LocalDateTime.now());});
-        return pricingAttributeDAO.insert(pricingAttributes);
-    }
-
-    @Override
-    public List<PricingAttribute> update(List<PricingAttribute> pricingAttributes) {
-        pricingAttributes.forEach(pricingAttribute -> {pricingAttribute.setLastModifiedUser(getCurrentUser());pricingAttribute.setLastModifiedDateTime(LocalDateTime.now());});
-        return pricingAttributeDAO.saveAll(pricingAttributes);
-    }
-
-    @Override
-    public List<PricingAttribute> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<PricingAttribute> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<PricingAttribute> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return pricingAttributeDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
-    public Optional<PricingAttribute> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<PricingAttribute> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
-    }
 }

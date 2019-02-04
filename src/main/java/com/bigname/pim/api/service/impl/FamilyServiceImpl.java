@@ -36,52 +36,10 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public Family createOrUpdate(Family family) {
-        return familyDAO.save(family);
-    }
-
-    @Override
-    public List<Family> create(List<Family> families) {
-        families.forEach(family -> {family.setCreatedUser(getCurrentUser());family.setCreatedDateTime(LocalDateTime.now());});
-        return familyDAO.insert(families);
-    }
-
-    @Override
-    public List<Family> update(List<Family> families) {
-        families.forEach(family -> {family.setLastModifiedUser(getCurrentUser());family.setLastModifiedDateTime(LocalDateTime.now());});
-        return familyDAO.saveAll(families);
-    }
-
-    @Override
     public List<Family> saveAll(List<Family> families) {
         List<Family> _families = familyDAO.saveAll(families);
-        _families.forEach(family -> family.getVariantGroups().forEach((k, variantGroup) -> variantGroup.setFamily(family)));
+        _families.forEach(family -> family.getVariantGroups().forEach((k, variantGroup) -> variantGroup.setFamily(family))); //TODO - verify if this is required
         return _families;
-    }
-
-    @Override
-    public List<Family> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<Family> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<Family> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return familyDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
-    public Optional<Family> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<Family> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
     }
 
     @Override

@@ -34,48 +34,6 @@ public class AssetCollectionServiceImpl extends BaseServiceSupport<AssetCollecti
     }
 
     @Override
-    public List<AssetCollection> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<AssetCollection> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<AssetCollection> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return assetCollectionDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
-    public Optional<AssetCollection> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<AssetCollection> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    protected AssetCollection createOrUpdate(AssetCollection assetCollection) {
-        return assetCollectionDAO.save(assetCollection);
-    }
-
-    @Override
-    public List<AssetCollection> create(List<AssetCollection> assetCollections) {
-        assetCollections.forEach(assetCollection -> {assetCollection.setCreatedUser(getCurrentUser());assetCollection.setCreatedDateTime(LocalDateTime.now());});
-        return assetCollectionDAO.insert(assetCollections);
-    }
-
-    @Override
-    public List<AssetCollection> update(List<AssetCollection> assetCollections) {
-        assetCollections.forEach(assetCollection -> {assetCollection.setLastModifiedUser(getCurrentUser());assetCollection.setLastModifiedDateTime(LocalDateTime.now());});
-        return assetCollectionDAO.saveAll(assetCollections);
-    }
-
-    @Override
     public List<Map<String, Object>> getAssetsHierarchy(String collectionId, FindBy findBy, String nodeId,  boolean... activeRequired) {
         List<Map<String, Object>> hierarchy = new ArrayList<>();
         get(collectionId, findBy, activeRequired)

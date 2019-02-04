@@ -25,6 +25,10 @@ public interface BaseService<T, DAO> {
 
     T update(String id, FindBy findBy, T t);
 
+    List<T> create(List<T> entities);
+
+    List<T> update(List<T> entities);
+
     Optional<T> get(String id, FindBy findBy, boolean... activeRequired);
 
     boolean toggle(String id, FindBy findBy, Toggle active);
@@ -68,9 +72,7 @@ public interface BaseService<T, DAO> {
 
     List<T> findAll(Criteria criteria);
 
-    default Page<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return new PageImpl<>(new ArrayList<>());  // TODO - Remove this default implementation after implementing search for all entities
-    }
+    Page<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
     Optional<T> findOne(Map<String, Object> criteria);
 

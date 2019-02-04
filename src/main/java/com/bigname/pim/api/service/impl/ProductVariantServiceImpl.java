@@ -49,30 +49,10 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public List<ProductVariant> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<ProductVariant> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
     public Page<ProductVariant> findAll(String searchField, String keyword, String productId, FindBy findBy, String channelId, Pageable pageable, boolean... activeRequired) {
         return productDAO.findById(productId, findBy)
                 .map(product -> productVariantDAO.findAll(searchField, keyword, product.getId(), channelId, pageable, activeRequired))
                 .orElse(new PageImpl<ProductVariant>(new ArrayList<>()));
-    }
-
-    @Override
-    public Optional<ProductVariant> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<ProductVariant> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
     }
 
     @Override
@@ -92,10 +72,10 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         return super.update(variantId, variantIdFindBy, productVariant);
     }
 
-    @Override
+    /*@Override
     protected ProductVariant createOrUpdate(ProductVariant productVariant) {
         return productVariantDAO.save(productVariant);
-    }
+    }*/
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
@@ -138,23 +118,11 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         if(_variant.isPresent()) {
             ProductVariant variant = _variant.get();
             variant.setActive(active.state());
-            createOrUpdate(variant);
+            productVariantDAO.save(variant);
             return true;
         } else {
             return false;
         }
-    }
-
-    @Override
-    public List<ProductVariant> create(List<ProductVariant> productVariants) {
-        productVariants.forEach(productVariant -> {productVariant.setCreatedUser(getCurrentUser());productVariant.setCreatedDateTime(LocalDateTime.now());});
-        return productVariantDAO.insert(productVariants);
-    }
-
-    @Override
-    public List<ProductVariant> update(List<ProductVariant> productVariants) {
-        productVariants.forEach(productVariant -> {productVariant.setLastModifiedUser(getCurrentUser());productVariant.setLastModifiedDateTime(LocalDateTime.now());});
-        return productVariantDAO.saveAll(productVariants);
     }
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead

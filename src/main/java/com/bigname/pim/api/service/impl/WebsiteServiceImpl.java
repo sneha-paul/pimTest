@@ -43,21 +43,6 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     }
 
     @Override
-    public List<Website> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<Website> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<Website> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return websiteDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
     public Page<Map<String, Object>> findAllWebsiteCatalogs(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(websiteId, findBy, false)
                 .map(catalog -> websiteDAO.findAllWebsiteCatalogs(catalog.getId(), searchField, keyword, pageable, activeRequired))
@@ -69,33 +54,6 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
         return get(websiteId, findBy, false)
                 .map(catalog -> websiteDAO.findAvailableCatalogsForWebsite(catalog.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
-    }
-
-    @Override
-    public Optional<Website> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<Website> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Website createOrUpdate(Website website) {
-        return websiteDAO.save(website);
-    }
-
-    @Override
-    public List<Website> create(List<Website> websites) {
-        websites.forEach(website -> {website.setCreatedUser(getCurrentUser());website.setCreatedDateTime(LocalDateTime.now());});
-        return websiteDAO.insert(websites);
-    }
-
-    @Override
-    public List<Website> update(List<Website> websites) {
-        websites.forEach(website -> {website.setLastModifiedUser(getCurrentUser());website.setLastModifiedDateTime(LocalDateTime.now());});
-        return websiteDAO.saveAll(websites);
     }
 
     /**

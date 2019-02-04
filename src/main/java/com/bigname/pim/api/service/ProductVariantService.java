@@ -22,10 +22,6 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     boolean toggle(String productId, FindBy productIdFindBy,  String channelId, String productVariantId, FindBy variantIdFindBy, Toggle active);
 
-    List<ProductVariant> create(List<ProductVariant> productVariants);
-
-    List<ProductVariant> update(List<ProductVariant> productVariants);
-
     ProductVariant cloneInstance(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, Entity.CloneType type);
 
     Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, int page, int size, Sort sort, boolean... activeRequired);

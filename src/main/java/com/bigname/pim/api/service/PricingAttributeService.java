@@ -11,7 +11,4 @@ import java.util.List;
  */
 public interface PricingAttributeService extends BaseService<PricingAttribute,PricingAttributeDAO> {
 
-    List<PricingAttribute> create(List<PricingAttribute> pricingAttributes);
-
-    List<PricingAttribute> update(List<PricingAttribute> pricingAttributes);
 }

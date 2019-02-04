@@ -15,7 +15,4 @@ public interface VirtualFileService extends BaseService<VirtualFile, VirtualFile
     List<VirtualFile> getFiles(String directoryId);
     Optional<VirtualFile> getFile(String fileName, String directoryId);
 
-    List<VirtualFile> create(List<VirtualFile> virtualFiles);
-
-    List<VirtualFile> update(List<VirtualFile> virtualFiles);
 }

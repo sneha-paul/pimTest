@@ -12,7 +12,4 @@ import java.util.List;
  */
 public interface ChannelService extends BaseService<Channel, ChannelDAO> {
 
-    List<Channel> create(List<Channel> channels);
-
-    List<Channel> update(List<Channel> channels);
 }

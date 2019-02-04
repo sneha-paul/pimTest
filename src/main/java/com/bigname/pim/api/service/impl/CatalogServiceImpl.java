@@ -53,41 +53,6 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         this.categoryService = categoryService;
     }
 
-
-    @Override
-    public Catalog createOrUpdate(Catalog catalog) {
-        return catalogDAO.save(catalog);
-    }
-
-    @Override
-    public List<Catalog> create(List<Catalog> catalogs) {
-        catalogs.forEach(catalog -> {catalog.setCreatedUser(getCurrentUser());catalog.setCreatedDateTime(LocalDateTime.now());});
-        return catalogDAO.insert(catalogs);
-    }
-
-    @Override
-    public List<Catalog> update(List<Catalog> catalogs) {
-        catalogs.forEach(catalog -> {catalog.setLastModifiedUser(getCurrentUser());catalog.setLastModifiedDateTime(LocalDateTime.now());});
-        return catalogDAO.saveAll(catalogs);
-    }
-
-    @Override
-    public List<Catalog> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<Catalog> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-
-
-    @Override
-    public Page<Catalog> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return catalogDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
     @Override
     public Page<Map<String, Object>> findAllRootCategories(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(catalogId, findBy, false)
@@ -100,16 +65,6 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         return get(catalogId, findBy, false)
                 .map(category -> catalogDAO.findAvailableRootCategoriesForCatalog(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
-    }
-
-    @Override
-    public Optional<Catalog> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<Catalog> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
     }
 
     /**

@@ -10,11 +10,15 @@ import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 import com.bigname.pim.api.service.VirtualFileService;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,31 +38,6 @@ public class VirtualFileServiceImpl extends BaseServiceSupport<VirtualFile, Virt
         super(virtualFileDAO, "virtualFile", validator);
         this.virtualFileDAO = virtualFileDAO;
         this.assetCollectionDAO = assetCollectionDAO;
-    }
-
-    @Override
-    public List<VirtualFile> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<VirtualFile> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Optional<VirtualFile> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<VirtualFile> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    protected VirtualFile createOrUpdate(VirtualFile virtualFile) {
-        return virtualFileDAO.save(virtualFile);
     }
 
     @Override

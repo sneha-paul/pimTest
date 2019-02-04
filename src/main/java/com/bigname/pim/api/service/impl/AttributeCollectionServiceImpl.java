@@ -34,48 +34,6 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
     }
 
     @Override
-    public AttributeCollection createOrUpdate(AttributeCollection attributeCollection) {
-        return attributeCollectionDAO.save(attributeCollection);
-    }
-
-    @Override
-    public List<AttributeCollection> create(List<AttributeCollection> attributeCollections) {
-        attributeCollections.forEach(attributeCollection -> {attributeCollection.setCreatedUser(getCurrentUser());attributeCollection.setCreatedDateTime(LocalDateTime.now());});
-        return attributeCollectionDAO.insert(attributeCollections);
-    }
-
-    @Override
-    public List<AttributeCollection> update(List<AttributeCollection> attributeCollections) {
-        attributeCollections.forEach(attributeCollection -> {attributeCollection.setLastModifiedUser(getCurrentUser());attributeCollection.setLastModifiedDateTime(LocalDateTime.now());});
-        return attributeCollectionDAO.saveAll(attributeCollections);
-    }
-
-    @Override
-    public List<AttributeCollection> findAll(Map<String, Object> criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public List<AttributeCollection> findAll(Criteria criteria) {
-        return dao.findAll(criteria);
-    }
-
-    @Override
-    public Page<AttributeCollection> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return attributeCollectionDAO.findAll(searchField, keyword, pageable, activeRequired);
-    }
-
-    @Override
-    public Optional<AttributeCollection> findOne(Map<String, Object> criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
-    public Optional<AttributeCollection> findOne(Criteria criteria) {
-        return dao.findOne(criteria);
-    }
-
-    @Override
     public Page<AttributeCollection> getAll(int page, int size, Sort sort, boolean... activeRequired) {
         Page<AttributeCollection> attributeCollections = super.getAll(page, size, sort, activeRequired);
         attributeCollections.forEach(this::setAttributeList);

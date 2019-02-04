@@ -17,6 +17,7 @@ import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,12 +55,53 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
         this.externalIdPropertyLabel = externalIdPropertyLabel;
     }
 
+    @Override
+    public List<T> findAll(Map<String, Object> criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public List<T> findAll(Criteria criteria) {
+        return dao.findAll(criteria);
+    }
+
+    @Override
+    public Page<T> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return dao.findAll(searchField, keyword, pageable, activeRequired);
+    }
+
+    @Override
+    public Optional<T> findOne(Map<String, Object> criteria) {
+        return dao.findOne(criteria);
+    }
+
+    @Override
+    public Optional<T> findOne(Criteria criteria) {
+        return dao.findOne(criteria);
+    }
+
+
     public String getEntityName() {
         return entityName;
     }
 
-//    @CachePut(value = "entities", keyGenerator = "cacheKeyGenerator")
-    abstract protected T createOrUpdate(T t);
+    @Override
+    public List<T> create(List<T> entities) {
+        entities.forEach(t -> {
+            t.setCreatedUser(getCurrentUser());
+            t.setCreatedDateTime(LocalDateTime.now());
+        });
+        return dao.insert(entities);
+    }
+
+    @Override
+    public List<T> update(List<T> entities) {
+        entities.forEach(t -> {
+            t.setLastModifiedUser(getCurrentUser());
+            t.setLastModifiedDateTime(LocalDateTime.now());
+        });
+        return dao.saveAll(entities);
+    }
 
     @Override
     public T create(T t) {
@@ -70,7 +112,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
                     });
             t.setCreatedDateTime(LocalDateTime.now());
             t.setCreatedUser(getCurrentUser());
-            return createOrUpdate(t);
+            return dao.insert(t);
         } catch(Exception e) {
             throw new EntityCreateException("An error occurred while creating the " + entityName + " dut to: "+ e.getMessage(), e);
         }
@@ -97,7 +139,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
             t1.merge(t);
             t1.setLastModifiedDateTime(LocalDateTime.now());
             t1.setLastModifiedUser(getCurrentUser());
-            return createOrUpdate(t1);
+            return dao.save(t1);
         }
     }
 
