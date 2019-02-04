@@ -195,18 +195,11 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
             //If discontinueFromDate is not null and discontinueToDate is not null
             if (getDiscontinuedFrom() != null && getDiscontinuedTo() != null) {
 
-                //If discontinueFromDate already passed, discontinue the item
-                if (!getDiscontinuedFrom().isAfter(LocalDate.now())) {
+                //If discontinueFromDate already passed and discontinueToDate not passed, discontinue the item
+                if (!getDiscontinuedFrom().isAfter(LocalDate.now()) && !getDiscontinuedTo().isBefore(LocalDate.now())) {
                     setDiscontinued("Y");
-                } else if (getDiscontinuedFrom().isAfter(LocalDate.now())) { // Otherwise set Discontinued to 'N'
+                } else if (getDiscontinuedFrom().isAfter(LocalDate.now()) || getDiscontinuedTo().isBefore(LocalDate.now())) { // Otherwise set Discontinued to 'N'
                     setDiscontinued("N");
-                }
-
-                //If discontinueToDate already passed, set Discontinued to 'N'
-                if (getDiscontinuedTo().isBefore(LocalDate.now())) {
-                    setDiscontinued("N");
-                } else if (!getDiscontinuedTo().isBefore(LocalDate.now())) { // If its not passed, keep discontinued as 'Y'
-                    setDiscontinued("Y");
                 }
             } else if (getDiscontinuedFrom() != null) { //If discontinueFromDate is not null and discontinueToDate is null
 

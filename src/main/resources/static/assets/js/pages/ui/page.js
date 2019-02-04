@@ -885,6 +885,7 @@
                     $('#js-body-container').fadeOut('fast', function(){
                         $('#js-body-container').html(data);
                         $('[data-toggle="tooltip"]').tooltip();
+                        $.loadEvent();
                         if(hash) {
                             $('a.nav-link[href*="' + hash + '"]').trigger('click');
                         } else {
