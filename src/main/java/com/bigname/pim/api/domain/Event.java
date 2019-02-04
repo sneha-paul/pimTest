@@ -41,6 +41,7 @@ public class Event extends Entity<Event> {
 
     public Event() {
         super();
+        setExternalId(getId());
     }
 
     public String getUser() {

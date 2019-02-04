@@ -4,18 +4,21 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.Entity;
+import com.bigname.pim.api.domain.Event;
 import com.bigname.pim.api.domain.User;
 import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.exception.DuplicateEntityException;
 import com.bigname.core.exception.EntityCreateException;
 import com.bigname.core.persistence.dao.GenericDAO;
 import com.bigname.core.util.FindBy;
+import com.bigname.pim.api.service.EventService;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
 import com.bigname.core.util.Toggle;
 import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.core.Authentication;
@@ -42,6 +45,8 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
     protected String externalIdPropertyLabel;
     protected Validator validator;
     protected Service service;
+    @Autowired
+    private EventService eventService;
 
     protected BaseServiceSupport(DAO dao, String entityName, Validator validator) {
         this(dao, entityName, entityName + "Id", StringUtil.capitalize(entityName) + " Id",  validator);
@@ -105,6 +110,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
 
     @Override
     public T create(T t) {
+        Event event = new Event();
         try {
             get(t.getExternalId(), EXTERNAL_ID, false)
                     .ifPresent(t1 ->    {
@@ -112,9 +118,35 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
                     });
             t.setCreatedDateTime(LocalDateTime.now());
             t.setCreatedUser(getCurrentUser());
-            return dao.insert(t);
+            T _t = dao.insert(t);
+            if(!t.getClass().equals(Event.class)) {
+                event.setEntity(getEntityName());
+                event.setTimeStamp(_t.getCreatedDateTime());
+                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setEventType(Event.Type.CREATE);
+                event.setDetails("New " + getEntityName() + " instance created with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
+                Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
+                dataObj.put("createdDateTime", _t.getCreatedDateTime());
+                event.setData(dataObj);
+            }
+            return _t;
         } catch(Exception e) {
-            throw new EntityCreateException("An error occurred while creating the " + entityName + " dut to: "+ e.getMessage(), e);
+            String message = "An error occurred while creating the " + entityName + " dut to: "+ e.getMessage();
+            if(!t.getClass().equals(Event.class)) {
+                event.setEntity(getEntityName());
+                event.setTimeStamp(t.getCreatedDateTime());
+                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setEventType(Event.Type.ERROR);
+                event.setDetails(message);
+                Map<String, Object> dataObj = ConversionUtil.toJSONMap(t);
+                dataObj.put("createdDateTime", t.getCreatedDateTime());
+                event.setData(dataObj);
+            }
+            throw new EntityCreateException(message, e);
+        } finally {
+            if(!t.getClass().equals(Event.class)) {
+                eventService.create(event);
+            }
         }
     }
 
@@ -319,5 +351,13 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getPrincipal)
                 .map(User.class::cast);
+    }
+
+    public String getExternalIdProperty() {
+        return externalIdProperty;
+    }
+
+    public String getExternalIdPropertyLabel() {
+        return externalIdPropertyLabel;
     }
 }
