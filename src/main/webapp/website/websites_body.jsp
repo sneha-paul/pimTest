@@ -33,6 +33,7 @@
                 { data: 'websiteName', name : 'websiteName' , title : 'Website Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.url + '<small>';}},
                 { data: 'externalId', name : 'externalId', title : 'Website ID' }
             ],
+            buttons: ['DETAILS']
         });
         $.addModal({
             selector: '#js-create-website',

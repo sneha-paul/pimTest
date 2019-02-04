@@ -408,7 +408,7 @@
                             }
                         });
                     $(options.selector + '_wrapper').find('.dt-buttons').append(importButton, exportButton, activeButton, inactiveButton, discontinuedButton);
-                    $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' }); //TODO - not showing on top, showing on bottom
+                    $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' });
                 },
                 ajax: {
                     url: options.url,
@@ -438,7 +438,7 @@
                                             button.title = 'Enable';
                                             button.style = 'success';
                                         } else {
-                                            button.icon = 'icon-ban';
+                                            button.icon = 'icon-close';
                                             button.title = 'Disable';
                                             button.style = 'danger';
                                         }
