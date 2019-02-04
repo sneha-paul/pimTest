@@ -174,6 +174,7 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     abstract public T merge(T t);
 
     protected void mergeBaseProperties(T t) {
+        this.setActive(t.getActive());
         this.setDiscontinued(t.getDiscontinued());
         this.setDiscontinuedFrom(t.getDiscontinuedFrom());
         this.setDiscontinuedTo(t.getDiscontinuedTo());
@@ -235,6 +236,7 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     abstract public Map<String, String> toMap();
 
     protected Map<String, String> getBasePropertiesMap() {
+        orchestrate();
         Map<String, String> map = new LinkedHashMap<>();
         map.put("externalId", getExternalId());
         map.put("active", getActive());

@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
+import static com.bigname.common.util.ValidationUtil.isEmpty;
+
 /**
  * The base controller class containing reusable endpoints and methods
  *
@@ -53,14 +55,6 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         this.services.add(service);
     }
 
-    /*@ResponseBody
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public Map<String, Object> uploadFile(@RequestParam("file") MultipartFile file, ModelMap modelMap) throws IOException {
-        modelMap.addAttribute("file", file);
-        Files.write(Paths.get("/tmp/" + file.getOriginalFilename()), file.getBytes());
-        return new HashMap<>();
-    }*/
-
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")
@@ -75,7 +69,8 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         } else {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
-        Page<T> paginatedResult = service.getAll(pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+        Page<T> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? service.findAll(PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), dataTableRequest.getStatusOptions())
+                : service.findAll("productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         List<Map<String, String>> dataObjects = new ArrayList<>();
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);

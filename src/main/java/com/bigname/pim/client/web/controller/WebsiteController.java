@@ -128,49 +128,6 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         return new ModelAndView("website/websites", model);
     }
 
-    @RequestMapping(value =  {"/list", "/data"})
-    @ResponseBody
-    @SuppressWarnings("unchecked")
-    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        if(isEmpty(dataTableRequest.getSearch())) {
-//            return super.all(request, response, model);
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, String>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort;
-            if(pagination.hasSorts()) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            } else {
-                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-            }
-            List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
-        } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, String>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort;
-            if(pagination.hasSorts()) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            } else {
-                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-            }
-            List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<Website> paginatedResult = websiteService.findAll("websiteName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
-        }
-    }
-
     /**
      * Handler method to load a list of all the catalogs associated with the given websiteId.
      * This is a JSON data endpoint required for the dataTable

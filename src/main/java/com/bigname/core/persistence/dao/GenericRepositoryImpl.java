@@ -92,7 +92,18 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
         Query query = new Query();
         Criteria criteria = new Criteria();
         String[] activeOptions = PimUtil.getActiveOptions(activeRequired);
-        Criteria activeCriteria = Criteria.where("active").in(Arrays.asList(activeOptions));
+        Criteria activeCriteria;
+        if(activeOptions.length == 2) {
+            activeCriteria = Criteria.where("active").in(Arrays.asList(activeOptions));
+        } else if(activeOptions.length == 0){
+            activeCriteria = Criteria.where("active").nin(Arrays.asList(new String[]{"Y", "N"}));
+        } else {
+            if(activeOptions[0].equals("Y")) {
+                activeCriteria = Criteria.where("active").is("Y");
+            } else {
+                activeCriteria = Criteria.where("active").is("N");
+            }
+        }
 
         boolean showDiscontinued = PimUtil.showDiscontinued(activeRequired);
         if(showDiscontinued) {
@@ -103,7 +114,7 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
             // (start == null && end != null && end >= now)
             Criteria discontinueCriteria = new Criteria();
             discontinueCriteria.orOperator(
-                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").is(null).and("discontinued").is("N"),
+                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").is(null).and("discontinued").is("Y"),
                     Criteria.where("discontinuedFrom").ne(null).lte(LocalDateTime.now()).and("discontinuedTo").ne(null).gte(LocalDateTime.now()),
                     Criteria.where("discontinuedFrom").ne(null).lte(LocalDateTime.now()).and("discontinuedTo").is(null),
                     Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).gte(LocalDateTime.now())
@@ -119,9 +130,9 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
             Criteria discontinueCriteria = new Criteria();
             discontinueCriteria.orOperator(
                     Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").is(null).and("discontinued").is("N"),
-                    Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()).and("discontinuedTo").ne(null).lt(LocalDateTime.now()),
+                    Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1)),
                     Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()).and("discontinuedTo").is(null),
-                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).lt(LocalDateTime.now())
+                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1))
             );
             criteria.andOperator(activeCriteria, discontinueCriteria);
         }

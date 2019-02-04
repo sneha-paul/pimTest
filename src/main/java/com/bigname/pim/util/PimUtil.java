@@ -105,4 +105,22 @@ public class PimUtil {
         _criteria.andOperator(criteria.entrySet().stream().map(entry -> Criteria.where(entry.getKey()).is(entry.getValue())).collect(Collectors.toList()).toArray(new Criteria[0]));
         return _criteria;
     }
+
+    public static boolean[] getStatusOptions(String statusOptions) {
+        boolean[] _statusOptions = new boolean[3];
+        statusOptions = StringUtil.trim(statusOptions, true);
+        if(statusOptions.isEmpty()) {
+            statusOptions = PIMConstants.DEFAULT_GRID_STATUS_OPTIONS;
+        }
+        char[] options =statusOptions.toCharArray();
+
+        while(options.length < 3) {
+            options[options.length] = '0';
+        }
+
+        for(int i = 0; i < 3; i ++) {
+            _statusOptions[i] = options[i] == '1';
+        }
+        return _statusOptions;
+    }
 }

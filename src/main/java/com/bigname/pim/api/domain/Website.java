@@ -94,7 +94,7 @@ public class Website extends Entity<Website> {
                     this.setExternalId(website.getExternalId());
                     this.setWebsiteName(website.getWebsiteName());
                     this.setUrl(website.getUrl());
-                    this.setActive(website.getActive());
+                    mergeBaseProperties(website);
                     break;
             }
         }
@@ -107,7 +107,7 @@ public class Website extends Entity<Website> {
         map.put("externalId", getExternalId());
         map.put("websiteName", getWebsiteName());
         map.put("url", getUrl());
-        map.put("active", getActive());
+        map.putAll(getBasePropertiesMap());
         return map;
     }
 

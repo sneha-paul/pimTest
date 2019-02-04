@@ -58,7 +58,7 @@
                 name: 'TOGGLE_STATUS',
                 style: 'danger',
                 title: 'Disable',
-                icon: 'icon-ban',
+                icon: 'icon-close',
                 click: function(row){
                     $.toggleStatus(
                         $.getURL((typeof options.toggleUrl === 'undefined' || options.toggleUrl === '' ? options.pageUrl + '{externalId}/active/{active}' : options.toggleUrl), {

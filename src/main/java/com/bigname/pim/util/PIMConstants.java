@@ -24,4 +24,6 @@ public class PIMConstants {
     public static Set<Integer> DEFAULT_QUANTITY_BREAKS = new TreeSet<>(Arrays.asList(50, 100, 250, 500, 1000));
 
     public enum ReorderingDirection {UP, DOWN}
+
+    public static String DEFAULT_GRID_STATUS_OPTIONS = "110"; // ACTIVE - 1 (TRUE), INACTIVE - 1 (TRUE), DISCONTINUED - 0 (FALSE)
 }

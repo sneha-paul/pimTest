@@ -1,7 +1,12 @@
 package com.bigname.common.datatable.model;
 
+import com.bigname.common.util.StringUtil;
+import com.bigname.pim.util.PIMConstants;
+import com.bigname.pim.util.PimUtil;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,6 +47,9 @@ public class Request {
 
     /** The is global search. */
     private boolean isGlobalSearch;
+
+    /** The status option flags **/
+    private boolean[] statusOptions;
 
     /**
      * Instantiates a new data table request.
@@ -215,6 +223,24 @@ public class Request {
     }
 
     /**
+     * Gets the status options
+     *
+     * @returnthe status options
+     */
+    public boolean[] getStatusOptions() {
+        return statusOptions;
+    }
+
+    /**
+     * Sets the status options
+     *
+     * @param statusOptions the statusOptions to set
+     */
+    public void setStatusOptions(boolean[] statusOptions) {
+        this.statusOptions = statusOptions;
+    }
+
+    /**
      * Prepare data table request.
      *
      * @param request the request
@@ -232,6 +258,7 @@ public class Request {
 
             this.setSearch(request.getParameter("search[value]"));
             this.setRegex(Boolean.valueOf(request.getParameter("search[regex]")));
+            this.statusOptions = PimUtil.getStatusOptions(request.getParameter("statusOptions"));
 
             int sortableCol = request.getParameter("order[0][column]") != null ? Integer.parseInt(request.getParameter("order[0][column]")) : -1;
 

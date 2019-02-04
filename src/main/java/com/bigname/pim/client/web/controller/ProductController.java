@@ -171,7 +171,7 @@ public class ProductController extends BaseController<Product, ProductService> {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Product> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? productService.getAll(pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+        Page<Product> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? productService.findAll(PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), dataTableRequest.getStatusOptions())
                 : productService.findAll("productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
         List<ProductVariant> productVariants = productVariantService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, false);

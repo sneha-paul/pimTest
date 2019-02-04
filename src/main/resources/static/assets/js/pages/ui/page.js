@@ -101,7 +101,7 @@
                         data: 'actions', title: 'Actions',
                         render: function(data, type, row, meta) {
                             var actions;
-                            var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
+                            var icon = 'icon-close', action = 'Disable', btnClass = 'btn-danger';
                             if('Y' !== row.active) {
                                 icon = 'icon-check';
                                 action = 'Enable';
@@ -244,7 +244,7 @@
                         data: 'actions', title: 'Actions',
                         render: function(data, type, row, meta) {
                             var actions;
-                            var icon = 'icon-ban', action = 'Disable', btnClass = 'btn-danger';
+                            var icon = 'icon-close', action = 'Disable', btnClass = 'btn-danger';
                             if('Y' !== row.active) {
                                 icon = 'icon-check';
                                 action = 'Enable';
@@ -372,19 +372,48 @@
                     $(options.selector + '_filter.dataTables_filter .search-btn').remove();
                     $(options.selector + '_filter.dataTables_filter').append($clearButton, $searchButton);
 
-                    let importButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-outline-primary"><i class="fa fa-download"></i></a>');
-                    let exportButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-outline-secondary"><i class="fa fa-upload"></i></a>');
-                    let activeButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-success"><i class="icon-check"></i></a>');
-                    let inactiveButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-danger"><i class="icon-ban"></i></a>');
-                    let discontinuedButton = $('<a href="javascript:void(0);" class="btn btn-sm btn-outline-warning"><i class="icon-trash"></i></a>');
-                    $('.dt-buttons').append(importButton, exportButton, activeButton, inactiveButton, discontinuedButton);
+                    let importButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="Import Data"><i class="fa fa-download"></i></button>')
+                        .click(function() {
+
+                        });
+                    let exportButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
+                        .click(function() {
+
+                        });
+                    let activeButton = $('<button class="btn btn-sm btn-success js-active-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Active Filter"><i class="icon-check"></i></button>')
+                        .click(function() {
+                            if($.getDataTableStatusOptions(options.selector) === '100') {
+                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                            } else {
+                                $(this).toggleClass(['btn-outline-secondary', 'btn-success', 'js-active-on']);
+                                $searchButton.click();
+                            }
+                        });
+                    let inactiveButton = $('<button class="btn btn-sm btn-danger js-inactive-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Inactive Filter"><i class="icon-close"></i></button>')
+                        .click(function() {
+                            if($.getDataTableStatusOptions(options.selector) === '010') {
+                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                            } else {
+                                $(this).toggleClass(['btn-outline-secondary', 'btn-danger', 'js-inactive-on']);
+                                $searchButton.click();
+                            }
+                        });
+                    let discontinuedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
+                        .click(function() {
+                            if($.getDataTableStatusOptions(options.selector) === '001') {
+                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                            } else {
+                                $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-discontinued-on']);
+                                $searchButton.click();
+                            }
+                        });
+                    $(options.selector + '_wrapper').find('.dt-buttons').append(importButton, exportButton, activeButton, inactiveButton, discontinuedButton);
+                    $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' }); //TODO - not showing on top, showing on bottom
                 },
                 ajax: {
                     url: options.url,
                     data: function ( data ) {
-                        // data.columns[3].search.value='ACTIVE';
-                        // console.log(data);
-                        //process data before sent to server.
+                        data.statusOptions = $.getDataTableStatusOptions(options.selector);
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
@@ -537,6 +566,16 @@
                     }
                 });
             });
+        },
+        getDataTableStatusOptions: function(selector) {
+            var statusOption = '';
+            if($(selector + '_wrapper .dt-buttons').find('.btn').length > 0) {
+                statusOption += $(selector + '_wrapper .dt-buttons').find('.js-active-on').length;
+                statusOption += $(selector + '_wrapper .dt-buttons').find('.js-inactive-on').length;
+                statusOption += $(selector + '_wrapper .dt-buttons').find('.js-discontinued-on').length;
+            }
+            return statusOption;
+
         },
         /**
          * Refreshes the dataTable data only. All current parameters will be preserved, including
