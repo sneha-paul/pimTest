@@ -53,9 +53,9 @@ var DataTable = $.fn.dataTable;
     } );*/
 $.extend( true, DataTable.defaults, {
 	dom:
-    	"<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-10 dt-toolbar'<'dt-buttons'><'dt-filter'f>>>" +
-		"<'row'<'col-sm-12'tr>>" +
-		"<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+    	"<'row dt-header'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-10 dt-toolbar'<'dt-buttons'><'dt-filter'f>>>" +
+		"<'row dt-body'<'col-sm-12'tr>>" +
+		"<'row dt-footer'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
 	renderer: 'bootstrap'
 } );
 
