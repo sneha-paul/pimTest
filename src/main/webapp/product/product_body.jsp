@@ -43,8 +43,8 @@
                         </c:if>
                     </c:forEach>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productVariants">Product Variants</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productCategories">Categories</a></li>
+                    <li class="nav-item"><a class="nav-link js-productVariants-tab" data-toggle="tab" href="#productVariants">Product Variants</a></li>
+                    <li class="nav-item"><a class="nav-link js-productCategories-tab" data-toggle="tab" href="#productCategories">Categories</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">

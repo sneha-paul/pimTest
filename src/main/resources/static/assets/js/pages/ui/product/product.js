@@ -71,20 +71,23 @@ $( document ).ready(function() {
     }
     urlParams['channelId'] = '{channelId}';
 
-    $.initAssociationsGrid({
-        selector: '#paginatedProductVariantsTable',
-        names: ['productVariants', 'productVariant'],
-        pageUrl: $.getURL('/pim/products/{productId}/variants/'),
-        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
-        toggleUrl: '/pim/products/{productId}/channels/{channelId}/variants/{externalId}/active/{active}',
-        urlParams: urlParams,
-        reordering: false,
-        columns: [
-            { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name', render: function ( data, type, row, meta ) {
-                let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
-            return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
-            { data: 'externalId', name : 'externalId', title : 'Variant ID' }
-        ]
+    $('.js-productVariants-tab').on('shown.bs.tab.productVariants', function (e) {
+        $.initAssociationsGrid({
+            selector: '#paginatedProductVariantsTable',
+            names: ['productVariants', 'productVariant'],
+            pageUrl: $.getURL('/pim/products/{productId}/variants/'),
+            dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
+            toggleUrl: '/pim/products/{productId}/channels/{channelId}/variants/{externalId}/active/{active}',
+            urlParams: urlParams,
+            reordering: false,
+            columns: [
+                { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name', render: function ( data, type, row, meta ) {
+                    let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
+                    return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
+                { data: 'externalId', name : 'externalId', title : 'Variant ID' }
+            ]
+        });
+        $(this).removeClass('js-productVariants-tab').off('shown.bs.tab.productVariants');
     });
 
     var urlParams1 = {};
@@ -95,19 +98,22 @@ $( document ).ready(function() {
         urlParams1['catalogId'] = '{catalogId}';
     }
 
-    $.initAssociationsGrid({
-        selector: '#paginatedCategoriesTable',
-        names: ['categories', 'category'],
-        pageUrl: $.getURL('/pim/categories/{categoryId}/'),
-        dataUrl: $.getURL('/pim/products/{productId}/categories/data'),
-        toggleUrl: '/pim/products/{productId}/categories/{externalId}/active/{active}',
-        urlParams: urlParams1,
-        reordering: false,
-        columns: [
-            { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
-            { data: 'externalId', name : 'externalId', title : 'Category ID' }
-        ],
-        buttons: ['TOGGLE_STATUS']
+    $('.js-productCategories-tab').on('shown.bs.tab.productCategories', function (e) {
+        $.initAssociationsGrid({
+            selector: '#paginatedCategoriesTable',
+            names: ['categories', 'category'],
+            pageUrl: $.getURL('/pim/categories/{categoryId}/'),
+            dataUrl: $.getURL('/pim/products/{productId}/categories/data'),
+            toggleUrl: '/pim/products/{productId}/categories/{externalId}/active/{active}',
+            urlParams: urlParams1,
+            reordering: false,
+            columns: [
+                { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' }
+            ],
+            buttons: ['TOGGLE_STATUS']
+        });
+        $(this).removeClass('js-productCategories-tab').off('shown.bs.tab.productCategories');
     });
 
     $.addModal({
