@@ -9,8 +9,8 @@
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#seo">SEO</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#subCategories">SubCategories</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link js-subCategories-tab" data-toggle="tab" href="#subCategories">SubCategories</a></li>
+                    <li class="nav-item"><a class="nav-link js-products-tab" data-toggle="tab" href="#products">Products</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">

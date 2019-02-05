@@ -17,20 +17,23 @@ $(function(){
         urlParams['hash'] = $.getPageAttribute('hash');
     }
 
-    $.initAssociationsGrid({
-        selector: '#paginatedSubCategoriesSortableTable',
-        names: ['subCategoriesSortable', 'subCategory'],
-        pageUrl: $.getURL('/pim/categories/'),
-        dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
-        toggleUrl: '/pim/categories/{categoryId}/subCategories/{externalId}/active/{active}',
-        pageLength: 10,
-        urlParams: urlParams,
-        reordering: false,
-        columns: [
-            { data: 'sequenceNum', name : 'sequenceNum', visible: false },
-            { data: 'subCategoryName', name : 'categoryName' , title : 'Category Name'},
-            { data: 'externalId', name : 'externalId', title : 'Category ID' }
-        ]
+    $('.js-subCategories-tab').on('shown.bs.tab.subCategories', function (e) {
+        $.initAssociationsGrid({
+            selector: '#paginatedSubCategoriesSortableTable',
+            names: ['subCategoriesSortable', 'subCategory'],
+            pageUrl: $.getURL('/pim/categories/'),
+            dataUrl: $.getURL('/pim/categories/{categoryId}/subCategories/data'),
+            toggleUrl: '/pim/categories/{categoryId}/subCategories/{externalId}/active/{active}',
+            pageLength: 10,
+            urlParams: urlParams,
+            reordering: false,
+            columns: [
+                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
+                { data: 'subCategoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' }
+            ]
+        });
+        $(this).removeClass('js-subCategories-tab').off('shown.bs.tab.subCategories');
     });
 
     $.initAssociationsGrid({
@@ -83,22 +86,26 @@ $(function(){
         urlParams1['hash'] = $.getPageAttribute('hash');
     }
 
-    $.initAssociationsGrid({
-        selector: '#paginatedProductsSortableTable',
-        names: ['productsSortable', 'product'],
-        pageUrl: $.getURL('/pim/products/'),
-        dataUrl: $.getURL('/pim/categories/{categoryId}/products/data'),
-        toggleUrl: '/pim/categories/{categoryId}/products/{externalId}/active/{active}',
-        urlParams: urlParams1,
-        reordering: false,
-        columns: [
-            { data: 'sequenceNum', name : 'sequenceNum', visible: false },
-            { data: 'productName', name : 'productName' , title : 'Product Name', width: '35%', render: function ( data, type, row, meta ) {
-        let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
-        return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
-        { data: 'externalId', name : 'externalId', title : 'Product ID' }
-        ]
+    $('.js-products-tab').on('shown.bs.tab.products', function (e){
+        $.initAssociationsGrid({
+            selector: '#paginatedProductsSortableTable',
+            names: ['productsSortable', 'product'],
+            pageUrl: $.getURL('/pim/products/'),
+            dataUrl: $.getURL('/pim/categories/{categoryId}/products/data'),
+            toggleUrl: '/pim/categories/{categoryId}/products/{externalId}/active/{active}',
+            urlParams: urlParams1,
+            reordering: false,
+            columns: [
+                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
+                { data: 'productName', name : 'productName' , title : 'Product Name', width: '35%', render: function ( data, type, row, meta ) {
+                    let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
+                    return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
+                { data: 'externalId', name : 'externalId', title : 'Product ID' }
+            ]
+        });
+        $(this).removeClass('js-products-tab').off('shown.bs.tab.products');
     });
+
 
     $.initAssociationsGrid({
         selector: '#paginatedProductsReorderableTable',
