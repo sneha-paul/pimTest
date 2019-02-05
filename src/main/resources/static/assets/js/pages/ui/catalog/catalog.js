@@ -6,20 +6,24 @@ $(function(){
     urlParams['catalogId'] = '{catalogId}';
     urlParams['hash'] = 'rootCategories';
 
-    $.initAssociationsGrid({
-        selector: '#paginatedRootCategoriesSortableTable',
-        names: ['rootCategoriesSortable', 'rootCategory'],
-        pageUrl: $.getURL('/pim/categories/'),
-        dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
-        toggleUrl: '/pim/catalogs/{catalogId}/rootCategories/{externalId}/active/{active}',
-        urlParams: urlParams,
-        reordering: false,
-        columns: [
-            { data: 'sequenceNum', name : 'sequenceNum', visible: false },
-            { data: 'rootCategoryName', name : 'categoryName' , title : 'Category Name'},
-            { data: 'externalId', name : 'externalId', title : 'Category ID' }
-        ]
+    $('.js-rootCategories-tab').on('shown.bs.tab.rootCategories', function (e) {
+        $.initAssociationsGrid({
+            selector: '#paginatedRootCategoriesSortableTable',
+            names: ['rootCategoriesSortable', 'rootCategory'],
+            pageUrl: $.getURL('/pim/categories/'),
+            dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/data'),
+            toggleUrl: '/pim/catalogs/{catalogId}/rootCategories/{externalId}/active/{active}',
+            urlParams: urlParams,
+            reordering: false,
+            columns: [
+                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
+                { data: 'rootCategoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' }
+            ]
+        });
+        $(this).removeClass('js-rootCategories-tab').off('shown.bs.tab.rootCategories');
     });
+
 
     $.initAssociationsGrid({
         selector: '#paginatedRootCategoriesReorderableTable',
@@ -43,15 +47,20 @@ $(function(){
     }
     urlParams1['catalogId'] = '{catalogId}';
     urlParams1['hash'] = 'hierarchy';
-    $.initTreeDataTable({
-        selector: '#categoriesHierarchy',
-        names: ['categoriesHierarchy', 'category'],
-        url: $.getURL('/pim/catalogs/{catalogId}/hierarchy/'),
-        url2: '/pim/categories/',
-        collapsed: false,
-        collapsible: false,
-        urlParams: urlParams1
+
+    $('.js-hierarchy-tab').on('shown.bs.tab.hierarchy', function (e) {
+        $.initTreeDataTable({
+            selector: '#categoriesHierarchy',
+            names: ['categoriesHierarchy', 'category'],
+            url: $.getURL('/pim/catalogs/{catalogId}/hierarchy/'),
+            url2: '/pim/categories/',
+            collapsed: false,
+            collapsible: false,
+            urlParams: urlParams1
+        });
+        $(this).removeClass('js-hierarchy-tab').off('shown.bs.tab.hierarchy');
     });
+
 
     $('.js-sorting-mode').on('click', function() {
         if(!$(this).hasClass('selected')) {
