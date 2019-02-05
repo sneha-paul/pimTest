@@ -20,13 +20,12 @@
             selector: '#paginatedEventsTable',
             names: ['events', 'event'],
             pageUrl: '/pim/events/',
-            dataUrl: '/pim/events/data',
+            dataUrl: '/pim/events/datas',
+            hideStatus:'true',
             columns: [
-                { data: 'user', name : 'user' , title : 'User'},
-                //{ data: 'details', name : 'details', title : 'Details'},
-                { data: 'entity', name : 'entity', title : 'Entity'},
-                { data: 'eventType', name : 'eventType' , title : 'Event Type'}
-
+                { data: 'userName', name : 'userName' , title : 'User'},
+                { data: 'details', name : 'details', title : 'Details'},
+                { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
             ]
         });
 

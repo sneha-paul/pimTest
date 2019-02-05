@@ -122,7 +122,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
             if(!t.getClass().equals(Event.class)) {
                 event.setEntity(getEntityName());
                 event.setTimeStamp(_t.getCreatedDateTime());
-                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setUserName(getCurrentUser().map(Entity::getId).orElse(""));
                 event.setEventType(Event.Type.CREATE);
                 event.setDetails("New " + getEntityName() + " instance created with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
                 Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
@@ -131,11 +131,11 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
             }
             return _t;
         } catch(Exception e) {
-            String message = "An error occurred while creating the " + entityName + " dut to: "+ e.getMessage();
+            String message = "An error occurred while creating the " + entityName + " due to: "+ e.getMessage();
             if(!t.getClass().equals(Event.class)) {
                 event.setEntity(getEntityName());
                 event.setTimeStamp(t.getCreatedDateTime());
-                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setUserName(getCurrentUser().map(Entity::getId).orElse(""));
                 event.setEventType(Event.Type.ERROR);
                 event.setDetails(message);
                 Map<String, Object> dataObj = ConversionUtil.toJSONMap(t);
@@ -154,6 +154,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
     @SuppressWarnings("unchecked")
 //    @Caching(put = {@CachePut(value = "entities", key = "#findBy.INTERNAL_ID+#id"), @CachePut(value = "entities", key = "#findBy.EXTERNAL_ID+#id")})
     public T update(String id, FindBy findBy, T t) {
+        Event event = new Event();
         Optional<T> _t1 = proxy().get(id, findBy, false);
         if(!_t1.isPresent()) {
             throw new IllegalStateException("Illegal operation");
@@ -171,7 +172,27 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
             t1.merge(t);
             t1.setLastModifiedDateTime(LocalDateTime.now());
             t1.setLastModifiedUser(getCurrentUser());
-            return dao.save(t1);
+            T _t = dao.save(t1);
+            if(!t.getClass().equals(Event.class)) {
+                event.setEntity(getEntityName());
+                event.setTimeStamp(_t.getLastModifiedDateTime());
+                event.setUserName(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setEventType(Event.Type.UPDATE);
+                event.setDetails("Updated " + getEntityName() + " instance with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
+                Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
+                dataObj.put("lastModifiedDateTime", _t.getLastModifiedDateTime());
+                dataObj.put("createdDateTime", _t.getCreatedDateTime());
+                event.setData(dataObj);
+            }
+            if(!t1.getClass().equals(Event.class)) {
+                eventService.create(event);
+            }
+            return _t;
+
+
+
+
+
         }
     }
 
