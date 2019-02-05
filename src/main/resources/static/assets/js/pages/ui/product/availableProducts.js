@@ -5,9 +5,9 @@ $( document ).ready(function() {
         pageLength: 10,
         dataUrl: $.getURL('/pim/categories/{categoryId}/products/available/list'),
         columns: [
-            { data: 'productName', name : 'productName' , title : 'Product Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
+            { data: 'productName', name : 'productName' , title : 'Product Name', width:'80%', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
             { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family', visible: false },
-            { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+            { data: 'actions', name : 'actions' , title : 'Actions', width:'10%', orderable: false}
         ],
         buttons: [$.addItemButton({action: addProduct})]
     });

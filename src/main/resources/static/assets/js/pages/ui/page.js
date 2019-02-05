@@ -68,6 +68,12 @@
                 info: false,
                 searching: true,
                 paging:   false,
+                scrollY: 300,
+                scrollCollapse: true,
+                dom:
+                "<'row dt-header'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-10 dt-toolbar'<'dt-buttons'><'dt-filter'f>>>" +
+                "<'row dt-body'<'col-sm-12'tr>>" +
+                "<'row dt-footer'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 // rowReorder: typeof options.reordering === 'undefined' || options.reordering ? {snapX: 10} : false,
                 createdRow: function (row, data, index) {
                     $(row).addClass('disable-select parent-' + data.parent);
@@ -329,6 +335,22 @@
 
             });
         },
+
+        validateDataTableOptions: function(options) {
+            $.each(options.columns, function(i, column){
+                if(column.hasOwnProperty('visible') && column.visible === false) {
+
+                } else if(column.hasOwnProperty('width')){
+                    let colWidth = $.findMatch(column.width, /[\s]*(\d*)%/);
+                    if(isNaN(colWidth)) {
+                        options.columns[i].width = i == 0 ? '35%' : '20%';
+                    }
+                } else {
+                    options.columns[i].width = i == 0 ? '35%' : '20%';
+                }
+            });
+        },
+
         initDataTable: function(options) {
             $.bindDataTable(options, $(options.selector).DataTable( {
                 processing: true,
@@ -338,19 +360,27 @@
                 searching: typeof options.searching === 'undefined' ?  true : options.searching,
                 ordering: !(typeof options.reordering !== 'undefined' && options.reordering),
                 rowReorder: typeof options.reordering !== 'undefined' && options.reordering ? {snapX: 10} : false,
-                // dom: "<'row'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-10 dt-toolbar'<'dt-buttons'><'dt-filter'f>>>",
+                dom:
+                "<'row dt-header'<'col-sm-12 col-md-2'l><'col-sm-12 col-md-10 dt-toolbar'<'dt-buttons'><'dt-filter'f>>>" +
+                "<'row dt-body'<'col-sm-12'tr>>" +
+                "<'row dt-footer'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 language: {
                     info: "_START_ to _END_ of _TOTAL_",
                     lengthMenu: "_MENU_",
                     search: ''
                 },
+                scrollY: 300,
+                scrollCollapse: true,
                 initComplete : function() {
                     var input = $(options.selector + '_filter.dataTables_filter input').unbind()
-                            .on('keyup', function() {
+                            .on('keyup', function(e) {
                                 if($(this).val() !== '') {
                                     $(options.selector + '_filter.dataTables_filter .dt-clear').removeClass('js-hidden');
                                 } else {
                                     $(options.selector + '_filter.dataTables_filter .dt-clear').addClass('js-hidden');
+                                }
+                                if(e.keyCode === 13) {
+                                    $searchButton.click();
                                 }
                             }),
                         self = this.api(),
@@ -509,6 +539,10 @@
                         }
                     });
                 }
+            });
+
+            $.getDataTable(dataTableName).on( 'draw.dt', function () {
+
             });
 
             $(options.selector).on('click', '.js-scope-selector', function () {
@@ -833,6 +867,13 @@
                 }
             }
             return encodeURI((url.startsWith('http') || url.startsWith('www') ? '' : $.getPageAttribute("urlRoot") ) + url);
+        },
+        findMatch: function(string, regex) {
+            if(match = regex.exec(string)) {
+                let result = match[1];
+                return typeof match[1] !== undefined ? match[1].trim() : '';
+            }
+            return '';
         },
         getURLWithRequestParams: function(uri, requestParams, fullURL, context) {
             if(_.isEmpty(requestParams)) {

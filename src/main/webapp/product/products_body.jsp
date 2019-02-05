@@ -33,15 +33,13 @@
             dataUrl: '/pim/products/data',
             columns: [
                 {
-                    data: 'productName', name : 'productName' , title : 'Product Name',
+                    data: 'productName', name : 'productName' , title : 'Product Name', width: '35%',
                     render: function ( data, type, row, meta ) {
                         let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
                         return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'
                     }
                 },
-//                { data: 'variantCount', name : 'variantCount', title: 'Variants'},
-//                { data: 'variantImages', name : 'variantImages', visible:false },
-                { data: 'variantCount', name : 'variantCount', title : 'Variants',
+                { data: 'variantCount', name : 'variantCount', title : 'Variants', width: '20%',
                     render: function ( data, type, row, meta ) {
                         let content = '<ul class="list-unstyled variant-info">';
 
@@ -59,7 +57,7 @@
                         return content;
                     }
                 },
-                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family' }
+                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family', width: '15%', render: function ( data, type, row, meta ) {return 'TODO'} }
             ],
         });
 

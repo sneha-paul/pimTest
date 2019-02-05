@@ -230,7 +230,6 @@ public class Product extends Entity<Product> {
             }
         });
     }
-    CollectionsUtil collectionsUtil = new CollectionsUtil();
 
     public Map<String, Object> diff(Product product, boolean... ignoreInternalId) {
         boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
@@ -247,7 +246,7 @@ public class Product extends Entity<Product> {
         if (!this.getChannelId().equals(product.getChannelId())) {
             diff.put("channelId", product.getChannelId());
         }
-        Object scopedFamilyAttributesDiff = collectionsUtil.compareMaps(product.getScopedFamilyAttributes(),this.getScopedFamilyAttributes());
+        Object scopedFamilyAttributesDiff = CollectionsUtil.compareMaps(product.getScopedFamilyAttributes(),this.getScopedFamilyAttributes());
         if(scopedFamilyAttributesDiff.equals(""))
         {
             diff.put("scopedFamilyAttributes", scopedFamilyAttributesDiff);

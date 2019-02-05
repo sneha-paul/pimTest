@@ -115,36 +115,32 @@
                     <div class="tab-pane" id="subCategories">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div class="row p-b-25">
-                                            <div class="col-lg-12 col-md-12">
-                                                <div class="pull-right">
-                                                    <button type="button" class="btn btn-success js-add-subCategory"><i class="fa fa-plus"></i> <span class="p-l-5">Add SubCategories</span></button>
-                                                    <button type="button" class="btn btn-sm btn-secondary js-sorting-mode subCategories selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode subCategories"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
-                                                </div>
-                                            </div>
+                                <div class="row p-b-25">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="pull-right">
+                                            <button type="button" class="btn btn-success js-add-subCategory"><i class="fa fa-plus"></i> <span class="p-l-5">Add SubCategories</span></button>
+                                            <button type="button" class="btn btn-sm btn-secondary js-sorting-mode subCategories selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode subCategories"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                         </div>
-                                        <ul class="nav nav-tabs-new2" style="position: absolute; top: -1000px">
-                                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#subCategoriesSortable">Sortable</a></li>
-                                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#subCategoriesReorderable">Reorderable</a></li>
-                                        </ul>
-                                        <div class="tab-content">
-                                            <div class="tab-pane show active" id="subCategoriesSortable">
-                                                <div class="table-responsive">
-                                                    <table id="paginatedSubCategoriesSortableTable" class="table table-hover dataTable table-custom" style="width: 100%">
-                                                        <thead class="thead-dark"></thead>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <div class="tab-pane" id="subCategoriesReorderable">
-                                                <div class="table-responsive no-filter">
-                                                    <table id="paginatedSubCategoriesReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
-                                                        <thead class="thead-dark"></thead>
-                                                    </table>
-                                                </div>
-                                            </div>
+                                    </div>
+                                </div>
+                                <ul class="nav nav-tabs-new2" style="position: absolute; top: -1000px">
+                                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#subCategoriesSortable">Sortable</a></li>
+                                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#subCategoriesReorderable">Reorderable</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane show active" id="subCategoriesSortable">
+                                        <div class="table-responsive scrollable-dt">
+                                            <table id="paginatedSubCategoriesSortableTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                <thead class="thead-dark"></thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="subCategoriesReorderable">
+                                        <div class="table-responsive scrollable-dt no-filter">
+                                            <table id="paginatedSubCategoriesReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
+                                                <thead class="thead-dark"></thead>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -154,36 +150,32 @@
                     <div class="tab-pane" id="products">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div class="row p-b-25">
-                                            <div class="col-lg-12 col-md-12">
-                                                <div class="pull-right">
-                                                    <button type="button" class="btn btn-success js-add-products"><i class="fa fa-plus"></i> <span class="p-l-5">Add Products</span></button>
-                                                    <button type="button" class="btn btn-sm btn-secondary js-sorting-mode products selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode products"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
-                                                </div>
-                                            </div>
+                                <div class="row p-b-25">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="pull-right">
+                                            <button type="button" class="btn btn-success js-add-products"><i class="fa fa-plus"></i> <span class="p-l-5">Add Products</span></button>
+                                            <button type="button" class="btn btn-sm btn-secondary js-sorting-mode products selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode products"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                         </div>
-                                        <ul class="nav nav-tabs-new2" style="position: absolute; top: -1000px">
-                                            <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#productsSortable">Sortable</a></li>
-                                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productsReorderable">Reorderable</a></li>
-                                        </ul>
-                                        <div class="tab-content">
-                                            <div class="tab-pane show active" id="productsSortable">
-                                                <div class="table-responsive scrollable-dt">
-                                                    <table id="paginatedProductsSortableTable" class="table table-hover dataTable table-custom" style="width: 100%">
-                                                        <thead class="thead-dark"></thead>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                            <div class="tab-pane" id="productsReorderable">
-                                                <div class="table-responsive scrollable-dt no-filter">
-                                                    <table id="paginatedProductsReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
-                                                        <thead class="thead-dark"></thead>
-                                                    </table>
-                                                </div>
-                                            </div>
+                                    </div>
+                                </div>
+                                <ul class="nav nav-tabs-new2" style="position: absolute; top: -1000px">
+                                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#productsSortable">Sortable</a></li>
+                                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productsReorderable">Reorderable</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane show active" id="productsSortable">
+                                        <div class="table-responsive scrollable-dt">
+                                            <table id="paginatedProductsSortableTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                <thead class="thead-dark"></thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="productsReorderable">
+                                        <div class="table-responsive scrollable-dt no-filter">
+                                            <table id="paginatedProductsReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
+                                                <thead class="thead-dark"></thead>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>

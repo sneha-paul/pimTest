@@ -11,7 +11,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive">
+                <div class="table-responsive scrollable-dt">
                     <table id="paginatedWebsitesTable" class="table table-hover dataTable table-custom" style="width: 100% !important;">
                         <thead class="thead-dark">
 

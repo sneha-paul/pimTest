@@ -93,6 +93,7 @@
 
         .dt-buttons {
             display: inline-block;
+            line-height: 40px;
         }
 
         .dt-buttons .btn {
@@ -196,16 +197,25 @@
             overflow: hidden;
         }
 
-        .scrollable-dt .dt-body {
-            height: calc(55vh + 50px);
+        .scrollable-dt .dt-body .dataTables_scrollBody {
+            max-height: calc(55vh + 50px) !important;
+            min-height:calc(20vh + 10px) !important;
             overflow: auto;
             padding-bottom:25px;
+            background-color: #f8f8f8;
         }
-        .scrollable-dt.modal-dt > div:first-of-type > div:nth-of-type(3) {
-            /*position: fixed;
-            bottom: 14px;
-            width: 68%;
-            right: auto;*/
+
+        .scrollable-dt.modal-dt .dt-body .dataTables_scrollBody {
+            max-height: calc(45vh + 50px) !important;
+            min-height:calc(20vh + 10px) !important;
+            overflow: auto;
+            padding-bottom:25px;
+            background-color: #f8f8f8;
+        }
+
+        .scrollable-dt .dt-body .dataTables_scrollHead {
+            background-color: #212529;
+            border-color: #32383e;
         }
 
         .scrollable-dt .dt-footer {
@@ -219,21 +229,22 @@
         .scrollable-dt .dataTable {
             margin-top:2px !important;
             background-color: #f8f8f8;
+            border-bottom:1px solid #dee2e6;
         }
 
-        .scrollable-dt .dt-body::-webkit-scrollbar-track {
+        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
             background-color: #ffffff;
             padding: 1px;
             box-shadow: none;
         }
 
-        .scrollable-dt .dt-body::-webkit-scrollbar {
+        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar {
             width: 10px;
             background-color: #f8f8f8;
         }
 
-        .scrollable-dt .dt-body::-webkit-scrollbar-thumb {
+        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar-thumb {
             background-color: #7f7f7f;
             border: 2px solid #ffffff;
             border-radius: 5px;
@@ -535,7 +546,7 @@
         }
 
         .no-filter .dataTables_filter {
-            visibility: hidden;
+            display: none;
         }
 
         .dropzone {

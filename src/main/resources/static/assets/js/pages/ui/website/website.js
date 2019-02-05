@@ -3,18 +3,23 @@ $(function(){
     if($.getPageAttribute('websiteId') !== '') {
         urlParams['websiteId'] = '{websiteId}';
     }
-    $.initAssociationsGrid({
-        selector: '#paginatedCatalogsTable',
-        names: ['websiteCatalogs', 'websiteCatalog'],
-        pageUrl: $.getURL('/pim/catalogs/'),
-        dataUrl: $.getURL('/pim/websites/{websiteId}/catalogs/data'),
-        urlParams: urlParams,
-        columns: [
-            { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-            { data: 'externalId', name : 'catalogId', title : 'Catalog ID' }
-        ],
-        buttons: ['DETAILS']
+
+    $('.js-catalogs-tab').on('shown.bs.tab.catalogs', function (e) {
+        $.initAssociationsGrid({
+            selector: '#paginatedCatalogsTable',
+            names: ['websiteCatalogs', 'websiteCatalog'],
+            pageUrl: $.getURL('/pim/catalogs/'),
+            dataUrl: $.getURL('/pim/websites/{websiteId}/catalogs/data'),
+            urlParams: urlParams,
+            columns: [
+                { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
+                { data: 'externalId', name : 'catalogId', title : 'Catalog ID' }
+            ],
+            buttons: ['DETAILS']
+        });
+        $(this).removeClass('js-catalogs-tab').off('shown.bs.tab.catalogs');
     });
+
 
     $('.js-add-catalog').off().on('click', function(){
         var close = function(){};

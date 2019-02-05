@@ -233,6 +233,7 @@
                     data: 'active',
                     name: 'active',
                     title: 'Status',
+                    width: '10%',
                     orderable: false,
                     render: function (data, type, row, meta) {
                         return $.renderStatusColumn(row);
@@ -240,7 +241,7 @@
                 };
             }
             if(!options.hideActions) {
-                columns[columns.length] = {data: 'actions', name: 'actions', title: 'Actions', orderable: false};
+                columns[columns.length] = {data: 'actions', name: 'actions', title: 'Actions', width: '10%', orderable: false};
             }
             $.initGrid(Object.assign(options, {
                 columns: columns,
