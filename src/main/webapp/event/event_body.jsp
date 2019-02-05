@@ -19,7 +19,7 @@
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">User</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="userName" name="userName" value="${event.user}" class="form-control" readonly/>
+                                                        <input type="text" id="userName" name="userName" value="${event.userName}" class="form-control" readonly/>
                                                     </div>
                                                     <div class="form-group js-external-id">
                                                         <label for="timeStamp">Time Stamp</label><code class="highlighter-rouge m-l-10">*</code>
