@@ -1,15 +1,18 @@
 $( document ).ready(function() {
-    $.initGrid({
-        selector: '#paginatedAvailableRootCategoriesTable',
-        names: ['availableRootCategories', 'availableRootCategory'],
-        pageLength: 10,
-        dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/available/list'),
-        columns: [
-            { data: 'categoryName', name : 'categoryName' , title : 'Category Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
-            { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ],
-        buttons: [$.addItemButton({action: addRootCategory})]
-    });
+    setTimeout(function(){
+        $.initGrid({
+            selector: '#paginatedAvailableRootCategoriesTable',
+            names: ['availableRootCategories', 'availableRootCategory'],
+            pageLength: 10,
+            dataUrl: $.getURL('/pim/catalogs/{catalogId}/rootCategories/available/list'),
+            columns: [
+                { data: 'categoryName', name : 'categoryName' , title : 'Category Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
+                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+            ],
+            buttons: [$.addItemButton({action: addRootCategory})]
+        });
+    }, 200);
+
 
     function addRootCategory(row) {
         $.ajax({
