@@ -13,7 +13,7 @@
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#attributes">Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link js-attributes-tab" data-toggle="tab" href="#attributes">Attributes</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="DETAILS">
@@ -106,19 +106,23 @@
         'collectionId': '${attributeCollection.collectionId}'
     });
     $(document).ready(function () {
-        $.initGrid({
-            selector: '#paginatedAttributesTable',
-            names: ['attributes', 'attribute'],
-            dataUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes'),
-            columns: [
-                {data: 'name', name: 'name', title: 'Attribute Name'},
-                {data: 'id', name: 'id', title: 'Attribute ID'},
-                {data: 'group', name: 'group', title: 'Attribute Group'},
-                {data: 'selectable', name: 'selectable', title: 'Selectable'},
-                {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
-            ],
-            buttons: [$.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
+        $('.js-attributes-tab').on('shown.bs.tab.attributes', function (e) {
+            $.initGrid({
+                selector: '#paginatedAttributesTable',
+                names: ['attributes', 'attribute'],
+                dataUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes'),
+                columns: [
+                    {data: 'name', name: 'name', title: 'Attribute Name'},
+                    {data: 'id', name: 'id', title: 'Attribute ID'},
+                    {data: 'group', name: 'group', title: 'Attribute Group'},
+                    {data: 'selectable', name: 'selectable', title: 'Selectable'},
+                    {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+                ],
+                buttons: [$.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
+            });
+            $(this).removeClass('js-attributes-tab').off('shown.bs.tab.attributes');
         });
+
 
 
     });
