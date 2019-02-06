@@ -155,40 +155,56 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
 //    @Caching(put = {@CachePut(value = "entities", key = "#findBy.INTERNAL_ID+#id"), @CachePut(value = "entities", key = "#findBy.EXTERNAL_ID+#id")})
     public T update(String id, FindBy findBy, T t) {
         Event event = new Event();
-        Optional<T> _t1 = proxy().get(id, findBy, false);
-        if(!_t1.isPresent()) {
-            throw new IllegalStateException("Illegal operation");
-        } else {
-            if(findBy == INTERNAL_ID && !entityName.equals("productVariant")) { //TODO need to handle productVariant update from controller using INTERNAL_ID
-                Preconditions.checkState(id.equals(t.getId()), "Illegal operation");
-            }
-            T t1 = _t1.get();
-            if(!t.getExternalId().equals(t1.getExternalId())) {
-                get(t.getExternalId(), EXTERNAL_ID, false)
-                        .ifPresent(t2 ->    {
-                            throw new DuplicateEntityException("Another " + entityName + " instance exists with the given " + entityName + " id:" + t.getExternalId());
-                        });
-            }
-            t1.merge(t);
-            t1.setLastModifiedDateTime(LocalDateTime.now());
-            t1.setLastModifiedUser(getCurrentUser());
-            T _t = dao.save(t1);
-            if(!t.getClass().equals(Event.class)) {
-                event.setEntity(getEntityName());
-                event.setTimeStamp(_t.getLastModifiedDateTime());
-                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
-                event.setEventType(Event.Type.UPDATE);
-                event.setDetails("Updated " + getEntityName() + " instance with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
-                Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
-                dataObj.put("lastModifiedDateTime", _t.getLastModifiedDateTime());
-                dataObj.put("createdDateTime", _t.getCreatedDateTime());
-                event.setData(dataObj);
-            }
-            if(!t1.getClass().equals(Event.class)) {
-                eventService.create(event);
+        try {
+            Optional<T> _t1 = proxy().get(id, findBy, false);
+            T _t = null;
+            if(_t1.isPresent()) {
+                if(findBy == INTERNAL_ID && !entityName.equals("productVariant")) { //TODO need to handle productVariant update from controller using INTERNAL_ID
+                    Preconditions.checkState(id.equals(t.getId()), "Illegal operation");
+                }
+               T t1 = _t1.get();
+                if(!t.getExternalId().equals(t1.getExternalId())) {
+                    get(t.getExternalId(), EXTERNAL_ID, false)
+                            .ifPresent(t2 ->    {
+                                throw new DuplicateEntityException("Another " + entityName + " instance exists with the given " + entityName + " id:" + t.getExternalId());
+                            });
+                }
+                t1.merge(t);
+                t1.setLastModifiedDateTime(LocalDateTime.now());
+                t1.setLastModifiedUser(getCurrentUser());
+                _t = dao.save(t1);
+                if(!t.getClass().equals(Event.class)) {
+                    event.setEntity(getEntityName());
+                    event.setTimeStamp(_t.getLastModifiedDateTime());
+                    event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                    event.setEventType(Event.Type.UPDATE);
+                    event.setDetails("Updated " + getEntityName() + " instance with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
+                    Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
+                    dataObj.put("lastModifiedDateTime", _t.getLastModifiedDateTime());
+                    dataObj.put("createdDateTime", _t.getCreatedDateTime());
+                    event.setData(dataObj);
+                }
             }
             return _t;
+        } catch (Exception e) {
+            String message = "Illegal operation";
+            if(!t.getClass().equals(Event.class)) {
+                event.setEntity(getEntityName());
+                event.setTimeStamp(LocalDateTime.now());
+                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setEventType(Event.Type.ERROR);
+                event.setDetails(message);
+                Map<String, Object> dataObj = ConversionUtil.toJSONMap(t);
+                dataObj.put("lastModifiedDateTime", t.getLastModifiedDateTime());
+                event.setData(dataObj);
+            }
+            throw new IllegalStateException(message);
+        } finally {
+            if(!t.getClass().equals(Event.class)) {
+                eventService.create(event);
+            }
         }
+
     }
 
     @Override
