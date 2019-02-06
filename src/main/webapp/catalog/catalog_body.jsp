@@ -107,14 +107,14 @@
                                         </ul>
                                         <div class="tab-content">
                                             <div class="tab-pane show active" id="sortable">
-                                                <div class="table-responsive">
+                                                <div class="table-responsive scrollable-dt">
                                                     <table id="paginatedRootCategoriesSortableTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                         <thead class="thead-dark"></thead>
                                                     </table>
                                                 </div>
                                             </div>
                                             <div class="tab-pane" id="reorderable">
-                                                <div class="table-responsive no-filter">
+                                                <div class="table-responsive scrollable-dt no-filter">
                                                     <table id="paginatedRootCategoriesReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
                                                         <thead class="thead-dark"></thead>
                                                     </table>
@@ -131,7 +131,7 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
-                                        <div class="table-responsive no-filter">
+                                        <div class="table-responsive scrollable-dt no-filter">
                                             <table id="categoriesHierarchy" class="table table-hover dataTable treeDataTable table-custom m-b-0" style="width: 100% !important">
                                                 <thead class="thead-dark">
                                                 </thead>

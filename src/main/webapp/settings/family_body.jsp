@@ -13,10 +13,9 @@
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#familyAttributes">Attributes</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantGroups">Variant Groups</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#familyAttributesScope">Scope</a></li>
-                    <%--<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#channelVariantGroups">Channel</a></li>--%>
+                    <li class="nav-item"><a class="nav-link js-familyAttributes-tab" data-toggle="tab" href="#familyAttributes">Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link js-variantGroups-tab" data-toggle="tab" href="#variantGroups">Variant Groups</a></li>
+                    <li class="nav-item"><a class="nav-link js-familyAttributesScope-tab" data-toggle="tab" href="#familyAttributesScope">Scope</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="DETAILS">
@@ -86,7 +85,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="table-responsive">
+                                        <div class="table-responsive scrollable-dt">
                                             <table id="paginatedFamilyAttributesTable"
                                                    class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark">
@@ -115,7 +114,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="table-responsive">
+                                        <div class="table-responsive scrollable-dt">
                                             <table id="paginatedVariantGroupsTable"
                                                    class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark">
@@ -134,7 +133,7 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
-                                        <div class="table-responsive">
+                                        <div class="table-responsive scrollable-dt">
                                             <table id="paginatedFamilyAttributesScopeTable"
                                                    class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark">
@@ -149,7 +148,7 @@
                                 <div class="card">
                                     <fieldset><legend>Channel Variant Groups</legend></fieldset>
                                     <div class="body">
-                                        <div class="table-responsive">
+                                        <div class="table-responsive scrollable-dt">
                                             <table id="paginatedChannelVariantGroupsTable"
                                                    class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark">
@@ -163,25 +162,6 @@
                             </div>
                         </div>
                     </div>
-                    <%--<div class="tab-pane" id="channelVariantGroups">
-                        <div class="row clearfix">
-                            <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div class="table-responsive">
-                                            <table id="paginatedChannelVariantGroupsTable"
-                                                   class="table table-hover dataTable table-custom" style="width: 100%">
-                                                <thead class="thead-dark">
-
-                                                </thead>
-
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>--%>
                 </div>
             </div>
         </div>
@@ -195,17 +175,20 @@
         'familyId': '${family.familyId}'
     });
     $(document).ready(function () {
-        $.initGrid({
-            selector: '#paginatedFamilyAttributesTable',
-            names: ['familyAttributes', 'familyAttribute'],
-            dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
-            columns: [
-                {data: 'name', name: 'name', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.id + '</code><small>'}},
-                {data: 'uiType', name: 'uiType', title: 'UI Type'},
-                {data: 'group', name: 'group', title: 'Attribute Group'},
-                {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
-            ],
-            buttons: [$.attributeOptionsButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}/options'})]
+        $('.js-familyAttributes-tab').on('shown.bs.tab.familyAttributes', function (e) {
+            $.initGrid({
+                selector: '#paginatedFamilyAttributesTable',
+                names: ['familyAttributes', 'familyAttribute'],
+                dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
+                columns: [
+                    {data: 'name', name: 'name', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.id + '</code><small>'}},
+                    {data: 'uiType', name: 'uiType', title: 'UI Type'},
+                    {data: 'group', name: 'group', title: 'Attribute Group'},
+                    {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+                ],
+                buttons: [$.attributeOptionsButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}/options'})]
+            });
+            $(this).removeClass('js-familyAttributes-tab').off('shown.bs.tab.familyAttributes');
         });
 
         var columns = [];
@@ -237,51 +220,60 @@
             }
         }
 
-        $.initGrid({
-            selector: '#paginatedFamilyAttributesScopeTable',
-            names: ['familyAttributesScopes', 'familyAttributesScope'],
-            dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
-            columns: columns
-        });
+        $('.js-familyAttributesScope-tab').on('shown.bs.tab.familyAttributesScope', function (e) {
+            $.initGrid({
+             selector: '#paginatedFamilyAttributesScopeTable',
+             names: ['familyAttributesScopes', 'familyAttributesScope'],
+             dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
+             columns: columns
+             });
 
-        columns = [];
-        columns[0] = {data: 'name', name: 'name', title: 'Attribute Name'};
-        idx = 0;
-        for(let channelId in channels) {
-            if(channels.hasOwnProperty(channelId)) {
-                columns[++idx] = {
-                    data: 'channel_' + channelId,
-                    name: 'channel_' + channelId,
-                    title: channels[channelId],
-                    orderable: false,
-                    render: function (data, type, row, meta) {
-                        return $.renderChannelSelector(row, channelId);
-                    }
-                };
+            columns = [];
+            columns[0] = {data: 'name', name: 'name', title: 'Attribute Name'};
+            idx = 0;
+            for(let channelId in channels) {
+                if(channels.hasOwnProperty(channelId)) {
+                    columns[++idx] = {
+                        data: 'channel_' + channelId,
+                        name: 'channel_' + channelId,
+                        title: channels[channelId],
+                        orderable: false,
+                        render: function (data, type, row, meta) {
+                            return $.renderChannelSelector(row, channelId);
+                        }
+                    };
+                }
             }
-        }
+            $.initGrid({
+                selector: '#paginatedChannelVariantGroupsTable',
+                names: ['channelVariantGroups', "channelVariantGroup"],
+                dataUrl: $.getURL('/pim/families/{familyId}/variantGroups'),
+                searching: false,
+                columns: columns
+            });
 
-        $.initGrid({
-            selector: '#paginatedChannelVariantGroupsTable',
-            names: ['channelVariantGroups', "channelVariantGroup"],
-            dataUrl: $.getURL('/pim/families/{familyId}/variantGroups'),
-            searching: false,
-            columns: columns
+            $(this).removeClass('js-familyAttributesScope-tab').off('shown.bs.tab.familyAttributesScope');
         });
+
+
 
         var urlParams = {familyId: '{familyId}', hash: 'variantGroups'};
-        $.initAssociationsGrid({
-            selector: '#paginatedVariantGroupsTable',
-            names: 'variantGroups',
-            pageUrl: $.getURL('/pim/families/{familyId}/variantGroups/'),
-            dataUrl: $.getURL('/pim/families/{familyId}/variantGroups/list'),
-            toggleUrl: '/pim/families/{familyId}/variantGroups/{externalId}/active/{active}',
-            urlParams: urlParams,
-            columns: [
-                {data: 'name', name: 'name', title: 'Name'},
-                {data: 'externalId', name: 'externalId', title: 'Group ID'},
-                {data: 'variantAxis', name: 'variantAxis', title: 'Variant Axis'}
-            ]
+
+        $('.js-variantGroups-tab').on('shown.bs.tab.variantGroups', function (e) {
+            $.initAssociationsGrid({
+                selector: '#paginatedVariantGroupsTable',
+                names: 'variantGroups',
+                pageUrl: $.getURL('/pim/families/{familyId}/variantGroups/'),
+                dataUrl: $.getURL('/pim/families/{familyId}/variantGroups/list'),
+                toggleUrl: '/pim/families/{familyId}/variantGroups/{externalId}/active/{active}',
+                urlParams: urlParams,
+                columns: [
+                    {data: 'name', name: 'name', title: 'Name'},
+                    {data: 'externalId', name: 'externalId', title: 'Group ID'},
+                    {data: 'variantAxis', name: 'variantAxis', title: 'Variant Axis'}
+                ]
+            });
+            $(this).removeClass('js-variantGroups-tab').off('shown.bs.tab.variantGroups');
         });
 
 
