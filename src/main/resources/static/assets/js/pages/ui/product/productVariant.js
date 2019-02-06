@@ -64,15 +64,18 @@ $( document ).ready(function() {
         ]
     });
 
-
-    columns[columns.length] = {  data : 'actions' , title : 'Actions', orderable: false };
-    $.initGrid({
-        selector: '#paginatedPricingTable',
-        names: ['variantPricing', 'variantPricing'],
-        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{productVariantId}/pricing'),
-        columns: columns,
-        buttons: [$.pricingAttributeDetailsButton()]
+    $('.js-variantPricing-tab').on('shown.bs.tab.variantPricing', function (e) {
+        columns[columns.length] = {  data : 'actions' , title : 'Actions', orderable: false };
+        $.initGrid({
+            selector: '#paginatedPricingTable',
+            names: ['variantPricing', 'variantPricing'],
+            dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/{productVariantId}/pricing'),
+            columns: columns,
+            buttons: [$.pricingAttributeDetailsButton()]
+        });
+        $(this).removeClass('js-variantPricing-tab').off('shown.bs.tab.variantPricing');
     });
+
 
     var adjustment;
     var startSequence = "";

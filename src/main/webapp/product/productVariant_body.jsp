@@ -1,11 +1,4 @@
-<%--@elvariable id="product" type="com.bigname.pim.api.domain.Product"--%>
-<%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.api.domain.ProductFamily>"--%>
-<%--@elvariable id="masterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
-<%--@elvariable id="detailsMasterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
-<%--@elvariable id="featuresMasterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
-<%--@elvariable id="defaultDetailsAttributeGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%--@elvariable id="productVariant" type="com.bigname.pim.api.domain.ProductVariant"--%>
 <c:set var="product" value="${productVariant.product}"/>
 <c:set var="masterGroups" value="${product.productFamily.addonMasterGroups}"/>
 <c:set var="detailsMasterGroup" value="${product.productFamily.detailsMasterGroup}"/>
@@ -25,7 +18,7 @@
                     <c:forEach var="masterGroup" items="${masterGroups}">
                         <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#${masterGroup.id}">${masterGroup.name}</a></li>
                     </c:forEach>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantPricing">Pricing</a></li>
+                    <li class="nav-item"><a class="nav-link js-variantPricing-tab" data-toggle="tab" href="#variantPricing">Pricing</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantFeatures">Variant Features</a></li>
                 </ul>
                 <div class="tab-content">
