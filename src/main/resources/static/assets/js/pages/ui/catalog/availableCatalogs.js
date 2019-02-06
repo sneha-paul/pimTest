@@ -1,15 +1,18 @@
 $( document ).ready(function() {
-    $.initGrid({
-        selector: '#paginatedAvailableCatalogsTable',
-        names: ['availableCatalogs', 'availableCatalog'],
-        dataUrl: $.getURL('/pim/websites/{websiteId}/catalogs/available/list'),
-        columns: [
-            { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
-            { data: 'externalId', name : 'externalId', title : 'Catalog ID' },
-            { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ],
-        buttons: [$.addItemButton({action: addCatalog})]
-    });
+    setTimeout(function(){
+        $.initGrid({
+            selector: '#paginatedAvailableCatalogsTable',
+            names: ['availableCatalogs', 'availableCatalog'],
+            dataUrl: $.getURL('/pim/websites/{websiteId}/catalogs/available/list'),
+            columns: [
+                { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
+                { data: 'externalId', name : 'externalId', title : 'Catalog ID' },
+                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+            ],
+            buttons: [$.addItemButton({action: addCatalog})]
+        });
+    }, 200);
+
 
     function addCatalog(row) {
         $.ajax({
