@@ -3,7 +3,7 @@
     <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="body">
-                <div class="table-responsive">
+                <div class="table-responsive scrollable-dt">
                     <table id="paginatedEventsTable" class="table table-hover dataTable table-custom" style="width: 100% !important;">
                         <thead class="thead-dark">
 
