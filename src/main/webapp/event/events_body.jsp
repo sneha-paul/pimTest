@@ -24,8 +24,8 @@
             hideStatus:'true',
             columns: [
                 { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
-                { data: 'userName', name : 'userName' , title : 'User'},
-                { data: 'details', name : 'details', title : 'Details'},
+                { data: 'userName', name : 'userName' , title : 'User' , orderable: false},
+                { data: 'details', name : 'details', title : 'Details' , orderable: false},
             ]
         });
 
