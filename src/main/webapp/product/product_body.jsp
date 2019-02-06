@@ -620,7 +620,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="table-responsive">
+                                        <div class="table-responsive scrollable-dt">
                                             <table id="paginatedCategoriesTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark"></thead>
                                             </table>
