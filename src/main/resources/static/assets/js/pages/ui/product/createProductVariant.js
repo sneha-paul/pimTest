@@ -8,13 +8,16 @@ $( document ).ready(function() {
         }
     }
     columns[i] = { data: 'actions', name : 'actions' , title : 'Actions', orderable: false};
-    $.initGrid({
-        selector: '#paginatedAvailableProductVariantsTable',
-        names: ['availableProductVariants', 'availableProductVariant'],
-        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/available/list'),
-        columns: columns,
-        buttons: [$.addItemButton({action: createVariant})]
-    });
+
+    setTimeout(function(){
+        $.initGrid({
+            selector: '#paginatedAvailableProductVariantsTable',
+            names: ['availableProductVariants', 'availableProductVariant'],
+            dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/available/list'),
+            columns: columns,
+            buttons: [$.addItemButton({action: createVariant})]
+        });
+    }, 200);
 
     function createVariant(row) {
         $.ajax({

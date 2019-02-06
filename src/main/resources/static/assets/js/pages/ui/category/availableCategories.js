@@ -1,15 +1,17 @@
 $( document ).ready(function() {
-    $.initGrid({
-        selector: '#paginatedAvailableCategoriesTable',
-        names: ['availableCategories', 'availableCategory'],
-        dataUrl: $.getURL('/pim/products/{productId}/categories/available/list'),
-        columns: [
-            { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
-            { data: 'externalId', name : 'externalId', title : 'Category ID' },
-            { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
-        ],
-        buttons: [$.addItemButton({action: addCategory})]
-    });
+    setTimeout(function(){
+        $.initGrid({
+            selector: '#paginatedAvailableCategoriesTable',
+            names: ['availableCategories', 'availableCategory'],
+            dataUrl: $.getURL('/pim/products/{productId}/categories/available/list'),
+            columns: [
+                { data: 'categoryName', name : 'categoryName' , title : 'Category Name'},
+                { data: 'externalId', name : 'externalId', title : 'Category ID' },
+                { data: 'actions', name : 'actions' , title : 'Actions', orderable: false}
+            ],
+            buttons: [$.addItemButton({action: addCategory})]
+        });
+    }, 200);
 
     function addCategory(row) {
         $.ajax({
