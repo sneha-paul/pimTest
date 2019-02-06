@@ -2,9 +2,6 @@
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
-            <%--<div class="header">
-                <h2>${website.websiteName} <small><code class="highlighter-rouge">${website.websiteId}</code></small><small class="pull-right m-t--15"><code style="color:#808080">_id: ${website.id}</code></small></h2>
-            </div>--%>
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
@@ -15,11 +12,11 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
-                                        <form method="post" action="/pim/events/${event.id}" data-method="PUT" data-success-message='["Successfully updated the website", "Website Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                        <form method="post" action="/pim/events/${event.id}" data-method="PUT" data-success-message='["Successfully updated the event", "Event Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">User</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="userName" name="userName" value="${event.userName}" class="form-control" readonly/>
+                                                        <input type="text" id="userName" name="userName" value="${event.user}" class="form-control" readonly/>
                                                     </div>
                                                     <div class="form-group js-external-id">
                                                         <label for="timeStamp">Time Stamp</label><code class="highlighter-rouge m-l-10">*</code>

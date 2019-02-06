@@ -122,7 +122,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
             if(!t.getClass().equals(Event.class)) {
                 event.setEntity(getEntityName());
                 event.setTimeStamp(_t.getCreatedDateTime());
-                event.setUserName(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
                 event.setEventType(Event.Type.CREATE);
                 event.setDetails("New " + getEntityName() + " instance created with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
                 Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
@@ -135,7 +135,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
             if(!t.getClass().equals(Event.class)) {
                 event.setEntity(getEntityName());
                 event.setTimeStamp(t.getCreatedDateTime());
-                event.setUserName(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
                 event.setEventType(Event.Type.ERROR);
                 event.setDetails(message);
                 Map<String, Object> dataObj = ConversionUtil.toJSONMap(t);
@@ -176,7 +176,7 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
             if(!t.getClass().equals(Event.class)) {
                 event.setEntity(getEntityName());
                 event.setTimeStamp(_t.getLastModifiedDateTime());
-                event.setUserName(getCurrentUser().map(Entity::getId).orElse(""));
+                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
                 event.setEventType(Event.Type.UPDATE);
                 event.setDetails("Updated " + getEntityName() + " instance with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
                 Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
@@ -188,11 +188,6 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
                 eventService.create(event);
             }
             return _t;
-
-
-
-
-
         }
     }
 

@@ -26,7 +26,7 @@ public class Event extends Entity<Event> {
         CREATE, UPDATE, ERROR, LOGIN, LOGOUT
     }
 
-    private String userName;
+    private String user;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime timeStamp;
@@ -44,9 +44,9 @@ public class Event extends Entity<Event> {
         setExternalId(getId());
     }
 
-    public String getUserName() {return userName;}
+    public String getUser() {return user;}
 
-    public void setUserName(String userName) {this.userName = userName;}
+    public void setUser(String user) {this.user = user;}
 
     public String getDetails() {
         return details;
@@ -102,7 +102,7 @@ public class Event extends Entity<Event> {
     public Map<String, String> toMap() {
 
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("user", getUserName());
+        map.put("userName", getUser());
         map.put("entity", getEntity());
         map.put("details", getDetails());
         map.put("eventType", getEventType().name());

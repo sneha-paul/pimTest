@@ -262,7 +262,7 @@ public class BreadcrumbsBuilder {
             case "com.bigname.pim.api.domain.User":
                 return ((UserService)services.get("userService")).get(id, FindBy.EXTERNAL_ID, false).map(User::getUserName).orElse("");
             case "com.bigname.pim.api.domain.Event":
-                return ((EventService)services.get("eventService")).get(id, FindBy.EXTERNAL_ID, false).map(Event::getUserName).orElse("");
+                return ((EventService)services.get("eventService")).get(id, FindBy.EXTERNAL_ID, false).map(Event::getUser).orElse("");
         }
         return "";
     }

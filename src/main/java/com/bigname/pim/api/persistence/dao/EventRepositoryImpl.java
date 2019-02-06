@@ -25,14 +25,10 @@ public class EventRepositoryImpl extends GenericRepositoryImpl<Event> implements
 
     public  Page<Map<String, Object>> getEventData(Pageable pageable) {
         Sort sort = pageable.getSort();
-        SortOperation sortOperation;
-        if(sort == null) {
-           sortOperation = sort(Sort.Direction.ASC, "sequenceNum").and(Sort.Direction.DESC, "subSequenceNum");
-        } else {
-            Sort.Order order = sort.iterator().next();
-            //sortOperation = sort(order.getDirection(), order.getProperty());
+        SortOperation sortOperation = null;
+       /* if(sort == null) {*/
             sortOperation = sort(Sort.by(new Sort.Order(Sort.Direction.ASC, "timeStamp")));
-        }
+       // }
         LookupOperation lookupOperation = LookupOperation.newLookup()
                 .from("user")
                 .localField("user")
@@ -42,7 +38,7 @@ public class EventRepositoryImpl extends GenericRepositoryImpl<Event> implements
         Aggregation aggregation = newAggregation(
                 lookupOperation,
                 replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(event, 0)")).mergeWith(ROOT)),
-                project().andExclude("description", "event "),
+                project().andExclude("description", "event"),
                 sortOperation,
                 skip(pageable.getOffset()),
                 limit((long) pageable.getPageSize())
@@ -52,7 +48,7 @@ public class EventRepositoryImpl extends GenericRepositoryImpl<Event> implements
         return PageableExecutionUtils.getPage(
                mongoTemplate.aggregate(aggregation, "event", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList()),
                pageable,
-               () -> mongoTemplate.count(new Query().addCriteria(null), Event.class));
+               () -> mongoTemplate.count(new Query(), Event.class));
 
     }
 

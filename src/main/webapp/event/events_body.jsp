@@ -23,9 +23,9 @@
             dataUrl: '/pim/events/datas',
             hideStatus:'true',
             columns: [
+                { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
                 { data: 'userName', name : 'userName' , title : 'User'},
                 { data: 'details', name : 'details', title : 'Details'},
-                { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
             ]
         });
 

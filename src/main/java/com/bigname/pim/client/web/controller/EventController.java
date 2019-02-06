@@ -29,7 +29,6 @@ import java.util.Map;
 /**
  * Created by dona on 30-01-2019.
  */
-
 @Controller
 @RequestMapping("pim/events")
 public class EventController extends BaseController<Event, EventService> {
@@ -68,7 +67,6 @@ public class EventController extends BaseController<Event, EventService> {
         }
         List<Map<String, Object>> dataObjects = new ArrayList<>();
         Page<Map<String, Object>> paginatedResult = eventService.getEventData(getPaginationRequest(request), false);
-
         paginatedResult.getContent().forEach(e -> dataObjects.add(e));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -79,9 +77,9 @@ public class EventController extends BaseController<Event, EventService> {
     /**
      * Handler method to load the event details page or the create new event page
      *
-     * @param id eventId of the website instance that needs to be loaded
+     * @param id eventId of the event instance that needs to be loaded
      *
-     * @return The ModelAndView instance for the details page or create page depending on the presence of the 'id' pathVariable
+     * @return The ModelAndView instance for the details page depending on the presence of the 'id' pathVariable
      */
     @RequestMapping(value = {"/{id}"})
     public ModelAndView details(@PathVariable(value = "id", required = false) String id,
@@ -91,7 +89,6 @@ public class EventController extends BaseController<Event, EventService> {
         model.put("active", "EVENTS");
         model.put("mode", "DETAILS");
         model.put("view", "event/event" + (reload ? "_body" : ""));
-
         return id == null ? super.details(model) : eventService.get(id, FindBy.EXTERNAL_ID, false)
                 .map(event -> {
                     model.put("event", event);
