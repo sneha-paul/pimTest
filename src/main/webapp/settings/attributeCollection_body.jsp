@@ -95,7 +95,7 @@
 </div>
 <script>
     $.initPage({
-        'collectionId': '${attributeCollection.collectionId}'
+        'collectionId': '${attributeCollection.collectionId}',
     });
     $(document).ready(function () {
         $('.js-attributes-tab').on('shown.bs.tab.attributes', function (e) {
@@ -105,12 +105,12 @@
                 dataUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes'),
                 columns: [
                     {data: 'name', name: 'name', title: 'Attribute Name'},
-                    {data: 'id', name: 'id', title: 'Attribute ID'},
+                    {data: 'externalId', name: 'externalId', title: 'Attribute ID'},
                     {data: 'group', name: 'group', title: 'Attribute Group'},
                     {data: 'selectable', name: 'selectable', title: 'Selectable'},
                     {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
                 ],
-                buttons: [$.attributeDetailsModalButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}'}), $.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
+                buttons: [$.detailsButton({pageUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes/')}), $.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
             });
             $(this).removeClass('js-attributes-tab').off('shown.bs.tab.attributes');
         });

@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -48,6 +50,9 @@ public class Attribute extends ValidatableEntity<Attribute> {
     private Attribute(Attribute attributeDTO, Map<String, AttributeGroup> attributeGroups) {
         this(attributeDTO.getName());
         this.setUiType(attributeDTO.getUiType());
+        if(isNotEmpty(attributeDTO.getParentAttributeId())) {
+            this.setParentAttributeId(attributeDTO.getParentAttributeId());
+        }
         AttributeGroup attributeGroup = null;
         AttributeGroup attributeGroupDTO = attributeDTO.getAttributeGroup();
         orchestrate();
@@ -241,7 +246,7 @@ public class Attribute extends ValidatableEntity<Attribute> {
 
     public Map<String, String> toMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("id", getId());
+        map.put("externalId", getId());
         map.put("fullId", getAttributeGroup().getFullId() + '|' + getId());
         map.put("uiType", getUiType().name());
         map.put("dataType", getDataType());
@@ -320,6 +325,17 @@ public class Attribute extends ValidatableEntity<Attribute> {
             }
             return UIType.INPUT_BOX;
 
+        }
+
+        public static Map<String, String> getAll() {
+            Map<String, String> all = new HashMap<>();
+            for(UIType uiType : values()) {
+                all.put(uiType.name(), uiType.getLabel());
+            }
+            return all.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         }
     }
 

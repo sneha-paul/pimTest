@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -153,5 +154,16 @@ public class AttributeCollection extends Entity<AttributeCollection> {
         }
 
         return diff;
+    }
+
+    public List<Attribute> getAvailableParentAttributes(Attribute forAttribute) {
+        // An attribute can only have a maximum of one parent attribute.
+        // Get all the existing parents and add to the excludedAttributeIds list.
+        List<String> excludedAttributeIds = getAllAttributes().stream().filter(attribute -> isNotEmpty(attribute.getParentAttributeId())).map(Attribute::getParentAttributeId).collect(Collectors.toList());
+        if(isNotEmpty(forAttribute.getId())) {
+            excludedAttributeIds.add(forAttribute.getId());
+        }
+        // Only multi-select attributes can be used as parents
+        return getAllAttributes().stream().filter(attribute -> "Y".equals(attribute.getUiType().isSelectable()) && !excludedAttributeIds.contains(attribute.getId())).sorted(Comparator.comparing(Attribute::getName)).collect(Collectors.toList());
     }
 }

@@ -4,6 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.web.controller.BaseController;
@@ -11,6 +12,7 @@ import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
+import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,87 +45,6 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     }
 
     /**
-     * Handler method to load the list attributeCollection page
-     *
-     * @return The ModelAndView instance for the list attributeCollection page
-     */
-    @RequestMapping()
-    public ModelAndView all() {
-        Map<String, Object> model = new HashMap<>();
-        model.put("active", "ATTRIBUTE_COLLECTIONS");
-        return new ModelAndView("settings/attributeCollections", model);
-    }
-
-    @RequestMapping(value =  {"/list", "/data"})
-    @ResponseBody
-    @SuppressWarnings("unchecked")
-    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        if(isEmpty(dataTableRequest.getSearch())) {
-            return super.all(request, response, model);
-        } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, String>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort;
-            if(pagination.hasSorts()) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            } else {
-                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-            }
-            List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<AttributeCollection> paginatedResult = attributeCollectionService.findAll("collectionName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
-        }
-    }
-
-    /**
-     * Handler method to create a new attributeCollection
-     *
-     * @param attributeCollection The attributeCollection model attribute that needs to be created
-     *
-     * @return a map of model attributes
-     */
-    @RequestMapping(method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> create( AttributeCollection attributeCollection) {
-        Map<String, Object> model = new HashMap<>();
-        if(isValid(attributeCollection, model, AttributeCollection.CreateGroup.class)) {
-            attributeCollection.setActive("N");
-            attributeCollectionService.create(attributeCollection);
-            model.put("success", true);
-        }
-        return model;
-    }
-
-    /**
-     * Handler method to update a attributeCollection instance
-     *
-     * @param   collectionId of the attributeCollection instance that needs to be updated
-     * @param attributeCollection The modified website instance corresponding to the given collectionId
-     *
-     * @return a map of model attributes
-     */
-
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "id") String collectionId, AttributeCollection attributeCollection) {
-        return update(collectionId, attributeCollection, "/pim/attributeCollections/", attributeCollection.getGroup().length == 1 && attributeCollection.getGroup()[0].equals("DETAILS") ? AttributeCollection.DetailsGroup.class : null);
-    }
-
-   /* @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("success", attributeCollectionService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
-        return model;
-    }*/
-
-    /**
      * Handler method to load the attributeCollection details page or the create new attributeCollection page
      *
      * @param id collectionId of the attributeCollection instance that needs to be loaded
@@ -147,22 +68,128 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));
     }
 
-    @RequestMapping(value= {"/{id}/attribute", "/{id}/attributes/{attributeId}"})
-    public ModelAndView attributeDetails(@PathVariable(value = "id") String id, @PathVariable(value = "attributeId", required = false) String attributeId) {
-        return attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+    /**
+     * Handler method to create a new attributeCollection
+     *
+     * @param attributeCollection The attributeCollection model attribute that needs to be created
+     *
+     * @return a map of model attributes
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> create(AttributeCollection attributeCollection) {
+        Map<String, Object> model = new HashMap<>();
+        if(isValid(attributeCollection, model, AttributeCollection.CreateGroup.class)) {
+            attributeCollection.setActive("N");
+            attributeCollectionService.create(attributeCollection);
+            model.put("success", true);
+        }
+        return model;
+    }
+
+    /**
+     * Handler method to update a attributeCollection instance
+     *
+     * @param   collectionId of the attributeCollection instance that needs to be updated
+     * @param attributeCollection The modified website instance corresponding to the given collectionId
+     *
+     * @return a map of model attributes
+     */
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> update(@PathVariable(value = "id") String collectionId,
+                                      AttributeCollection attributeCollection) {
+        return update(collectionId, attributeCollection, "/pim/attributeCollections/", attributeCollection.getGroup().length == 1 && attributeCollection.getGroup()[0].equals("DETAILS") ? AttributeCollection.DetailsGroup.class : null);
+    }
+
+    /**
+     * Handler method to load the list attributeCollection page
+     *
+     * @return The ModelAndView instance for the list attributeCollection page
+     */
+    @RequestMapping()
+    public ModelAndView all() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "ATTRIBUTE_COLLECTIONS");
+        return new ModelAndView("settings/attributeCollections", model);
+    }
+
+    @RequestMapping(value =  {"/list", "/data"})
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> all(HttpServletRequest request,
+                                           HttpServletResponse response,
+                                           Model model) {
+        Request dataTableRequest = new Request(request);
+        if(isEmpty(dataTableRequest.getSearch())) {
+            return super.all(request, response, model);
+        } else {
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, String>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort;
+            if(pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            } else {
+                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            Page<AttributeCollection> paginatedResult = attributeCollectionService.findAll("collectionName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+            return result;
+        }
+    }
+
+    @RequestMapping(value= {"/{collectionId}/attributes/{attributeId}", "/{collectionId}/attributes/create"})
+    public ModelAndView attributeDetails(@PathVariable(value = "collectionId") String collectionId,
+                                         @PathVariable(value = "attributeId", required = false) String attributeId) {
+        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
-                    model.put("mode", attributeId == null ? "CREATE" : "DETAILS");
-                    model.put("attribute", isEmpty(attributeId) ? new Attribute() : attributeCollection.getAllAttributes().stream()
-                                                                                        .filter(attribute -> attribute.getId().equals(attributeId)).findFirst()
-                                                                                                .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId)));
-                    if(attributeId != null) {
-//                        model.put("parentAttributeOptions", attributeCollection.getAllAttributes().stream().filter(attribute -> attribute))//TODO
-                    }
-                    model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
-                    return new ModelAndView("settings/attribute", model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));
+                    Attribute attribute;
+                    String mode;
+                    if(isNotEmpty(attributeId)) {
+                        mode = "DETAILS";
+                        attribute = attributeCollection.getAllAttributes().stream()
+                                .filter(attribute1 -> attribute1.getId().equals(attributeId)).findFirst()
+                                .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
+                        model.put("breadcrumbs", new Breadcrumbs("Attribute Collections",
+                                "Attribute Collections", "/pim/attributeCollections",
+                                attributeCollection.getCollectionName(), "/pim/attributeCollections/" + attributeCollection.getCollectionId(),
+                                "Attributes", "/pim/attributeCollections/" + attributeCollection.getCollectionId() + "#attributes",
+                                attribute.getName(), ""));
+                    } else {
+                        attribute = new Attribute();
+                        mode = "CREATE";
+                        model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(collectionId, FindBy.EXTERNAL_ID, null));
 
+                    }
+                    model.put("attribute", attribute);
+                    model.put("mode", mode);
+                    model.put("uiTypes", Attribute.UIType.getAll());
+                    model.put("parentAttributes", attributeCollection.getAvailableParentAttributes(attribute).stream().collect(CollectionsUtil.toLinkedMap(Attribute::getFullId, Attribute::getName)));
+                    return new ModelAndView("settings/attribute", model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
+
+    }
+
+    @RequestMapping(value = "/{collectionId}/attributes", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> createAttribute(@PathVariable(value = "collectionId") String id, Attribute attribute) {
+        Map<String, Object> model = new HashMap<>();
+        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false);
+        // TODO - cross field validation to see if one of attributeGroup ID and attributeGroup name is not empty
+        if(attributeCollection.isPresent() && isValid(attribute, model)) {
+            attributeCollection.get().setGroup("ATTRIBUTES");
+            attributeCollection.get().addAttribute(attribute);
+            attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection.get());
+            model.put("success", true);
+        }
+        return model;
     }
 
 
@@ -195,21 +222,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
 
     }
 
-    @RequestMapping(value = "/{collectionId}/attribute", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "collectionId") String id, Attribute attribute) {
-        Map<String, Object> model = new HashMap<>();
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false);
-        // TODO - cross field validation to see if one of attributeGroup ID and attributeGroup name is not empty
-        if(attributeCollection.isPresent() && isValid(attribute, model)) {
-            attributeCollection.get().setGroup("ATTRIBUTES");
-            attributeCollection.get().setGroup(attribute.getGroup());
-            attributeCollection.get().addAttribute(attribute);
-            attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection.get());
-            model.put("success", true);
-        }
-        return model;
-    }
+
 
     @RequestMapping("/{id}/attributes")
     @ResponseBody

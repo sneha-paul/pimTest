@@ -81,7 +81,7 @@
 
         .modal-body {
             margin:1rem !important;
-            padding:0!important;
+            /*padding:0!important;*/
         }
 
         .dt-clear {
