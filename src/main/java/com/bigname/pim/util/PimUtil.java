@@ -5,6 +5,7 @@ import com.bigname.core.domain.Entity;
 import com.bigname.core.util.FindBy;
 import org.springframework.data.mongodb.core.query.Criteria;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,6 +105,10 @@ public class PimUtil {
         Criteria _criteria = new Criteria();
         _criteria.andOperator(criteria.entrySet().stream().map(entry -> Criteria.where(entry.getKey()).is(entry.getValue())).collect(Collectors.toList()).toArray(new Criteria[0]));
         return _criteria;
+    }
+
+    public static boolean isDataTableRequest(HttpServletRequest request) {
+        return request.getParameter("draw") != null;
     }
 
     public static boolean[] getStatusOptions(String statusOptions) {

@@ -301,7 +301,7 @@
                 draw(dt, true);
             });
 
-            $(options.selector).off().on('click', '.js-add-asset,.js-add-asset-group,.js-toggle-status', function() {
+            /*$(options.selector).off().on('click', '.js-add-asset,.js-add-asset-group,.js-toggle-status', function() {
                 if($(this).hasClass('js-add-asset')) {
                     $.showModal({
                         url: $.getURLWithRequestParams('/pim/assetCollections/{collectionId}/assets', {assetGroupId: $(this).data('external-id')}),
@@ -333,7 +333,7 @@
                         $.refreshDataTable.bind(this, typeof options.names === 'undefined' ? options.name : options.names[0]), $(this).data('active'));
                 }
 
-            });
+            });*/
         },
 
         validateDataTableOptions: function(options) {
@@ -371,6 +371,12 @@
                 },
                 scrollY: 300,
                 scrollCollapse: true,
+                headerCallback: function headerCallback(thead, data, start, end, display) {
+                    /*$(thead)
+                        .find('th')
+                        .first()
+                        .html('Displaying ' + (end - start) + ' records');*/
+                },
                 initComplete : function() {
                     var input = $(options.selector + '_filter.dataTables_filter input').unbind()
                             .on('keyup', function(e) {

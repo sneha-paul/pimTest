@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.StringUtil;
 import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.pim.util.PIMConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
@@ -24,6 +25,7 @@ public class Attribute extends ValidatableEntity<Attribute> {
     private String regEx;
     private String selectable = "N";
     private String active = "Y";
+    private String parentAttributeId; //Full Id of the parent attribute, if any
     private long sequenceNum;
     private int subSequenceNum;
 
@@ -191,6 +193,14 @@ public class Attribute extends ValidatableEntity<Attribute> {
         this.options = options;
     }
 
+    public String getParentAttributeId() {
+        return parentAttributeId;
+    }
+
+    public void setParentAttributeId(String parentAttributeId) {
+        this.parentAttributeId = parentAttributeId;
+    }
+
     public AttributeGroup getTopLevelGroup() {
         if(isEmpty(getAttributeGroup()) || isEmpty(getAttributeGroup().getParentGroup())) {
             return getAttributeGroup();
@@ -207,8 +217,26 @@ public class Attribute extends ValidatableEntity<Attribute> {
     public void orchestrate() {
         setSelectable(getSelectable());
         if(isEmpty(getId())) {
-            setId(toId(getName()));
+            String id = toId(getName());
+            if(id.length() > PIMConstants.ID_MAX_LENGTH) {
+                id = id.substring(0, PIMConstants.ID_MAX_LENGTH);
+            }
+            setId(id);
         }
+    }
+
+    public Attribute merge(Attribute attribute) {
+        this.setName(attribute.getName());
+        this.setLabel(isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : attribute.getName());
+        //TODO - update attribute id - If the attribute id is used in family, then we should update all those references
+        this.setUiType(attribute.getUiType());
+        if(isEmpty(getParentAttributeId()) && isNotEmpty(attribute.getParentAttributeId())) {
+            this.setParentAttributeId(attribute.getParentAttributeId());
+        } else if(isNotEmpty(getParentAttributeId()) && !getParentAttributeId().equals(attribute.getParentAttributeId())) {
+            this.setParentAttributeId(attribute.getParentAttributeId());
+            //TODO - remove all parent bases options
+        }
+        return this;
     }
 
     public Map<String, String> toMap() {

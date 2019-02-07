@@ -12,6 +12,7 @@ public class PIMConstants {
     public static final String DEFAULT_CHANNEL_ID = "ECOMMERCE";
 
     public static final int MAX_FETCH_SIZE = 300;
+    public static int ID_MAX_LENGTH = 20;
 
     public static class Character {
         public static final String EQUALS = "=";

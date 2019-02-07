@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<div class="popup-content" style="padding:20px">
-    <div class="body">
-        <div class="row p-b-25">
+<div class="popup-content" style="padding-left: 0;padding-right: 0;">
+    <div class="body" style="height: 400px;overflow: hidden">
+        <%--<div class="row p-b-25">
             <div class="col-lg-12 col-md-12">
                 <div class="pull-right">
                     <button type="button" class="btn btn-success js-add-attribute-option"><i class="fa fa-plus"></i> <span class="p-l-5">Add Option</span></button>
@@ -20,15 +20,21 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="table-responsive scrollable-dt modal-dt">
+        </div>--%>
+        <%--<div class="table-responsive scrollable-dt modal-dt">
             <table id="paginatedAttributeOptionsTable" class="table table-hover dataTable table-custom" style="width: 100%">
                 <thead class="thead-dark">
 
                 </thead>
 
             </table>
+        </div>--%>
+        <div>
+            <div id="attributeOptions">
+
+            </div>
         </div>
+
     </div>
 </div>
 <img src="/assets/img/tiny.png" onload="$.setPageAttributes({'attributeId': '${attributeId}'});$.initAHAH(this)"/>

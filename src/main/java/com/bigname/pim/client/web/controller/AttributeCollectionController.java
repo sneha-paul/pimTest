@@ -11,6 +11,7 @@ import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
+import com.bigname.pim.util.PimUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 import static com.bigname.common.util.ValidationUtil.isEmpty;
+import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -145,12 +147,52 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));
     }
 
-    @RequestMapping("/{id}/attribute")
-    public ModelAndView attributeDetails(@PathVariable(value = "id") String id) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("attribute", new Attribute());
-        model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
-        return new ModelAndView("settings/attribute", model);
+    @RequestMapping(value= {"/{id}/attribute", "/{id}/attributes/{attributeId}"})
+    public ModelAndView attributeDetails(@PathVariable(value = "id") String id, @PathVariable(value = "attributeId", required = false) String attributeId) {
+        return attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+                .map(attributeCollection -> {
+                    Map<String, Object> model = new HashMap<>();
+                    model.put("mode", attributeId == null ? "CREATE" : "DETAILS");
+                    model.put("attribute", isEmpty(attributeId) ? new Attribute() : attributeCollection.getAllAttributes().stream()
+                                                                                        .filter(attribute -> attribute.getId().equals(attributeId)).findFirst()
+                                                                                                .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId)));
+                    if(attributeId != null) {
+//                        model.put("parentAttributeOptions", attributeCollection.getAllAttributes().stream().filter(attribute -> attribute))//TODO
+                    }
+                    model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
+                    return new ModelAndView("settings/attribute", model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));
+
+    }
+
+
+    @RequestMapping(value = "/{collectionId}/attributes/{attributeId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> updateAttribute(@PathVariable(value = "collectionId") String collectionId,
+                                               @PathVariable(value = "attributeId") String attributeId,
+                                               @RequestParam Map<String, Object> parameterMap) {
+        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+                .map(attributeCollection -> {
+                    Map<String, Object> model = new HashMap<>();
+                    Attribute attribute = attributeCollection.getAllAttributes().stream()
+                            .filter(attribute1 -> attribute1.getFullId().equals(parameterMap.get("fullId"))).findFirst()
+                            .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
+                    attribute.setName((String)parameterMap.get("name"));
+                    if(isNotEmpty(parameterMap.get("parentAttributeId"))) {
+                        attribute.setParentAttributeId((String)parameterMap.get("parentAttributeId"));
+                    }
+                    if(isNotEmpty(parameterMap.get("uiType"))) {
+                        attribute.setUiType(Attribute.UIType.get((String)parameterMap.get("uiType")));
+                    }
+                    if(isValid(attribute, model)) {
+                        attributeCollection.setGroup("ATTRIBUTES");
+                        attributeCollection.updateAttribute(attribute);
+                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                        model.put("success", true);
+                    }
+                    return model;
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
+
     }
 
     @RequestMapping(value = "/{collectionId}/attribute", method = RequestMethod.PUT)
@@ -194,21 +236,31 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Result<Map<String, String>> getAttributeOptions(@PathVariable(value = "collectionId") String collectionId, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
 
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        if(PimUtil.isDataTableRequest(request)) {   // Datatable
+            Request dataTableRequest = new Request(request);
+            Pagination pagination = dataTableRequest.getPagination();
+            Result<Map<String, String>> result = new Result<>();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort = null;
+            if (pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+            paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+            return result;
+        } else {    // Handsontable
+            Result<Map<String, String>> result = new Result<>();
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId, 0, 300, null);
+            paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            return result;
         }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
     }
 
     @RequestMapping("/{collectionId}/attributes/{attributeId}/options")

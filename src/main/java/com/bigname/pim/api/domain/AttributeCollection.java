@@ -67,6 +67,21 @@ public class AttributeCollection extends Entity<AttributeCollection> {
         return this;
     }
 
+    public AttributeCollection updateAttribute(Attribute attributeDTO) {
+        Map<String, AttributeGroup> attributeGroups = getAttributes();
+        String fullGroupId = attributeDTO.getAttributeGroup().getFullId();
+        List<String> groupIds = new ArrayList<>(getPipedValues(fullGroupId));
+        AttributeGroup group = attributeGroups.get(groupIds.remove(0));
+        while(!groupIds.isEmpty()) {
+            group = group.getChildGroups().get(groupIds.remove(0));
+        }
+        Attribute attribute = group.getAttributes().get(attributeDTO.getId());
+        if(isNotEmpty(attribute)) {
+            attribute.merge(attributeDTO);
+        }
+        return this;
+    }
+
     public AttributeCollection addAttributeOption(AttributeOption attributeOptionDTO) {
         String attributeFullId = attributeOptionDTO.getAttributeId();
         AttributeGroup.getAttributeGroup(attributeFullId.substring(0, attributeFullId.lastIndexOf("|")), getMappedAttributes())

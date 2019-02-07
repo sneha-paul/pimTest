@@ -79,6 +79,11 @@
             z-index: 2000;
         }
 
+        .modal-body {
+            margin:1rem !important;
+            padding:0!important;
+        }
+
         .dt-clear {
             position: absolute;
             right: 44px;
@@ -199,6 +204,14 @@
 
         .scrollable-dt .dt-body .dataTables_scrollBody {
             max-height: calc(55vh + 50px) !important;
+            min-height:calc(20vh + 10px) !important;
+            overflow: auto;
+            padding-bottom:25px;
+            background-color: #f8f8f8;
+        }
+
+        .tab-content .scrollable-dt .dt-body .dataTables_scrollBody {
+            max-height: calc(35vh + 50px) !important;
             min-height:calc(20vh + 10px) !important;
             overflow: auto;
             padding-bottom:25px;
@@ -753,8 +766,10 @@
         </div>
     </div>
 </div>
+<%--TODO - testing to see is it ok to load vendor specific css at the bottom--%>
+<link href="/assets/vendor/handsontable/handsontable.full.min.css" rel="stylesheet" media="screen">
 <%-- Javascript --%>
-
+<script src="/assets/vendor/handsontable/handsontable.full.min.js"></script>
 <%--<script src="/assets/bundles/libscripts.bundle.js"></script>--%>
 <script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
 <script src="/assets/js/pages/ui/global.js"></script><%-- should be called after page.js--%>

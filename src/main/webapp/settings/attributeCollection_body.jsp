@@ -19,79 +19,71 @@
                     <div class="tab-pane show active" id="DETAILS">
                         <div class="row clearfix m-t-20">
                             <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <form method="post"
-                                              action="/pim/attributeCollections/${attributeCollection.collectionId}"
-                                              data-method="PUT"
-                                              data-success-message='["Successfully updated the attribute collection", "Collection Updated"]'
-                                              data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
-                                            <div class="row">
-                                                <div class="col-md-6 col-sm-12">
-                                                    <div class="form-group">
-                                                        <label for="collectionName">Collection Name</label><code
-                                                            class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="collectionName" name="collectionName"
-                                                               value="${attributeCollection.collectionName}"
-                                                               class="form-control"/>
-                                                    </div>
-                                                    <div class="form-group js-external-id">
-                                                        <label for="collectionId">Collection ID</label><code
-                                                            class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="collectionId" name="collectionId"
-                                                               class="form-control"
-                                                               value="${attributeCollection.collectionId}"/>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label>Status</label>
-                                                        <br/>
-                                                        <label for="active" class="fancy-checkbox">
-                                                            <input type="checkbox" id="active" name="active" value="Y"
-                                                                   <c:if test="${attributeCollection.active eq 'Y'}">checked="checked"</c:if>>
-                                                            <span>Active</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
+                                <form method="post"
+                                      action="/pim/attributeCollections/${attributeCollection.collectionId}"
+                                      data-method="PUT"
+                                      data-success-message='["Successfully updated the attribute collection", "Collection Updated"]'
+                                      data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="collectionName">Collection Name</label><code
+                                                    class="highlighter-rouge m-l-10">*</code>
+                                                <input type="text" id="collectionName" name="collectionName"
+                                                       value="${attributeCollection.collectionName}"
+                                                       class="form-control"/>
                                             </div>
-                                            <br>
-                                            <input type="hidden" name="group" value="DETAILS"/>
-                                            <button type="submit" class="btn btn-primary"
-                                                    onclick="$.submitAction(event, this)">Save
-                                            </button>
-                                            <a href="/pim/attributeCollections">
-                                                <button type="button" class="btn btn-danger">Cancel</button>
-                                            </a>
-                                        </form>
+                                            <div class="form-group js-external-id">
+                                                <label for="collectionId">Collection ID</label><code
+                                                    class="highlighter-rouge m-l-10">*</code>
+                                                <input type="text" id="collectionId" name="collectionId"
+                                                       class="form-control"
+                                                       value="${attributeCollection.collectionId}"/>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <br/>
+                                                <label for="active" class="fancy-checkbox">
+                                                    <input type="checkbox" id="active" name="active" value="Y"
+                                                           <c:if test="${attributeCollection.active eq 'Y'}">checked="checked"</c:if>>
+                                                    <span>Active</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                    <br>
+                                    <input type="hidden" name="group" value="DETAILS"/>
+                                    <button type="submit" class="btn btn-primary"
+                                            onclick="$.submitAction(event, this)">Save
+                                    </button>
+                                    <a href="/pim/attributeCollections">
+                                        <button type="button" class="btn btn-danger">Cancel</button>
+                                    </a>
+                                </form>
                             </div>
                         </div>
                     </div>
                     <div class="tab-pane" id="attributes">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div class="row p-b-25">
-                                            <div class="col-lg-12 col-md-12">
-                                                <div class="pull-right">
-                                                    <button type="button"
-                                                            class="btn btn-success js-add-attribute"><i
-                                                            class="fa fa-plus"></i> <span class="p-l-5">Add Attribute</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="table-responsive scrollable-dt">
-                                            <table id="paginatedAttributesTable"
-                                                   class="table table-hover dataTable table-custom" style="width: 100%">
-                                                <thead class="thead-dark">
-
-                                                </thead>
-                                            </table>
+                                <div class="row p-b-25">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="pull-right">
+                                            <button type="button"
+                                                    class="btn btn-success js-add-attribute"><i
+                                                    class="fa fa-plus"></i> <span class="p-l-5">Add Attribute</span>
+                                            </button>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="table-responsive scrollable-dt">
+                                    <table id="paginatedAttributesTable"
+                                           class="table table-hover dataTable table-custom" style="width: 100%">
+                                        <thead class="thead-dark">
+
+                                        </thead>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -118,7 +110,7 @@
                     {data: 'selectable', name: 'selectable', title: 'Selectable'},
                     {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
                 ],
-                buttons: [$.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
+                buttons: [$.attributeDetailsModalButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}'}), $.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
             });
             $(this).removeClass('js-attributes-tab').off('shown.bs.tab.attributes');
         });

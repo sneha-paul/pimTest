@@ -72,6 +72,44 @@
             };
         },
 
+        showModalButton: function(options) {
+            let buttons = options.buttons ? options.buttons : [];
+            buttons[buttons.length] = {text: 'CLOSE', style: 'danger', close: true, click: function(){}};
+            return {
+                name: options.name,
+                style: options.style,
+                title: options.buttonTitle,
+                icon: options.icon,
+                click: function(row) {
+                    $.showModal({
+                        url: options.pageUrl(row),
+                        name:options.pageName,
+                        title:options.pageTitle(row),
+                        buttons: buttons
+                    });
+                }
+            }
+        },
+
+        attributeDetailsModalButton: function(options) {
+            return $.showModalButton({
+                name: 'ATTRIBUTE_DETAILS',
+                style: 'info',
+                title: 'Details',
+                icon: 'icon-eye',
+                pageUrl: function(row){
+                    return $.getURL(options.actionUrl, {attributeId: row.id});
+                },
+                pageName: 'attributes',
+                pageTitle: function(row){
+                    return row.name;
+                },
+                buttons: [
+                    {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('attributes');$.closeModal();});}},
+                ]
+            });
+        },
+
         attributeOptionsButton: function(options) {
           return {
               name: 'ATTRIBUTE_OPTIONS',
