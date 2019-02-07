@@ -32,11 +32,11 @@
                         <p>Apparently we're experiencing an error. But don't worry, we will solve it shortly.
                             <br>Please <a href="javascript:void(0);">click here</a> to report this issue.</p>
                         <div class="margin-top-30">
-                            <a href="javascript:$('.js-error').toggleClass('js-hidden')" class="js-error btn btn-danger"><i class="fa fa-warning"></i> <span>Show Error</span></a>
-                            <a href="javascript:$('.js-error').toggleClass('js-hidden')" class="js-error js-hidden btn btn-danger"><i class="fa fa-warning"></i> <span>Hide Error</span></a>
+                            <a href="javascript:$('.js-error.btn').toggle();$('.js-error-details').fadeToggle()" class="js-error btn btn-danger"><i class="fa fa-warning"></i> <span>Show Error</span></a>
+                            <a href="javascript:$('.js-error.btn').toggle();$('.js-error-details').fadeToggle()" class="js-error btn btn-danger" style="display: none"><i class="fa fa-warning"></i> <span>Hide Error</span></a>
                             <a href="/" class="btn btn-primary"><i class="fa fa-home"></i> <span>Home</span></a>
                         </div>
-                        <div class="js-error js-hidden m-t-25 scrollable" style="max-height: 500px">
+                        <div class="js-error-details m-t-25 scrollable" style="max-height: 500px; display: none">
                             <p>${message}
                             </br><p><code>${trace}</code></p>
                         </div>
