@@ -2,6 +2,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <tiles:insertDefinition name="headlessLayout">
     <tiles:putAttribute name="title" value="BIGNAME - PIM"/>
+    <tiles:putAttribute name="layout" value="wide"/>
     <tiles:putAttribute name="body">
 
         <div class="card">

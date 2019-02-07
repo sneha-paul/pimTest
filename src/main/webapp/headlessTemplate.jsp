@@ -38,7 +38,7 @@
 
     <style>
         a:focus {outline:0;}
-        .auth-box {
+        .auth-box.wide {
             width: 75%;
         }
         .js-hidden {
@@ -72,7 +72,7 @@
     <div id="wrapper">
         <div class="vertical-align-wrap">
             <div class="vertical-align-middle auth-main">
-                <div class="auth-box">
+                <div class="auth-box <tiles:insertAttribute name="layout" ignore="true"/>">
                     <div class="top">
                         <img style="margin:0 0 -7px 11px" src="/assets/img/bnlogo-white.png" alt="BIGNAME">
                     </div>
