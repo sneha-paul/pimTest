@@ -95,7 +95,7 @@ public class CollectionsUtil {
             }
         }
         return  flatten ;
-        }
+    }
 
 /*    public static void main(String[] args) {
         Map<String, Map<String, Object>> input = new HashMap<>();
