@@ -35,8 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().loginPage("/login").permitAll()
+                .defaultSuccessUrl("/home")
                 .and()
                 .logout().permitAll()
+                .logoutSuccessUrl("/login?logout")
                 .and().exceptionHandling().authenticationEntryPoint(new AjaxAwareAuthenticationEntryPoint("/login"))
                 .and().csrf().disable();
     }
