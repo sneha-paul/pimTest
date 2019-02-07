@@ -20,10 +20,52 @@
     <!-- VENDOR CSS -->
     <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/sweetalert/sweetalert.css"/>
 
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/color_skins.css">
+
+    <script src="/assets/vendor/jquery/jquery-3.3.1.min.js"></script>
+    <script src="/assets/vendor/underscore/underscore-min.js"></script>
+    <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.2/dist/sweetalert2.all.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <script src="/assets/js/pages/ui/page.js"></script>
+    <script src="/assets/js/pages/ui/global.js"></script><%-- should be called after page.js--%>
+
+    <style>
+        a:focus {outline:0;}
+        .auth-box {
+            width: 75%;
+        }
+        .js-hidden {
+            display: none;
+        }
+        .scrollable {
+            overflow: auto;
+        }
+        .scrollable::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+            background-color: #ffffff;
+            padding: 1px;
+            box-shadow: none;
+        }
+
+        .scrollable::-webkit-scrollbar {
+            width: 10px;
+            background-color: #f8f8f8;
+        }
+
+        .scrollable::-webkit-scrollbar-thumb {
+            background-color: #7f7f7f;
+            border: 2px solid #ffffff;
+            border-radius: 5px;
+        }
+    </style>
+
 </head>
 <body class="theme-blue">
     <!-- WRAPPER -->

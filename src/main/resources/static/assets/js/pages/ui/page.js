@@ -1099,6 +1099,15 @@
             }, callback);
         },
 
+        showError: function(title, message) {
+            swal.fire({
+                title: title,
+                html: message,
+                animation:false,
+                type: 'error'
+            });
+        },
+
         confirmedAJAXRequest: function(options, callback) {
             const defaultOptions = {
                 method: 'PUT',
