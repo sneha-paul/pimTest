@@ -56,7 +56,7 @@ public class ExportController {
         return model;
     }
 
-    @RequestMapping(value = "/products", method = RequestMethod.GET)
+    @RequestMapping(value = "/productsData", method = RequestMethod.GET)
     public Map<String, Object> exportProductData(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
         productExporter.exportData("/DevStudio/Docs/PIM_ExcelFiles/ProductData.xlsx");

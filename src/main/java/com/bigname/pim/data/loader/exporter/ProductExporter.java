@@ -9,10 +9,7 @@ import com.bigname.pim.util.POIUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +25,7 @@ public class ProductExporter {
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
 
         Map<String, Object[]> data = new TreeMap<String, Object[]>();
-       // data.put("1", new Object[]{"PRODUCT_ID", "PRODUCT_NAME", "PRODUCT_FAMILY", "ACTIVE", "DISCONTINUED", "ID" });
+      //  data.put("1", new Object[]{"PRODUCT_ID", "PRODUCT_NAME", "PRODUCT_FAMILY", "ACTIVE", "DISCONTINUED", "ID" });
        /* int i=2;
         for (Iterator<Map<String, Object>> iter = productVariantData.iterator(); iter.hasNext(); ) {
             ProductVariant element = (ProductVariant) iter.next();
@@ -36,18 +33,29 @@ public class ProductExporter {
             i++;
         }*/
 
-        int i=0;
-        for (Map<String, Object> featureService : productVariantData) {
-            //for (Map.Entry<String, Object> entry : featureService.entrySet()) {
-            data.put(Integer.toString(i), new Object[]{ productVariantData.get(i).values()});
-            Map variantAttributes = (Map) featureService.get("variantAttributes");
-            CollectionsUtil.flattenMap(variantAttributes);
-            data.put(Integer.toString(i), new Object[]{featureService.get("externalId"), featureService.get("productName"), featureService.get("productFamilyId"), featureService.get("active"), featureService.get("discontinued"), featureService.get("_id")});
-            //}
+        List<Map<String, Object>> variantsAttributes = new ArrayList<>();
+        Set<String> header = new HashSet<>();
+        productVariantData.forEach(variant -> {
+            int i=2;
+            Map<String, Object> variantAttributesMap = new HashMap<>();
+            variant.forEach((key, value) -> {
+                if(value instanceof String) {
+                    variantAttributesMap.put(key, value);
+                }
+                Map<String, Object> scopedProductAttributes = (Map<String, Object>)((Map<String, Object>)variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
+                Map<String, Object> pricingDetails = (Map<String, Object>)(Map<String, Object>)variant.get("pricingDetails");
+                Map<String, Object> variantAttributes = (Map<String, Object>)(Map<String, Object>)variant.get("variantAttributes");
+                variantAttributesMap.putAll(scopedProductAttributes);
+                variantAttributesMap.putAll(pricingDetails);
+                variantAttributesMap.putAll(variantAttributes);
+            });
+            header.addAll(variantAttributesMap.keySet());
+            variantsAttributes.add(variantAttributesMap);
+            data.put(Integer.toString(i), new Object[]{variantAttributesMap.values().toString()});
             i++;
-        }
+        });
 
-
+        data.put("1", header.toArray());
         POIUtil.writeData(filePath, "product", data);
         return true;
     }
