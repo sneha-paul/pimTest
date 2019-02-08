@@ -29,7 +29,7 @@ public class PimAuthenticationSuccessHandler implements AuthenticationSuccessHan
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        if (((User) authentication.getPrincipal()).getStatus().equals("pending")) {
+        if ("pending".equals(((User) authentication.getPrincipal()).getStatus())) {
             response.sendRedirect("/login");
         } else {
             Event event = new Event();
@@ -43,8 +43,7 @@ public class PimAuthenticationSuccessHandler implements AuthenticationSuccessHan
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 }
-                String ipAddress = inetAddress.getHostAddress();
-                remoteAddr = ipAddress;
+                remoteAddr = inetAddress != null ? inetAddress.getHostAddress() : "0.0.0.0";
             }
             event.setEntity("Login");
             event.setTimeStamp(LocalDateTime.now());

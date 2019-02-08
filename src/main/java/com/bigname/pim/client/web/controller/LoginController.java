@@ -36,7 +36,7 @@ public class LoginController {
         } else {
             userStatus = principal.toString();
         }
-        if(userStatus.equals("pending")){
+        if("pending".equals(userStatus)){
             return new ModelAndView("redirect:/login");
         }else{
             return new ModelAndView("redirect:/pim/dashboard");
