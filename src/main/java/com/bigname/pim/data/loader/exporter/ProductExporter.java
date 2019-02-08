@@ -6,10 +6,14 @@ import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.util.POIUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -35,8 +39,8 @@ public class ProductExporter {
 
         List<Map<String, Object>> variantsAttributes = new ArrayList<>();
         Set<String> header = new HashSet<>();
+       // final int i=2;
         productVariantData.forEach(variant -> {
-            int i=2;
             Map<String, Object> variantAttributesMap = new HashMap<>();
             variant.forEach((key, value) -> {
                 if(value instanceof String) {
@@ -45,18 +49,40 @@ public class ProductExporter {
                 Map<String, Object> scopedProductAttributes = (Map<String, Object>)((Map<String, Object>)variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
                 Map<String, Object> pricingDetails = (Map<String, Object>)(Map<String, Object>)variant.get("pricingDetails");
                 Map<String, Object> variantAttributes = (Map<String, Object>)(Map<String, Object>)variant.get("variantAttributes");
+
+               /*ObjectMapper mapperObj = new ObjectMapper();
+                try {
+                    pricingDetails = mapperObj.readValue(CollectionsUtil.buildMapString(pricingDetails,0),
+                            new TypeReference<HashMap<String,Object>>(){});
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }*/
+
                 variantAttributesMap.putAll(scopedProductAttributes);
                 variantAttributesMap.putAll(pricingDetails);
                 variantAttributesMap.putAll(variantAttributes);
+
             });
             header.addAll(variantAttributesMap.keySet());
             variantsAttributes.add(variantAttributesMap);
-            data.put(Integer.toString(i), new Object[]{variantAttributesMap.values().toString()});
-            i++;
+
+
         });
 
-        data.put("1", header.toArray());
-        POIUtil.writeData(filePath, "product", data);
+        List<List<Object>> data1 = new ArrayList<>();
+        List<Object> headerColumns = new ArrayList<>(header);
+        data1.add(headerColumns);
+        for (Map<String, Object> variantAttributes : variantsAttributes) {
+            List<Object> variantData = new ArrayList<>();
+            for(int i = 0; i < headerColumns.size(); i++){
+                String key = (String)headerColumns.get(i);
+                variantData.add(variantAttributes.get(key));
+            }
+            data1.add(variantData);
+        }
+
+
+        POIUtil.writeData(filePath, "product", data1);
         return true;
     }
 }
