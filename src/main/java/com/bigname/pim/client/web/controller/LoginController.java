@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,36 +39,13 @@ public class LoginController {
         if(userStatus.equals("pending")){
             return new ModelAndView("redirect:/login");
         }else{
-            remoteAddr = request.getRemoteAddr();
-            if (remoteAddr.equalsIgnoreCase("0:0:0:0:0:0:0:1")) {
-                InetAddress inetAddress = null;
-                try {
-                    inetAddress = InetAddress.getLocalHost();
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                }
-                String ipAddress = inetAddress.getHostAddress();
-                remoteAddr = ipAddress;
-            }
-
-            event.setEntity("Login");
-            event.setTimeStamp(LocalDateTime.now());
-            event.setUser(((User)principal).getId());
-            event.setEventType(Event.Type.LOGIN);
-            event.setDetails(((User)principal).getUserName() + " logged in from " + remoteAddr);
-            /*Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
-            dataObj.put("lastModifiedDateTime", _t.getLastModifiedDateTime());
-            dataObj.put("createdDateTime", _t.getCreatedDateTime());
-            event.setData(dataObj);*/
-            eventService.create(event);
-
             return new ModelAndView("redirect:/pim/dashboard");
         }
 
     }
 
 
-    @RequestMapping(value = "/login?logout")
+ /*   @RequestMapping(value = "/login?logout")
     @ResponseBody
     public void checkLogOffUserStatus(HttpServletRequest request) {
         Event event = new Event();
@@ -96,13 +70,13 @@ public class LoginController {
             event.setUser(((User)principal).getId());
             event.setEventType(Event.Type.LOGIN);
             event.setDetails(((User)principal).getUserName() + " logged out from " + remoteAddr);
-            /*Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
+            *//*Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
             dataObj.put("lastModifiedDateTime", _t.getLastModifiedDateTime());
             dataObj.put("createdDateTime", _t.getCreatedDateTime());
-            event.setData(dataObj);*/
+            event.setData(dataObj);*//*
             eventService.create(event);
 
             //return new ModelAndView("redirect:/pim/dashboard");
 
-    }
+    }*/
 }
