@@ -43,9 +43,13 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group js-name">
                                 <label>Attribute Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                <input type="text" name="name" value="${attribute.name}" class="form-control" required="true"/>
+                                <input type="text" name="name" class="form-control" required="true"/>
+                            </div>
+                            <div class="form-group js-external-id">
+                                <label>Attribute ID</label><code class="highlighter-rouge m-l-10">*</code>
+                                <input type="text" name="id" class="form-control" required="true"/>
                             </div>
                             <div class="form-group">
                                 <label>Parent Attribute</label>

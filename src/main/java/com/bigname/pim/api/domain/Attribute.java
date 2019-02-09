@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Transient;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,16 @@ public class Attribute extends ValidatableEntity<Attribute> {
     @JsonIgnore
     private AttributeGroup attributeGroup;
 
+    // Map of all attributeOptions for an attribute instance
     private Map<String, AttributeOption> options = new LinkedHashMap<>();
+
+    //TODO - can be removed later, so far option grouping can be achieved without this
+    //Map of attributeOptionFullIds grouped by parentOptionId (Normal ID, not FullID). (This will be empty when parentAttributeId is empty)
+    private Map<String, List<String>> parentBasedOptions = new HashMap<>();
+
+    //TODO - this can also be removed, since the database lookup for this is not that expensive
+    //Reference map of usage. Key will be familyId and values will be familyAttributeFullIds.
+    private Map<String, List<String>> referenceMap = new HashMap<>();
 
     public Attribute() {}
 
@@ -198,6 +208,22 @@ public class Attribute extends ValidatableEntity<Attribute> {
         this.options = options;
     }
 
+    public Map<String, List<String>> getParentBasedOptions() {
+        return parentBasedOptions;
+    }
+
+    public void setParentBasedOptions(Map<String, List<String>> parentBasedOptions) {
+        this.parentBasedOptions = parentBasedOptions;
+    }
+
+    public Map<String, List<String>> getReferenceMap() {
+        return referenceMap;
+    }
+
+    public void setReferenceMap(Map<String, List<String>> referenceMap) {
+        this.referenceMap = referenceMap;
+    }
+
     public String getParentAttributeId() {
         return parentAttributeId;
     }
@@ -253,6 +279,7 @@ public class Attribute extends ValidatableEntity<Attribute> {
         map.put("name", getName());
         map.put("group", AttributeGroup.getFullGroupLabel(getAttributeGroup(), "|"));
         map.put("selectable", getSelectable());
+        map.put("parentAttributeId", getParentAttributeId());
         map.put("options", Integer.toString(options.size()));
         return map;
     }

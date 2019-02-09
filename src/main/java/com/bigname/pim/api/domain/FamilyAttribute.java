@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Transient;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class FamilyAttribute extends ValidatableEntity {
     private int subSequenceNum;
     private String collectionId;
     private String attributeId;
+    private String parentFamilyAttributeId; //Full Id of the parent family attribute, if any
     private Map<String, Scope> scope = new HashMap<>();
 
     @Transient @JsonIgnore
@@ -51,11 +53,17 @@ public class FamilyAttribute extends ValidatableEntity {
 
     private Map<String, FamilyAttributeOption> options = new LinkedHashMap<>();
 
+    //Map of familyAttributeOptionFullIds grouped by parentOptionFullId. (This will be empty when parentAttributeId is empty)
+    private Map<String, List<String>> parentBasedOptions = new HashMap<>();
+
     public FamilyAttribute() {}
 
     public FamilyAttribute(FamilyAttribute attributeDTO, Map<String, FamilyAttributeGroup> familyGroups) {
 
         this(isNotEmpty(attributeDTO.getName()) ? attributeDTO.getName() : attributeDTO.getAttribute().getName(), isNotEmpty(attributeDTO.getLabel()) ? attributeDTO.getLabel() : attributeDTO.getAttribute().getLabel());
+        if(isNotEmpty(attributeDTO.getParentFamilyAttributeId())) {
+            this.setParentFamilyAttributeId(attributeDTO.getParentFamilyAttributeId());
+        }
         this.attribute = attributeDTO.getAttribute();
         this.collectionId = attributeDTO.getCollectionId();
         this.attributeId = this.attribute.getFullId();
@@ -293,6 +301,22 @@ public class FamilyAttribute extends ValidatableEntity {
         this.options = options;
     }
 
+    public String getParentFamilyAttributeId() {
+        return parentFamilyAttributeId;
+    }
+
+    public void setParentFamilyAttributeId(String parentFamilyAttributeId) {
+        this.parentFamilyAttributeId = parentFamilyAttributeId;
+    }
+
+    public Map<String, List<String>> getParentBasedOptions() {
+        return parentBasedOptions;
+    }
+
+    public void setParentBasedOptions(Map<String, List<String>> parentBasedOptions) {
+        this.parentBasedOptions = parentBasedOptions;
+    }
+
     public Pair<String, Object> validate(Object value, String channelId, int level) {
         Type type = getType(channelId);
         boolean required = level == 0 ? type == Type.COMMON && isRequired(channelId) : type == Type.VARIANT && isRequired(channelId);
@@ -398,6 +422,7 @@ public class FamilyAttribute extends ValidatableEntity {
             map.put("group", FamilyAttributeGroup.getUniqueLeafGroupLabel(getAttributeGroup(), "|"));
             map.put("required", getRequired());
             map.put("selectable", getSelectable());
+            map.put("parentAttributeId", getParentFamilyAttributeId());
             map.put("options", Integer.toString(options.size()));
         }
         return map;

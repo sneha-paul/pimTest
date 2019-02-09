@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,15 +17,27 @@ public class AttributeOption extends ValidatableEntity {
     @NotEmpty(message = "Option value cannot be empty")
     private String value;
 
-    @NotEmpty(message = "Option id cannot be empty")
+    @Transient
+//    @NotEmpty(message = "Option id cannot be empty") - TODO - verify if this is required
     private String id;
 
     @NotEmpty(message = "Option fullId cannot be empty")
     private String fullId;
 
+    private String parentOptionFullId;
+    private String independent = "N";
+
+    @Transient
+    private String parentOptionValue;
+
     private String active = "Y";
+
     private long sequenceNum;
     private int subSequenceNum;
+
+    //TODO - this needs to be handled in the future, since this lookup is somewhat expensive
+    //Reference map of usage. Key will be familyId and values will be familyAttributeOptionFullIds.
+    private Map<String, List<String>> referenceMap = new HashMap<>();
 
     @NotEmpty(message = "Attribute id cannot be empty")
     @Transient
@@ -38,11 +52,19 @@ public class AttributeOption extends ValidatableEntity {
     }
 
     public String getId() {
+        if(isEmpty(id) && isNotEmpty(fullId)) {
+            List<String> idChain = getPipedValues(fullId);
+            id = idChain.get(idChain.size() - 1);
+        }
         return id;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.id = id != null ? id.toUpperCase() : null;
+        if(isNotEmpty(fullId)) {
+            fullId = null;
+            orchestrate();
+        }
     }
 
     public String getFullId() {
@@ -59,6 +81,7 @@ public class AttributeOption extends ValidatableEntity {
 
     public void setAttributeId(String attributeId) {
         this.attributeId = attributeId;
+        orchestrate();
     }
 
     public String getCollectionId() {
@@ -85,6 +108,14 @@ public class AttributeOption extends ValidatableEntity {
         this.active = toYesNo(active, "Y");
     }
 
+    public String getIndependent() {
+        return independent;
+    }
+
+    public void setIndependent(String independent) {
+        this.independent = toYesNo(independent, "Y");
+    }
+
     public long getSequenceNum() {
         return sequenceNum;
     }
@@ -100,9 +131,43 @@ public class AttributeOption extends ValidatableEntity {
     public void setSubSequenceNum(int subSequenceNum) {
         this.subSequenceNum = subSequenceNum;
     }
+
+    public String getParentOptionFullId() {
+        return parentOptionFullId;
+    }
+
+    public void setParentOptionFullId(String parentOptionFullId) {
+        this.parentOptionFullId = parentOptionFullId;
+    }
+
+    public String getParentOptionValue() {
+        return parentOptionValue;
+    }
+
+    public void setParentOptionValue(String parentOptionValue) {
+        this.parentOptionValue = parentOptionValue;
+    }
+
+    public Map<String, List<String>> getReferenceMap() {
+        return referenceMap;
+    }
+
+    public void setReferenceMap(Map<String, List<String>> referenceMap) {
+        this.referenceMap = referenceMap;
+    }
+
+    public AttributeOption merge(AttributeOption attributeOption) {
+        this.setValue(attributeOption.getValue());
+        this.setParentOptionFullId(attributeOption.getParentOptionFullId());
+        //TODO - update attributeOption id - If the attributeOption id is used in familyAttributes, then we should update all those references
+
+        return this;
+    }
+
     @Override
     public void orchestrate() {
         setActive(getActive());
+        setIndependent(getIndependent());
         if(isEmpty(getId())) {
             setId(toId(getValue()));
         }
@@ -115,7 +180,7 @@ public class AttributeOption extends ValidatableEntity {
         map.put("value", getValue());
         map.put("active", getActive());
         map.put("fullId", getCollectionId() + "|" + getFullId());
-
+        map.put("parent", getParentOptionValue());
         return map;
     }
 }

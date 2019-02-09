@@ -35,6 +35,20 @@
             };
         },
 
+        attributeOptionsTabButton: function(options) {
+            return {
+                style: 'primary',
+                title: 'Show Attribute Options',
+                icon: 'fa fa-list',
+                check: function(row) {
+                    return 'Y' === row.selectable;
+                },
+                click: function (row) {
+                    window.location.href = $.getURL(options.actionUrl, {attributeId: row.externalId});
+                }
+            };
+        },
+
         cloneButton: function(options) {
             return {
                 name: 'CLONE',
@@ -80,7 +94,7 @@
                 style: options.style,
                 title: options.buttonTitle,
                 icon: options.icon,
-                click: function(row) {
+                click: function(row) {console.log(options.pageTitle(row));
                     $.showModal({
                         url: options.pageUrl(row),
                         name:options.pageName,
@@ -91,26 +105,27 @@
             }
         },
 
-        attributeDetailsModalButton: function(options) {
+        attributeOptionDetailButton: function(options) {
             return $.showModalButton({
-                name: 'ATTRIBUTE_DETAILS',
+                name: 'ATTRIBUTE_OPTION_DETAILS',
                 style: 'info',
                 title: 'Details',
                 icon: 'icon-eye',
                 pageUrl: function(row){
-                    return $.getURL(options.actionUrl, {attributeId: row.id});
+                    return $.getURL(options.actionUrl, {attributeOptionId: row.id});
                 },
-                pageName: 'attributes',
+                pageName: 'attribute-option',
                 pageTitle: function(row){
-                    return row.name;
+                    return 'Attribute Option Details';
                 },
                 buttons: [
-                    {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('attributes');$.closeModal();});}},
+                    {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('attributeOptions');$.closeModal();});}},
                 ]
             });
         },
 
-        attributeOptionsButton: function(options) {
+        //TODO - DO NOT DELETE
+        /*attributeOptionsButton: function(options) {
           return {
               name: 'ATTRIBUTE_OPTIONS',
               style: 'primary',
@@ -130,7 +145,7 @@
                   });
               }
           }
-        },
+        },*/
 
         addItemButton: function(options) {
             return {

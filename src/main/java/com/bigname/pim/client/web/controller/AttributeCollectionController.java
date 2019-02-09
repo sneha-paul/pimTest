@@ -5,6 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.web.controller.BaseController;
@@ -157,11 +158,15 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                         attribute = attributeCollection.getAllAttributes().stream()
                                 .filter(attribute1 -> attribute1.getId().equals(attributeId)).findFirst()
                                 .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
+                        if(isNotEmpty(attribute.getParentAttributeId())) {
+                            model.put("parentAttribute", attributeCollection.getAttribute(attribute.getParentAttributeId()).orElse(null));
+                        }
                         model.put("breadcrumbs", new Breadcrumbs("Attribute Collections",
                                 "Attribute Collections", "/pim/attributeCollections",
                                 attributeCollection.getCollectionName(), "/pim/attributeCollections/" + attributeCollection.getCollectionId(),
                                 "Attributes", "/pim/attributeCollections/" + attributeCollection.getCollectionId() + "#attributes",
                                 attribute.getName(), ""));
+                        model.put("collectionId", collectionId);
                     } else {
                         attribute = new Attribute();
                         mode = "CREATE";
@@ -201,32 +206,33 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
-                    Attribute attribute = attributeCollection.getAllAttributes().stream()
-                            .filter(attribute1 -> attribute1.getFullId().equals(parameterMap.get("fullId"))).findFirst()
-                            .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
-                    attribute.setName((String)parameterMap.get("name"));
-                    if(isNotEmpty(parameterMap.get("parentAttributeId"))) {
-                        attribute.setParentAttributeId((String)parameterMap.get("parentAttributeId"));
-                    }
-                    if(isNotEmpty(parameterMap.get("uiType"))) {
-                        attribute.setUiType(Attribute.UIType.get((String)parameterMap.get("uiType")));
-                    }
-                    if(isValid(attribute, model)) {
-                        attributeCollection.setGroup("ATTRIBUTES");
-                        attributeCollection.updateAttribute(attribute);
-                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
-                        model.put("success", true);
-                    }
-                    return model;
+                    String attributeFullId = (String)parameterMap.get("fullId");
+                    return attributeCollection.getAttribute(attributeFullId)
+                            .map(attribute -> {
+                                attribute.setName((String)parameterMap.get("name"));
+                                if(isNotEmpty(parameterMap.get("parentAttributeId"))) {
+                                    attribute.setParentAttributeId((String)parameterMap.get("parentAttributeId"));
+                                }
+                                if(isNotEmpty(parameterMap.get("uiType"))) {
+                                    attribute.setUiType(Attribute.UIType.get((String)parameterMap.get("uiType")));
+                                }
+                                if(isValid(attribute, model)) {
+                                    attributeCollection.setGroup("ATTRIBUTES");
+                                    attributeCollection.updateAttribute(attribute);
+                                    attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                                    model.put("success", true);
+                                }
+                                return model;
+                            }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeFullId));
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
 
     }
 
 
 
-    @RequestMapping("/{id}/attributes")
+    @RequestMapping("/{collectionId}/attributes/data")
     @ResponseBody
-    public Result<Map<String, String>> getAttributes(@PathVariable(value = "id") String id, HttpServletRequest request) {
+    public Result<Map<String, String>> getAttributes(@PathVariable(value = "collectionId") String id, HttpServletRequest request) {
 
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
@@ -245,9 +251,11 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return result;
     }
 
-    @RequestMapping("/{collectionId}/attributes/{attributeId}/options/list")
+    @RequestMapping("/{collectionId}/attributes/{attributeId}/options/data")
     @ResponseBody
-    public Result<Map<String, String>> getAttributeOptions(@PathVariable(value = "collectionId") String collectionId, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
+    public Result<Map<String, String>> getAttributeOptions(@PathVariable(value = "collectionId") String collectionId,
+                                                           @PathVariable(value = "attributeId") String attributeId,
+                                                           HttpServletRequest request) {
 
         if(PimUtil.isDataTableRequest(request)) {   // Datatable
             Request dataTableRequest = new Request(request);
@@ -276,26 +284,75 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         }
     }
 
-    @RequestMapping("/{collectionId}/attributes/{attributeId}/options")
-    public ModelAndView attributeOptions(@PathVariable(value = "collectionId") String collectionId,
-                                         @PathVariable(value = "attributeId") String attributeId) {
-        Map<String, Object> model = new HashMap<>();
-//        model.put("attributeCollectionId", collectionId);
-        model.put("attributeId", attributeId);
-        return new ModelAndView("settings/attributeOptions", model);
+    @RequestMapping(value= {"/{collectionId}/attributes/{attributeId}/options/{attributeOptionId}", "/{collectionId}/attributes/{attributeId}/options/create"})
+    public ModelAndView attributeOptionDetails(@PathVariable(value = "collectionId") String collectionId,
+                                         @PathVariable(value = "attributeId") String attributeId,
+                                         @PathVariable(value = "attributeOptionId", required = false) String attributeOptionId) {
+
+        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+            .map(attributeCollection -> {
+                Map<String, Object> model = new HashMap<>();
+                Attribute attribute = attributeCollection.getAllAttributes().stream()
+                        .filter(attribute1 -> attribute1.getId().equals(attributeId)).findFirst()
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
+
+                String mode;
+                AttributeOption attributeOption;
+                if(isNotEmpty(attributeOptionId)) {
+                    mode = "DETAILS";
+                    String optionFullId = StringUtil.getPipedValue(attribute.getFullId(), attributeOptionId);
+                    attributeOption = attributeCollection.getAttributeOption(optionFullId).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Option with Id: " + optionFullId));
+                } else {
+                    attributeOption = new AttributeOption();
+                    mode = "CREATE";
+                }
+                model.put("mode", mode);
+                model.put("attribute", attribute);
+                model.put("attributeOption", attributeOption);
+                if(isNotEmpty(attribute.getParentAttributeId())) {
+                    model.put("parentAttributeOptions", attributeCollection.getAttribute(attribute.getParentAttributeId())
+                            .map(parentAttribute -> parentAttribute.getOptions()
+                                    .entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.comparing(AttributeOption::getValue)))
+                                    .collect(CollectionsUtil.toLinkedMap(e -> e.getValue().getFullId(), e -> e.getValue().getValue())))
+                            .orElse(new HashMap<>()));
+                }
+                return new ModelAndView("settings/attributeOption", model);
+            }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
+
     }
 
-    @RequestMapping(value = "/{collectionId}/attributes/{attributeId}/options", method = RequestMethod.PUT)
+
+    @RequestMapping(value = "/{collectionId}/attributes/{attributeId}/attributeOptions", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> saveAttributeOptions(@PathVariable(value = "collectionId") String collectionId, AttributeOption attributeOption) {
-        Map<String, Object> model = new HashMap<>();
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false);
-        if(attributeCollection.isPresent() && isValid(attributeOption, model)) {
-            attributeCollection.get().setGroup("ATTRIBUTES");
-            attributeCollection.get().addAttributeOption(attributeOption);
-            attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection.get());
-            model.put("success", true);
-        }
-        return model;
+    public Map<String, Object> createAttributeOption(@PathVariable(value = "collectionId") String collectionId,
+                                                    AttributeOption attributeOptionDTO) {
+        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+                .map(attributeCollection -> {
+                    Map<String, Object> model = new HashMap<>();
+                    if(isValid(attributeOptionDTO, model)) {
+                        attributeCollection.setGroup("ATTRIBUTES");
+                        attributeCollection.addAttributeOption(attributeOptionDTO);
+                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                        model.put("success", true);
+                    }
+                    return model;
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
+    }
+
+    @RequestMapping(value = "/{collectionId}/attributes/{attributeId}/attributeOptions/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> updateAttributeOption(@PathVariable(value = "collectionId") String collectionId,
+                                                    AttributeOption attributeOptionDTO) {
+        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+                .map(attributeCollection -> {
+                    Map<String, Object> model = new HashMap<>();
+                    if(isValid(attributeOptionDTO, model)) {
+                        attributeCollection.setGroup("ATTRIBUTES");
+                        attributeCollection.updateAttributeOption(attributeOptionDTO);
+                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                        model.put("success", true);
+                    }
+                    return model;
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
     }
 }

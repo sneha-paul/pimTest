@@ -1,6 +1,9 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.StringUtil;
 import com.bigname.core.domain.Entity;
+import com.bigname.core.exception.EntityNotFoundException;
+import com.bigname.pim.util.PIMConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -69,27 +72,149 @@ public class AttributeCollection extends Entity<AttributeCollection> {
     }
 
     public AttributeCollection updateAttribute(Attribute attributeDTO) {
-        Map<String, AttributeGroup> attributeGroups = getAttributes();
-        String fullGroupId = attributeDTO.getAttributeGroup().getFullId();
-        List<String> groupIds = new ArrayList<>(getPipedValues(fullGroupId));
-        AttributeGroup group = attributeGroups.get(groupIds.remove(0));
-        while(!groupIds.isEmpty()) {
-            group = group.getChildGroups().get(groupIds.remove(0));
-        }
-        Attribute attribute = group.getAttributes().get(attributeDTO.getId());
-        if(isNotEmpty(attribute)) {
-            attribute.merge(attributeDTO);
-        }
+        getAttribute(getAttributeFullId(attributeDTO))
+                .map(attribute -> attribute.merge(attributeDTO))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeDTO.getFullId()));
         return this;
     }
 
     public AttributeCollection addAttributeOption(AttributeOption attributeOptionDTO) {
-        String attributeFullId = attributeOptionDTO.getAttributeId();
-        AttributeGroup.getAttributeGroup(attributeFullId.substring(0, attributeFullId.lastIndexOf("|")), getMappedAttributes())
-                .getAttributes()
-                .get(attributeFullId.substring(attributeFullId.lastIndexOf("|") + 1)).getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
+        attributeOptionDTO.setAttributeId(getAttributeFullId(attributeOptionDTO)); // If the attributeId is not fullId, this method will convert it to fullId
+        getAttribute(attributeOptionDTO.getAttributeId())
+                .map(attribute -> {
+                    attributeOptionDTO.setId(StringUtil.getUniqueName(attributeOptionDTO.getId(), new ArrayList<>(attribute.getOptions().keySet())));
+                    attribute.getOptions().put(attributeOptionDTO.getId(), attributeOptionDTO);
+                    String fullParentOptionId = attributeOptionDTO.getParentOptionFullId();
+                    if(isNotEmpty(fullParentOptionId)) {
+                        String simpleParentOptionId = fullParentOptionId.substring(fullParentOptionId.lastIndexOf("|") + 1);
+                        if(!attribute.getParentBasedOptions().containsKey(simpleParentOptionId)) {
+                            attribute.getParentBasedOptions().put(simpleParentOptionId, new ArrayList<>());
+                        }
+                        attribute.getParentBasedOptions().get(simpleParentOptionId).add(attributeOptionDTO.getId());
+                    }
+                    return attribute;
+                });
         return this;
     }
+
+    public AttributeCollection updateAttributeOption(AttributeOption attributeOptionDTO) {
+        String attributeFullId = getAttributeFullId(attributeOptionDTO);
+        attributeOptionDTO.setAttributeId(attributeFullId); // If the attributeId is not fullId, this method will convert it to fullId
+        String attributeOptionFullId = getPipedValue(attributeFullId, attributeOptionDTO.getId());
+        getAttributeOption(attributeOptionFullId)
+                .map(attributeOption -> {
+                    //If parent option is modified, update the parentBasedOptions map in the corresponding attribute
+                    String existingFullParentOptionId = attributeOption.getParentOptionFullId();
+                    String newFullParentOptionId = attributeOptionDTO.getParentOptionFullId();
+
+                    if(!existingFullParentOptionId.equals(newFullParentOptionId)) {   // Parent option modified
+
+                        //Get the attribute
+                        getAttribute(attributeFullId)
+                                .map(attribute -> {
+                                    String existingSimpleParentOptionId = existingFullParentOptionId.substring(existingFullParentOptionId.lastIndexOf("|") + 1);
+                                    String newSimpleParentOptionId = newFullParentOptionId.substring(newFullParentOptionId.lastIndexOf("|") + 1);
+
+                                    //If the parentBaseOptions have no entry for the newParentOptionId, create an empty entry
+                                    if(!attribute.getParentBasedOptions().containsKey(newSimpleParentOptionId)) {
+                                        attribute.getParentBasedOptions().put(newSimpleParentOptionId, new ArrayList<>());
+                                    }
+                                    //Swap the optionId in the parentBasedOptions map, from existingParentId to newParentId
+                                    attribute.getParentBasedOptions().get(newSimpleParentOptionId).add(attributeOptionDTO.getId());
+                                    //Remove the optionId from
+                                    attribute.getParentBasedOptions().get(existingSimpleParentOptionId).remove(attributeOptionDTO.getId());
+                                    return attribute;
+                                });
+                    }
+                    attributeOption.merge(attributeOptionDTO);
+
+                    return attributeOption;
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Option with Id: " + attributeOptionDTO.getFullId()));
+        return this;
+    }
+
+    public String getAttributeFullId(Attribute attribute) {
+        //FullId chains must contain at least 2 id nodes(GROUP_ID|ATTRIBUTE_ID. If it contains only 1 node, then find the fullId
+        List<String> idChain = getPipedValues(attribute.getFullId());
+        return idChain.size() < 1 ? null : idChain.size() > 1 ? attribute.getFullId() :
+                getAllAttributes().stream()
+                    .filter(attribute1 -> attribute1.getId().equals(idChain.get(0))).findFirst()
+                    .map(Attribute::getFullId)
+                    .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attribute.getFullId()));
+    }
+
+    public String getAttributeOptionFullId(AttributeOption attributeOption) {
+        //FullId chains must contain at least 3 id nodes(GROUP_ID|ATTRIBUTE_ID|OPTION_ID. If it contains only 1 node, then find the fullId
+        List<String> idChain = getPipedValues(attributeOption.getFullId());
+        return idChain.size() < 2 ? null : idChain.size() > 2 ? attributeOption.getFullId() :
+                getAllAttributes().stream()
+                    .filter(attribute -> attribute.getId().equals(idChain.get(0))).findFirst()
+                    .map(attribute -> attribute.getFullId() + "|" + idChain.get(1))
+                    .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeOption.getFullId()));
+    }
+
+    public String getAttributeFullId(AttributeOption attributeOption) {
+        String attributeOptionFullId = getAttributeOptionFullId(attributeOption);
+        return attributeOptionFullId == null ? null : attributeOptionFullId.substring(0, attributeOptionFullId.lastIndexOf("|"));
+    }
+
+    public Optional<Attribute> getAttribute(String attributeFullId) {
+        Attribute attribute = null;
+        // attributeFullId is required
+        if(isNotEmpty(attributeFullId)) {
+
+            //All grouped attributes for the collection
+            Map<String, AttributeGroup> attributeGroups = getAttributes();
+
+            //Split attributeFullId to individual ids
+            List<String> ids = new ArrayList<>(getPipedValues(attributeFullId));
+
+            //Since attributeFullId is not empty, ids will at least have one element
+            //Get the attributeId, which will be the last id in the ids list
+            String attributeId = ids.remove(ids.size() - 1);
+
+            //An attribute can't live outside a group. We can proceed further if there is at least one id left in the ids list
+            if(!ids.isEmpty()) {
+                //Top level attribute group
+                AttributeGroup group = attributeGroups.get(ids.remove(0));
+                //Go recursively to the innermost group
+                while(!ids.isEmpty()) {
+                    group = group.getChildGroups().get(ids.remove(0));
+                }
+                attribute = group.getAttributes().get(attributeId);
+            }
+        }
+        return isNotNull(attribute) ? Optional.of(attribute) : Optional.empty();
+
+    }
+
+
+
+    public Optional<AttributeOption> getAttributeOption(String attributeOptionFullId) {
+        AttributeOption attributeOption = null;
+        // attributeOptionFullId is required
+        if(isNotEmpty(attributeOptionFullId)) {
+
+            //Split the attributeOptionFullId to individual ids
+            List<String> ids = new ArrayList<>(getPipedValues(attributeOptionFullId));
+
+            //Since attributeOptionFullId is not empty, ids will at least have one element
+            //Get the attributeOptionId, which will be the last id in the ids list
+            String attributeOptionId = ids.remove(ids.size() - 1);
+
+            //An attribute can't live outside a group. We can proceed further if there is at least two ids left in the ids list, one for the group and one for the attribute
+            if(ids.size() > 1) {
+                // First build the attributeFullId from the remaining ids and get the attribute, and then get the option corresponding to the attributeOptionId from the attribute
+                String attributeFullId = getPipedValue(ids.toArray(new String[0]));
+                attributeOption = getAttribute(attributeFullId)
+                                    .map(attribute -> attribute.getOptions().get(attributeOptionId))
+                                    .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeFullId));
+            }
+        }
+        return isNotNull(attributeOption) ? Optional.of(attributeOption) : Optional.empty();
+    }
+
+
 
     public List<Attribute> getAllAttributes() {
         return allAttributes;

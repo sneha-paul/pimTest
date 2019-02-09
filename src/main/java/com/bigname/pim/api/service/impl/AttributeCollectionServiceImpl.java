@@ -1,5 +1,8 @@
 package com.bigname.pim.api.service.impl;
 
+import com.bigname.common.util.StringUtil;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.service.BaseServiceSupport;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
@@ -106,16 +109,42 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
          /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
-        List<AttributeOption> options = new ArrayList<>();
-        Optional<AttributeCollection> attributeCollection = get(collectionId, findBy, false);
-        if(attributeCollection.isPresent()) {
-            options = AttributeGroup.getAttributeGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), attributeCollection.get().getMappedAttributes())
-                    .getAttributes()
-                    .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
-                    .getOptions().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
-            //TODO - sort this based on the requested sort
+        Map<String, AttributeOption> parentAttributeOptions = new HashMap<>();
+        List<AttributeOption> attributeOptions = get(collectionId, findBy, false)
+                .map(attributeCollection -> attributeCollection.getAttribute(attributeId)
+                        .map(attribute -> {
+                            parentAttributeOptions.putAll(attributeCollection.getAttribute(attribute.getParentAttributeId())
+                                    .map(Attribute::getOptions).orElse(new HashMap<>()));
+
+                            return attribute.getOptions().entrySet().stream()
+                                .map(Map.Entry::getValue)
+                                .collect(Collectors.toList());
+
+                        })
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id :" + collectionId))
+                ).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id :" + collectionId));
+
+
+        attributeOptions.forEach(attributeOption -> {
+            attributeOption.setCollectionId(collectionId);
+            attributeOption.setId(StringUtil.getSimpleId(attributeOption.getFullId()));
+            String parentOptionSimpleId = StringUtil.getSimpleId(attributeOption.getParentOptionFullId());
+            if(ValidationUtil.isNotEmpty(parentOptionSimpleId)) {
+                attributeOption.setParentOptionValue(parentAttributeOptions.get(parentOptionSimpleId).getValue());
+            } else if("Y".equals(attributeOption.getIndependent())){
+                attributeOption.setParentOptionValue("");
+            }
+        });
+
+        //TODO - implement other sort options as well
+        if(parentAttributeOptions.isEmpty()) {
+            attributeOptions.sort(Comparator.comparing(AttributeOption::getValue));
+        } else {
+            attributeOptions.sort(Comparator.comparing(AttributeOption::getParentOptionValue).thenComparing(AttributeOption::getValue));
         }
-        return paginate(options, page, size);
+
+
+        return paginate(attributeOptions, page, size);
     }
 
     /**

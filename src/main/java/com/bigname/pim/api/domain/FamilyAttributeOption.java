@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,9 +24,14 @@ public class FamilyAttributeOption extends ValidatableEntity {
     @Transient
     private String fullId;
 
+    private String parentOptionFullId;
+
     private String active = "Y";
     private long sequenceNum;
     private int subSequenceNum;
+
+    //Reference map of usage. Key will be channelId and values will be productIds.
+    private Map<String, List<String>> referenceMap = new HashMap<>();
 
     @NotEmpty(message = "Attribute option id cannot be empty", groups = {AddOptionGroup.class})
     @Transient @JsonIgnore
@@ -107,6 +114,23 @@ public class FamilyAttributeOption extends ValidatableEntity {
     public void setSubSequenceNum(int subSequenceNum) {
         this.subSequenceNum = subSequenceNum;
     }
+
+    public String getParentOptionFullId() {
+        return parentOptionFullId;
+    }
+
+    public void setParentOptionFullId(String parentOptionFullId) {
+        this.parentOptionFullId = parentOptionFullId;
+    }
+
+    public Map<String, List<String>> getReferenceMap() {
+        return referenceMap;
+    }
+
+    public void setReferenceMap(Map<String, List<String>> referenceMap) {
+        this.referenceMap = referenceMap;
+    }
+
     @Override
     public void orchestrate() {
         setActive(getActive());

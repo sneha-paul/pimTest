@@ -102,7 +102,7 @@
             $.initGrid({
                 selector: '#paginatedAttributesTable',
                 names: ['attributes', 'attribute'],
-                dataUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes'),
+                dataUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes/data'),
                 columns: [
                     {data: 'name', name: 'name', title: 'Attribute Name'},
                     {data: 'externalId', name: 'externalId', title: 'Attribute ID'},
@@ -110,7 +110,7 @@
                     {data: 'selectable', name: 'selectable', title: 'Selectable'},
                     {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
                 ],
-                buttons: [$.detailsButton({pageUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes/')}), $.attributeOptionsButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}/options'})]
+                buttons: [$.detailsButton({pageUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes/')}), $.attributeOptionsTabButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}#attributeOptions'})]
             });
             $(this).removeClass('js-attributes-tab').off('shown.bs.tab.attributes');
         });

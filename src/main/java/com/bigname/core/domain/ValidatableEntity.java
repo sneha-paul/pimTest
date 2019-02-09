@@ -92,7 +92,15 @@ abstract public class ValidatableEntity<T> implements Serializable {
     }
 
     protected static List<String> getPipedValues(String value) {
-        return StringUtil.splitPipeDelimitedAsList(value);
+        return StringUtil.getPipedValues(value);
+    }
+
+    protected static String getPipedValue(String... values) {
+        return StringUtil.getPipedValue(values);
+    }
+
+    protected static String getSimpleId(String fullId) {
+        return StringUtil.getSimpleId(fullId);
     }
 
     protected static boolean booleanValue(String value) {

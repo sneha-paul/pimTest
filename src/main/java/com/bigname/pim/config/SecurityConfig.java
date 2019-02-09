@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .successHandler(pimAuthenticationSuccessHandler)
+//                .successHandler(pimAuthenticationSuccessHandler)
                 .loginPage("/login").permitAll()
                 .and()
                 .logout()

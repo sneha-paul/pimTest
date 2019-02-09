@@ -42,6 +42,18 @@ public class StringUtil {
         return map;
     }
 
+    public static List<String> getPipedValues(String value) {
+        return splitPipeDelimitedAsList(value);
+    }
+
+    public static String getPipedValue(String... values) {
+        return concatinate(Arrays.asList(values), "|");
+    }
+
+    public static String getSimpleId(String pipedValues) {
+        return ValidationUtil.isEmpty(pipedValues) || !pipedValues.contains("|") ? pipedValues : pipedValues.substring(pipedValues.lastIndexOf("|") + 1);
+    }
+
     public static final String[] splitPipeDelimited(String value) {
         return ValidationUtil.isEmpty(value) ? new String[0] : split(value, "\\|");
     }
