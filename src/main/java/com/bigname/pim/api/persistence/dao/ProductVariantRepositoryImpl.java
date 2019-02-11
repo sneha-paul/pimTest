@@ -67,8 +67,8 @@ public class ProductVariantRepositoryImpl extends GenericRepositoryImpl<ProductV
         Aggregation aggregation = newAggregation(
                 lookupOperation,
                 replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(product, 0)")).mergeWith(ROOT)),
-                project().andExclude("product"),
-                limit(100)
+                project().andExclude("product")
+//                limit(100)
                 //  sortOperation,
                 //  limit((long) pageable.getPageSize())
         );
