@@ -57,7 +57,7 @@
                         return content;
                     }
                 },
-                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family', width: '15%', render: function ( data, type, row, meta ) {return 'TODO'} }
+                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family', width: '15%' }
             ],
         });
 

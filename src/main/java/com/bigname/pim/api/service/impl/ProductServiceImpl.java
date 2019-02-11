@@ -179,6 +179,20 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         return products;
     }
 
+    @Override
+    public Page<Product> findAll(Pageable pageable, boolean... activeRequired) {
+        Page<Product> products = super.findAll(pageable, activeRequired);
+        products.forEach(product -> setProductFamily(product, FindBy.INTERNAL_ID));
+        return products;
+    }
+
+    @Override
+    public Page<Product> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        Page<Product> products = super.findAll(searchField, keyword, pageable, activeRequired);
+        products.forEach(product -> setProductFamily(product, FindBy.INTERNAL_ID));
+        return products;
+    }
+
     /**
      * Overriding the base service method to inject the productFamily instance
      *
