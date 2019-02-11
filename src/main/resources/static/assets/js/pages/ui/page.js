@@ -648,7 +648,10 @@
                 name = name.trim();
                 //If this is a treeDataTable, reload the treeDataTable, otherwise refresh the data
                 if(!$.reloadTreeDataTable(name)) {
-                    $.getDataTable(name).ajax.reload(null, false);
+                    let dt = $.getDataTable(name);
+                    if(dt) {
+                        dt.ajax.reload(null, false);
+                    }
                 }
             });
 

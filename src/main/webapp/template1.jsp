@@ -543,8 +543,8 @@
         }*/
 
         .file-container {
-            height: calc(50vh);
-            overflow: auto;
+            /*height: calc(50vh);*/
+            /*overflow: auto;*/
             padding-left:30px;
         }
 
@@ -599,7 +599,7 @@
             padding: 0.375rem 0.75rem;
             line-height: 1.5;
             border-radius: 0.25rem;
-            /*width:14%;*/
+            width:14%;
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: 25px;
