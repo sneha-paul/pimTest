@@ -17,6 +17,8 @@ import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
+import com.bigname.pim.data.exportor.CategoryExporter;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -43,8 +45,8 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     private CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService){
-        super(categoryService, Category.class, websiteService, catalogService);
+    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, CatalogService catalogService, WebsiteService websiteService){
+        super(categoryService, Category.class, categoryExporter, websiteService, catalogService);
         this.categoryService = categoryService;
     }
 

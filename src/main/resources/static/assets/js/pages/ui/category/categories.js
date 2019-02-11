@@ -3,6 +3,7 @@ $(function(){
         selector: '#paginatedCategoriesTable',
         names: ['categories','category'],
         pageUrl: '/pim/categories/',
+        toolbar: [{name: 'EXPORT', actionUrl: '/pim/categories/export'}, {name: 'IMPORT'}],
         dataUrl: '/pim/categories/data',
         columns: [
             { data: 'categoryName', name : 'categoryName' , title : 'Category Name', width:'45%', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6>';}},

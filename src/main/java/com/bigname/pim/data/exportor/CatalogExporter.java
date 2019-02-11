@@ -42,7 +42,7 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService> {
             data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getActive(), element.getDiscontinued(), element.getId() });
             i++;
         }
-        POIUtil.writeData(filePath, "catalog", data);
+        POIUtil.writeData(filePath, "Catalog", data);
         return true;
     }
 }
