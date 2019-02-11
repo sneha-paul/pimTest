@@ -1,10 +1,14 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.core.domain.EntityAssociation;
+import com.bigname.pim.util.PIMConstants;
+import com.bigname.pim.util.ProductUtil;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * Created by sruthi on 26-09-2018.
@@ -63,13 +67,12 @@ public class CategoryProduct extends EntityAssociation<Category, Product> {
         map.put("productName", attributesMap.get("productName"));
         map.put("active", attributesMap.get("active"));
         map.put("sequenceNum", attributesMap.get("sequenceNum"));
-       /* Map<String, Object> defaultAsset = getChild().getDefaultAsset();
+        Map<String, Object> defaultAsset = ProductUtil.getDefaultAsset((Map<String, Object>)((Map<String, Object>)attributesMap.get("scopedAssets")).get(PIMConstants.DEFAULT_CHANNEL_ID), FileAsset.AssetFamily.ASSETS); //TODO - replace the hard coded channel ID in Phase2
         if(isNotEmpty(defaultAsset)) {
             map.put("imageName", (String) defaultAsset.get("internalName"));
         } else {
             map.put("imageName", "noimage.png");
-        }*/
-        map.put("imageName", "noimage.png");
+        }
         return map;
     }
 

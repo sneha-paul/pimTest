@@ -92,6 +92,15 @@ public class ProductUtil {
         return defaultAsset;
     }
 
+    public static Map<String, Object> getDefaultAsset(Map<String, Object> channelAssets, FileAsset.AssetFamily family) {
+        Map<String, Object> defaultAsset = null;
+        if(channelAssets != null && channelAssets.containsKey(family.name())) {
+            List<Map<String, Object>> assets = ConversionUtil.toGenericMap(channelAssets.get(family.name()));
+            defaultAsset = assets.stream().filter(assetMap -> "Y".equals(assetMap.get("defaultFlag"))).findFirst().orElse(assets.isEmpty() ? null : assets.get(0));
+        }
+        return defaultAsset;
+    }
+
     public static Map<String, Object> getDefaultAsset(ProductVariant productVariant, FileAsset.AssetFamily family) {
         Map<String, Object> defaultAsset = null;
         if(productVariant.getVariantAssets().containsKey(family.name())) {
