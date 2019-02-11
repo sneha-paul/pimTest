@@ -28,6 +28,7 @@
             selector: '#paginatedCatalogsTable',
             names: ['catalogs','catalog'],
             pageUrl: '/pim/catalogs/',
+            toolbar: [{name: 'EXPORT', actionUrl: '/pim/catalogs/export'}],
             dataUrl: '/pim/catalogs/data',
             columns: [
                 { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},

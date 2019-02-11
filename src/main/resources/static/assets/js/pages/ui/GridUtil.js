@@ -250,6 +250,7 @@
                 url: options.dataUrl,
                 actionUrl: options.actionUrl ? options.actionUrl : '',
                 searching: typeof options.searching === 'undefined' ?  true : options.searching,
+                toolbar: typeof options.toolbar === 'undefined' ? [] : options.toolbar,
                 pageLength: options.pageLength,
                 reorderCallback: options.reorderCallback || function(){},
                 reordering: options.reordering,

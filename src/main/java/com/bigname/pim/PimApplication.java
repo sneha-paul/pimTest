@@ -15,7 +15,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader"})
+@SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor"})
 @EnableMongoRepositories(basePackages = {"com.bigname.pim.api.persistence"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern="com.bigname.core.persistence.dao.GenericDAO")})
 @EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass = true)
 //@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)

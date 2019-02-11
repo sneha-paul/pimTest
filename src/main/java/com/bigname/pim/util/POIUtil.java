@@ -68,7 +68,7 @@ public class POIUtil {
         return data;
     }
 
-    public static boolean writeData(String filePath,String sheetName,Map<String, Object[]> data) {
+    public static boolean writeData(String filePath, String sheetName, Map<String, Object[]> data) {
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -91,6 +91,9 @@ public class POIUtil {
                 else if (obj instanceof Integer)
                     cell.setCellValue((Integer)obj);
             }
+        }
+        for(int i = 0; i < data.size(); i ++) {
+            sheet.setColumnWidth(i, 15000);
         }
         try {
             FileOutputStream out = new FileOutputStream(new File(filePath));

@@ -408,14 +408,28 @@
                     $(options.selector + '_filter.dataTables_filter .search-btn').remove();
                     $(options.selector + '_filter.dataTables_filter').append($clearButton, $searchButton);
 
-                    let importButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="Import Data"><i class="fa fa-download"></i></button>')
-                        .click(function() {
+                    let toolbar = [];
+                    $.each(options.toolbar, function(i, button) {
+                        switch(button.name) {
 
-                        });
-                    let exportButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
-                        .click(function() {
+                            case 'IMPORT':
+                            {
+                                toolbar.push($('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="Import Data"><i class="fa fa-download"></i></button>')
+                                    .click(function () {
 
-                        });
+                                    }));
+                            }
+                            break;
+                            case 'EXPORT':
+                                toolbar.push($('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
+                                    .click(function() {
+                                        window.location.href = button.actionUrl;
+                                    }));
+                                break;
+                        }
+                    });
+
+
                     let activeButton = $('<button class="btn btn-sm btn-success js-active-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Active Filter"><i class="icon-check"></i></button>')
                         .click(function() {
                             if($.getDataTableStatusOptions(options.selector) === '100') {
@@ -425,6 +439,7 @@
                                 $searchButton.click();
                             }
                         });
+                    toolbar.push(activeButton);
                     let inactiveButton = $('<button class="btn btn-sm btn-danger js-inactive-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Inactive Filter"><i class="icon-close"></i></button>')
                         .click(function() {
                             if($.getDataTableStatusOptions(options.selector) === '010') {
@@ -434,6 +449,7 @@
                                 $searchButton.click();
                             }
                         });
+                    toolbar.push(inactiveButton);
                     let discontinuedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
                         .click(function() {
                             if($.getDataTableStatusOptions(options.selector) === '001') {
@@ -443,8 +459,9 @@
                                 $searchButton.click();
                             }
                         });
-                    $(options.selector + '_wrapper').find('.dt-buttons').append(importButton, exportButton, activeButton, inactiveButton, discontinuedButton);
-                    $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' });
+                    toolbar.push(discontinuedButton);
+                    $(options.selector + '_wrapper').find('.dt-buttons').append(toolbar);
+                    $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' , trigger : 'hover'});
                 },
                 ajax: {
                     url: options.url,
@@ -931,7 +948,7 @@
 
                     $('#js-body-container').fadeOut('fast', function(){
                         $('#js-body-container').html(data);
-                        $('[data-toggle="tooltip"]').tooltip();
+                        $('[data-toggle="tooltip"]').tooltip({trigger : 'hover'});
                         $.loadEvent();
                         if(hash) {
                             $('a.nav-link[href*="' + hash + '"]').trigger('click');

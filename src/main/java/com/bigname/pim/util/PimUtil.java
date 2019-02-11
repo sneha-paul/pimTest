@@ -6,6 +6,8 @@ import com.bigname.core.util.FindBy;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -127,5 +129,9 @@ public class PimUtil {
             _statusOptions[i] = options[i] == '1';
         }
         return _statusOptions;
+    }
+
+    public static String getTimestamp() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
     }
 }

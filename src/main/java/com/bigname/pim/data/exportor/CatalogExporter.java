@@ -1,9 +1,10 @@
-package com.bigname.pim.data.loader.exporter;
+package com.bigname.pim.data.exportor;
 
+import com.bigname.core.data.exporter.BaseExporter;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.util.POIUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bigname.pim.util.PimUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
@@ -15,13 +16,25 @@ import java.util.TreeMap;
  * Created by sruthi on 25-01-2019.
  */
 @Component
-public class CatalogExporter {
-    @Autowired
+public class CatalogExporter implements BaseExporter<Catalog, CatalogService> {
+
     private CatalogService catalogService;
 
+    public CatalogExporter(CatalogService catalogService) {
+        this.catalogService = catalogService;
+    }
+
+    @Override
+    public String getFileName(Type fileType) {
+        return "CatalogExport" + PimUtil.getTimestamp() + fileType.getExt();
+    }
+
+    @Override
     public boolean exportData(String filePath) {
         List<Catalog> catalogData = catalogService.getAll(null,true);
-        Map<String, Object[]> data = new TreeMap<String, Object[]>();
+
+        Map<String, Object[]> data = new TreeMap<>();
+
         data.put("1", new Object[]{"CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID" });
         int i=2;
         for (Iterator<Catalog> iter = catalogData.iterator(); iter.hasNext(); ) {

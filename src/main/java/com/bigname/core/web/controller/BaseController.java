@@ -6,9 +6,11 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ReflectionUtil;
+import com.bigname.core.data.exporter.BaseExporter;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.domain.EntityAssociation;
 import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.exception.FileNotFoundException;
 import com.bigname.core.service.BaseService;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.util.Toggle;
@@ -16,19 +18,31 @@ import com.bigname.pim.client.model.Breadcrumbs;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.client.web.controller.ControllerSupport;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.bigname.common.util.ValidationUtil.isEmpty;
@@ -43,11 +57,20 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     private Service service;
     private Class<T> entityClass;
     private Set<BaseService> services = new HashSet<>();
+    protected BaseExporter exporter;
+    protected Logger LOGGER = LoggerFactory.getLogger((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+
+    @Value("${app.export.feed.location:/usr/local/pim/uploads/data/export/}")
+    protected String exportFileStorageLocation;
 
     protected BaseController(Service service) {
         this.service = service;
     }
 
+    protected BaseController(Service service, Class<T> entityClass, BaseExporter<T, Service> exporter, BaseService... services) {
+        this(service, entityClass, services);
+        this.exporter = exporter;
+    }
     protected BaseController(Service service, Class<T> entityClass, BaseService... services) {
         this.service = service;
         this.entityClass = entityClass;
@@ -95,6 +118,34 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return model;
     }
 
+    @GetMapping("/export")
+    public ResponseEntity<Resource> downloadFile(HttpServletRequest request) {
+        String fileLocation = exportFileStorageLocation;
+        String fileName = exporter.getFileName(BaseExporter.Type.XLSX);
+
+        exporter.exportData(fileLocation + fileName);
+        // Load file as Resource
+        Resource resource = loadFileAsResource(fileLocation, fileName);
+
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            LOGGER.error("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
     protected Map<String, Object> update(String id, T entity, String baseMapping, Class<?>... groups) {
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("id", id));
@@ -110,6 +161,20 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
             }
         }
         return model;
+    }
+
+    protected Resource loadFileAsResource(String fileLocation, String fileName) {
+        try {
+            Path filePath = Paths.get(fileLocation).resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if(resource.exists()) {
+                return resource;
+            } else {
+                throw new FileNotFoundException("File not found " + fileName);
+            }
+        } catch (MalformedURLException ex) {
+            throw new FileNotFoundException("File not found " + fileName, ex);
+        }
     }
 
     @Override
