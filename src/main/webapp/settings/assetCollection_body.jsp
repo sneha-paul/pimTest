@@ -31,12 +31,14 @@
                 <c:if test="${not empty folders}">
                     <div class="p-t-25">
                         <div class="p-b-15"><h6>Folders</h6></div>
-                        <div class="row file-container">
+                        <div class="row">
+                            <div class="file-container">
                             <c:forEach var="folder" items="${folders}">
                                 <div id="${folder.id}" class="col-xl-2 col-lg-3 col-md-4 col-sm-6 btn-label secondary js-folder" data-toggle="tooltip" data-placement="top" title="" data-original-title="${folder.fileName}">
                                     <i class="text-primary fa fa-folder p-r-10"></i>${folder.fileName}
                                 </div>
                             </c:forEach>
+                            </div>
                         </div>
                     </div>
                 </c:if>

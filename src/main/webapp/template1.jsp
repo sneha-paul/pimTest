@@ -594,10 +594,9 @@
             user-select: none;
             border: 1px solid transparent;
             padding: 0.375rem 0.75rem;
-            font-size: 1rem;
             line-height: 1.5;
             border-radius: 0.25rem;
-            width:14%;
+            /*width:14%;*/
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: 25px;
