@@ -15,7 +15,7 @@
 
         <div id="navbar-menu">
             <ul class="nav navbar-nav">
-                <li class="dropdown">
+                <%--<li class="dropdown">
                     <a href="javascript:void(0);" class="dropdown-toggle icon-menu" data-toggle="dropdown">
                         <i class="icon-bell"></i>
                         <span class="notification-dot"></span>
@@ -90,7 +90,7 @@
                         <li><a href="javascript:void(0);"><i class="icon-printer"></i> <span>Invoices</span></a></li>
                         <li><a href="javascript:void(0);"><i class="icon-refresh"></i> <span>Renewals</span></a></li>
                     </ul>
-                </li>
+                </li>--%>
                 <li><a href="/logout" class="icon-menu"><i class="icon-login"></i></a></li>
             </ul>
         </div>
