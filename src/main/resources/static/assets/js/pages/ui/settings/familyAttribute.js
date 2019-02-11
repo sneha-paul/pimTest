@@ -12,7 +12,7 @@ $(function(){
                 { data: 'id', name : 'id', title : 'ID' },
                 { data: 'actions', name : 'actions', title : 'Actions', orderable: false }
             ],
-            buttons: [$.attributeOptionDetailButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}/options/{attributeOptionId}'})]
+           // buttons: [$.attributeOptionDetailButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}/options/{attributeOptionId}'})]
         });
         $(this).removeClass('js-attributeOptions-tab').off('shown.bs.tab.attributeOptions');
     });

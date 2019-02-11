@@ -1,6 +1,7 @@
 package com.bigname.pim.data.exportor;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.core.data.exporter.BaseExporter;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.util.FindBy;
@@ -84,7 +85,6 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
             data.add(variantData);
 
         }
-        data.remove("createdUser");
         POIUtil.writeData(filePath, "Product", data);
         return true;
     }
@@ -92,6 +92,52 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
     @Override
     public String getFileName(Type fileType) {
         return "ProductExport" + PimUtil.getTimestamp() + fileType.getExt();
+    }
+
+    public boolean exportJsonData(String filePath) {
+        List<Map<String, Object>> productVariantData = productVariantService.getAll();
+        Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
+
+        List<Map<String, Object>> variantsAttributes = new ArrayList<>();
+        Set<String> header = new HashSet<>();
+        productVariantData.forEach(variant -> {
+            Map<String, Object> variantAttributesMap = new HashMap<>();
+            variant.forEach((key, value) -> {
+                if(value instanceof String) {
+                    variantAttributesMap.put(key, value);
+                }
+
+                String productFamilyId = (String) variant.get("productFamilyId");
+                String familyId = null;
+                if(productFamilyId != null && familyLookup.containsKey(productFamilyId)){
+                    familyId = familyLookup.get(productFamilyId).getFamilyId();
+                }
+
+                Map<String, Object> scopedProductAttributes = (Map<String, Object>)((Map<String, Object>)variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
+                Map<String, Object> pricingDetails = (Map<String, Object>)(Map<String, Object>)variant.get("pricingDetails");
+                Map<String, Object> variantAttributes = (Map<String, Object>)(Map<String, Object>)variant.get("variantAttributes");
+                if(scopedProductAttributes != null) {
+                    variantAttributesMap.putAll(scopedProductAttributes);
+                } else {
+                    System.out.println(variant);
+                }
+                variantAttributesMap.put("PRICING_DETAILS", CollectionsUtil.buildMapString(pricingDetails,0).toString());
+                if(variantAttributes != null) {
+                    variantAttributesMap.putAll(variantAttributes);
+                } else {
+                    System.out.println(variant);
+                }
+                variantAttributesMap.replace("productFamilyId", familyId);
+                variantAttributesMap.remove("createdUser");
+                variantAttributesMap.remove("lastModifiedUser");
+
+            });
+            header.addAll(variantAttributesMap.keySet());
+            variantsAttributes.add(variantAttributesMap);
+        });
+
+        POIUtil.writeJsonData(filePath, "Product", ConversionUtil.toJSONString(variantsAttributes));
+        return true;
     }
 }
 

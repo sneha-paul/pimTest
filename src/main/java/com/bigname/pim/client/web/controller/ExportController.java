@@ -65,9 +65,9 @@ public class ExportController {
 
     @ResponseBody
     @RequestMapping(value = "/productData", method = RequestMethod.GET)
-    public Map<String, Object> exportProductData1(HttpServletRequest request) {
+    public Map<String, Object> exportProductJsonData(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        model.put("Data",  productVariantService.getAll());
+        productExporter.exportJsonData("/DevStudio/Docs/PIM_ExcelFiles/ProductData.json");
         return model;
     }
 }

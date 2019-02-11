@@ -139,4 +139,17 @@ public class POIUtil {
         }
         return true;
     }
+
+    public static boolean writeJsonData(String filePath, String fileName, String data) {
+
+        try (FileWriter file = new FileWriter(filePath)) {
+
+            file.write(data);
+            file.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 }

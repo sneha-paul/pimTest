@@ -9,7 +9,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive">
+                <div class="table-responsive scrollable-dt">
                     <table id="paginatedFamiliesTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
                         <thead class="thead-dark">
                         </thead>
