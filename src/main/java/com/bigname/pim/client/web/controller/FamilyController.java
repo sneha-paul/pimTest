@@ -4,7 +4,9 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
@@ -30,6 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isEmpty;
+import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -57,7 +60,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return new ModelAndView("settings/families", model);
     }
 
-    @RequestMapping(value =  {"/list", "/data"})
+    @RequestMapping(value =  {"/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")
     public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -84,6 +87,20 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         }
     }
 
+    @RequestMapping(value = {"/{id}", "/create"})
+    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
+                                @RequestParam(name = "reload", required = false) boolean reload) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "FAMILIES");
+        model.put("mode", id == null ? "CREATE" : "DETAILS");
+        model.put("view", "settings/family"  + (reload ? "_body" : ""));
+        return id == null ? super.details(model) : familyService.get(id, FindBy.EXTERNAL_ID, false)
+                .map(family -> {
+                    model.put("family", family);
+                    model.put("channels", ConversionUtil.toJSONString(channelService.getAll(0, 100, null).getContent().stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))));
+                    return super.details(id, model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Family with Id: " + id));
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
@@ -103,38 +120,227 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return update(familyId, family, "/pim/families/", family.getGroup().length == 1 && family.getGroup()[0].equals("DETAILS") ? Family.DetailsGroup.class : null);
     }
 
-
-    /*@RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
+    @RequestMapping("/{familyId}/attributes/data")
     @ResponseBody
-    public Map<String, Object> toggle(@PathVariable(value = "id") String id, @PathVariable(value = "active") String active) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("success", familyService.toggle(id, FindBy.EXTERNAL_ID, Toggle.get(active)));
-        return model;
-    }*/
+    public Result<Map<String, Object>> allAttributes(@PathVariable(value = "familyId") String id, HttpServletRequest request) {
 
-    @RequestMapping(value = {"/{id}", "/create"})
-    public ModelAndView details(@PathVariable(value = "id", required = false) String id,
-                                @RequestParam(name = "reload", required = false) boolean reload) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("active", "FAMILIES");
-        model.put("mode", id == null ? "CREATE" : "DETAILS");
-        model.put("view", "settings/family"  + (reload ? "_body" : ""));
-       return id == null ? super.details(model) : familyService.get(id, FindBy.EXTERNAL_ID, false)
-               .map(family -> {
-                   model.put("family", family);
-                   model.put("channels", ConversionUtil.toJSONString(channelService.getAll(0, 100, null).getContent().stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))));
-                   return super.details(id, model);
-               }).orElseThrow(() -> new EntityNotFoundException("Unable to find Family with Id: " + id));
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, Object>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = pagination.hasSorts() ? Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName())) : null;
+        familyService.get(id, FindBy.EXTERNAL_ID, false).ifPresent(family -> {
+            List<Map<String, Object>> dataObjects = new ArrayList<>();
+            Page<FamilyAttribute> paginatedResult = familyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+            paginatedResult.getContent().forEach(familyAttribute -> {
+                familyAttribute.getScope().forEach((channelId, scope) -> {
+                    if (family.getChannelVariantGroups().containsKey(channelId)) {
+                        VariantGroup channelVariantGroup = family.getVariantGroups().get(family.getChannelVariantGroups().get(channelId));
+                        channelVariantGroup.getVariantAxis().forEach((level, axisAttributeIds) -> axisAttributeIds.stream().filter(axisAttributeId -> axisAttributeId.equals(familyAttribute.getId())).findFirst().ifPresent(axisAttributeId -> familyAttribute.getScope().put(channelId, FamilyAttribute.Scope.LOCKED)));
+                    }
+                });
+                dataObjects.add(familyAttribute.toMap());
+            });
+            result.setDataObjects(dataObjects);
+            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        });
+        return result;
     }
 
-    @RequestMapping("/{id}/attribute")
-    public ModelAndView attributeDetails(@PathVariable(value = "id") String id) {
+
+    @RequestMapping(value= {"/{familyId}/attributes/{attributeId}", "/{familyId}/attributes/create"})
+    public ModelAndView attributeDetails(@PathVariable(value = "familyId") String familyId,
+                                         @PathVariable(value = "attributeId", required = false) String attributeId) {
+        return familyService.get(familyId, FindBy.EXTERNAL_ID, false)
+                .map(family -> {
+                    Map<String, Object> model = new HashMap<>();
+                    FamilyAttribute attribute;
+                    String mode;
+                    if(isNotEmpty(attributeId)) {
+                        mode = "DETAILS";
+                        attribute = family.getAllAttributes().stream()
+                                .filter(attribute1 -> attribute1.getId().equals(attributeId)).findFirst()
+                                .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
+                        if(isNotEmpty(attribute.getParentAttributeId())) {
+                            model.put("parentAttribute", family.getAttribute(attribute.getParentAttributeId()).orElse(null));
+                        }
+                        model.put("breadcrumbs", new Breadcrumbs("Families",
+                                "Families", "/pim/families",
+                                family.getFamilyName(), "/pim/families/" + family.getFamilyId(),
+                                "Attributes", "/pim/families/" + family.getFamilyId() + "#attributes",
+                                attribute.getName(), ""));
+                        model.put("familyId", familyId);
+                        model.put("attributeGroup", FamilyAttributeGroup.getUniqueLeafGroupLabel(attribute.getAttributeGroup(), "|"));
+                    } else {
+                        attribute = new FamilyAttribute();
+                        mode = "CREATE";
+                        model.put("attributeCollections", collectionService.getAll(0, 100, null).getContent());
+                        model.put("attributeGroups", familyService.getAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null));
+                        model.put("parentAttributeGroups", familyService.getParentAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null));
+                    }
+
+                    model.put("attribute", attribute);
+                    model.put("mode", mode);
+                    model.put("uiTypes", Attribute.UIType.getAll());
+                    model.put("parentAttributes", family.getAvailableParentAttributes(attribute).stream().collect(CollectionsUtil.toLinkedMap(FamilyAttribute::getFullId, FamilyAttribute::getName)));
+                    return new ModelAndView("settings/familyAttribute", model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Family with Id: " + familyId));
+
+    }
+
+    @RequestMapping(value = "/{familyId}/attributes", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> createAttribute(@PathVariable(value = "familyId") String id, FamilyAttribute familyAttribute) {
         Map<String, Object> model = new HashMap<>();
-        model.put("attributeCollections", collectionService.getAll(0, 100, null).getContent());
-        model.put("attribute", new FamilyAttribute());
-        model.put("attributeGroups", familyService.getAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
-        model.put("parentAttributeGroups", familyService.getParentAttributeGroupsIdNamePair(id, FindBy.EXTERNAL_ID, null));
-        return new ModelAndView("settings/familyAttribute", model);
+        Optional<Family> family = familyService.get(id, FindBy.EXTERNAL_ID, false);
+        // TODO - cross field validation to see if one of attributeGroup ID and attributeGroup name is not empty
+        if(family.isPresent() && isValid(familyAttribute, model)) {
+            family.get().setGroup("ATTRIBUTES");
+            Attribute attribute = collectionService.findAttribute(familyAttribute.getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.getAttributeId()).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute in Collection with ids: [" + familyAttribute.getCollectionId() + " >> " + familyAttribute.getAttributeId() + "]"));
+            familyAttribute.setAttribute(attribute);
+            family.get().addAttribute(familyAttribute);
+            familyService.update(id, FindBy.EXTERNAL_ID, family.get());
+            model.put("success", true);
+        }
+        return model;
+    }
+
+    @RequestMapping(value = "/{familyId}/attributes/{attributeId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> updateAttribute(@PathVariable(value = "familyId") String familyId,
+                                               @PathVariable(value = "attributeId") String attributeId,
+                                               @RequestParam Map<String, Object> parameterMap) {
+        return familyService.get(familyId, FindBy.EXTERNAL_ID, false)
+                .map(family -> {
+                    Map<String, Object> model = new HashMap<>();
+                    String attributeFullId = (String)parameterMap.get("fullId");
+                    return family.getAttribute(attributeFullId)
+                            .map(attribute -> {
+                                attribute.setName((String)parameterMap.get("name"));
+                                if(isNotEmpty(parameterMap.get("parentAttributeId"))) {
+                                    attribute.setParentAttributeId((String)parameterMap.get("parentAttributeId"));
+                                } else if(isNotEmpty(attribute.getParentAttributeId())) {
+                                    attribute.setParentAttributeId(null);
+                                }
+                                /*if(isNotEmpty(parameterMap.get("uiType"))) {
+                                    attribute.setUiType(Attribute.UIType.get((String)parameterMap.get("uiType")));
+                                }*/
+                                if(isValid(attribute, model)) {
+                                    family.setGroup("ATTRIBUTES");
+                                    family.updateAttribute(attribute);
+                                    familyService.update(familyId, FindBy.EXTERNAL_ID, family);
+                                    model.put("success", true);
+                                }
+                                return model;
+                            }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeFullId));
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Family with Id: " + familyId));
+    }
+
+    @RequestMapping("/{familyId}/attributes/{attributeId}/options/data")
+    @ResponseBody
+    public Result<Map<String, String>> allAttributeOptions(@PathVariable(value = "familyId") String familyId,
+                                                           @PathVariable(value = "attributeId") String attributeId,
+                                                           HttpServletRequest request) {
+
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Page<FamilyAttributeOption> paginatedResult = familyService.getFamilyAttributeOptions(familyId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
+    @RequestMapping("/{familyId}/attributes/{attributeId}/options/available")
+    public ModelAndView availableAttributeOptions(@PathVariable(value = "familyId") String familyId,
+                                                  @PathVariable(value = "attributeId") String attributeId) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("attributeId", attributeId);
+        return new ModelAndView("settings/availableFamilyAttributeOptions", model);
+    }
+
+    @RequestMapping("/{familyId}/attributes/{attributeId}/options/available/data")
+    @ResponseBody
+    public Result<Map<String, String>> availableAttributeOptions(@PathVariable(value = "familyId") String familyId,
+                                                                 @PathVariable(value = "attributeId") String _familyAttributeId,
+                                                                 HttpServletRequest request) {
+        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        Result<Map<String, String>> result = new Result<>();
+        if(family.isPresent()) {
+            String familyAttributeId = family.get().getAttributeFullId(_familyAttributeId);
+            Request dataTableRequest = new Request(request);
+            Pagination pagination = dataTableRequest.getPagination();
+            result.setDraw(dataTableRequest.getDraw());
+            Sort sort = null;
+            if(pagination.hasSorts()) {
+                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+            }
+            List<Map<String, String>> dataObjects = new ArrayList<>();
+            List<FamilyAttribute> familyAttribute = FamilyAttributeGroup.getAllAttributes(family.get()).stream().filter(e -> e.getFullId().equals(familyAttributeId)).collect(Collectors.toList());
+            if(ValidationUtil.isNotEmpty(familyAttribute)) {
+                Map<String, FamilyAttributeOption> familyAttributeOptions = familyAttribute.get(0).getOptions();
+                collectionService.findAttribute(familyAttribute.get(0).getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.get(0).getAttributeId()).ifPresent(attribute -> {
+                    Map<String, AttributeOption> optionsMap = attribute.getOptions();
+                    List<AttributeOption> optionsList = optionsMap.entrySet().stream().filter(e -> !familyAttributeOptions.keySet().contains(e.getKey())).map(Map.Entry::getValue).collect(Collectors.toList());
+                    //TODO - sorting and pagination
+                    Page<AttributeOption> paginatedResult = new PageImpl<>(optionsList);
+                    paginatedResult.getContent().forEach(e -> {
+                        e.setCollectionId(familyAttribute.get(0).getCollectionId());
+                        dataObjects.add(e.toMap());
+                    });
+                    result.setDataObjects(dataObjects);
+                    result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+                    result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+                });
+            }
+        }
+        return result;
+    }
+
+    @RequestMapping(value= {"/{familyId}/attributes/{attributeId}/options/{attributeOptionId}"})
+    public ModelAndView attributeOptionDetails(@PathVariable(value = "familyId") String familyId,
+                                               @PathVariable(value = "attributeId") String attributeId,
+                                               @PathVariable(value = "attributeOptionId", required = false) String attributeOptionId) {
+
+        return familyService.get(familyId, FindBy.EXTERNAL_ID, false)
+                .map(family -> {
+                    Map<String, Object> model = new HashMap<>();
+                    FamilyAttribute attribute = family.getAllAttributes().stream()
+                            .filter(attribute1 -> attribute1.getId().equals(attributeId)).findFirst()
+                            .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
+
+                    String mode;
+                    FamilyAttributeOption attributeOption;
+                    if(isNotEmpty(attributeOptionId)) {
+                        mode = "DETAILS";
+                        String optionFullId = StringUtil.getPipedValue(attribute.getFullId(), attributeOptionId);
+//                        attributeOption = family.getAttributeOption(optionFullId).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Option with Id: " + optionFullId));
+                    } else {
+                        attributeOption = new FamilyAttributeOption();
+                        mode = "CREATE";
+                    }
+                    model.put("mode", mode);
+                    model.put("attribute", attribute);
+//                    model.put("attributeOption", attributeOption);
+                    if(isNotEmpty(attribute.getParentAttributeId())) {
+                        model.put("parentAttributeOptions", family.getAttribute(attribute.getParentAttributeId())
+                                .map(parentAttribute -> parentAttribute.getOptions()
+                                        .entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.comparing(FamilyAttributeOption::getValue)))
+                                        .collect(CollectionsUtil.toLinkedMap(e -> e.getValue().getFullId(), e -> e.getValue().getValue())))
+                                .orElse(new HashMap<>()));
+                    }
+                    return new ModelAndView("settings/familyAttributeOption", model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Family with Id: " + familyId));
+
     }
 
     @RequestMapping("/{familyId}/variantGroups/{variantGroupId}/axisAttributes/available")
@@ -172,78 +378,6 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         }
         return new ModelAndView("settings/variantGroup" + (reload ? "_body" : ""), model);
     }
-
-    /*@RequestMapping("/{familyId}/variantGroups/{variantGroupId}/axisAttributes")
-    @ResponseBody
-    public Result<Map<String, String>> getVariantAxisAttributes(@PathVariable(value = "familyId") String familyId,
-                                                                @PathVariable(value = "variantGroupId") String variantGroupId,
-                                                                HttpServletRequest request) {
-
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        List<FamilyAttribute> attributes = familyService.getVariantAxisAttributes(familyId, variantGroupId, FindBy.EXTERNAL_ID, sort);
-        attributes.forEach(e -> dataObjects.add(e.toMap("AXIS_ATTRIBUTE")));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(attributes.size()));
-        result.setRecordsFiltered(Long.toString(attributes.size()));
-        return result;
-    }*/
-
-    /*@RequestMapping("/{familyId}/variantGroups/{variantGroupId}/axisAttributes/available/list")
-    @ResponseBody
-    public Result<Map<String, String>> getAvailableVariantAxisAttributes(@PathVariable(value = "familyId") String familyId,
-                                                                @PathVariable(value = "variantGroupId") String variantGroupId,
-                                                                HttpServletRequest request) {
-
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        List<FamilyAttribute> attributes = familyService.getAvailableVariantAxisAttributes(familyId, variantGroupId, FindBy.EXTERNAL_ID, sort);
-        attributes.forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(attributes.size()));
-        result.setRecordsFiltered(Long.toString(attributes.size()));
-        return result;
-    }*/
-
-    /*@RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/axisAttributes/{attributeId}", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> addAxisAttribute(@PathVariable(value = "familyId") String familyId,
-                                                @PathVariable(value = "variantGroupId") String variantGroupId,
-                                                @PathVariable(value = "attributeId") String attributeId) {
-        Map<String, Object> model = new HashMap<>();
-
-        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
-        if(family.isPresent()) {
-            family.get().setGroup("VARIANT_GROUPS");
-            FamilyAttribute axisAttribute = FamilyAttribute.findAttribute(attributeId, family.get().getAttributes());
-            if(ValidationUtil.isNotEmpty(axisAttribute)) {
-                Map<Integer, List<FamilyAttribute>> variantAxis = family.get().getVariantGroups().get(variantGroupId).getVariantAxis();
-                if(ValidationUtil.isNotEmpty(variantAxis) && variantAxis.containsKey(1)) {
-                    variantAxis.get(1).add(axisAttribute);
-                } else {
-                    variantAxis.put(1, Arrays.asList(axisAttribute));
-                }
-            }
-            familyService.update(familyId, FindBy.EXTERNAL_ID, family.get());
-            model.put("success", true);
-        }
-
-        return model;
-    }*/
 
     @RequestMapping(value = "/{familyId}/variantGroups/{variantGroupId}/variantAttributes", method = RequestMethod.POST)
     @ResponseBody
@@ -328,71 +462,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return model;
     }
 
-    @RequestMapping(value = "/{familyId}/attribute", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> saveAttribute(@PathVariable(value = "familyId") String id, FamilyAttribute familyAttribute) {
-        Map<String, Object> model = new HashMap<>();
-        Optional<Family> family = familyService.get(id, FindBy.EXTERNAL_ID, false);
-        // TODO - cross field validation to see if one of attributeGroup ID and FamilyAttributeGroup name is not empty
-        if(family.isPresent() /*&& isValid(familyAttribute, model)*/) {
-            family.get().setGroup("ATTRIBUTES");
-            Attribute attribute = collectionService.findAttribute(familyAttribute.getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.getAttributeId()).get();
-            familyAttribute.setAttribute(attribute);
-            family.get().addAttribute(familyAttribute);
-            familyService.update(id, FindBy.EXTERNAL_ID, family.get());
-            model.put("success", true);
-        }
-        return model;
-    }
 
-    @RequestMapping("/{id}/attributes")
-    @ResponseBody
-    public Result<Map<String, Object>> getFamilyAttributes(@PathVariable(value = "id") String id, HttpServletRequest request) {
-
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, Object>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = pagination.hasSorts() ? Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName())) : null;
-        familyService.get(id, FindBy.EXTERNAL_ID, false).ifPresent(family -> {
-            List<Map<String, Object>> dataObjects = new ArrayList<>();
-            Page<FamilyAttribute> paginatedResult = familyService.getFamilyAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
-            paginatedResult.getContent().forEach(familyAttribute -> {
-                familyAttribute.getScope().forEach((channelId, scope) -> {
-                    if (family.getChannelVariantGroups().containsKey(channelId)) {
-                        VariantGroup channelVariantGroup = family.getVariantGroups().get(family.getChannelVariantGroups().get(channelId));
-                        channelVariantGroup.getVariantAxis().forEach((level, axisAttributeIds) -> axisAttributeIds.stream().filter(axisAttributeId -> axisAttributeId.equals(familyAttribute.getId())).findFirst().ifPresent(axisAttributeId -> familyAttribute.getScope().put(channelId, FamilyAttribute.Scope.LOCKED)));
-                    }
-                });
-                dataObjects.add(familyAttribute.toMap());
-            });
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        });
-        return result;
-    }
-
-    @RequestMapping("/{familyId}/attributes/{attributeId}/options/list")
-    @ResponseBody
-    public Result<Map<String, String>> getFamilyAttributeOptions(@PathVariable(value = "familyId") String familyId, @PathVariable(value = "attributeId") String attributeId, HttpServletRequest request) {
-
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<FamilyAttributeOption> paginatedResult = familyService.getFamilyAttributeOptions(familyId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
-    }
 
     @RequestMapping("/{familyId}/attributes/{attributeId}/options")
     public ModelAndView attributeOptions(@PathVariable(value = "familyId") String familyId,
@@ -402,52 +472,6 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         model.put("attributeId", attributeId);
         return new ModelAndView("settings/familyAttributeOptions", model);
     }
-
-    @RequestMapping("/{familyId}/attributes/{attributeId}/options/available")
-    public ModelAndView availableAttributeOptions(@PathVariable(value = "familyId") String familyId,
-                                         @PathVariable(value = "attributeId") String attributeId) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("attributeId", attributeId);
-        return new ModelAndView("settings/availableFamilyAttributeOptions", model);
-    }
-
-    @RequestMapping("/{familyId}/attributes/{attributeId}/options/available/list")
-    @ResponseBody
-    public Result<Map<String, String>> getAvailableFamilyAttributeOptions(@PathVariable(value = "familyId") String familyId,
-                                                                          @PathVariable(value = "attributeId") String familyAttributeId,
-                                                                          HttpServletRequest request) {
-        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
-        Result<Map<String, String>> result = new Result<>();
-        if(family.isPresent()) {
-            Request dataTableRequest = new Request(request);
-            Pagination pagination = dataTableRequest.getPagination();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort = null;
-            if(pagination.hasSorts()) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            }
-            List<Map<String, String>> dataObjects = new ArrayList<>();
-            List<FamilyAttribute> familyAttribute = FamilyAttributeGroup.getAllAttributes(family.get()).stream().filter(e -> e.getFullId().equals(familyAttributeId)).collect(Collectors.toList());
-            if(ValidationUtil.isNotEmpty(familyAttribute)) {
-                Map<String, FamilyAttributeOption> familyAttributeOptions = familyAttribute.get(0).getOptions();
-                collectionService.findAttribute(familyAttribute.get(0).getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.get(0).getAttributeId()).ifPresent(attribute -> {
-                    Map<String, AttributeOption> optionsMap = attribute.getOptions();
-                    List<AttributeOption> optionsList = optionsMap.entrySet().stream().filter(e -> !familyAttributeOptions.keySet().contains(e.getKey())).map(Map.Entry::getValue).collect(Collectors.toList());
-                    //TODO - sorting and pagination
-                    Page<AttributeOption> paginatedResult = new PageImpl<>(optionsList);
-                    paginatedResult.getContent().forEach(e -> {
-                        e.setCollectionId(familyAttribute.get(0).getCollectionId());
-                        dataObjects.add(e.toMap());
-                    });
-                    result.setDataObjects(dataObjects);
-                    result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-                    result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-                });
-            }
-        }
-        return result;
-    }
-
 
     @RequestMapping(value = "/{familyId}/attributes/{familyAttributeId}/scope/{scope}", method = RequestMethod.PUT)
     @ResponseBody

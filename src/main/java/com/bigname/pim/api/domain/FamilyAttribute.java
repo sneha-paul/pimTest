@@ -35,7 +35,7 @@ public class FamilyAttribute extends ValidatableEntity {
     private int subSequenceNum;
     private String collectionId;
     private String attributeId;
-    private String parentFamilyAttributeId; //Full Id of the parent family attribute, if any
+    private String parentAttributeId; //Full Id of the parent family attribute, if any
     private Map<String, Scope> scope = new HashMap<>();
 
     @Transient @JsonIgnore
@@ -61,8 +61,8 @@ public class FamilyAttribute extends ValidatableEntity {
     public FamilyAttribute(FamilyAttribute attributeDTO, Map<String, FamilyAttributeGroup> familyGroups) {
 
         this(isNotEmpty(attributeDTO.getName()) ? attributeDTO.getName() : attributeDTO.getAttribute().getName(), isNotEmpty(attributeDTO.getLabel()) ? attributeDTO.getLabel() : attributeDTO.getAttribute().getLabel());
-        if(isNotEmpty(attributeDTO.getParentFamilyAttributeId())) {
-            this.setParentFamilyAttributeId(attributeDTO.getParentFamilyAttributeId());
+        if(isNotEmpty(attributeDTO.getParentAttributeId())) {
+            this.setParentAttributeId(attributeDTO.getParentAttributeId());
         }
         this.attribute = attributeDTO.getAttribute();
         this.collectionId = attributeDTO.getCollectionId();
@@ -301,12 +301,12 @@ public class FamilyAttribute extends ValidatableEntity {
         this.options = options;
     }
 
-    public String getParentFamilyAttributeId() {
-        return parentFamilyAttributeId;
+    public String getParentAttributeId() {
+        return parentAttributeId;
     }
 
-    public void setParentFamilyAttributeId(String parentFamilyAttributeId) {
-        this.parentFamilyAttributeId = parentFamilyAttributeId;
+    public void setParentAttributeId(String parentAttributeId) {
+        this.parentAttributeId = parentAttributeId;
     }
 
     public Map<String, List<String>> getParentBasedOptions() {
@@ -405,6 +405,20 @@ public class FamilyAttribute extends ValidatableEntity {
         }
     }
 
+    public FamilyAttribute merge(FamilyAttribute attribute) {
+        this.setName(attribute.getName());
+        this.setLabel(isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : attribute.getName());
+        //TODO - update attribute id - If the attribute id is used in product/variant, then we should update all those references
+        //DON"T update anything else for familyAttribute updates
+        if(isEmpty(getParentAttributeId()) && isNotEmpty(attribute.getParentAttributeId())) {
+            this.setParentAttributeId(attribute.getParentAttributeId());
+        } else if(isNotEmpty(getParentAttributeId()) && !getParentAttributeId().equals(attribute.getParentAttributeId())) {
+            this.setParentAttributeId(attribute.getParentAttributeId());
+            //TODO - update all parent reference in options
+        }
+        return this;
+    }
+
     public Map<String, Object> toMap(String... profile) {
         Map<String, Object> map = new LinkedHashMap<>();
         if(isNotEmpty(ConversionUtil.toList(profile)) && "AXIS_ATTRIBUTE".equalsIgnoreCase(profile[0])) {
@@ -412,7 +426,7 @@ public class FamilyAttribute extends ValidatableEntity {
             map.put("name", getName());
             map.put("level", Integer.toString(getLevel()));
         } else {
-            map.put("id", getId());
+            map.put("externalId", getId());
             map.put("fullId", getAttributeGroup().getFullId() + '|' + getId());
             map.put("uiType", getUiType().name());
             map.put("scopable", getScopable());
@@ -422,7 +436,7 @@ public class FamilyAttribute extends ValidatableEntity {
             map.put("group", FamilyAttributeGroup.getUniqueLeafGroupLabel(getAttributeGroup(), "|"));
             map.put("required", getRequired());
             map.put("selectable", getSelectable());
-            map.put("parentAttributeId", getParentFamilyAttributeId());
+            map.put("parentAttributeId", getParentAttributeId());
             map.put("options", Integer.toString(options.size()));
         }
         return map;

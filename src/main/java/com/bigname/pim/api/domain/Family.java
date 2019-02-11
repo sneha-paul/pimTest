@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.core.domain.Entity;
+import com.bigname.core.exception.EntityNotFoundException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -69,13 +70,79 @@ public class Family extends Entity<Family> {
         return this;
     }
 
+    public Family updateAttribute(FamilyAttribute attributeDTO) {
+        getAttribute(getAttributeFullId(attributeDTO))
+                .map(attribute -> attribute.merge(attributeDTO))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeDTO.getFullId()));
+        return this;
+    }
+
     public Family addAttributeOption(FamilyAttributeOption familyAttributeOptionDTO, AttributeOption attributeOption) {
         FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption(familyAttributeOptionDTO, attributeOption);
-        String attributeId = familyAttributeOption.getFamilyAttributeId();
+        String attributeId = getAttributeFullId(familyAttributeOption.getFamilyAttributeId());
         FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), getAttributes())
                 .getAttributes()
                 .get(attributeId.substring(attributeId.lastIndexOf("|") + 1)).getOptions().put(familyAttributeOption.getId(), familyAttributeOption);
         return this;
+    }
+
+    public String getAttributeFullId(FamilyAttribute attribute) {
+        return getAttributeFullId(attribute.getFullId());
+    }
+
+    public String getAttributeFullId(String attributeId) {
+        //FullId chains must contain at least 4 id nodes(MASTER_GROUP|LEVEL_2|GROUP_ID|ATTRIBUTE_ID. If it contains less than 4 nodes, then find the fullId
+        List<String> idChain = getPipedValues(attributeId);
+        return idChain.size() < 1 ? null : idChain.size() > 3 ? attributeId :
+                getAllAttributes().stream()
+                        .filter(attribute1 -> attribute1.getId().equals(idChain.get(0))).findFirst()
+                        .map(FamilyAttribute::getFullId)
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeId));
+    }
+
+    public String getAttributeOptionFullId(FamilyAttributeOption attributeOption) {
+        //FullId chains must contain at least 5 id nodes(MASTER_GROUP|LEVEL_2|GROUP_ID|ATTRIBUTE_ID|OPTION_ID. If it contains less than 5 nodes, then find the fullId
+        List<String> idChain = getPipedValues(attributeOption.getFullId());
+        return idChain.size() < 2 ? null : idChain.size() > 4 ? attributeOption.getFullId() :
+                getAllAttributes().stream()
+                        .filter(attribute -> attribute.getId().equals(idChain.get(idChain.size() - 2))).findFirst()
+                        .map(attribute -> attribute.getFullId() + "|" + idChain.get(idChain.size() - 1))
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute with Id: " + attributeOption.getFullId()));
+    }
+
+    public String getAttributeFullId(FamilyAttributeOption attributeOption) {
+        String attributeOptionFullId = getAttributeOptionFullId(attributeOption);
+        return attributeOptionFullId == null ? null : attributeOptionFullId.substring(0, attributeOptionFullId.lastIndexOf("|"));
+    }
+
+    public Optional<FamilyAttribute> getAttribute(String attributeFullId) {
+        FamilyAttribute attribute = null;
+        // attributeFullId is required
+        if(isNotEmpty(attributeFullId)) {
+
+            //All grouped attributes for the collection
+            Map<String, FamilyAttributeGroup> attributeGroups = getAttributes();
+
+            //Split attributeFullId to individual ids
+            List<String> ids = new ArrayList<>(getPipedValues(attributeFullId));
+
+            //Since attributeFullId is not empty, ids will at least have one element
+            //Get the attributeId, which will be the last id in the ids list
+            String attributeId = ids.remove(ids.size() - 1);
+
+            //An attribute can't live outside a group. We can proceed further if there is at least one id left in the ids list
+            if(!ids.isEmpty()) {
+                //Top level attribute group
+                FamilyAttributeGroup group = attributeGroups.get(ids.remove(0));
+                //Go recursively to the innermost group
+                while(!ids.isEmpty()) {
+                    group = group.getChildGroups().get(ids.remove(0));
+                }
+                attribute = group.getAttributes().get(attributeId);
+            }
+        }
+        return isNotNull(attribute) ? Optional.of(attribute) : Optional.empty();
+
     }
 
     public Map<String, VariantGroup> getVariantGroups() {
@@ -92,6 +159,17 @@ public class Family extends Entity<Family> {
 
     public void setChannelVariantGroups(Map<String, String> channelVariantGroups) {
         this.channelVariantGroups = channelVariantGroups;
+    }
+
+    public List<FamilyAttribute> getAvailableParentAttributes(FamilyAttribute forAttribute) {
+        // An attribute can only have a maximum of one parent attribute.
+        // Get all the existing parents and add to the excludedAttributeIds list.
+        List<String> excludedAttributeIds = getAllAttributes().stream().filter(attribute -> isNotEmpty(attribute.getParentAttributeId())).map(FamilyAttribute::getParentAttributeId).collect(Collectors.toList());
+        if(isNotEmpty(forAttribute.getId())) {
+            excludedAttributeIds.add(forAttribute.getId());
+        }
+        // Only multi-select attributes can be used as parents
+        return getAllAttributes().stream().filter(attribute -> "Y".equals(attribute.getUiType().isSelectable()) && !excludedAttributeIds.contains(attribute.getId())).sorted(Comparator.comparing(FamilyAttribute::getName)).collect(Collectors.toList());
     }
 
     //TODO - enable this after implementing the variant group lock functionality

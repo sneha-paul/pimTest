@@ -1,9 +1,9 @@
 $(function(){
     $.addModal({
         selector: '.js-add-familyAttribute',
-        url: $.getURL('/pim/families/{familyId}/attribute'),
+        url: $.getURL('/pim/families/{familyId}/attributes/create'),
         name:'family-attribute',
-        title:'Family Attribute',
+        title:'Create Family Attribute',
         buttons: [
             {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('familyAttributes');$.closeModal();});}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}

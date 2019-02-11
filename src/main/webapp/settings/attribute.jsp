@@ -22,7 +22,7 @@
                             <div class="form-group">
                                 <label for="js-attribute-group-id">Attribute Group</label><code class="highlighter-rouge m-l-10">*</code>
                                 <select class="form-control" id="js-attribute-group-id" name="attributeGroup.fullId">
-                                    <option value="">Add a NEW GROUP</option>
+                                    <%--<option value="">Add a NEW GROUP</option>--%>
                                     <c:forEach var="pair" items="${attributeGroups}">
                                         <option value="${pair.value0}" <c:if test="${pair.value0 eq 'DEFAULT_GROUP'}">selected</c:if>>${pair.value1}</option>
                                     </c:forEach>

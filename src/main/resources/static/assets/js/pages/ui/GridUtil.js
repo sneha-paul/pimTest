@@ -124,8 +124,7 @@
             });
         },
 
-        //TODO - DO NOT DELETE
-        /*attributeOptionsButton: function(options) {
+        attributeOptionsButton: function(options) {
           return {
               name: 'ATTRIBUTE_OPTIONS',
               style: 'primary',
@@ -145,7 +144,7 @@
                   });
               }
           }
-        },*/
+        },
 
         addItemButton: function(options) {
             return {
@@ -208,18 +207,18 @@
                 icon = 'fa-check-square-o';
                 color = ' text-success';
             }
-            return '<span class="js-scopable' + color + '" title="' + title + '" data-scopable="' + data.scopable + '" data-id="' + data.id + '"><i class="fa ' + icon + '"></i></span>';
+            return '<span class="js-scopable' + color + '" title="' + title + '" data-scopable="' + data.scopable + '" data-id="' + data.externalId + '"><i class="fa ' + icon + '"></i></span>';
         },
 
         renderScopeSelector: function(data, channelId) {
             if (_.isEmpty(data.scope[channelId]) || data.scope[channelId] === 'OPTIONAL') {
-                return '<span class="js-scope-selector" title="Optional" data-channel="' + channelId + '" data-scope="OPTIONAL" data-id="' + data.id + '"><i class="fa fa-square-o"></i></span>';
+                return '<span class="js-scope-selector" title="Optional" data-channel="' + channelId + '" data-scope="OPTIONAL" data-id="' + data.externalId + '"><i class="fa fa-square-o"></i></span>';
             } else if (data.scope[channelId] === 'REQUIRED') {
-                return '<span class="js-scope-selector text-success" title="Required" data-channel="' + channelId + '" data-scope="REQUIRED" data-id="' + data.id + '"><i class="fa fa-check-square-o"></i></span>';
+                return '<span class="js-scope-selector text-success" title="Required" data-channel="' + channelId + '" data-scope="REQUIRED" data-id="' + data.externalId + '"><i class="fa fa-check-square-o"></i></span>';
             } else if (data.scope[channelId] === 'LOCKED') {
                 return '<span class="text-primary" title="Variant Axis"><i class="icon-target"></i></span>';
             } else {
-                return '<span class="js-scope-selector text-danger" title="Not Applicable" data-channel="' + channelId + '" data-scope="NOT_APPLICABLE" data-id="' + data.id + '"><i class="icon-ban" style="font-weight: bold"></i></span>';
+                return '<span class="js-scope-selector text-danger" title="Not Applicable" data-channel="' + channelId + '" data-scope="NOT_APPLICABLE" data-id="' + data.externalId + '"><i class="icon-ban" style="font-weight: bold"></i></span>';
             }
         },
 
@@ -249,6 +248,7 @@
                 selector: options.selector,
                 names: options.names,
                 url: options.dataUrl,
+                actionUrl: options.actionUrl ? options.actionUrl : '',
                 searching: typeof options.searching === 'undefined' ?  true : options.searching,
                 pageLength: options.pageLength,
                 reorderCallback: options.reorderCallback || function(){},

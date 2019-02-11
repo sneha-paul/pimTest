@@ -13,7 +13,7 @@
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
-                    <li class="nav-item"><a class="nav-link js-familyAttributes-tab" data-toggle="tab" href="#familyAttributes">Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link js-familyAttributes-tab" data-toggle="tab" href="#attributes">Attributes</a></li>
                     <li class="nav-item"><a class="nav-link js-variantGroups-tab" data-toggle="tab" href="#variantGroups">Variant Groups</a></li>
                     <li class="nav-item"><a class="nav-link js-familyAttributesScope-tab" data-toggle="tab" href="#familyAttributesScope">Scope</a></li>
                 </ul>
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="familyAttributes">
+                    <div class="tab-pane" id="attributes">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -179,14 +179,14 @@
             $.initGrid({
                 selector: '#paginatedFamilyAttributesTable',
                 names: ['familyAttributes', 'familyAttribute'],
-                dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
+                dataUrl: $.getURL('/pim/families/{familyId}/attributes/data'),
                 columns: [
-                    {data: 'name', name: 'name', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.id + '</code><small>'}},
+                    {data: 'name', name: 'name', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small style="color:#808080">' + row.externalId + '</code><small>'}},
                     {data: 'uiType', name: 'uiType', title: 'UI Type'},
                     {data: 'group', name: 'group', title: 'Attribute Group'},
                     {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
                 ],
-                buttons: [$.attributeOptionsButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}/options'})]
+                buttons: [$.detailsButton({pageUrl: $.getURL('/pim/families/{familyId}/attributes/')}), $.attributeOptionsTabButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}#attributeOptions'})]
             });
             $(this).removeClass('js-familyAttributes-tab').off('shown.bs.tab.familyAttributes');
         });
@@ -224,7 +224,8 @@
             $.initGrid({
              selector: '#paginatedFamilyAttributesScopeTable',
              names: ['familyAttributesScopes', 'familyAttributesScope'],
-             dataUrl: $.getURL('/pim/families/{familyId}/attributes'),
+             dataUrl: $.getURL('/pim/families/{familyId}/attributes/data'),
+             actionUrl: $.getURL('/pim/families/{familyId}/attributes'),
              columns: columns
              });
 
@@ -262,7 +263,7 @@
         $('.js-variantGroups-tab').on('shown.bs.tab.variantGroups', function (e) {
             $.initAssociationsGrid({
                 selector: '#paginatedVariantGroupsTable',
-                names: 'variantGroups',
+                names: ['variantGroups', 'variantGroup'],
                 pageUrl: $.getURL('/pim/families/{familyId}/variantGroups/'),
                 dataUrl: $.getURL('/pim/families/{familyId}/variantGroups/list'),
                 toggleUrl: '/pim/families/{familyId}/variantGroups/{externalId}/active/{active}',

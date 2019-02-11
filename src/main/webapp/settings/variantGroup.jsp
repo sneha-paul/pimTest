@@ -17,11 +17,11 @@
                       data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
-                            <div class="form-group">
+                            <div class="form-group js-name">
                                 <label for="groupName">Group Name</label>
                                 <input id="groupName" type="text" name="name" class="form-control"/>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group js-external-id">
                                 <label for="groupId">Group ID</label>
                                 <input type="text" id="groupId" name="groupId" class="form-control"/>
                             </div>
@@ -29,7 +29,7 @@
                                 <label for="level">Variant Levels</label>
                                 <select class="form-control" id="level" name="level">
                                     <option value="1">1</option>
-                                    <option value="2">2</option>
+                                    <%--<option value="2">2</option>--%>
                                 </select>
                             </div>
                         </div>

@@ -552,7 +552,7 @@
             });
 
             $(options.selector).on('click', '.js-scope-selector', function () {
-                var url = $.getURL(options.url + '/{familyAttributeId}/scope/{scope}', {
+                var url = $.getURL(options.actionUrl + '/{familyAttributeId}/scope/{scope}', {
                     familyAttributeId: $(this).data('id'),
                     scope: $(this).data('scope'),
                 });
@@ -583,13 +583,13 @@
                     errorMessage: ['Error Setting the Channel Variant Group', 'An error occurred while setting the channel variant group'],
                     successCallback: function(data) {
                         $.refreshDataTable(typeof options.names === 'undefined' ? options.name : options.names[0]);
-                        $.refreshDataTable('familyAttributesScope');
+                        $.refreshDataTable('familyAttributesScopes');
                     }
                 });
             });
 
             $(options.selector).on('click', '.js-scopable', function () {
-                var url = $.getURL(options.url + '/{familyAttributeId}/scopable/{scopable}', {
+                var url = $.getURL(options.actionUrl + '/{familyAttributeId}/scopable/{scopable}', {
                     familyAttributeId: $(this).data('id'),
                     scopable: $(this).data('scopable'),
 

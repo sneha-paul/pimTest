@@ -2,7 +2,7 @@ $( document ).ready(function() {
     $.initGrid({
         selector: '#paginatedAvailableAttributeOptionsTable',
         names: ['availableAttributeOptions', 'availableAttributeOption'],
-        dataUrl: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/available/list'),
+        dataUrl: $.getURL('/pim/families/{familyId}/attributes/{attributeId}/options/available/data'),
         columns: [
             { data: 'value', name : 'value' , title : 'Value'},
             { data: 'id', name : 'id', title : 'ID' },
@@ -23,11 +23,11 @@ $( document ).ready(function() {
                 $.refreshDataTable('availableAttributeOptions');
                 toastr.success('Successfully added the option', 'Option Added');
             } else {
-                toastr.success('Error occurred while adding the option', 'Error Adding Option');
+                toastr.error('Error occurred while adding the option', 'Error Adding Option');
             }
 
         }).fail(function(jqXHR, status) {
-            toastr.success('Error occurred while adding the attribute option', 'Error Adding Option');
+            toastr.error('Error occurred while adding the attribute option', 'Error Adding Option');
         });
     }
 });

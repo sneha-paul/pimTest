@@ -93,6 +93,7 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
         List<FamilyAttributeOption> options = new ArrayList<>();
         Optional<Family> family = get(familyId, findBy, false);
         if(family.isPresent()) {
+            attributeId = family.get().getAttributeFullId(attributeId);
             options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), family.get().getAttributes())
                     .getAttributes()
                     .get(attributeId.substring(attributeId.lastIndexOf("|") + 1))
