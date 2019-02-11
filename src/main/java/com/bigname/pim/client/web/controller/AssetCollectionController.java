@@ -162,10 +162,16 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                 model.put("files", assets.stream().filter(a -> !"Y".equals(a.getIsDirectory())).collect(Collectors.toList()));
                 List<String> parentChain = asset.getParentIds().subList(1, asset.getParentIds().size());// Get all parent Ids except the root
                 parentChain.add(asset.getId());
-                model.put("parentChain", assetService.getAll(parentChain.toArray(new String[0]), FindBy.INTERNAL_ID, null, false).stream().collect(CollectionsUtil.toLinkedMap(Entity::getId, VirtualFile::getFileName)));
-                model.put("breadcrumbs", new Breadcrumbs("Asset Collection",
-                        "Asset Collections", "/pim/assetCollections",
-                        assetCollection.get().getCollectionName(), ""));
+//                model.put("parentChain", assetService.getAll(parentChain.toArray(new String[0]), FindBy.INTERNAL_ID, null, false).stream().collect(CollectionsUtil.toLinkedMap(Entity::getId, VirtualFile::getFileName)));
+                List<String> crumbs = new ArrayList<>();
+                crumbs.addAll(Arrays.asList("Asset Collections", "/pim/assetCollections"));
+                crumbs.addAll(Arrays.asList(assetCollection.get().getCollectionName(), "/pim/assetCollections/" + collectionId));
+                for (VirtualFile virtualFile : assetService.getAll(parentChain.toArray(new String[0]), FindBy.INTERNAL_ID, null, false)) {
+                    crumbs.addAll(Arrays.asList(virtualFile.getFileName(), "/pim/assetCollections/" + collectionId + "/assets/" + virtualFile.getId()));
+                }
+                crumbs.set(crumbs.size() - 1, "");
+                model.put("breadcrumbs", new Breadcrumbs("Asset Collection", crumbs.toArray(new String[0])));
+
                 return new ModelAndView("settings/asset" + (reload ? "Collection_body" : ""), model);
             } else {
                 throw new EntityNotFoundException("Unable to find Asset Collection with Id: " + collectionId);

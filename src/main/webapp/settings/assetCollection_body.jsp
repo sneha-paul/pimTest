@@ -10,20 +10,11 @@
             <div class="header">
                 <h2>${assetCollection.collectionName}
                     <small><code class="highlighter-rouge">${assetCollection.collectionId}</code></small>
-                    <small class="pull-right m-t--15"><code style="color:#808080">_id: ${assetCollection.id}</code>
-                    </small>
+                    <%--<small class="pull-right m-t-15"><code style="color:#808080">_id: ${assetCollection.id}</code></small>--%>
                 </h2>
             </div>
             <div class="body">
                 <div style="border-bottom: 1px solid #DADADA">
-                    <div>
-                        <ul class="breadcrumb" style="background-color: #ffffff; font-size: 16px; margin-bottom: 0">
-                            <li class="breadcrumb-item"><a href="/pim/assetCollections/${assetCollection.collectionId}">${assetCollection.collectionId}</a></li>
-                            <c:forEach var="entry" items="${parentChain}">
-                                <li class="breadcrumb-item"><a href="${entry.key}"><i class="text-primary p-r-10 fa fa-folder"></i>${entry.value}</a></li>
-                            </c:forEach>
-                        </ul>
-                    </div>
                     <div style="float: right; position: relative; top: -50px;">
                         <button type="button" class="btn btn-icon btn-success btn-round js-create-folder" title="Create New Folder">
                             <i class="fa fa-folder"></i><span style="font-size: 8px;position: relative;top:-8px"><i class="fa fa-plus"></i></span><span class="p-l-5"></span>
@@ -40,14 +31,12 @@
                 <c:if test="${not empty folders}">
                     <div class="p-t-25">
                         <div class="p-b-15"><h6>Folders</h6></div>
-                        <div class="row">
-                            <div class="col">
-                                <c:forEach var="folder" items="${folders}">
-                                    <div id="${folder.id}" class="btn-label secondary js-folder" data-toggle="tooltip" data-placement="top" title="" data-original-title="${folder.fileName}">
-                                        <i class="text-primary fa fa-folder p-r-10"></i>${folder.fileName}
-                                    </div>
-                                </c:forEach>
-                            </div>
+                        <div class="row file-container">
+                            <c:forEach var="folder" items="${folders}">
+                                <div id="${folder.id}" class="col-xl-2 col-lg-3 col-md-4 col-sm-6 btn-label secondary js-folder" data-toggle="tooltip" data-placement="top" title="" data-original-title="${folder.fileName}">
+                                    <i class="text-primary fa fa-folder p-r-10"></i>${folder.fileName}
+                                </div>
+                            </c:forEach>
                         </div>
                     </div>
                 </c:if>

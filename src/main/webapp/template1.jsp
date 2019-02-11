@@ -245,19 +245,19 @@
             border-bottom:1px solid #dee2e6;
         }
 
-        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar-track {
+        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar-track, .file-container::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
             background-color: #ffffff;
             padding: 1px;
             box-shadow: none;
         }
 
-        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar {
+        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar, .file-container::-webkit-scrollbar {
             width: 10px;
             background-color: #f8f8f8;
         }
 
-        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar-thumb {
+        .scrollable-dt .dt-body .dataTables_scrollBody::-webkit-scrollbar-thumb, .file-container::-webkit-scrollbar-thumb {
             background-color: #7f7f7f;
             border: 2px solid #ffffff;
             border-radius: 5px;
@@ -539,6 +539,12 @@
             padding-right: 0;
         }*/
 
+        .file-container {
+            height: calc(50vh);
+            overflow: auto;
+            padding-left:30px;
+        }
+
         .btn:focus, .btn:active {
             outline: none !important;
             box-shadow: none !important;
@@ -597,6 +603,7 @@
             margin-right: 25px;
             margin-bottom: 25px;
             cursor: pointer;
+            font-size: 12px;
         }
 
         .truncate {
