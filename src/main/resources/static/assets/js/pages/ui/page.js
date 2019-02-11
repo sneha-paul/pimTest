@@ -400,7 +400,7 @@
                                     $(options.selector + '_filter.dataTables_filter .dt-clear').addClass('js-hidden');
                                 }
                             }),
-                        $clearButton = $('<i class="fa fa-times-circle dt-clear text-danger js-hidden"></i>')
+                        $clearButton = $('<button class="btn btn-default dt-clear js-hidden"><i class="fa fa-times-circle  text-danger"></i></button>')
                             .click(function() {
                                 input.val('');
                                 $searchButton.click();

@@ -4,7 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.ValidationUtil2;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.EntityAssociation;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.common.util.ValidationUtil2.isEmpty;
+import static com.bigname.common.util.ValidationUtil.isEmpty;
 
 /**
  * Created by sruthi on 29-08-2018.
@@ -278,7 +278,7 @@ public class CategoryController extends BaseController<Category, CategoryService
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Product> paginatedResult = ValidationUtil2.isEmpty(dataTableRequest.getSearch()) ? categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+        Page<Product> paginatedResult = ValidationUtil.isEmpty(dataTableRequest.getSearch()) ? categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
                 : categoryService.findAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);

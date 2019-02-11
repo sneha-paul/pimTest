@@ -249,9 +249,9 @@ public class Attribute extends ValidatableEntity<Attribute> {
         setSelectable(getSelectable());
         if(isEmpty(getId())) {
             String id = toId(getName());
-            if(id.length() > PIMConstants.ID_MAX_LENGTH) {
-                id = id.substring(0, PIMConstants.ID_MAX_LENGTH);
-            }
+//            if(id.length() > PIMConstants.ID_MAX_LENGTH) {
+//                id = id.substring(0, PIMConstants.ID_MAX_LENGTH);
+//            }
             setId(id);
         }
     }

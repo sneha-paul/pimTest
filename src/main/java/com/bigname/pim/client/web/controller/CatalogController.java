@@ -4,7 +4,7 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.ValidationUtil2;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.EntityAssociation;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.common.util.ValidationUtil2.isEmpty;
+import static com.bigname.common.util.ValidationUtil.isEmpty;
 
 /**
  *
@@ -187,7 +187,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Category> paginatedResult = ValidationUtil2.isEmpty(dataTableRequest.getSearch()) ? catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+        Page<Category> paginatedResult = ValidationUtil.isEmpty(dataTableRequest.getSearch()) ? catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
                 : catalogService.findAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);

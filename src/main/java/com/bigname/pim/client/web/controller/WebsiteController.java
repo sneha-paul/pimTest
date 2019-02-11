@@ -5,7 +5,7 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil2;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.EntityAssociation;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
@@ -140,7 +140,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     @ResponseBody
     public Result<Map<String, Object>> getWebsiteCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
-        if(ValidationUtil2.isEmpty(dataTableRequest.getSearch())) {
+        if(ValidationUtil.isEmpty(dataTableRequest.getSearch())) {
             return getAssociationGridData(websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), WebsiteCatalog.class, request);
         } else {
             Pagination pagination = dataTableRequest.getPagination();
@@ -200,7 +200,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Catalog> paginatedResult = ValidationUtil2.isEmpty(dataTableRequest.getSearch()) ? websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
+        Page<Catalog> paginatedResult = ValidationUtil.isEmpty(dataTableRequest.getSearch()) ? websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
                 : websiteService.findAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);

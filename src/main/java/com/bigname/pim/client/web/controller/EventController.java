@@ -4,12 +4,17 @@ import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.Entity;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.Event;
+import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.service.EventService;
+import com.bigname.pim.api.service.UserService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by dona on 30-01-2019.
@@ -34,10 +40,12 @@ import java.util.Map;
 public class EventController extends BaseController<Event, EventService> {
 
    private EventService eventService;
+   private UserService userService;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, UserService userService) {
         super(eventService, Event.class);
         this.eventService = eventService;
+        this.userService = userService;
     }
 
     /**
@@ -54,20 +62,28 @@ public class EventController extends BaseController<Event, EventService> {
 
     @RequestMapping("/datas")
     @ResponseBody
-    public Result<Map<String, Object>> getEventData(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public Result<Map<String, String>> getEventData(HttpServletRequest request, HttpServletResponse response, Model model) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, Object>> result = new Result<>();
+        Result<Map<String, String>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
         Sort sort;
         if(pagination.hasSorts()) {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+            sort = Sort.by(new Sort.Order(Sort.Direction.DESC, "timeStamp"));
         }
-        List<Map<String, Object>> dataObjects = new ArrayList<>();
-        Page<Map<String, Object>> paginatedResult = eventService.getEventData(getPaginationRequest(request), false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e));
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+//        Page<Map<String, Object>> paginatedResult = eventService.getEventData(getPaginationRequest(request), false);
+        Map<String, User> usersLookup = userService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, u -> u));
+        Page<Event> paginatedResult = ValidationUtil.isEmpty(dataTableRequest.getSearch()) ? eventService.getAll(dataTableRequest.getPagination().getPageNumber(), dataTableRequest.getPagination().getPageSize(), sort, false)
+                                                : eventService.findAll("details", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+        paginatedResult.getContent().forEach(e -> {
+            Map<String, String> data = e.toMap();
+            data.put("userName", usersLookup.get(e.getUser()).getUserName());
+            dataObjects.add(data);
+
+        });
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
@@ -89,8 +105,9 @@ public class EventController extends BaseController<Event, EventService> {
         model.put("active", "EVENTS");
         model.put("mode", "DETAILS");
         model.put("view", "event/event" + (reload ? "_body" : ""));
-        return id == null ? super.details(model) : eventService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : eventService.get(id, FindBy.INTERNAL_ID, false)
                 .map(event -> {
+                    event.setUser(userService.get(event.getUser(), FindBy.INTERNAL_ID, false).map(User::getUserName).orElse(""));
                     model.put("event", event);
                     return super.details(id, model);
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Event with Id: " + id));

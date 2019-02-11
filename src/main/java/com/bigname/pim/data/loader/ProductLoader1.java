@@ -1127,8 +1127,8 @@ public class ProductLoader1 {
                             {
                                 AttributeOption attributeOption = new AttributeOption();
                                 attributeOption.setCollectionId(attributeCollectionId);
-                                attributeOption.setAttributeId(attribute.getFullId());
                                 attributeOption.setValue(attributeOptionValue);
+                                attributeOption.setAttributeId(attribute.getFullId());
                                 attributeOption.setActive("Y");
                                 attributeOption.orchestrate();
                                 attribute.getOptions().put(ValidatableEntity.toId(attributeOptionValue), attributeOption);
@@ -1441,6 +1441,8 @@ public class ProductLoader1 {
                     if (isEmpty(product.getChannelAssets())) {
                         productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
                         product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                        existingProducts.put(productId, product);
+
                     }
                 } else {
                     //                        System.out.println(assetFileName + " <======= Not Found");
@@ -1460,6 +1462,7 @@ public class ProductLoader1 {
                             if (isEmpty(product.getChannelAssets())) {
                                 productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
                                 product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                                existingProducts.put(productId, product);
                             }
                         } else {
                             //                                System.out.println(assetFileName + " <======= Asset Not Found");

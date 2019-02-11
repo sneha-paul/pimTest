@@ -4,6 +4,7 @@ import com.bigname.core.domain.Entity;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -102,11 +103,12 @@ public class Event extends Entity<Event> {
     public Map<String, String> toMap() {
 
         Map<String, String> map = new LinkedHashMap<>();
+        map.put("externalId", getId());
         map.put("userName", getUser());
         map.put("entity", getEntity());
         map.put("details", getDetails());
         map.put("eventType", getEventType().name());
-        map.put("timeStamp", String.valueOf(getTimeStamp()));
+        map.put("timeStamp", getTimeStamp().format(DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a")));
         map.put("data", String.valueOf(getData()));
         return map;
     }

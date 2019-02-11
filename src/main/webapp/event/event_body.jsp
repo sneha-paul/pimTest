@@ -24,7 +24,7 @@
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="message">Message</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="message" name="message" class="form-control" value="${event.details}" readonly/>
+                                                        <textarea type="text" id="message" name="message" class="form-control" disabled>${event.details}</textarea>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="entity">Entity</label><code class="highlighter-rouge m-l-10">*</code>

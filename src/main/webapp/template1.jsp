@@ -90,6 +90,9 @@
             top:10px;
             font-weight: bold;
             cursor: pointer;
+            box-shadow: none;
+            border: none;
+            padding:0 !important;
         }
 
         .dt-toolbar {
