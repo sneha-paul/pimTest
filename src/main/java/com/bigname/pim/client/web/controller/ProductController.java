@@ -14,8 +14,10 @@ import com.bigname.core.util.Toggle;
 import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
+import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -47,8 +49,8 @@ public class ProductController extends BaseController<Product, ProductService> {
     private FamilyService productFamilyService;
     private ChannelService channelService;
 
-    public ProductController(ProductService productService, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
-        super(productService, Product.class, websiteService, categoryService, catalogService);
+    public ProductController(ProductService productService, @Lazy ProductExporter productExporter, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
+        super(productService, Product.class, productExporter, websiteService, categoryService, catalogService);
         this.productService = productService;
         this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;

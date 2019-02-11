@@ -30,6 +30,7 @@
             selector: '#paginatedProductsTable',
             names: ['products','product'],
             pageUrl: '/pim/products/',
+            toolbar: [{name: 'EXPORT', actionUrl: '/pim/products/export'}, {name: 'IMPORT'}],
             dataUrl: '/pim/products/data',
             columns: [
                 {

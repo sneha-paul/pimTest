@@ -3,7 +3,7 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.data.exportor.CatalogExporter;
 import com.bigname.pim.data.exportor.CategoryExporter;
-import com.bigname.pim.data.loader.exporter.ProductExporter;
+import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.data.loader.exporter.WebsiteExporter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

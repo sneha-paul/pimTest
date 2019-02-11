@@ -129,7 +129,7 @@ public class CollectionsUtil {
         System.out.println(buildMapString(input,0).toString());
     }*/
 //buildMapString(input,0) -- pass 0 index at first time
-    public static <K, V> String buildMapString(Map<K, V> map, int index) {
+    public static <K, V> StringBuilder buildMapString(Map<K, V> map, int index) {
         StringBuilder builder = new StringBuilder();
         Set<K> keySet = map.keySet();
         for (K key : keySet) {
@@ -144,6 +144,7 @@ public class CollectionsUtil {
                 builder.append(value + ";");
             }
         }
-        return builder.toString();
+
+        return builder;
     }
 }
