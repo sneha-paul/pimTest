@@ -130,9 +130,9 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
             Criteria discontinueCriteria = new Criteria();
             discontinueCriteria.orOperator(
                     Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").is(null).and("discontinued").is("N"),
-                    Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1)),
-                    Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()).and("discontinuedTo").is(null),
-                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1))
+                    Criteria.where("discontinuedFrom").ne(null).gt(LocalDateTime.now()),
+                    Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1)),
+                    Criteria.where("discontinuedFrom").ne(null).lte(LocalDateTime.now()).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1))
             );
             criteria.andOperator(activeCriteria, discontinueCriteria);
         }
