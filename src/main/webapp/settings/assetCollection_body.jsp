@@ -53,8 +53,8 @@
                                     <div class="file">
                                         <a href="javascript:void(0);">
                                             <div class="hover">
-                                                <button type="button" class="btn btn-icon btn-success">
-                                                    <i class="fa fa-edit"></i>
+                                                <button type="button" class="btn btn-icon btn-success" onclick="window.location.href='/pim/assetCollections/downloadAsset?fileId=${file.id}'">
+                                                 <i class="fa fa-download"></i>
                                                 </button>
                                             </div>
                                             <div class="image">

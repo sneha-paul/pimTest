@@ -5,7 +5,6 @@ import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.domain.Entity;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.web.controller.BaseController;
@@ -15,6 +14,7 @@ import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -278,4 +278,11 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                                                        @PathVariable(value = "assetGroupId") String assetGroupId) {
         return assetCollectionService.getAssetsHierarchy(id, FindBy.EXTERNAL_ID, assetGroupId, false);
     }
+
+    @RequestMapping("/downloadAsset")
+    public ResponseEntity<Resource> downloadImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request)  {
+        VirtualFile asset = assetService.get(fileId, FindBy.INTERNAL_ID,false).orElse(null);
+        return downloadAsset(asset.getInternalFileName(), request);
+    }
+
 }
