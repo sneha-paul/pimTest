@@ -18,9 +18,11 @@ import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -266,5 +268,11 @@ public class ProductController extends BaseController<Product, ProductService> {
         Map<String, Object> model = new HashMap<>();
         model.put("success", productService.toggleProductCategory(productId, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
+    }
+
+    @RequestMapping("/downloadDigitalAsset")
+    public ResponseEntity<Resource> downloadDigitalAssetsImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request)  {
+        VirtualFile asset = assetService.get(fileId, FindBy.INTERNAL_ID,false).orElse(null);
+        return downloadAsset(asset.getInternalFileName(), request);
     }
 }

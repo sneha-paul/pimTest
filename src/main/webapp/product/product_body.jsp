@@ -314,7 +314,7 @@
                                                                 <li class="dropdown">
                                                                     <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"></a>
                                                                     <ul class="dropdown-menu dropdown-menu-right">
-                                                                        <li><a href="javascript:void(0);" onclick="$(this).closest('.digital-asset-container').flip(true)">Edit</a></li>
+                                                                        <li><a href="/pim/products/downloadDigitalAsset?fileId=${asset.id}">Download</a></li>
                                                                         <li><a href="javascript:$.deleteAsset('${asset.id}');">Delete</a></li>
                                                                         <c:if test="${not isDefault}">
                                                                             <li><a href="javascript:$.setAsDefaultAsset('${asset.id}')">Set as Default</a></li>
