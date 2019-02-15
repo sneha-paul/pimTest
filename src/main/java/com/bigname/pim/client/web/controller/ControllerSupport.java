@@ -2,10 +2,23 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.core.domain.Entity;
 import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.exception.FileNotFoundException;
 import com.bigname.core.service.BaseService;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +30,12 @@ import static com.bigname.common.util.ValidationUtil.isNotEmpty;
  * @since 1.0
  */
 abstract public class ControllerSupport {
+
+    @Value("${app.asset.location:/usr/local/pim/uploads/assets/}")
+    protected String assetFileStorageLocation;
+
+    protected Logger LOGGER = LoggerFactory.getLogger(ControllerSupport.class);
+
     abstract protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>... groups);
 
     @SuppressWarnings("unchecked")
@@ -67,5 +86,47 @@ abstract public class ControllerSupport {
             referrer = defaultURL;
         }
         return referrer;
+    }
+
+    protected ResponseEntity<Resource> downloadFile(String fileLocation, String fileName, HttpServletRequest request) {
+
+        // Load file as Resource
+        Resource resource = loadFileAsResource(fileLocation, fileName);
+
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            LOGGER.error("Could not determine file type.");
+}
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
+    protected ResponseEntity<Resource> downloadAsset(String fileName, HttpServletRequest request) {
+        return downloadFile(assetFileStorageLocation, fileName, request);
+    }
+
+    protected Resource loadFileAsResource(String fileLocation, String fileName) {
+        try {
+            Path filePath = Paths.get(fileLocation).resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if(resource.exists()) {
+                return resource;
+            } else {
+                throw new FileNotFoundException("File not found " + fileName);
+            }
+        } catch (MalformedURLException ex) {
+            throw new FileNotFoundException("File not found " + fileName, ex);
+        }
     }
 }

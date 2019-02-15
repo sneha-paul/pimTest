@@ -19,9 +19,12 @@ import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.PIMConstants;
 import org.apache.commons.collections4.MapUtils;
 import org.javatuples.Pair;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -55,13 +58,16 @@ public class ProductVariantController extends ControllerSupport {
 
     private WebsiteService websiteService;
 
+    private VirtualFileService assetService;
+
     public ProductVariantController( ProductVariantService productVariantService,
                                      ProductService productService,
                                      ChannelService channelService,
                                      PricingAttributeService pricingAttributeService,
                                      CategoryService categoryService,
                                      CatalogService catalogService,
-                                     WebsiteService websiteService){
+                                     WebsiteService websiteService,
+                                     VirtualFileService assetService){
         this.productVariantService = productVariantService;
         this.productService = productService;
         this.channelService = channelService;
@@ -69,6 +75,7 @@ public class ProductVariantController extends ControllerSupport {
         this.websiteService = websiteService;
         this.catalogService = catalogService;
         this.categoryService = categoryService;
+        this.assetService = assetService;
     }
 
     @RequestMapping("/{productId}/channels/{channelId}/variants/available/list")
@@ -466,5 +473,12 @@ public class ProductVariantController extends ControllerSupport {
         data.sort(Comparator.comparing(o -> o.get("name")));
         return data;
     }
+
+    @RequestMapping("/downloadVariantAsset")
+    public ResponseEntity<Resource> downloadVariantAssetsImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request){
+
+        VirtualFile asset = assetService.get(fileId, FindBy.INTERNAL_ID,false).orElse(null);
+        return downloadAsset(asset.getInternalFileName(), request);
+}
 
 }

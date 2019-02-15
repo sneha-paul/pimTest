@@ -117,31 +117,12 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     }
 
     @GetMapping("/export")
-    public ResponseEntity<Resource> downloadFile(HttpServletRequest request) {
+    public ResponseEntity<Resource> exportFile(HttpServletRequest request) {
         String fileLocation = exportFileStorageLocation;
         String fileName = exporter.getFileName(BaseExporter.Type.XLSX);
 
         exporter.exportData(fileLocation + fileName);
-        // Load file as Resource
-        Resource resource = loadFileAsResource(fileLocation, fileName);
-
-        // Try to determine file's content type
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-            LOGGER.error("Could not determine file type.");
-        }
-
-        // Fallback to the default content type if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+        return downloadFile(fileLocation, fileName, request);
     }
 
     protected Map<String, Object> update(String id, T entity, String baseMapping, Class<?>... groups) {
