@@ -68,6 +68,11 @@ public class POIUtil {
         return data;
     }
 
+    @Deprecated
+    /**
+     * use the below method instead
+     * @see #writeData(String, String, List)
+     */
     public static boolean writeData(String filePath, String sheetName, Map<String, Object[]> data) {
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -129,6 +134,43 @@ public class POIUtil {
                     cell.setCellValue((Integer)obj);
             }
         }
+        try {
+            FileOutputStream out = new FileOutputStream(new File(filePath));
+            workbook.write(out);
+            out.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    public static boolean writeData(String filePath, Map<String, List<List<Object>>> datas) {
+        // Blank workbook
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        datas.forEach((sheetName, data) -> {
+            // Create a blank sheet
+            XSSFSheet sheet = workbook.createSheet(sheetName);
+
+            // Iterate over data and write to sheet
+
+            int rownum = 0;
+            for (List<Object> objArr : data) {
+                // this creates a new row in the sheet
+                Row row = sheet.createRow(rownum++);
+                int cellnum = 0;
+                for (Object obj : objArr) {
+                    // this line creates a cell in the next column of that row
+                    Cell cell = row.createCell(cellnum++);
+                    if (obj instanceof String)
+                        cell.setCellValue((String)obj);
+                    else if (obj instanceof Integer)
+                        cell.setCellValue((Integer)obj);
+                }
+            }
+        });
+
         try {
             FileOutputStream out = new FileOutputStream(new File(filePath));
             workbook.write(out);
