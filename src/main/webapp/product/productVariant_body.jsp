@@ -40,11 +40,11 @@
                                                                 <div class="row">
                                                                     <div class="col-md-6 col-sm-12">
                                                                         <div class="form-group">
-                                                                            <label for="productVariantName">Product Variant Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                            <label for="productVariantName">Child Product Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                                             <input type="text" id="productVariantName" name="productVariantName" value="${productVariant.productVariantName}" class="form-control" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label for="productVariantId">Product VariantID</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                            <label for="productVariantId">Child Product ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                                             <input type="text" id="productVariantId" name="productVariantId" class="form-control" value="${productVariant.productVariantId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">
@@ -52,7 +52,7 @@
                                                                             <input type="text" id="productId" class="form-control" disabled="disabled" value="${product.productId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label for="productFamilyId">ProductFamily</label>
+                                                                            <label for="productFamilyId">Product Type</label>
                                                                             <input type="text" id="productFamilyId" class="form-control" disabled="disabled" value="${product.productFamily.familyName}"/>
                                                                         </div>
                                                                         <c:if test="${not empty detailsMasterGroup}">

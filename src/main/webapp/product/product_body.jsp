@@ -42,8 +42,8 @@
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#${masterGroup.id}">${masterGroup.name}</a></li>
                         </c:if>
                     </c:forEach>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Product Features</a></li>
-                    <li class="nav-item"><a class="nav-link js-productVariants-tab" data-toggle="tab" href="#productVariants">Product Variants</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#productFeatures">Features</a></li>
+                    <li class="nav-item"><a class="nav-link js-productVariants-tab" data-toggle="tab" href="#productVariants">Child Products</a></li>
                     <li class="nav-item"><a class="nav-link js-productCategories-tab" data-toggle="tab" href="#productCategories">Categories</a></li>
                 </ul>
                 <div class="tab-content">
@@ -72,7 +72,7 @@
                                                                             <input type="text" id="productId" name="productId" class="form-control" value="${product.productId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label for="productFamilyId">ProductFamily</label>
+                                                                            <label for="productFamilyId">Product Type</label>
                                                                             <input id="productFamilyId" class="form-control" type="text" disabled="disabled" value="${product.productFamily.familyName}"/>
                                                                         </div>
                                                                         <c:if test="${not empty detailsMasterGroup}">
@@ -594,7 +594,7 @@
                                         <div class="row p-b-25">
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
-                                                    <button id="js-create-variant" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Product Variant</span></button>
+                                                    <button id="js-create-variant" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Child Product</span></button>
                                                 </div>
                                             </div>
                                         </div>

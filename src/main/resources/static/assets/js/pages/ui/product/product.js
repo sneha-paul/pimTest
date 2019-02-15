@@ -81,10 +81,10 @@ $( document ).ready(function() {
             urlParams: urlParams,
             reordering: false,
             columns: [
-                { data: 'productVariantName', name : 'productVariantName' , title : 'Variant Name', render: function ( data, type, row, meta ) {
+                { data: 'productVariantName', name : 'productVariantName' , title : 'Child Product Name', render: function ( data, type, row, meta ) {
                     let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
                     return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
-                { data: 'externalId', name : 'externalId', title : 'Variant ID' }
+                { data: 'externalId', name : 'externalId', title : 'Child Product ID' }
             ]
         });
         $(this).removeClass('js-productVariants-tab').off('shown.bs.tab.productVariants');

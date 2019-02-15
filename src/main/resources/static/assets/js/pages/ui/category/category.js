@@ -97,10 +97,10 @@ $(function(){
             reordering: false,
             columns: [
                 { data: 'sequenceNum', name : 'sequenceNum', visible: false },
-                { data: 'productName', name : 'productName' , title : 'Product Name', width: '35%', render: function ( data, type, row, meta ) {
+                { data: 'productName', name : 'productName' , title : 'Parent Product Name', width: '35%', render: function ( data, type, row, meta ) {
                     let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
                     return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
-                { data: 'externalId', name : 'externalId', title : 'Product ID' }
+                { data: 'externalId', name : 'externalId', title : 'Parent Product ID' }
             ]
         });
         $(this).removeClass('js-products-tab').off('shown.bs.tab.products');
@@ -117,8 +117,8 @@ $(function(){
         reordering: true,
         columns: [
             { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
-            { data: 'productName', name : 'productName' , title : 'Product Name'},
-            { data: 'externalId', name : 'externalId', title : 'Product ID' }
+            { data: 'productName', name : 'productName' , title : 'Parent Product Name'},
+            { data: 'externalId', name : 'externalId', title : 'Parent Product ID' }
         ]
     });
 

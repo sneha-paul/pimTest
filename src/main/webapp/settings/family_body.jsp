@@ -31,14 +31,14 @@
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">
-                                                        <label for="familyName">Family Name</label><code
+                                                        <label for="familyName">Product Type Name</label><code
                                                             class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="familyName" name="familyName"
                                                                value="${family.familyName}"
                                                                class="form-control"/>
                                                     </div>
                                                     <div class="form-group js-external-id">
-                                                        <label for="familyId">Family ID</label><code
+                                                        <label for="familyId">Product Type ID</label><code
                                                             class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="familyId" name="familyId"
                                                                class="form-control"

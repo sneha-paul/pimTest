@@ -10,7 +10,7 @@
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#seo">SEO</a></li>
                     <li class="nav-item"><a class="nav-link js-subCategories-tab" data-toggle="tab" href="#subCategories">SubCategories</a></li>
-                    <li class="nav-item"><a class="nav-link js-products-tab" data-toggle="tab" href="#products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link js-products-tab" data-toggle="tab" href="#products">Parent Products</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">
@@ -153,7 +153,7 @@
                                 <div class="row p-b-25">
                                     <div class="col-lg-12 col-md-12">
                                         <div class="pull-right">
-                                            <button type="button" class="btn btn-success js-add-products"><i class="fa fa-plus"></i> <span class="p-l-5">Add Products</span></button>
+                                            <button type="button" class="btn btn-success js-add-products"><i class="fa fa-plus"></i> <span class="p-l-5">Add Parent Products</span></button>
                                             <button type="button" class="btn btn-sm btn-secondary js-sorting-mode products selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
                                             <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode products"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                         </div>

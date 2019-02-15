@@ -5,7 +5,7 @@
                 <div class="row p-b-25">
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
-                                <button id="js-create-family" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Family</span></button>
+                                <button id="js-create-family" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Product Type</span></button>
                         </div>
                     </div>
                 </div>
@@ -27,8 +27,8 @@
             pageUrl: '/pim/families/',
             dataUrl: '/pim/families/data',
             columns: [
-                { data: 'externalId', name : 'externalId', title : 'Family ID' },
-                { data: 'familyName', name : 'familyName' , title : 'Family Name'}
+                { data: 'externalId', name : 'externalId', title : 'Product Type ID' },
+                { data: 'familyName', name : 'familyName' , title : 'Product Type Name'}
             ]
         });
 

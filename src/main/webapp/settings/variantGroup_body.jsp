@@ -17,7 +17,7 @@
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details" onclick="window.location.hash=''">Details</a></li>
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#axisAttributes">Axis Attributes</a></li>
                     <c:if test="${not empty variantGroupAxisAttributes['AXIS_ATTRIBUTES_L1'] and (variantGroup.level eq 1 or not empty variantGroupAxisAttributes['AXIS_ATTRIBUTES_L2'])}">
-                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantAttributes">Variant Attributes</a></li>
+                        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#variantAttributes">Child Product Attributes</a></li>
                     </c:if>
                 </ul>
                 <div class="tab-content">
@@ -85,7 +85,7 @@
                                 <div class="col-lg-4 col-md-12">
                                     <div class="card bg-dark planned_task">
                                         <div class="header">
-                                            <h2>Product Level Attributes</h2>
+                                            <h2>Parent Product Attributes</h2>
                                             <%--<ul class="header-dropdown">
                                                 <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
                                             </ul>--%>
@@ -173,7 +173,7 @@
                                 <div class="col-lg-4 col-md-12">
                                     <div class="card bg-dark planned_task">
                                         <div class="header">
-                                            <h2>Product Level Attributes</h2>
+                                            <h2>Parent Product Attributes</h2>
                                             <%--<ul class="header-dropdown">
                                                 <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
                                             </ul>--%>
@@ -197,7 +197,7 @@
                                 <div class="col-lg-4 col-md-12">
                                     <div class="card bg-dark progress_task">
                                         <div class="header">
-                                            <h2>Variant Attributes - Level 1</h2>
+                                            <h2>Child Product Attributes - Level 1</h2>
                                             <%--<ul class="header-dropdown">
                                                 <li><a href="javascript:void(0);" data-toggle="modal" data-target="#addcontact"><i class="icon-plus"></i></a></li>
                                             </ul>--%>

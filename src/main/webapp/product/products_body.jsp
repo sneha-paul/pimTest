@@ -58,7 +58,7 @@
                         return content;
                     }
                 },
-                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Family', width: '15%' }
+                { data: 'productFamilyId', name : 'productFamilyId', title : 'Product Type', width: '15%' }
             ],
         });
 

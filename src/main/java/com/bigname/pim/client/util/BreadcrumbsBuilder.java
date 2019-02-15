@@ -230,7 +230,7 @@ public class BreadcrumbsBuilder {
             case "com.bigname.pim.api.domain.PricingAttribute":
                 return new String[] {"Pricing Attributes", "pricingAttributes"};
             case "com.bigname.pim.api.domain.Family":
-                return new String[] {"Families", "families"};
+                return new String[] {"Product Types", "families"};
             case "com.bigname.pim.api.domain.User":
                 return new String[] {"User", "users"};
             case "com.bigname.pim.api.domain.Event":

@@ -25,7 +25,7 @@
                                 <input type="text" id="productId" name="productId" class="form-control"/>
                             </div>
                             <div class="form-group">
-                                <label for="productFamilyId">Product Family</label>
+                                <label for="productFamilyId">Product Type</label>
                                 <select class="form-control" id="productFamilyId" name="productFamilyId">
                                     <option value="">Select One</option>
                                     <c:forEach items="${productFamilies}" var="productFamily">

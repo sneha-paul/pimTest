@@ -11,7 +11,7 @@
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
-                    <li class="nav-item"><a class="nav-link js-rootCategories-tab" data-toggle="tab" href="#rootCategories">RootCategories</a></li>
+                    <li class="nav-item"><a class="nav-link js-rootCategories-tab" data-toggle="tab" href="#rootCategories">Categories</a></li>
                     <li class="nav-item"><a class="nav-link js-hierarchy-tab" data-toggle="tab" href="#hierarchy">Hierarchy</a></li>
                 </ul>
                 <div class="tab-content">
@@ -55,13 +55,15 @@
                                                                    <c:if test="${catalog.active eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Active</span>
                                                         </label>
-                                                        <label for="discontinued" class="fancy-checkbox">
+                                                         <%-- discontinued commented as per client request --%>
+
+                                                        <%--<label for="discontinued" class="fancy-checkbox">
                                                             <input type="checkbox" id="discontinued" name="discontinued" value="Y"
                                                                    <c:if test="${catalog.discontinued eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Discontinued</span>
-                                                        </label>
+                                                        </label>--%>
                                                     </div>
-                                                    <div class="js-dateRange">
+                                                    <%--<div class="js-dateRange">
                                                         <div class="form-group">
                                                             <label>Discontinue From </label>
                                                             <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${catalog.discontinuedFrom}">
@@ -70,7 +72,7 @@
                                                             <label>Discontinue To </label>
                                                             <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${catalog.discontinuedTo}">
                                                         </div>
-                                                    </div>
+                                                    </div>--%>
                                                 </div>
                                             </div>
                                             <br>
