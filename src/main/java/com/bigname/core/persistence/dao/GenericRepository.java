@@ -3,6 +3,7 @@ package com.bigname.core.persistence.dao;
 import com.bigname.core.util.FindBy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.List;
@@ -21,4 +22,5 @@ public interface GenericRepository<T> {
     Optional<T> findOne(Map<String, Object> criteria);
     Optional<T> findOne(Criteria criteria);
     Page<T> findAll(Pageable pageable, boolean... activeRequired);
+    MongoTemplate getMongoTemplate();
 }

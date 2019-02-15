@@ -142,4 +142,9 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
                 pageable,
                 () -> mongoTemplate.count(query, entityClass));
     }
+
+    @Override
+    public MongoTemplate getMongoTemplate() {
+        return mongoTemplate;
+    }
 }

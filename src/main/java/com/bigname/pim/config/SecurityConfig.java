@@ -34,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/assets/**").permitAll()
+                .antMatchers("/actuator/health").permitAll()
                 .antMatchers( "/pim/user/**", "/forgotPassword").permitAll()
                 .antMatchers("/pim/feeds/**").permitAll()
                 .anyRequest().authenticated()
