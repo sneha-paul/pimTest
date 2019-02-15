@@ -165,8 +165,8 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                         if(isNotEmpty(attribute.getParentAttributeId())) {
                             model.put("parentAttribute", family.getAttribute(attribute.getParentAttributeId()).orElse(null));
                         }
-                        model.put("breadcrumbs", new Breadcrumbs("Families",
-                                "Families", "/pim/families",
+                        model.put("breadcrumbs", new Breadcrumbs("Product Types",
+                                "Product Types", "/pim/families",
                                 family.getFamilyName(), "/pim/families/" + family.getFamilyId(),
                                 "Attributes", "/pim/families/" + family.getFamilyId() + "#attributes",
                                 attribute.getName(), ""));
@@ -369,8 +369,8 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                 model.put("variantGroup", family.get().getVariantGroups().get(variantGroupId));
                 model.put("variantGroupAttributes", family.get().getVariantGroupAttributes(variantGroupId));
                 model.put("variantGroupAxisAttributes", family.get().getVariantGroupAxisAttributes(variantGroupId));
-                model.put("breadcrumbs", new Breadcrumbs("Families",
-                        "Families", "/pim/families",
+                model.put("breadcrumbs", new Breadcrumbs("Product Types",
+                        "Product Types", "/pim/families",
                         family.get().getFamilyName(), "/pim/families/" + family.get().getFamilyId(),
                         "Variant Groups", "/pim/families/" + family.get().getFamilyId() + "#variantGroups",
                         family.get().getVariantGroups().get(variantGroupId).getName(), ""));
