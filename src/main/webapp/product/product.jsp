@@ -4,7 +4,7 @@
 <c:choose>
     <c:when test="${mode eq 'DETAILS'}">
         <tiles:insertDefinition name="mainLayout">
-            <tiles:putAttribute name="title" value="PIM - Products"/>
+            <tiles:putAttribute name="title" value="PIM - Parent Products"/>
             <tiles:putAttribute name="body" value="/product/product_body.jsp"/>
         </tiles:insertDefinition>
     </c:when>
@@ -12,16 +12,16 @@
         <div class="popup-content" style="padding:20px">
             <div class="body">
                 <form method="post" action="/pim/products" data-method="POST"
-                      data-success-message='["Successfully created the product", "Product Created"]'
+                      data-success-message='["Successfully created the parent product", "Parent Product Created"]'
                       data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
                             <div class="form-group js-name">
-                                <label for="productName">Product Name</label>
+                                <label for="productName">Parent Product Name</label>
                                 <input type="text" name="productName" id="productName" class="form-control"/>
                             </div>
                             <div class="form-group js-external-id">
-                                <label for="productId">Product ID</label>
+                                <label for="productId">Parent Product ID</label>
                                 <input type="text" id="productId" name="productId" class="form-control"/>
                             </div>
                             <div class="form-group">

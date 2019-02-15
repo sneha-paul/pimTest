@@ -7,7 +7,7 @@
                 <div class="row p-b-25">
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
-                            <button id="js-create-product" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Product</span></button>
+                            <button id="js-create-product" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Parent Product</span></button>
                         </div>
                     </div>
                 </div>
@@ -34,13 +34,13 @@
             dataUrl: '/pim/products/data',
             columns: [
                 {
-                    data: 'productName', name : 'productName' , title : 'Product Name', width: '35%',
+                    data: 'productName', name : 'productName' , title : 'Parent Product Name', width: '35%',
                     render: function ( data, type, row, meta ) {
                         let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
                         return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'
                     }
                 },
-                { data: 'variantCount', name : 'variantCount', title : 'Variants', width: '20%',
+                { data: 'variantCount', name : 'variantCount', title : 'Child Products', width: '20%',
                     render: function ( data, type, row, meta ) {
                         let content = '<ul class="list-unstyled variant-info">';
 
@@ -66,7 +66,7 @@
             selector: '#js-create-product',
             url: $.getURL('/pim/products/create'),
             name:'create-product',
-            title:'Create Product',
+            title:'Create Parent Product',
             buttons: [
                 {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('products');$.closeModal();});}},
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}

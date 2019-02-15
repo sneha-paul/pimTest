@@ -26,7 +26,7 @@
                                         <form method="post"
                                               action="/pim/families/${family.familyId}"
                                               data-method="PUT"
-                                              data-success-message='["Successfully updated the family", "Family Updated"]'
+                                              data-success-message='["Successfully updated the product type", "Product Type Updated"]'
                                               data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">

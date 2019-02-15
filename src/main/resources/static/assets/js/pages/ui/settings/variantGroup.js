@@ -29,8 +29,8 @@ $(function(){
         $.ajaxSubmit({
             url: url,
             data: data,
-            successMessage: ['Updated Variant Group Attributes', 'Successfully updated variant group attributes'],
-            errorMessage: ['Error Updating Variant Group Attributes', 'An error occurred while updating variant group attributes']
+            successMessage: ['Updated Child Product Attributes', 'Successfully updated child product attributes'],
+            errorMessage: ['Error Updating Child Product Attributes', 'An error occurred while updating child product attributes']
         });
     }
 

@@ -48,7 +48,7 @@
                                                                             <input type="text" id="productVariantId" name="productVariantId" class="form-control" value="${productVariant.productVariantId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">
-                                                                            <label for="productId">Product ID</label>
+                                                                            <label for="productId">Parent Product ID</label>
                                                                             <input type="text" id="productId" class="form-control" disabled="disabled" value="${product.productId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">

@@ -3,7 +3,7 @@
 <c:choose>
     <c:when test="${mode eq 'DETAILS'}">
         <tiles:insertDefinition name="mainLayout">
-            <tiles:putAttribute name="title" value="PIM - Families"/>
+            <tiles:putAttribute name="title" value="PIM - Product Types"/>
             <tiles:putAttribute name="body" value="/settings/family_body.jsp"/>
         </tiles:insertDefinition>
     </c:when>

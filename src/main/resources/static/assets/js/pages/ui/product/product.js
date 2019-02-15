@@ -121,7 +121,7 @@ $( document ).ready(function() {
         url: $.getURL('/pim/products/{productId}/variants/create?ts=' + new Date().getTime()),
         data: {channelId: $.getPageAttribute('channelId')},
         name:'create-variant',
-        title:'Create Product Variant',
+        title:'Create Chile Product',
         buttons: [
            // {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('productVariants');$.closeModal();});}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}

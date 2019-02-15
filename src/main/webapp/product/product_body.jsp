@@ -54,7 +54,7 @@
                                 <div class="card inner overflowhidden">
                                     <div class="body">
                                         <form method="post" action="/pim/products/${product.productId}/channels/${product.channelId}" data-method="PUT"
-                                              data-success-message='["Successfully updated the product", "Product Updated"]'
+                                              data-success-message='["Successfully updated the parent product", "Parent Product Updated"]'
                                               data-error-message='["Check the error message(s) and try again", "Invalid Data"]'>
                                             <div class="card inner group overflowhidden">
                                                 <div class="body">
@@ -64,11 +64,11 @@
                                                                 <div class="row">
                                                                     <div class="col-md-6 col-sm-12">
                                                                         <div class="form-group">
-                                                                            <label for="productName">Product Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                            <label for="productName">Parent Product Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                                             <input type="text" id="productName" name="productName" value="${product.productName}" class="form-control" required="true"/>
                                                                         </div>
                                                                         <div class="form-group js-external-id">
-                                                                            <label for="productId">Product ID</label><code class="highlighter-rouge m-l-10">*</code>
+                                                                            <label for="productId">Parent Product ID</label><code class="highlighter-rouge m-l-10">*</code>
                                                                             <input type="text" id="productId" name="productId" class="form-control" value="${product.productId}" required="true"/>
                                                                         </div>
                                                                         <div class="form-group">

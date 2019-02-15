@@ -168,7 +168,7 @@ $(function(){
             url: $.getURL('/pim/categories/{categoryId}/products/available'),
             loadingHtml: '<span class="fa fa-circle-o-notch fa-spin fa-3x text-primary"></span><span class="h4">Loading</span>',
             name:'available-products',
-            title:'Available Products',
+            title:'Available Parent Products',
             size: eModal.size.lg,
             successCallback: function() {
 
