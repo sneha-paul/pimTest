@@ -5,6 +5,7 @@ import com.bigname.core.service.BaseService;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.FileAsset;
+import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import org.springframework.data.domain.Page;
@@ -55,4 +56,7 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
     ProductVariant setAsDefaultAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily);
 
     List<Map<String,Object>> getAll();
+
+    boolean setProductVariantsSequence(String productId, FindBy productIdFindBy, String channelId, FindBy channelIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy);
+
 }

@@ -20,4 +20,6 @@ public interface ProductVariantDAO extends GenericDAO<ProductVariant>, ProductVa
     Optional<ProductVariant> findByProductIdAndChannelIdAndExternalIdAndActiveIn(String productId, String channelId, String productVariantId, String active[]);
     Page<ProductVariant> findByProductIdAndChannelIdAndExternalIdNotInAndActiveIn(String productId, String channelId, String[] productVariantIds, String active[], Pageable pageable);
     Page<ProductVariant> findByProductIdAndChannelIdAndProductVariantIdAndActiveIn(String productId, String channelId, String productVariantId, String active[], Pageable pageable);
+    Optional<ProductVariant> findTopByProductIdAndChannelIdAndSequenceNumOrderBySubSequenceNumDesc(String productId, String channelId, int sequenceNum);
+    List<ProductVariant> findByProductIdAndChannelIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(String productId, String channelId, long sequenceNum, int subSequenceNum);
 }

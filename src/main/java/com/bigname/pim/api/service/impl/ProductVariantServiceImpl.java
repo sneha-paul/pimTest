@@ -18,15 +18,15 @@ import com.google.common.base.Preconditions;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isNotEmpty;
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection.DOWN;
+import static com.bigname.pim.util.PIMConstants.ReorderingDirection.UP;
 
 /**
  * Created by sruthi on 20-09-2018.
@@ -146,7 +146,8 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     @Override
     public Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
-            sort = new Sort(Sort.Direction.ASC, "externalId");
+            //sort = new Sort(Sort.Direction.ASC, "externalId");
+            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         if(productIdFindBy == FindBy.EXTERNAL_ID) {
             Optional<Product> _product = productDAO.findByExternalId(productId);
@@ -427,4 +428,65 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     public List<Map<String, Object>> getAll() {
         return productVariantDAO.getAll();
     }
+
+    @Override
+    public ProductVariant create(ProductVariant productVariant) {
+        Optional<ProductVariant> top = productVariantDAO.findTopByProductIdAndChannelIdAndSequenceNumOrderBySubSequenceNumDesc(productVariant.getProductId(), productVariant.getChannelId(), 0);
+        productVariant.setSubSequenceNum(top.map(productVariant1 -> productVariant1.getSubSequenceNum() + 1).orElse(0));
+        return super.create(productVariant);
+    }
+
+    @Override
+    public boolean setProductVariantsSequence(String productId, FindBy productIdFindBy, String channelId, FindBy channelIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy) {
+
+        return get(sourceId, sourceIdFindBy, channelId,  false)
+                .map(product -> {
+                    Map<String, ProductVariant> productVariantsMap = getAll(productId, productIdFindBy, channelId, new String[] {sourceId, destinationId}, FindBy.EXTERNAL_ID, null, false)
+                            .stream().collect(Collectors.toMap(ProductVariant::getProductVariantId, productVariant1 -> productVariant1));
+
+                    ProductVariant source = productVariantsMap.get(sourceId);
+                    ProductVariant destination = productVariantsMap.get(destinationId);
+
+                    PIMConstants.ReorderingDirection direction = DOWN;
+                    if(source.getSequenceNum() > destination.getSequenceNum() ||
+                            (source.getSequenceNum() == destination.getSequenceNum() && source.getSubSequenceNum() <= destination.getSubSequenceNum())) {
+                        direction = UP;
+                    }
+                    List<ProductVariant> modifiedProductVariants = new ArrayList<>();
+                    if(direction == DOWN) {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum());
+                        modifiedProductVariants.add(source);
+                        destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        modifiedProductVariants.add(destination);
+                        modifiedProductVariants.addAll(rearrangeOtherProductVariants(productId, source, destination, direction));
+                    } else {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        modifiedProductVariants.add(source);
+                        modifiedProductVariants.addAll(rearrangeOtherProductVariants(productId, source, destination, direction));
+                    }
+                    productVariantDAO.saveAll(modifiedProductVariants);
+                    return true;
+                }).orElse(false);
+    }
+
+    private List<ProductVariant> rearrangeOtherProductVariants(String productId, ProductVariant source, ProductVariant destination, PIMConstants.ReorderingDirection direction) {
+        List<ProductVariant> adjustedProductVariants = new ArrayList<>();
+        List<ProductVariant> productVariants = productVariantDAO.findByProductIdAndChannelIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(productId, destination.getChannelId(), destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
+        int subSequenceNum = direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum();
+        for(ProductVariant productVariant : productVariants) {
+            if(productVariant.getId().equals(source.getId()) || productVariant.getId().equals(destination.getId())) {
+                continue;
+            }
+            if(productVariant.getSubSequenceNum() == subSequenceNum) {
+                productVariant.setSubSequenceNum(++subSequenceNum);
+                adjustedProductVariants.add(productVariant);
+            } else {
+                break;
+            }
+        }
+        return adjustedProductVariants;
+    }
+
 }

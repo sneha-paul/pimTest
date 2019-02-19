@@ -134,6 +134,9 @@ public class POIUtil {
                     cell.setCellValue((Integer)obj);
             }
         }
+        for(int i = 0; i < data.size(); i ++) {
+            sheet.setColumnWidth(i, 15000);
+        }        
         try {
             FileOutputStream out = new FileOutputStream(new File(filePath));
             workbook.write(out);
@@ -169,6 +172,9 @@ public class POIUtil {
                         cell.setCellValue((Integer)obj);
                 }
             }
+            for(int i = 0; i < data.size(); i ++) {
+                sheet.setColumnWidth(i, 15000);
+            }
         });
 
         try {
@@ -181,6 +187,7 @@ public class POIUtil {
         }
         return true;
     }
+
 
     public static boolean writeJsonData(String filePath, String fileName, String data) {
 

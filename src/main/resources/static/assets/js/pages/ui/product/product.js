@@ -53,6 +53,7 @@ $( document ).ready(function() {
 
         }
     });
+
     var urlParams = {};
     if($.getPageAttribute('websiteId') !== '') {
         urlParams['websiteId'] = '{websiteId}';
@@ -73,14 +74,15 @@ $( document ).ready(function() {
 
     $('.js-productVariants-tab').on('shown.bs.tab.productVariants', function (e) {
         $.initAssociationsGrid({
-            selector: '#paginatedProductVariantsTable',
-            names: ['productVariants', 'productVariant'],
+            selector: '#paginatedProductVariantsSortableTable',
+            names: ['productVariantsSortable', 'productVariant'],
             pageUrl: $.getURL('/pim/products/{productId}/variants/'),
             dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
             toggleUrl: '/pim/products/{productId}/channels/{channelId}/variants/{externalId}/active/{active}',
             urlParams: urlParams,
             reordering: false,
             columns: [
+                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
                 { data: 'productVariantName', name : 'productVariantName' , title : 'Child Product Name', render: function ( data, type, row, meta ) {
                     let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
                     return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
@@ -88,6 +90,43 @@ $( document ).ready(function() {
             ]
         });
         $(this).removeClass('js-productVariants-tab').off('shown.bs.tab.productVariants');
+    });
+
+    $.initAssociationsGrid({
+        selector: '#paginatedProductVariantsReorderableTable',
+        names: ['productVariantsReorderable', 'productVariant'],
+        pageUrl: $.getURL('/pim/products/{productId}/variants/'),
+        dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
+        toggleUrl: '/pim/products/{productId}/channels/{channelId}/variants/{externalId}/active/{active}',
+        urlParams: urlParams,
+        reordering: true,
+        // reorderCallback: function() {$.refreshDataTable('categoriesHierarchy')},
+        columns: [
+            { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
+            { data: 'productVariantName', name : 'productVariantName' , title : 'Child Product Name', render: function ( data, type, row, meta ) {
+                let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
+                return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
+            { data: 'externalId', name : 'externalId', title : 'Child Product ID' }
+        ]
+    });
+
+    $('.js-sorting-mode.variants').on('click', function() {
+        if(!$(this).hasClass('selected')) {
+            $.refreshDataTable('productVariantsSortable');
+            $('a.nav-link[href*="sortableProductVariant"]').trigger('click');
+            $(this).parent().find('.js-reordering-mode.variants').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+        }
+
+    });
+
+    $('.js-reordering-mode.variants').on('click', function() {
+        if(!$(this).hasClass('selected')) {
+            $.refreshDataTable('productVariantsReorderable');
+            $('a.nav-link[href*="reorderableProductVariant"]').trigger('click');
+            $(this).parent().find('.js-sorting-mode.variants').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+        }
     });
 
     var urlParams1 = {};

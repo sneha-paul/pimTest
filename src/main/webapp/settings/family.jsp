@@ -11,7 +11,7 @@
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
                     <div class="body">
-                        <form method="post" action="/pim/families" data-method="POST" data-success-message='["Successfully created the family", "Family Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
+                        <form method="post" action="/pim/families" data-method="POST" data-success-message='["Successfully created the product type", "Product Type Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                             <div class="row">
                                 <div class="col-md-6 col-sm-12">
                                     <div class="form-group js-name">

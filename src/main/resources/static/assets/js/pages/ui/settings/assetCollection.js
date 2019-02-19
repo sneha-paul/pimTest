@@ -21,6 +21,7 @@ $(function(){
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });
+
     $('.js-folder').off().on('dblclick', function(){
         window.location.href = $.getURL('/pim/assetCollections/{collectionId}/assets/{assetId}', {assetId: $(this).attr('id')});
     });

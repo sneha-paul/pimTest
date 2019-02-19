@@ -99,7 +99,7 @@ abstract public class ControllerSupport {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
             LOGGER.error("Could not determine file type.");
-}
+        }
 
         // Fallback to the default content type if type could not be determined
         if(contentType == null) {

@@ -10,7 +10,6 @@ import com.bigname.core.data.exporter.BaseExporter;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.domain.EntityAssociation;
 import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.exception.FileNotFoundException;
 import com.bigname.core.service.BaseService;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.util.Toggle;
@@ -22,13 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,11 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static com.bigname.common.util.ValidationUtil.isEmpty;
@@ -120,7 +112,6 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     public ResponseEntity<Resource> exportFile(HttpServletRequest request) {
         String fileLocation = exportFileStorageLocation;
         String fileName = exporter.getFileName(BaseExporter.Type.XLSX);
-
         exporter.exportData(fileLocation + fileName);
         return downloadFile(fileLocation, fileName, request);
     }
@@ -140,20 +131,6 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
             }
         }
         return model;
-    }
-
-    protected Resource loadFileAsResource(String fileLocation, String fileName) {
-        try {
-            Path filePath = Paths.get(fileLocation).resolve(fileName).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-            if(resource.exists()) {
-                return resource;
-            } else {
-                throw new FileNotFoundException("File not found " + fileName);
-            }
-        } catch (MalformedURLException ex) {
-            throw new FileNotFoundException("File not found " + fileName, ex);
-        }
     }
 
     @Override

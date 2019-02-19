@@ -1,5 +1,6 @@
 package com.bigname.pim;
 
+import com.bigname.core.config.ConfigProperties;
 import com.bigname.core.config.EmailConfig;
 import com.bigname.core.config.TilesConfig;
 import com.bigname.pim.config.CacheConfig;
@@ -8,6 +9,7 @@ import com.bigname.pim.config.WebConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -18,6 +20,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor"})
 @EnableMongoRepositories(basePackages = {"com.bigname.pim.api.persistence"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern="com.bigname.core.persistence.dao.GenericDAO")})
 @EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass = true)
+@EnableConfigurationProperties(ConfigProperties.class)
 //@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)
 //@EnableLoadTimeWeaving
 //

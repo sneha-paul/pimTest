@@ -7,6 +7,7 @@ import com.bigname.core.domain.Entity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.Family;
 import com.bigname.pim.api.domain.Product;
+import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.ProductVariantService;
@@ -30,6 +31,8 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
 
     @Autowired
     private FamilyService familyService;
+    @Autowired
+    private ProductService productService;
 
     public boolean exportData(String filePath) {
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
@@ -51,8 +54,8 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
                 }
 
                 Map<String, Object> scopedProductAttributes = (Map<String, Object>)((Map<String, Object>)variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
-                Map<String, Object> pricingDetails = (Map<String, Object>)(Map<String, Object>)variant.get("pricingDetails");
-                Map<String, Object> variantAttributes = (Map<String, Object>)(Map<String, Object>)variant.get("variantAttributes");
+                Map<String, Object> pricingDetails = (Map<String, Object>)variant.get("pricingDetails");
+                Map<String, Object> variantAttributes = (Map<String, Object>)variant.get("variantAttributes");
                 if(scopedProductAttributes != null) {
                     variantAttributesMap.putAll(scopedProductAttributes);
                 } else {
@@ -114,8 +117,8 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
                 }
 
                 Map<String, Object> scopedProductAttributes = (Map<String, Object>)((Map<String, Object>)variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
-                Map<String, Object> pricingDetails = (Map<String, Object>)(Map<String, Object>)variant.get("pricingDetails");
-                Map<String, Object> variantAttributes = (Map<String, Object>)(Map<String, Object>)variant.get("variantAttributes");
+                Map<String, Object> pricingDetails = (Map<String, Object>)variant.get("pricingDetails");
+                Map<String, Object> variantAttributes = (Map<String, Object>)variant.get("variantAttributes");
                 if(scopedProductAttributes != null) {
                     variantAttributesMap.putAll(scopedProductAttributes);
                 } else {
@@ -137,6 +140,28 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
         });
 
         POIUtil.writeJsonData(filePath, "Product", ConversionUtil.toJSONString(variantsAttributes));
+        return true;
+    }
+
+    public boolean exportProductsData(String filePath){
+        List<Product> products =  productService.getAll(null, false);
+        List<List<Object>> data = new ArrayList<>();
+        data.add(Arrays.asList(new String[]{"PARENT PRODUCT NAME", "PARENT PRODUCT ID"}));
+        products.forEach(product -> data.add(Arrays.asList(product.getProductName(), product.getExternalId())));
+        POIUtil.writeData(filePath, "Parent Products", data);
+        return true;
+    }
+
+    public boolean exportChildProductsData(String filePath){
+        List<List<Object>> data = new ArrayList<>();
+        List<Product> products =  productService.getAll(null, false);
+        data.add(Arrays.asList(new String[]{"CHILD PRODUCT NAME", "CHILD PRODUCT ID", "PARENT PRODUCT ID"}));
+        products.forEach(product -> {
+            List<ProductVariant> variants =  productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, product.getChannelId(), null, false);
+            variants.forEach(variant -> data.add(Arrays.asList(variant.getProductVariantName(), variant.getProductVariantId(),product.getExternalId())));
+        });
+
+        POIUtil.writeData(filePath, "Child Products", data);
         return true;
     }
 }

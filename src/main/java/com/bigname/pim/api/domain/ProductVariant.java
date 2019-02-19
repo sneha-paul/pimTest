@@ -49,6 +49,9 @@ public class ProductVariant extends Entity<ProductVariant> {
     @NotEmpty(message = "Channel Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String channelId;
 
+    private long sequenceNum;
+    private int subSequenceNum;
+
     public ProductVariant() {
         super();
     }
@@ -56,7 +59,7 @@ public class ProductVariant extends Entity<ProductVariant> {
     public ProductVariant(Product product) {
         super();
         setProduct(product);
-    }
+     }
 
     public ProductVariant(String externalId, String productVariantName) {
         super(externalId);
@@ -152,6 +155,22 @@ public class ProductVariant extends Entity<ProductVariant> {
         return ProductUtil.getDefaultAsset(this, FileAsset.AssetFamily.ASSETS);
     }
 
+    public long getSequenceNum() {
+        return sequenceNum;
+    }
+
+    public void setSequenceNum(long sequenceNum) {
+        this.sequenceNum = sequenceNum;
+    }
+
+    public int getSubSequenceNum() {
+        return subSequenceNum;
+    }
+
+    public void setSubSequenceNum(int subSequenceNum) {
+        this.subSequenceNum = subSequenceNum;
+    }
+
     protected void setExternalId() {
         this.productVariantId = getExternalId();
     }
@@ -210,6 +229,7 @@ public class ProductVariant extends Entity<ProductVariant> {
         } else {
             map.put("imageName", "noimage.png");
         }
+        map.put("sequenceNum", String.valueOf(getSequenceNum()));
         return map;
     }
     CollectionsUtil collectionsUtil = new CollectionsUtil();

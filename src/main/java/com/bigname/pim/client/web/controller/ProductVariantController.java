@@ -6,6 +6,7 @@ import com.bigname.common.datatable.model.Result;
 import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ReflectionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.domain.ValidatableEntity;
@@ -238,33 +239,134 @@ public class ProductVariantController extends ControllerSupport {
         });
     }
 
-    @RequestMapping("/{productId}/channels/{channelId}/variants/data")
+    /*@RequestMapping("/{productId}/channels/{channelId}/variants/data")
     @ResponseBody
     public Result<Map<String, String>> allChannelVariants(@PathVariable(name = "productId") String productId, @PathVariable(name = "channelId") String channelId, HttpServletRequest request) {
+
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
         result.setDraw(dataTableRequest.getDraw());
-        if(isNotEmpty(productId) && isNotEmpty(channelId)) {
-            productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
-                Sort sort = null;
-                if (pagination.hasSorts()) {
-                    sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-                } else {
-                    sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-                }
-                Page<ProductVariant> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false):
-                        productVariantService.findAll("productVariantName", dataTableRequest.getSearch(),product.getId(), FindBy.INTERNAL_ID, channelId, PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-                List<Map<String, String>> dataObjects = new ArrayList<>();
-                paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-                result.setDataObjects(dataObjects);
-                result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-                result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            });
+
+        if(isEmpty(dataTableRequest.getSearch())) {
+            if(isNotEmpty(productId) && isNotEmpty(channelId)) {
+                productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                    Sort sort = null;
+                    if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+                        sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+                    }
+                    Page<ProductVariant> paginatedResult = productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    int seq[] = {1};
+                    paginatedResult.getContent().forEach(e -> {
+                        e.setSequenceNum(Long.parseLong(Integer.toString(seq[0] ++)));
+                        dataObjects.add(e.toMap());
+                    });
+
+                    result.setDataObjects(dataObjects);
+                    result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+                    result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
+                });
+
+            }
+            return result;
         } else {
-            //TODO - send error message
+
+            if(isNotEmpty(productId) && isNotEmpty(channelId)) {
+                productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                    Sort sort = null;
+                    if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+                        sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+                    } else {
+                        sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "productVariantName")); //TODO : verify this logic
+                    }
+                    Page<ProductVariant> paginatedResult = productVariantService.findAll("productVariantName", dataTableRequest.getSearch(),product.getId(), FindBy.INTERNAL_ID, channelId, PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    int seq[] = {1};
+                    paginatedResult.getContent().forEach(e -> {
+                        e.setSequenceNum(Long.parseLong(Integer.toString(seq[0] ++)));
+                        dataObjects.add(e.toMap());
+                    });
+
+                    result.setDataObjects(dataObjects);
+                    result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+                    result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
+                });
+
+            }
+            return result;
         }
+
         return result;
+    }*/
+
+    //================================================================================================================================
+    @RequestMapping("/{productId}/channels/{channelId}/variants/data")
+    @ResponseBody
+    public Result<Map<String, String>> allChannelVariants(@PathVariable(name = "productId") String productId, @PathVariable(name = "channelId") String channelId, HttpServletRequest request) {
+
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+
+        if(isEmpty(dataTableRequest.getSearch())) {
+            if(isNotEmpty(productId) && isNotEmpty(channelId)) {
+                productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                    Sort sort = null;
+                    if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+                        sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+                    }
+                    Page<ProductVariant> paginatedResult = productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    int seq[] = {1};
+                    paginatedResult.getContent().forEach(e -> {
+                        e.setSequenceNum(Long.parseLong(Integer.toString(seq[0] ++)));
+                        dataObjects.add(e.toMap());
+                    });
+
+                    result.setDataObjects(dataObjects);
+                    result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+                    result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+                });
+
+            }
+            return result;
+        } else {
+
+            if(isNotEmpty(productId) && isNotEmpty(channelId)) {
+                productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                    Sort sort = null;
+                    if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
+                        sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+                    } else {
+                        sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "productVariantName")); //TODO : verify this logic
+                    }
+                    Page<ProductVariant> paginatedResult = productVariantService.findAll("productVariantName", dataTableRequest.getSearch(),product.getId(), FindBy.INTERNAL_ID, channelId, PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    int seq[] = {1};
+                    paginatedResult.getContent().forEach(e -> {
+                        e.setSequenceNum(Long.parseLong(Integer.toString(seq[0] ++)));
+                        dataObjects.add(e.toMap());
+                    });
+
+                    result.setDataObjects(dataObjects);
+                    result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+                    result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+                });
+
+            }
+            return result;
+        }
+    }
+
+    @RequestMapping(value = "/{productId}/channels/{channelId}/variants/data", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> setProductVariantsSequence(@PathVariable(name = "productId") String productId, @PathVariable(name = "channelId") String channelId, @RequestParam Map<String, String> parameterMap) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = productVariantService.setProductVariantsSequence(productId, FindBy.EXTERNAL_ID, channelId, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value = {"/{productId}/variants/{variantId}/pricingDetails/{pricingAttributeId}", "/{productId}/variants/{variantId}/pricingDetails"})

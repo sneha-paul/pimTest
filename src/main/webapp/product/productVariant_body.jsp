@@ -167,6 +167,16 @@
                                                                         </div>
                                                                         <div class="js-dateRange">
                                                                             <div class="form-group">
+                                                                                <label>Active From </label>
+                                                                                <input type="text" class="form-control dateUI js-start" name="activeFrom" value="${productVariant.activeFrom}">
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Active To </label>
+                                                                                <input type="text" class="form-control dateUI js-end" name="activeTo" value="${productVariant.activeTo}">
+                                                                            </div>
+                                                                        </div>
+                                                                       <%-- <div class="js-dateRange">
+                                                                            <div class="form-group">
                                                                                 <label>Discontinue From </label>
                                                                                 <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${productVariant.discontinuedFrom}">
                                                                             </div>
@@ -174,7 +184,7 @@
                                                                                 <label>Discontinue To </label>
                                                                                 <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${productVariant.discontinuedTo}">
                                                                             </div>
-                                                                        </div>
+                                                                        </div>--%>
                                                                     </div>
                                                                 </div>
                                                             </div>

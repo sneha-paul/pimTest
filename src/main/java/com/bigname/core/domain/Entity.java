@@ -31,6 +31,12 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     private String discontinued = "N";
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate activeFrom;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate activeTo;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate discontinuedFrom;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -82,6 +88,22 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
             active = "N";
         }
         this.active = toYesNo(active,"Y");
+    }
+
+    public LocalDate getActiveFrom() {
+        return activeFrom;
+    }
+
+    public void setActiveFrom(LocalDate activeFrom) {
+        this.activeFrom = activeFrom;
+    }
+
+    public LocalDate getActiveTo() {
+        return activeTo;
+    }
+
+    public void setActiveTo(LocalDate activeTo) {
+        this.activeTo = activeTo;
     }
 
     public String getDiscontinued() {
@@ -216,6 +238,36 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
                     setDiscontinued("N");
                 } else if (!getDiscontinuedTo().isBefore(LocalDate.now())) { // If its not passed, keep discontinued as 'Y'
                     setDiscontinued("Y");
+                }
+            }
+        }
+        //Orchestration is called prior to validation, perform activation related orchestration if there is at least one date and the date range is valid
+        if((getActiveFrom() != null && getActiveTo() != null && !getActiveFrom().isAfter(getActiveTo()))
+                || !(getActiveFrom() != null && getActiveTo() != null)) {
+            //If activeFromDate is not null and activeToDate is not null
+            if (getActiveFrom() != null && getActiveTo() != null) {
+
+                //If activeFromDate already passed and activeToDate not passed, activate the item
+                if (!getActiveFrom().isAfter(LocalDate.now()) && !getActiveTo().isBefore(LocalDate.now())) {
+                    setActive("Y");
+                } else if (getActiveFrom().isAfter(LocalDate.now()) || getActiveTo().isBefore(LocalDate.now())) { // Otherwise set Active to 'N'
+                    setActive("N");
+                }
+            } else if (getActiveFrom() != null) { //If activeFromDate is not null and activeToDate is null
+
+                //If activeFromDate already passed, activate the item
+                if (!getActiveFrom().isAfter(LocalDate.now())) {
+                    setActive("Y");
+                } else if (getActiveFrom().isAfter(LocalDate.now())) { // Otherwise set Active to 'N'
+                    setActive("N");
+                }
+            } else if (getActiveTo() != null) { //If activeFromDate is null and activeToDate is not null
+
+                //If activeToDate already passed, set Active to 'N'
+                if (getActiveTo().isBefore(LocalDate.now())) {
+                    setActive("N");
+                } else if (!getActiveTo().isBefore(LocalDate.now())) { // If its not passed, keep Active as 'Y'
+                    setActive("Y");
                 }
             }
         }

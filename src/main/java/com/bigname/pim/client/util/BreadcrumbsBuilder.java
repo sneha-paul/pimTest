@@ -66,8 +66,11 @@ public class BreadcrumbsBuilder {
                 this.services.put("userService", baseService);
             } else if(baseService instanceof EventService) {
                 this.services.put("eventService", baseService);
+            } else if(baseService instanceof ConfigService) {
+                this.services.put("configService", baseService);
+            } else if(baseService instanceof AssetFamilyService) {
+                this.services.put("assetFamilyService", baseService);
             }
-
 
         });
     }
@@ -235,6 +238,10 @@ public class BreadcrumbsBuilder {
                 return new String[] {"User", "users"};
             case "com.bigname.pim.api.domain.Event":
                 return new String[] {"Event", "events"};
+            case "com.bigname.pim.api.domain.Config":
+                return new String[] {"Config", "configs"};
+            case "com.bigname.pim.api.domain.AssetFamily":
+                return new String[] {"AssetFamily", "assetFamilies"};
         }
         return new String[] {"", "", "", ""};
     }
@@ -263,6 +270,10 @@ public class BreadcrumbsBuilder {
                 return ((UserService)services.get("userService")).get(id, FindBy.EXTERNAL_ID, false).map(User::getUserName).orElse("");
             case "com.bigname.pim.api.domain.Event":
                 return ((EventService)services.get("eventService")).get(id, FindBy.EXTERNAL_ID, false).map(Event::getUser).orElse("");
+            case "com.bigname.pim.api.domain.Config":
+                return ((ConfigService)services.get("configService")).get(id, FindBy.EXTERNAL_ID, false).map(Config::getConfigName).orElse("");
+            case "com.bigname.pim.api.domain.AssetFamily":
+                return ((AssetFamilyService)services.get("assetFamilyService")).get(id, FindBy.EXTERNAL_ID, false).map(AssetFamily::getAssetFamilyName).orElse("");
         }
         return "";
     }

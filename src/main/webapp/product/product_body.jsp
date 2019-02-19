@@ -165,6 +165,16 @@
                                                                         </div>
                                                                         <div class="js-dateRange">
                                                                             <div class="form-group">
+                                                                                <label>Active From </label>
+                                                                                <input type="text" class="form-control dateUI js-start" name="activeFrom" value="${product.activeFrom}">
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Active To </label>
+                                                                                <input type="text" class="form-control dateUI js-end" name="activeTo" value="${product.activeTo}">
+                                                                            </div>
+                                                                        </div>
+                                                                       <%-- <div class="js-dateRange">
+                                                                            <div class="form-group">
                                                                                 <label>Discontinue From </label>
                                                                                 <input type="text" class="form-control dateUI js-start" name="discontinuedFrom" value="${product.discontinuedFrom}">
                                                                             </div>
@@ -172,7 +182,7 @@
                                                                                 <label>Discontinue To </label>
                                                                                 <input type="text" class="form-control dateUI js-end" name="discontinuedTo" value="${product.discontinuedTo}">
                                                                             </div>
-                                                                        </div>                                                                    </div>
+                                                                        </div>    --%>                                                                </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -589,17 +599,30 @@
                     <div class="tab-pane" id="productVariants">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div class="row p-b-25">
-                                            <div class="col-lg-12 col-md-12">
-                                                <div class="pull-right">
-                                                    <button id="js-create-variant" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Child Product</span></button>
-                                                </div>
-                                            </div>
+                                <div class="row p-b-25">
+                                    <div class="col-lg-12 col-md-12">
+                                        <div class="pull-right">
+                                            <button id="js-create-variant" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Child Product</span></button>
+                                            <button type="button" class="btn btn-sm btn-secondary js-sorting-mode variants selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode variants"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                         </div>
+                                    </div>
+                                </div>
+                                <ul class="nav nav-tabs-new2" style="position: absolute; top: -1000px">
+                                    <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#sortableProductVariant">Sortable</a></li>
+                                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#reorderableProductVariant">Reorderable</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane show active" id="sortableProductVariant">
                                         <div class="table-responsive scrollable-dt">
-                                            <table id="paginatedProductVariantsTable" class="table table-hover dataTable table-custom c_list" style="width: 100%">
+                                            <table id="paginatedProductVariantsSortableTable" class="table table-hover dataTable table-custom c_list" style="width: 100%">
+                                                <thead class="thead-dark"></thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="reorderableProductVariant">
+                                        <div class="table-responsive scrollable-dt no-filter">
+                                            <table id="paginatedProductVariantsReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
                                                 <thead class="thead-dark"></thead>
                                             </table>
                                         </div>
@@ -608,6 +631,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="tab-pane" id="productCategories">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">

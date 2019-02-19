@@ -27,6 +27,17 @@ abstract public class ConversionUtil {
         return toObjectList(true, varArgs).stream().map(e -> (T)e).collect(Collectors.toList());
     }
 
+    public static String getValue(String... varArg) {
+        return varArg != null && varArg. length > 0 ? varArg[0] : null;
+    }
+
+    public static int getValue(int... varArg) {
+        return varArg != null && varArg. length > 0 ? varArg[0] : 0;
+    }
+
+    public static boolean getValue(boolean... varArg) {
+        return (varArg != null && varArg.length > 0) && varArg[0];
+    }
     /**
      * Convert the given varArgs into a list.
      * All null elements in the varArgs will be ignored

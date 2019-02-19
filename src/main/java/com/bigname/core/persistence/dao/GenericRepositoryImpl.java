@@ -92,16 +92,29 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
         Query query = new Query();
         Criteria criteria = new Criteria();
         String[] activeOptions = PimUtil.getActiveOptions(activeRequired);
-        Criteria activeCriteria;
+        Criteria activeCriteria = new Criteria();
         if(activeOptions.length == 2) {
             activeCriteria = Criteria.where("active").in(Arrays.asList(activeOptions));
         } else if(activeOptions.length == 0){
-            activeCriteria = Criteria.where("active").nin(Arrays.asList(new String[]{"Y", "N"}));
-        } else {
+            activeCriteria = null;
+            //activeCriteria = Criteria.where("active").nin(Arrays.asList(new String[]{"Y", "N"}));
+        } else if(activeOptions.length == 1){
             if(activeOptions[0].equals("Y")) {
-                activeCriteria = Criteria.where("active").is("Y");
+                activeCriteria.orOperator(
+                        Criteria.where("activeFrom").is(null).and("activeTo").is(null).and("active").is("Y"),
+                        Criteria.where("activeFrom").ne(null).lte(LocalDateTime.now()).and("activeTo").ne(null).gte(LocalDateTime.now()),
+                        Criteria.where("activeFrom").ne(null).lte(LocalDateTime.now()).and("activeTo").is(null),
+                        Criteria.where("activeFrom").is(null).and("activeTo").ne(null).gte(LocalDateTime.now())
+                );
+               // activeCriteria = Criteria.where("active").is("Y");
             } else {
-                activeCriteria = Criteria.where("active").is("N");
+                activeCriteria.orOperator(
+                        Criteria.where("activeFrom").is(null).and("activeTo").is(null).and("active").is("N"),
+                        Criteria.where("activeFrom").ne(null).gt(LocalDateTime.now()),
+                        Criteria.where("activeFrom").is(null).and("activeTo").ne(null).lt(LocalDateTime.now().minusDays(1)),
+                        Criteria.where("activeFrom").ne(null).lte(LocalDateTime.now()).and("activeTo").ne(null).lt(LocalDateTime.now().minusDays(1))
+                );
+                //activeCriteria = Criteria.where("active").is("N");
             }
         }
 
@@ -119,7 +132,12 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
                     Criteria.where("discontinuedFrom").ne(null).lte(LocalDateTime.now()).and("discontinuedTo").is(null),
                     Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).gte(LocalDateTime.now())
             );
-            criteria.orOperator(activeCriteria, discontinueCriteria);
+            if(activeCriteria != null){
+                criteria.orOperator(activeCriteria, discontinueCriteria);
+            } else {
+                criteria.orOperator(discontinueCriteria);
+            }
+
         } else {
             //Not discontinued
             // (start == null && end == null && disc != 'Y') or
@@ -134,7 +152,11 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
                     Criteria.where("discontinuedFrom").is(null).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1)),
                     Criteria.where("discontinuedFrom").ne(null).lte(LocalDateTime.now()).and("discontinuedTo").ne(null).lt(LocalDateTime.now().minusDays(1))
             );
-            criteria.andOperator(activeCriteria, discontinueCriteria);
+            if(activeCriteria != null) {
+                criteria.andOperator(activeCriteria, discontinueCriteria);
+            } else {
+                criteria.andOperator(discontinueCriteria);
+            }
         }
         query.addCriteria(criteria).with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()));
         return PageableExecutionUtils.getPage(

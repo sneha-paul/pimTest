@@ -47,7 +47,7 @@ public class WebsiteRepositoryTest {
         websiteDTO.setActive("Y");
         websiteDTO.setUrl("https://www.test1.com");
         Website website = websiteDAO.insert(websiteDTO);
-        Assert.assertFalse(website.diff(websiteDTO).isEmpty());
+        Assert.assertTrue(website.diff(websiteDTO).isEmpty());
 
     }
 
@@ -132,7 +132,41 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), true).getTotalElements(), activeCount[0]);
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, true).getTotalElements(), inactiveCount[0]);
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, false).getTotalElements(), 0);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, false, true).getTotalElements(), 0);
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+
+        websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", "2019-02-13 10:11:25.414", "activeTo", "2019-02-14 10:11:25.414"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", "2019-02-14 10:11:25.414"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "activeFrom", "2019-02-18 10:11:25.414"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "N", "activeFrom", null, "activeTo", null));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", "2019-02-13 10:11:25.414", "activeTo", "2019-02-18 10:11:25.414"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "activeFrom", "2019-02-13 10:11:25.414", "activeTo", null));
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "activeFrom", null, "activeTo", null));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y", "activeFrom", null, "activeTo", null));
+        int[] activeCount1 = {0}, inactiveCount1 = {0};
+        websiteDTOs = websitesData.stream().map(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            if("Y".equals(websiteData.get("active"))) {
+                activeCount1[0] ++;
+            } else {
+                inactiveCount1[0] ++;
+            }
+            return websiteDTO;
+        }).collect(Collectors.toList());
+
+        websiteDAO.insert(websiteDTOs);
+
+//        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size())).getTotalElements(), activeCount[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), true).getTotalElements(), activeCount1[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, true).getTotalElements(), inactiveCount1[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, false, true).getTotalElements(), 0);
 
 
     }
