@@ -6,6 +6,7 @@ import com.bigname.core.util.FindBy;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -133,5 +134,28 @@ public class PimUtil {
 
     public static String getTimestamp() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+    }
+
+    public static boolean isActive(String active, LocalDateTime from, LocalDateTime to){
+        return isBetween(from,to) || "Y".equals(active);
+    }
+
+    public static boolean isBetween(LocalDateTime from, LocalDateTime to){
+
+        LocalDateTime now = LocalDateTime.now();
+        if( from != null && to != null ){
+            return from.isBefore(now) && to.isAfter(now);
+        } else if( from != null ) {
+            return from.isBefore(now);
+        } else if( to != null ) {
+            return to.isAfter(now);
+        }else {
+            return false;
+        }
+
+    }
+
+    public static boolean hasDiscontinued(String active, LocalDateTime from, LocalDateTime to){
+        return isBetween(from,to) || "Y".equals(active);
     }
 }

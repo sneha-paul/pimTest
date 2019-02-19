@@ -3,7 +3,9 @@ package com.bigname.pim.api.persistence.dao;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
+import com.bigname.pim.api.cache.PIMCache;
 import com.bigname.pim.api.domain.Website;
+import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,6 +18,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -136,13 +140,17 @@ public class WebsiteRepositoryTest {
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        LocalDate tomorrow = today.plusDays(1);
+
         websitesData = new ArrayList<>();
-        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", "2019-02-13 10:11:25.414", "activeTo", "2019-02-14 10:11:25.414"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", "2019-02-14 10:11:25.414"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "activeFrom", "2019-02-18 10:11:25.414"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", yesterday, "activeTo", today));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", today));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "activeFrom", tomorrow));
         websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "N", "activeFrom", null, "activeTo", null));
-        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", "2019-02-13 10:11:25.414", "activeTo", "2019-02-18 10:11:25.414"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "activeFrom", "2019-02-13 10:11:25.414", "activeTo", null));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", yesterday, "activeTo", tomorrow));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "activeFrom", yesterday, "activeTo", null));
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "activeFrom", null, "activeTo", null));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y", "activeFrom", null, "activeTo", null));
         int[] activeCount1 = {0}, inactiveCount1 = {0};
@@ -152,7 +160,9 @@ public class WebsiteRepositoryTest {
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
             websiteDTO.setActive((String)websiteData.get("active"));
             websiteDTO.setUrl((String)websiteData.get("url"));
-            if("Y".equals(websiteData.get("active"))) {
+            websiteDTO.setActiveFrom((LocalDate)websiteData.get("activeFrom"));
+            websiteDTO.setActiveTo((LocalDate)websiteData.get("activeTo"));
+            if(PimUtil.isActive(websiteDTO.getActive(), websiteDTO.getActiveFrom() != null ? websiteDTO.getActiveFrom().atStartOfDay() : null, websiteDTO.getActiveTo() != null ? websiteDTO.getActiveTo().atStartOfDay() : null)) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;

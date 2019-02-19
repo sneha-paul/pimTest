@@ -27,15 +27,16 @@ $( document ).ready(function() {
             dataType: 'json'
         }).done(function(data) {
             if(data.success === true) {
-                $.refreshDataTable('productVariants');
+                $.refreshDataTable('productVariantsSortable');
+                $.refreshDataTable('productVariantsReorderable');
                 $.refreshDataTable('availableProductVariants');
                 toastr.success('Successfully created the variant', 'Variant Created');
             } else {
-                toastr.success('Error occurred while creating the variant', 'Error Creating Variant');
+                toastr.error('Error occurred while creating the variant', 'Error Creating Variant');
             }
 
         }).fail(function(jqXHR, status) {
-            toastr.success('Error occurred while creating the variant', 'Error Creating Variant');
+            toastr.error('Error occurred while creating the variant', 'Error Creating Variant');
         });
     }
 });

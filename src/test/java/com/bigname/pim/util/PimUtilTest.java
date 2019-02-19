@@ -1,6 +1,10 @@
 package com.bigname.pim.util;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.Assert.*;
 
@@ -112,4 +116,51 @@ public class PimUtilTest {
     public void buildCriteria() throws Exception {
     }
 
+    @Test
+    public void isActive(){
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime tomorrow = today.plusDays(1);
+
+        Assert.assertTrue(PimUtil.isActive("Y", null, null));
+        Assert.assertFalse(PimUtil.isActive("N", null, null));
+
+        Assert.assertTrue(PimUtil.isActive("Y", yesterday, null));
+        Assert.assertTrue(PimUtil.isActive("N", yesterday, null));
+        Assert.assertTrue(PimUtil.isActive("Y", today, null));
+        Assert.assertTrue(PimUtil.isActive("N", today, null));
+        Assert.assertTrue(PimUtil.isActive("Y", tomorrow, null));
+        Assert.assertFalse(PimUtil.isActive("N", tomorrow, null));
+
+        Assert.assertTrue(PimUtil.isActive("Y", null, yesterday));
+        Assert.assertFalse(PimUtil.isActive("N", null, yesterday));
+        Assert.assertTrue(PimUtil.isActive("Y", null, today));
+        Assert.assertFalse(PimUtil.isActive("N", null, today));
+        Assert.assertTrue(PimUtil.isActive("Y", null, tomorrow));
+        Assert.assertTrue(PimUtil.isActive("N", null ,tomorrow));
+    }
+
+    @Test
+    public void hasDiscontinued(){
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime tomorrow = today.plusDays(1);
+
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, null));
+        Assert.assertFalse(PimUtil.hasDiscontinued("N", null, null));
+
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", yesterday, null));
+        Assert.assertTrue(PimUtil.hasDiscontinued("N", yesterday, null));
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", today, null));
+        Assert.assertTrue(PimUtil.hasDiscontinued("N", today, null));
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", tomorrow, null));
+        Assert.assertFalse(PimUtil.hasDiscontinued("N", tomorrow, null));
+
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, yesterday));
+        Assert.assertFalse(PimUtil.hasDiscontinued("N", null, yesterday));
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, today));
+        Assert.assertFalse(PimUtil.hasDiscontinued("N", null, today));
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, tomorrow));
+        Assert.assertTrue(PimUtil.hasDiscontinued("N", null ,tomorrow));
+    }
 }

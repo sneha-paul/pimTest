@@ -119,7 +119,7 @@ public class ProductVariantController extends ControllerSupport {
                 if(isNotEmpty(variantGroup) && isNotEmpty(variantGroup.getVariantAxis().get(1))) {
                     List<String> axisAttributeTokens = StringUtil.splitPipeDelimitedAsList(variantIdentifier);
                     Map<String, String> axisAttributes = new HashMap<>();
-                    StringBuilder tempId = new StringBuilder();
+                    StringBuilder tempId = new StringBuilder(productId);
                     StringBuilder tempName = new StringBuilder();
                     for (int i = 0; i < axisAttributeTokens.size(); i = i + 2) {
                         axisAttributes.put(axisAttributeTokens.get(i), axisAttributeTokens.get(i + 1));
