@@ -65,7 +65,7 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @RequestMapping(value = "/{categoryId}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category, @RequestParam Map<String, Object> parameterMap) {
+    public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
         return update(categoryId, category, "/pim/categories/", category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null);
     }
 
