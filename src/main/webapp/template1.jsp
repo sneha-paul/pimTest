@@ -31,6 +31,7 @@
     <link rel="stylesheet" type="text/css" href="/assets/vendor/sweetalert/sweetalert.css"/>
     <link rel="stylesheet" type="text/css" href="/assets/vendor/jquery-datatable/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/vendor/jquery-datatable/rowReorder.bootstrap4.css">
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/jquery-multiselect/css/multi-select.css">
     <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.css">
     <link rel="stylesheet" type="text/css" href="/assets/vendor/parsleyjs/css/parsley.css">
     <link rel="stylesheet" type="text/css" href="/assets/vendor/table-dragger/table-dragger.min.css">
@@ -53,7 +54,7 @@
     <%--<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>--%>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.2/dist/sweetalert2.all.min.js"></script>
     <script src="/assets/vendor/bootstrap/js/bootstrap.js"></script>
-    <script src="/assets/vendor/bootstrap-multiselect/bootstrap-multiselect.js"></script>
+    <script src="/assets/vendor/jquery-multiselect/js/jquery.multi-select.js"></script>
     <script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
     <script src="/assets/vendor/gijgo/js/gijgo.min.js" type="text/javascript"></script>
     <script src="/assets/js/pages/ui/page.js"></script>
@@ -136,6 +137,36 @@
             border-radius: 50%;
             border: 2px solid #fff;
             box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.2);
+        }
+
+        .ms-container {
+            width: auto !important;
+        }
+        .ms-container .ms-list {
+            border-top-left-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+        }
+        .ms-container .custom-header {
+            text-align: center;
+            padding: 3px;
+            background: #000;
+            color: #fff;
+            border-top-left-radius: 3px !important;
+            border-top-right-radius: 3px !important;
+        }
+
+        .ig-container .input-group-prepend {
+            min-width: 100px;
+            width:25%;
+        }
+
+        .ig-container .input-group-text{
+            font-size: 14px !important;
+            width:100%;
+            background-color: #000000;
+            color:#ffffff;
+            border-color: #000000;
+
         }
 
         .breadcrumb-item + .breadcrumb-item::before {

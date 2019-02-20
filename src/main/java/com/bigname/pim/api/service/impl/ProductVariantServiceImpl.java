@@ -275,6 +275,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                         }
                     }
                     Pair<String, Object> error = attribute.validate(productVariant.getVariantAttributes().get(attribute.getId()), productVariant.getChannelId(), productVariant.getLevel());
+                    //TODO - validate nested attribute values
                     if(isNotEmpty(error)) {
                         _fieldErrors.put(attribute.getId(), error);
                     }

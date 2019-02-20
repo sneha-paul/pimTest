@@ -25,7 +25,7 @@ public class AttributeOption extends ValidatableEntity {
     private String fullId;
 
     private String parentOptionFullId;
-    private String independent = "N";
+    private String independent = "Y";
 
     @Transient
     private String parentOptionValue;

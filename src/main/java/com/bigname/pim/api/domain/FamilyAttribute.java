@@ -36,6 +36,9 @@ public class FamilyAttribute extends ValidatableEntity {
     private String collectionId;
     private String attributeId;
     private String parentAttributeId; //Full Id of the parent family attribute, if any
+    @Transient
+    private FamilyAttribute parentAttribute;
+
     private Map<String, Scope> scope = new HashMap<>();
 
     @Transient @JsonIgnore
@@ -309,6 +312,13 @@ public class FamilyAttribute extends ValidatableEntity {
         this.parentAttributeId = parentAttributeId;
     }
 
+    public FamilyAttribute getParentAttribute() {
+        if(isNotEmpty(getParentAttributeId()) && isEmpty(parentAttribute)) {
+            parentAttribute = getFamily().getAttribute(getParentAttributeId()).orElse(null);
+        }
+        return parentAttribute;
+    }
+
     public Map<String, List<String>> getParentBasedOptions() {
         return parentBasedOptions;
     }
@@ -320,15 +330,17 @@ public class FamilyAttribute extends ValidatableEntity {
     public Pair<String, Object> validate(Object value, String channelId, int level) {
         Type type = getType(channelId);
         boolean required = level == 0 ? type == Type.COMMON && isRequired(channelId) : type == Type.VARIANT && isRequired(channelId);
-        if(getUiType().isMultiSelect()) {
+        if(getUiType().isMultiSelect() && (value instanceof String || value instanceof String[])) {
             String[] attributeValue = value instanceof String ? new String[] {(String) value} : (String[]) value;
             if (required && (attributeValue.length == 0 || isEmpty(attributeValue[0]))) {
                 return Pair.with(getLabel() + " cannot be empty", attributeValue);
             }
         } else {
-            String attributeValue = (String) value;
-            if (required && isEmpty(attributeValue)) {
-                return Pair.with(getLabel() + " cannot be empty", attributeValue);
+            if(value instanceof String){
+                String attributeValue = (String) value;
+                if (required && isEmpty(attributeValue)) {
+                    return Pair.with(getLabel() + " cannot be empty", attributeValue);
+                }
             }
         }
         return null;

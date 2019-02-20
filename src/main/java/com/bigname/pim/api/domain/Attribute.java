@@ -314,6 +314,12 @@ public class Attribute extends ValidatableEntity<Attribute> {
     public enum UIType {
         INPUT_BOX("Input Box", "N"),
         DROPDOWN("Dropdown", "Y"),
+        MULTI_SELECT("Multi Select", "Y") {
+            @Override
+            public boolean isMultiSelect() {
+                return true;
+            }
+        },
         CHECKBOX("Checkbox", "Y") {
             @Override
             public boolean isMultiSelect() {
