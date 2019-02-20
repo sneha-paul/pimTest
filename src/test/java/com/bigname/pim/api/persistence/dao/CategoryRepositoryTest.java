@@ -1,8 +1,10 @@
 package com.bigname.pim.api.persistence.dao;
 
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,11 +12,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by dona on 19-02-2019.
@@ -42,7 +50,6 @@ public class CategoryRepositoryTest {
         categoryDTO.setActive("Y");
         Category category = categoryDAO.insert(categoryDTO);
         Assert.assertTrue(category.diff(categoryDTO).isEmpty());
-
     }
 
     @Test
@@ -84,6 +91,141 @@ public class CategoryRepositoryTest {
         Assert.assertTrue(category.isPresent());
         category = categoryDAO.findById(categoryDTO.getId(), FindBy.INTERNAL_ID);
         Assert.assertTrue(category.isPresent());
+    }
+
+
+    @Test
+    public void retrieveCategoriesTest() {
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "description", "TEST_3description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4", "externalId", "TEST_4", "description", "TEST_4description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5", "externalId", "TEST_5", "description", "TEST_5description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test6", "externalId", "TEST_6", "description", "TEST_6description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test7", "externalId", "TEST_7", "description", "TEST_7description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test8", "externalId", "TEST_8", "description", "TEST_8description", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test9", "externalId", "TEST_9", "description", "TEST_9description", "active", "Y"));
+
+        List<Category> categoryDTOs = categoriesData.stream().map(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDiscontinued((String)categoryData.get("discontinued"));
+            return categoryDTO;
+        }).collect(Collectors.toList());
+
+        categoryDAO.insert(categoryDTOs);
+
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false).getTotalElements(), categoryDTOs.size());
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size() - 1), false).getTotalElements(), categoryDTOs.size());
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size() - 1), false).getContent().size(), categoryDTOs.size() - 1);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(1, 1), false).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(1, categoryDTOs.size() - 1), false).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size() - 1), false).getTotalPages(), 2);
+
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+
+        categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "N", "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "N", "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "description", "TEST_3description", "active", "N", "discontinued", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4", "externalId", "TEST_4", "description", "TEST_4description", "active", "N", "discontinued", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5", "externalId", "TEST_5", "description", "TEST_5description", "active", "Y", "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test6", "externalId", "TEST_6", "description", "TEST_6description", "active", "Y", "discontinued", "N"));
+
+        int[] activeCount = {0}, inactiveCount = {0};
+        int[] discontinued = {0};
+        categoryDTOs = categoriesData.stream().map(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDiscontinued((String)categoryData.get("discontinued"));
+            if("Y".equals(categoryData.get("discontinued"))){
+                discontinued[0] ++;
+            } else {
+                if("Y".equals(categoryData.get("active"))) {
+                    activeCount[0] ++;
+                } else {
+                    inactiveCount[0] ++;
+                }
+            }
+            return categoryDTO;
+        }).collect(Collectors.toList());
+
+        categoryDAO.insert(categoryDTOs);
+
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), true).getTotalElements(), activeCount[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, true).getTotalElements(), inactiveCount[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, false, true).getTotalElements(), discontinued[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, true, true).getTotalElements(), inactiveCount[0] + discontinued[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), true, true, true).getTotalElements(), activeCount[0] + inactiveCount[0] + discontinued[0]);
+
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime tomorrow = today.plusDays(1);
+
+        categoriesData = new ArrayList<>();
+
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", yesterday, "activeTo", today, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", today, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "activeFrom", tomorrow, "discontinued", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "N", "activeFrom", null, "activeTo", null, "discontinued", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", yesterday, "activeTo", tomorrow, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "activeFrom", yesterday, "activeTo", null, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "activeFrom", null, "activeTo", null, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y", "activeFrom", null, "activeTo", null, "discontinued", "N"));
+        int[] activeCount1 = {0}, inactiveCount1 = {0}, discontinued1 = {0};
+
+        categoryDTOs = categoriesData.stream().map(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDTO.setDiscontinued((String)categoryData.get("discontinued"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setActiveFrom((LocalDateTime) categoryData.get("activeFrom"));
+            categoryDTO.setActiveTo((LocalDateTime) categoryData.get("activeTo"));
+
+            if("N".equals(categoryData.get("discontinued"))){
+                if(PimUtil.isActive(categoryDTO.getActive(), categoryDTO.getActiveFrom() != null ? categoryDTO.getActiveFrom() : null, categoryDTO.getActiveTo() != null ? categoryDTO.getActiveTo() : null)) {
+                    activeCount1[0] ++;
+                } else {
+                    inactiveCount1[0] ++;
+                }
+            } else {
+                discontinued1[0] ++;
+            }
+
+            /*if("Y".equals(categoryData.get("discontinued"))){
+                discontinued1[0] ++;
+            } else if("N".equals(categoryData.get("discontinued"))){
+                if(PimUtil.isActive(categoryDTO.getActive(), categoryDTO.getActiveFrom() != null ? categoryDTO.getActiveFrom() : null, categoryDTO.getActiveTo() != null ? categoryDTO.getActiveTo() : null)) {
+                    activeCount1[0] ++;
+                } else {
+                    inactiveCount1[0] ++;
+                }
+            }*/
+            return categoryDTO;
+        }).collect(Collectors.toList());
+
+        categoryDAO.insert(categoryDTOs);
+
+//        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size())).getTotalElements(), activeCount[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), true).getTotalElements(), activeCount1[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, true).getTotalElements(), inactiveCount1[0]);
+        /*Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0] + discontinued1[0]);*/
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, false, true).getTotalElements(), discontinued1[0]);
+
+
     }
 
     @After
