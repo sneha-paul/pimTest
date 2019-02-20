@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -134,5 +136,9 @@ abstract public class ConversionUtil {
             }
         }
         return size + " " + unit;
+    }
+
+    public static LocalDateTime getEOD(LocalDate date){
+        return date.plusDays(1).atStartOfDay().minusSeconds(1);
     }
 }

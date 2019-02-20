@@ -140,9 +140,9 @@ public class WebsiteRepositoryTest {
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
-        LocalDate today = LocalDate.now();
-        LocalDate yesterday = today.minusDays(1);
-        LocalDate tomorrow = today.plusDays(1);
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime tomorrow = today.plusDays(1);
 
         websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", yesterday, "activeTo", today));
@@ -160,9 +160,9 @@ public class WebsiteRepositoryTest {
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
             websiteDTO.setActive((String)websiteData.get("active"));
             websiteDTO.setUrl((String)websiteData.get("url"));
-            websiteDTO.setActiveFrom((LocalDate)websiteData.get("activeFrom"));
-            websiteDTO.setActiveTo((LocalDate)websiteData.get("activeTo"));
-            if(PimUtil.isActive(websiteDTO.getActive(), websiteDTO.getActiveFrom() != null ? websiteDTO.getActiveFrom().atStartOfDay() : null, websiteDTO.getActiveTo() != null ? websiteDTO.getActiveTo().atStartOfDay() : null)) {
+            websiteDTO.setActiveFrom((LocalDateTime) websiteData.get("activeFrom"));
+            websiteDTO.setActiveTo((LocalDateTime) websiteData.get("activeTo"));
+            if(PimUtil.isActive(websiteDTO.getActive(), websiteDTO.getActiveFrom() != null ? websiteDTO.getActiveFrom() : null, websiteDTO.getActiveTo() != null ? websiteDTO.getActiveTo() : null)) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;

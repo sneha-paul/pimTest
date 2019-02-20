@@ -1,5 +1,6 @@
 package com.bigname.pim.util;
 
+import com.bigname.common.util.ConversionUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -118,9 +119,12 @@ public class PimUtilTest {
 
     @Test
     public void isActive(){
-        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
         LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime yesterdayEOD = todayEOD.minusDays(1);
         LocalDateTime tomorrow = today.plusDays(1);
+        LocalDateTime tomorrowEOD = todayEOD.plusDays(1);
 
         Assert.assertTrue(PimUtil.isActive("Y", null, null));
         Assert.assertFalse(PimUtil.isActive("N", null, null));
@@ -132,19 +136,22 @@ public class PimUtilTest {
         Assert.assertTrue(PimUtil.isActive("Y", tomorrow, null));
         Assert.assertFalse(PimUtil.isActive("N", tomorrow, null));
 
-        Assert.assertTrue(PimUtil.isActive("Y", null, yesterday));
-        Assert.assertFalse(PimUtil.isActive("N", null, yesterday));
-        Assert.assertTrue(PimUtil.isActive("Y", null, today));
-        Assert.assertFalse(PimUtil.isActive("N", null, today));
-        Assert.assertTrue(PimUtil.isActive("Y", null, tomorrow));
-        Assert.assertTrue(PimUtil.isActive("N", null ,tomorrow));
+        Assert.assertTrue(PimUtil.isActive("Y", null, yesterdayEOD));
+        Assert.assertFalse(PimUtil.isActive("N", null, yesterdayEOD));
+        Assert.assertTrue(PimUtil.isActive("Y", null, todayEOD));
+        Assert.assertTrue(PimUtil.isActive("N", null, todayEOD));
+        Assert.assertTrue(PimUtil.isActive("Y", null, tomorrowEOD));
+        Assert.assertTrue(PimUtil.isActive("N", null ,tomorrowEOD));
     }
 
     @Test
     public void hasDiscontinued(){
-        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
         LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime yesterdayEOD = todayEOD.minusDays(1);
         LocalDateTime tomorrow = today.plusDays(1);
+        LocalDateTime tomorrowEOD = todayEOD.plusDays(1);
 
         Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, null));
         Assert.assertFalse(PimUtil.hasDiscontinued("N", null, null));
@@ -156,11 +163,11 @@ public class PimUtilTest {
         Assert.assertTrue(PimUtil.hasDiscontinued("Y", tomorrow, null));
         Assert.assertFalse(PimUtil.hasDiscontinued("N", tomorrow, null));
 
-        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, yesterday));
-        Assert.assertFalse(PimUtil.hasDiscontinued("N", null, yesterday));
-        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, today));
-        Assert.assertFalse(PimUtil.hasDiscontinued("N", null, today));
-        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, tomorrow));
-        Assert.assertTrue(PimUtil.hasDiscontinued("N", null ,tomorrow));
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, yesterdayEOD));
+        Assert.assertFalse(PimUtil.hasDiscontinued("N", null, yesterdayEOD));
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, todayEOD));
+        Assert.assertTrue(PimUtil.hasDiscontinued("N", null, todayEOD));
+        Assert.assertTrue(PimUtil.hasDiscontinued("Y", null, tomorrowEOD));
+        Assert.assertTrue(PimUtil.hasDiscontinued("N", null ,tomorrowEOD));
     }
 }

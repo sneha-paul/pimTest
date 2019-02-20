@@ -58,11 +58,11 @@
                                                     <div class="js-dateRange">
                                                         <div class="form-group">
                                                             <label>Active From </label>
-                                                            <input type="text" class="form-control dateUI js-start" name="activeFrom" value="${category.activeFrom}">
+                                                            <input type="text" class="form-control dateUI js-start" name="activeFromDate" value="${category.activeFrom}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label>Active To </label>
-                                                            <input type="text" class="form-control dateUI js-end" name="activeTo" value="${category.activeTo}">
+                                                            <input type="text" class="form-control dateUI js-end" name="activeToDate" value="${category.activeTo}">
                                                         </div>
                                                     </div>
                                                     <div class="js-dateRange">

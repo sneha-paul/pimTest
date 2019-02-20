@@ -111,8 +111,8 @@ abstract public class GenericRepositoryImpl<T> implements GenericRepository<T> {
                 activeCriteria.orOperator(
                         Criteria.where("activeFrom").is(null).and("activeTo").is(null).and("active").is("N"),
                         Criteria.where("activeFrom").ne(null).gt(LocalDateTime.now()),
-                        Criteria.where("activeFrom").is(null).and("activeTo").ne(null).lt(LocalDateTime.now().minusDays(1)),
-                        Criteria.where("activeFrom").ne(null).lte(LocalDateTime.now()).and("activeTo").ne(null).lt(LocalDateTime.now().minusDays(1))
+                        Criteria.where("activeFrom").is(null).and("activeTo").ne(null).lt(LocalDateTime.now()),
+                        Criteria.where("activeFrom").ne(null).lte(LocalDateTime.now()).and("activeTo").ne(null).lt(LocalDateTime.now())
                 );
                 //activeCriteria = Criteria.where("active").is("N");
             }
