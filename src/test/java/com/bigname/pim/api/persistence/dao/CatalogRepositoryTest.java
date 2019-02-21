@@ -82,6 +82,7 @@ public class CatalogRepositoryTest {
         Catalog catalogDetails = catalogDAO.findByExternalId(catalogDTO.getCatalogId()).orElse(null);
         Assert.assertTrue(catalogDetails != null);
         catalogDetails.setDescription("Test1 catalog description");
+        catalogDetails.setGroup("DETAILS");
         catalogDAO.save(catalogDetails);
         
         Optional<Catalog> catalog = catalogDAO.findByExternalId(catalogDetails.getCatalogId());
