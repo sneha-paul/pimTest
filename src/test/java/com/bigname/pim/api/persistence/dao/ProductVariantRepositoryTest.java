@@ -73,16 +73,16 @@ public class ProductVariantRepositoryTest {
         productVariantDTO.setChannelId("ECOMMERCE");
         productVariantDAO.insert(productVariantDTO);
 
-        productVariantDTO.setProductVariantName("Test1Name");
-        productVariantDTO.setProductVariantId("TEST1_ID");
-        productVariantDTO.setActive("N");
-        productVariantDAO.save(productVariantDTO);
+        ProductVariant productVariantDetails = productVariantDAO.findByExternalId(productVariantDTO.getProductVariantId()).orElse(null);
+        Assert.assertTrue(productVariantDetails != null);
+        productVariantDetails.setProductVariantName("Test1Name");
+        productVariantDAO.save(productVariantDetails);
 
-        Optional<ProductVariant> productVariant = productVariantDAO.findByExternalId(productVariantDTO.getProductVariantId());
+        Optional<ProductVariant> productVariant = productVariantDAO.findByExternalId(productVariantDetails.getProductVariantId());
         Assert.assertTrue(productVariant.isPresent());
-        productVariant = productVariantDAO.findById(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID);
+        productVariant = productVariantDAO.findById(productVariantDetails.getProductVariantId(), FindBy.EXTERNAL_ID);
         Assert.assertTrue(productVariant.isPresent());
-        productVariant = productVariantDAO.findById(productVariantDTO.getId(), FindBy.INTERNAL_ID);
+        productVariant = productVariantDAO.findById(productVariantDetails.getId(), FindBy.INTERNAL_ID);
         Assert.assertTrue(productVariant.isPresent());
     }
 

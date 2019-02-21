@@ -72,14 +72,16 @@ public class ProductRepositoryTest {
         productDTO.setActive("Y");
         productDAO.insert(productDTO);
 
-        productDTO.setProductName("Test1Name");
-        productDTO.setActive("Y");
-        productDAO.save(productDTO);
-        Optional<Product> product = productDAO.findByExternalId(productDTO.getProductId());
+        Product productDetails = productDAO.findByExternalId(productDTO.getProductId()).orElse(null);
+        Assert.assertTrue(productDetails != null);
+        productDetails.setProductName("Test1Name");
+        productDAO.save(productDetails);
+
+        Optional<Product> product = productDAO.findByExternalId(productDetails.getProductId());
         Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDTO.getProductId(), FindBy.EXTERNAL_ID);
+        product = productDAO.findById(productDetails.getProductId(), FindBy.EXTERNAL_ID);
         Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDTO.getId(), FindBy.INTERNAL_ID);
+        product = productDAO.findById(productDetails.getId(), FindBy.INTERNAL_ID);
         Assert.assertTrue(product.isPresent());
 
     }
