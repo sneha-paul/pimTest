@@ -58,6 +58,8 @@ public class BaseServiceSupportTest {
         Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(newWebsite != null);
         Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -72,14 +74,17 @@ public class BaseServiceSupportTest {
         Website websiteDetails = websiteService.get("TEST1", EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(websiteDetails != null);
         websiteDetails.setUrl("https://www.test11.com");
+        websiteDetails.setGroup("DETAILS");
 
         websiteService.update(websiteDetails.getWebsiteId(), EXTERNAL_ID, websiteDetails);
 
         Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(updatedWebsite != null);
-        Map<String, Object> diff = websiteDetails.diff(updatedWebsite);
+        Map<String, Object> diff = websiteDTO.diff(updatedWebsite);
         Assert.assertEquals(diff.size(), 1);
         Assert.assertEquals(diff.get("url"), "https://www.test11.com");
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
     }
 
@@ -108,6 +113,8 @@ public class BaseServiceSupportTest {
         websiteService.create(websiteDTOs);
 
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), websiteDTOs.size());
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @After
