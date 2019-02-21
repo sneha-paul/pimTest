@@ -136,6 +136,9 @@ public class Website extends Entity<Website> {
         if (!this.getUrl().equals(website.getUrl())) {
             diff.put("url", website.getUrl());
         }
+        if (!this.getActive().equals(website.getActive())) {
+            diff.put("active", website.getActive());
+        }
 
 
 
