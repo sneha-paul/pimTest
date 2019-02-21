@@ -8,6 +8,7 @@ import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.WebsiteService;
 
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -24,10 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
@@ -238,7 +236,7 @@ public class BaseServiceSupportTest {
     }
 
     @Test
-    public void getAllTest() {
+    public void getAllAsPageTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -266,6 +264,131 @@ public class BaseServiceSupportTest {
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
+    }
+
+    //TODO : need to check the Assert.assert...
+    @Test
+    public void getAllAsListTest() {
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "Y"));        ;
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
+
+        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            return websiteDTO;
+        }).collect(Collectors.toList());
+
+        websiteDAO.insert(websiteDTOs);
+
+        List<Website> result = websiteService.getAll(Sort.by("name").ascending(), false);
+        Assert.assertArrayEquals(result.toArray(), websiteDTOs.toArray());
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+
+        websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
+
+
+        websiteDTOs = websitesData.stream().map(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            return websiteDTO;
+        }).collect(Collectors.toList());
+
+        websiteDAO.insert(websiteDTOs);
+
+        result = websiteService.getAll(Sort.by("name").ascending(), false);
+        Assert.assertArrayEquals(result.toArray(), websiteDTOs.toArray());
+       // Assert.assertSame(result,websiteDTOs);
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+
+    }
+
+    @Test
+    public void getAllWithIdsAsPageTest() {
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
+
+        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            return websiteDTO;
+        }).collect(Collectors.toList());
+
+        websiteDAO.insert(websiteDTOs);
+
+        String[] ids = {"TEST_1", "TEST_2", "TEST_3"};
+
+        Page<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
+        Assert.assertEquals(paginatedResult.getContent().size(), 3);
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+    }
+
+    @Test
+    public void getAllWithIdsAsListTest() {
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
+
+        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            return websiteDTO;
+        }).collect(Collectors.toList());
+
+        websiteDAO.insert(websiteDTOs);
+
+        String[] ids = {"TEST_1", "TEST_2", "TEST_3"};
+
+        List<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, null, false);
+        Assert.assertEquals(paginatedResult.size(), 3);
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
 
