@@ -119,7 +119,7 @@ public class BaseServiceSupportTest {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
-    @Test
+    /*@Test
     public void updateEntitiesTest(){
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
@@ -144,7 +144,7 @@ public class BaseServiceSupportTest {
         websiteDAO.insert(websiteDTOs);
 
 
-    }
+    }*/
 
     @Test
     public void toggleTest() {
