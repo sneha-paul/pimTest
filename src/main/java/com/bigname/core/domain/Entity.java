@@ -49,11 +49,21 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime activeTo;
 
+    @Transient
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate discontinuedFrom;
+    private LocalDate discontinuedFromDate;
 
+    @Transient
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate discontinuedTo;
+    private LocalDate discontinuedToDate;
+
+    @JsonIgnore
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime discontinuedFrom;
+
+    @JsonIgnore
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime discontinuedTo;
 
     private String createdUser;
 
@@ -152,19 +162,35 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
         this.discontinued = toYesNo(discontinued,"Y");
     }
 
-    public LocalDate getDiscontinuedFrom() {
+    public LocalDate getDiscontinuedFromDate() {
+        return discontinuedFromDate;
+    }
+
+    public void setDiscontinuedFromDate(LocalDate discontinuedFromDate) {
+        this.discontinuedFromDate = discontinuedFromDate;
+    }
+
+    public LocalDate getDiscontinuedToDate() {
+        return discontinuedToDate;
+    }
+
+    public void setDiscontinuedToDate(LocalDate discontinuedToDate) {
+        this.discontinuedToDate = discontinuedToDate;
+    }
+
+    public LocalDateTime getDiscontinuedFrom() {
         return discontinuedFrom;
     }
 
-    public void setDiscontinuedFrom(LocalDate discontinuedFrom) {
+    public void setDiscontinuedFrom(LocalDateTime discontinuedFrom) {
         this.discontinuedFrom = discontinuedFrom;
     }
 
-    public LocalDate getDiscontinuedTo() {
+    public LocalDateTime getDiscontinuedTo() {
         return discontinuedTo;
     }
 
-    public void setDiscontinuedTo(LocalDate discontinuedTo) {
+    public void setDiscontinuedTo(LocalDateTime discontinuedTo) {
         this.discontinuedTo = discontinuedTo;
     }
 
@@ -244,42 +270,20 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
         super.orchestrate();
         getActiveFrom();
         getActiveTo();
+        getDiscontinuedFrom();
+        getDiscontinuedTo();
         liveOrchestration();
 
     }
 
     //Orchestration the needs to done based on date/time
     private void liveOrchestration() {
-        //Orchestration is called prior to validation, perform discontinuation related orchestration if there is at least one date and the date range is valid
-        if((getDiscontinuedFrom() != null && getDiscontinuedTo() != null && !getDiscontinuedFrom().isAfter(getDiscontinuedTo()))
-                || !(getDiscontinuedFrom() != null && getDiscontinuedTo() != null)) {
-            //If discontinueFromDate is not null and discontinueToDate is not null
-            if (getDiscontinuedFrom() != null && getDiscontinuedTo() != null) {
-
-                //If discontinueFromDate already passed and discontinueToDate not passed, discontinue the item
-                if (!getDiscontinuedFrom().isAfter(LocalDate.now()) && !getDiscontinuedTo().isBefore(LocalDate.now())) {
-                    setDiscontinued("Y");
-                } else if (getDiscontinuedFrom().isAfter(LocalDate.now()) || getDiscontinuedTo().isBefore(LocalDate.now())) { // Otherwise set Discontinued to 'N'
-                    setDiscontinued("N");
-                }
-            } else if (getDiscontinuedFrom() != null) { //If discontinueFromDate is not null and discontinueToDate is null
-
-                //If discontinueFromDate already passed, discontinue the item
-                if (!getDiscontinuedFrom().isAfter(LocalDate.now())) {
-                    setDiscontinued("Y");
-                } else if (getDiscontinuedFrom().isAfter(LocalDate.now())) { // Otherwise set Discontinued to 'N'
-                    setDiscontinued("N");
-                }
-            } else if (getDiscontinuedTo() != null) { //If discontinueFromDate is null and discontinueToDate is not null
-
-                //If discontinueToDate already passed, set Discontinued to 'N'
-                if (getDiscontinuedTo().isBefore(LocalDate.now())) {
-                    setDiscontinued("N");
-                } else if (!getDiscontinuedTo().isBefore(LocalDate.now())) { // If its not passed, keep discontinued as 'Y'
-                    setDiscontinued("Y");
-                }
-            }
+        if(PimUtil.hasDiscontinued(getDiscontinued(), getDiscontinuedFrom(), getDiscontinuedTo())){
+            setDiscontinued("Y");
+        } else {
+            setDiscontinued("N");
         }
+
         if(PimUtil.isActive(getActive(), getActiveFrom(), getActiveTo())){
             setActive("Y");
         } else {

@@ -1,6 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.cache.PIMCache;
@@ -140,16 +141,19 @@ public class WebsiteRepositoryTest {
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
-        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
         LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime yesterdayEOD = todayEOD.minusDays(1);
         LocalDateTime tomorrow = today.plusDays(1);
+        LocalDateTime tomorrowEOD = todayEOD.plusDays(1);
 
         websitesData = new ArrayList<>();
-        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", yesterday, "activeTo", today));
-        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", today));
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", yesterday, "activeTo", todayEOD));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", todayEOD));
         websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "activeFrom", tomorrow));
         websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "N", "activeFrom", null, "activeTo", null));
-        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", yesterday, "activeTo", tomorrow));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", yesterday, "activeTo", tomorrowEOD));
         websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "activeFrom", yesterday, "activeTo", null));
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "activeFrom", null, "activeTo", null));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y", "activeFrom", null, "activeTo", null));
@@ -162,7 +166,7 @@ public class WebsiteRepositoryTest {
             websiteDTO.setUrl((String)websiteData.get("url"));
             websiteDTO.setActiveFrom((LocalDateTime) websiteData.get("activeFrom"));
             websiteDTO.setActiveTo((LocalDateTime) websiteData.get("activeTo"));
-            if(PimUtil.isActive(websiteDTO.getActive(), websiteDTO.getActiveFrom() != null ? websiteDTO.getActiveFrom() : null, websiteDTO.getActiveTo() != null ? websiteDTO.getActiveTo() : null)) {
+            if(PimUtil.isActive(websiteDTO.getActive(), websiteDTO.getActiveFrom(), websiteDTO.getActiveTo())) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;

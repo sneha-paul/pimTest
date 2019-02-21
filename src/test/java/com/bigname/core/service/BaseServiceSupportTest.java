@@ -1,39 +1,29 @@
 package com.bigname.core.service;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.exception.DuplicateEntityException;
-import com.bigname.core.exception.EntityCreateException;
-import com.bigname.core.util.FindBy;
+import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.Event;
-import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
-import com.bigname.pim.api.service.EventService;
 import com.bigname.pim.api.service.WebsiteService;
 
-import com.google.common.base.Preconditions;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static com.bigname.core.util.FindBy.INTERNAL_ID;
 
 /**
  * Created by sruthi on 20-02-2019.
@@ -44,18 +34,11 @@ import static com.bigname.core.util.FindBy.INTERNAL_ID;
 @ContextConfiguration(classes={PimApplication.class})
 public class BaseServiceSupportTest {
 
-    protected String entityName;
-    protected String externalIdProperty;
-    protected String externalIdPropertyLabel;
-
     @Autowired
     private WebsiteDAO websiteDAO;
 
     @Autowired
     private WebsiteService websiteService;
-
-    @Autowired
-    private EventService eventService;
 
     @Before
     public void setUp() {
@@ -63,55 +46,22 @@ public class BaseServiceSupportTest {
     }
 
     @Test
-    public void create() {
+    public void createEntityTest() {
         Website websiteDTO = new Website();
         websiteDTO.setWebsiteName("Test1.com");
         websiteDTO.setWebsiteId("TEST1");
         websiteDTO.setActive("Y");
         websiteDTO.setUrl("https://www.test1.com");
 
-        Event event = new Event();
-        try {
-            websiteService.get(websiteDTO.getExternalId(), EXTERNAL_ID, false)
-                    .ifPresent(t1 ->    {
-                        throw new DuplicateEntityException("Another " + entityName + " instance exists with the given " + entityName + " id:" + websiteDTO.getExternalId());
-                    });
-            websiteDTO.setCreatedDateTime(LocalDateTime.now());
-            websiteDTO.setCreatedUser(getCurrentUser());
-            Website website = websiteDAO.insert(websiteDTO);
-            if(!websiteDTO.getClass().equals(Event.class)) {
-                event.setEntity(getEntityName());
-                event.setTimeStamp(website.getCreatedDateTime());
-                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
-                event.setEventType(Event.Type.CREATE);
-                event.setDetails("New " + getEntityName() + " instance created with " + getExternalIdPropertyLabel() + ":" + website.getExternalId());
-                Map<String, Object> dataObj = ConversionUtil.toJSONMap(website);
-                dataObj.put("createdDateTime", website.getCreatedDateTime());
-                event.setData(dataObj);
-            }
+        websiteService.create(websiteDTO);
 
-        } catch(Exception e) {
-            String message = "An error occurred while creating the " + entityName + " due to: "+ e.getMessage();
-            if(!websiteDTO.getClass().equals(Event.class)) {
-                event.setEntity(getEntityName());
-                event.setTimeStamp(websiteDTO.getCreatedDateTime());
-                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
-                event.setEventType(Event.Type.ERROR);
-                event.setDetails(message);
-                Map<String, Object> dataObj = ConversionUtil.toJSONMap(websiteDTO);
-                dataObj.put("createdDateTime", websiteDTO.getCreatedDateTime());
-                event.setData(dataObj);
-            }
-            throw new EntityCreateException(message, e);
-        } finally {
-            if(!websiteDTO.getClass().equals(Event.class)) {
-                eventService.create(event);
-            }
-        }
+        Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(newWebsite != null);
+        Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
     }
 
-   /* @Test
-    public void update() {
+    @Test
+    public void updateEntityTest() {
         Website websiteDTO = new Website();
         websiteDTO.setWebsiteName("Test1.com");
         websiteDTO.setWebsiteId("TEST1");
@@ -119,84 +69,45 @@ public class BaseServiceSupportTest {
         websiteDTO.setUrl("https://www.test1.com");
         websiteDAO.insert(websiteDTO);
 
-        Website websiteDTONew = new Website();
-        websiteDTONew.setWebsiteName("Test1.com");
-        websiteDTONew.setWebsiteId("TEST1");
-        websiteDTONew.setActive("Y");
-        websiteDTONew.setUrl("https://www.test11.com");
+        Website websiteDetails = websiteService.get("TEST1", EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(websiteDetails != null);
+        websiteDetails.setUrl("https://www.test11.com");
 
-        FindBy findBy = INTERNAL_ID;
+        websiteService.update(websiteDetails.getWebsiteId(), EXTERNAL_ID, websiteDetails);
 
-        Event event = new Event();
-        try {
-            Optional<Website> _t1 = websiteService.get(websiteDTO.getId(), findBy, false);
-            Website _t = null;
-            if(_t1.isPresent()) {
-                if(findBy == INTERNAL_ID && !entityName.equals("productVariant")) { //TODO need to handle productVariant update from controller using INTERNAL_ID
-                    Preconditions.checkState(websiteDTO.getId().equals(websiteDTONew.getId()), "Illegal operation");
-                }
-                Website t1 = _t1.get();
-                if(!websiteDTONew.getExternalId().equals(t1.getExternalId())) {
-                    websiteService.get(websiteDTONew.getExternalId(), EXTERNAL_ID, false)
-                            .ifPresent(t2 ->    {
-                                throw new DuplicateEntityException("Another " + entityName + " instance exists with the given " + entityName + " id:" + websiteDTONew.getExternalId());
-                            });
-                }
-                t1.merge(websiteDTONew);
-                t1.setLastModifiedDateTime(LocalDateTime.now());
-                t1.setLastModifiedUser(getCurrentUser());
-                _t = websiteDAO.save(t1);
-                if(!websiteDTONew.getClass().equals(Event.class)) {
-                    event.setEntity(getEntityName());
-                    event.setTimeStamp(_t.getLastModifiedDateTime());
-                    event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
-                    event.setEventType(Event.Type.UPDATE);
-                    event.setDetails("Updated " + getEntityName() + " instance with " + getExternalIdPropertyLabel() + ":" + _t.getExternalId());
-                    Map<String, Object> dataObj = ConversionUtil.toJSONMap(_t);
-                    dataObj.put("lastModifiedDateTime", _t.getLastModifiedDateTime());
-                    dataObj.put("createdDateTime", _t.getCreatedDateTime());
-                    event.setData(dataObj);
-                }
-            }
-        } catch (Exception e) {
-            String message = "Illegal operation";
-            if(!websiteDTONew.getClass().equals(Event.class)) {
-                event.setEntity(getEntityName());
-                event.setTimeStamp(LocalDateTime.now());
-                event.setUser(getCurrentUser().map(Entity::getId).orElse(""));
-                event.setEventType(Event.Type.ERROR);
-                event.setDetails(message);
-                Map<String, Object> dataObj = ConversionUtil.toJSONMap(websiteDTONew);
-                dataObj.put("lastModifiedDateTime", websiteDTONew.getLastModifiedDateTime());
-                event.setData(dataObj);
-            }
-            throw new IllegalStateException(message);
-        } finally {
-            if(!websiteDTONew.getClass().equals(Event.class)) {
-                eventService.create(event);
-            }
-        }
+        Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(updatedWebsite != null);
+        Map<String, Object> diff = websiteDetails.diff(updatedWebsite);
+        Assert.assertEquals(diff.size(), 1);
+        Assert.assertEquals(diff.get("url"), "https://www.test11.com");
 
-    }*/
-
-    public Optional<User> getCurrentUser() {
-        return Optional.ofNullable(SecurityContextHolder.getContext())
-                .map(SecurityContext::getAuthentication)
-                .filter(Authentication::isAuthenticated)
-                .map(Authentication::getPrincipal)
-                .map(User.class::cast);
     }
 
-    public String getExternalIdProperty() {
-        return externalIdProperty;
-    }
+    @Test
+    public void createEntitiesTest(){
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-    public String getExternalIdPropertyLabel() {
-        return externalIdPropertyLabel;
-    }
+        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            return websiteDTO;
+        }).collect(Collectors.toList());
 
-    public String getEntityName() {
-        return entityName;
+        websiteService.create(websiteDTOs);
+
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), websiteDTOs.size());
     }
 
     @After
