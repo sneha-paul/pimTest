@@ -659,9 +659,9 @@
         </div>
     </div>
 </div>
-<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}', hash : '${param.hash}'});$.getScript('/assets/js/pages/ui/product/product.js');"/>
+<img src="/assets/img/tiny.png" onload="$.initPage({productId : '${product.productId}', channelId : '${product.channelId}', hash : '${param.hash}'});$.initAHAH();"/>
 
-<%--<script src="/assets/js/pages/ui/product/product.js"></script>--%>
+<script src="/assets/js/pages/ui/product/product.js"></script>
 <script>
     $.initPage({
         'productId' : '${product.productId}',

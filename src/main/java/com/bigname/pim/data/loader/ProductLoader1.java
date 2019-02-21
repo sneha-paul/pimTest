@@ -1446,7 +1446,7 @@ public class ProductLoader1 {
                         });
             }
 
-            /*for (int row = 0; row < variantsData.size(); row++) {
+            for (int row = 0; row < variantsData.size(); row++) {
                 String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")), true).toUpperCase();
                 productId = convertCellValue("", productId);
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
@@ -1525,7 +1525,7 @@ public class ProductLoader1 {
                         }
                     }
                 }
-            }*/
+            }
             System.out.println("Done");
         });
 
