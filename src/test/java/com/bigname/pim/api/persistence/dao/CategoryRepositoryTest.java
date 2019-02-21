@@ -1,6 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Category;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,6 @@ import java.util.stream.Collectors;
 public class CategoryRepositoryTest {
     @Autowired
     CategoryDAO categoryDAO;
-
 
     @Before
     public void setUp() {
@@ -78,18 +79,19 @@ public class CategoryRepositoryTest {
         categoryDTO.setMetaTitle("Meta Title");
         categoryDAO.insert(categoryDTO);
 
-        categoryDTO.setCategoryName("Test1Name");
-        categoryDTO.setCategoryId("TEST1_ID");
-        categoryDTO.setDescription("Test1 category description");
-        categoryDTO.setGroup("DETAILS");
-        categoryDTO.setActive("N");
-        categoryDAO.save(categoryDTO);
+        Category categoryDetails = categoryDAO.findByExternalId(categoryDTO.getCategoryId()).orElse(null);
+        categoryDetails.setCategoryName("Test1Name");
+        categoryDetails.setMetaTitle("New Meta title");
+        categoryDetails.setMetaDescription("Meta description");
+        categoryDetails.setActive("N");
+        categoryDetails.setGroup("DETAILS", "SEO");
+        categoryDAO.save(categoryDetails);
 
-        Optional<Category> category = categoryDAO.findByExternalId(categoryDTO.getCategoryId());
+        Optional<Category> category = categoryDAO.findByExternalId(categoryDetails.getCategoryId());
         Assert.assertTrue(category.isPresent());
-        category = categoryDAO.findById(categoryDTO.getCategoryId(), FindBy.EXTERNAL_ID) ;
+        category = categoryDAO.findById(categoryDetails.getCategoryId(), FindBy.EXTERNAL_ID) ;
         Assert.assertTrue(category.isPresent());
-        category = categoryDAO.findById(categoryDTO.getId(), FindBy.INTERNAL_ID);
+        category = categoryDAO.findById(categoryDetails.getId(), FindBy.INTERNAL_ID);
         Assert.assertTrue(category.isPresent());
     }
 
@@ -169,17 +171,20 @@ public class CategoryRepositoryTest {
 
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
 
-        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
         LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime yesterdayEOD = todayEOD.minusDays(1);
         LocalDateTime tomorrow = today.plusDays(1);
+        LocalDateTime tomorrowEOD = todayEOD.plusDays(1);
 
         categoriesData = new ArrayList<>();
 
-        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", yesterday, "activeTo", today, "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", today, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "activeFrom", yesterday, "activeTo", todayEOD, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "activeFrom", null, "activeTo", todayEOD, "discontinued", "N"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "activeFrom", tomorrow, "discontinued", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "N", "activeFrom", null, "activeTo", null, "discontinued", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", yesterday, "activeTo", tomorrow, "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "activeFrom", yesterday, "activeTo", tomorrowEOD, "discontinued", "N"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "activeFrom", yesterday, "activeTo", null, "discontinued", "N"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "activeFrom", null, "activeTo", null, "discontinued", "N"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y", "activeFrom", null, "activeTo", null, "discontinued", "N"));
@@ -195,37 +200,27 @@ public class CategoryRepositoryTest {
             categoryDTO.setActiveFrom((LocalDateTime) categoryData.get("activeFrom"));
             categoryDTO.setActiveTo((LocalDateTime) categoryData.get("activeTo"));
 
-            if("N".equals(categoryData.get("discontinued"))){
-                if(PimUtil.isActive(categoryDTO.getActive(), categoryDTO.getActiveFrom() != null ? categoryDTO.getActiveFrom() : null, categoryDTO.getActiveTo() != null ? categoryDTO.getActiveTo() : null)) {
-                    activeCount1[0] ++;
-                } else {
-                    inactiveCount1[0] ++;
-                }
+            if(PimUtil.hasDiscontinued(categoryDTO.getDiscontinued(), categoryDTO.getDiscontinuedFrom(), categoryDTO.getDiscontinuedTo())) {
+                discontinued1[0]++;
+            } else if(PimUtil.isActive(categoryDTO.getActive(), categoryDTO.getActiveFrom(), categoryDTO.getActiveTo())) {
+                activeCount1[0] ++;
             } else {
-                discontinued1[0] ++;
+                inactiveCount1[0] ++;
             }
-
-            /*if("Y".equals(categoryData.get("discontinued"))){
-                discontinued1[0] ++;
-            } else if("N".equals(categoryData.get("discontinued"))){
-                if(PimUtil.isActive(categoryDTO.getActive(), categoryDTO.getActiveFrom() != null ? categoryDTO.getActiveFrom() : null, categoryDTO.getActiveTo() != null ? categoryDTO.getActiveTo() : null)) {
-                    activeCount1[0] ++;
-                } else {
-                    inactiveCount1[0] ++;
-                }
-            }*/
             return categoryDTO;
         }).collect(Collectors.toList());
 
         categoryDAO.insert(categoryDTOs);
 
-//        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size())).getTotalElements(), activeCount[0]);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), true).getTotalElements(), activeCount1[0]);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, true).getTotalElements(), inactiveCount1[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), true, true, true).getTotalElements(), activeCount1[0] + inactiveCount1[0] + discontinued1[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), true, true, false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), true, false, true).getTotalElements(), activeCount1[0] + discontinued1[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, true, true).getTotalElements(), inactiveCount1[0] + discontinued1[0]);
+        Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
         /*Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0] + discontinued1[0]);*/
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false, false, true).getTotalElements(), discontinued1[0]);
-
-
     }
 
     @After
