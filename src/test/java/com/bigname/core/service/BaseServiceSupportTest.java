@@ -8,6 +8,7 @@ import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.WebsiteService;
 
+import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,9 +24,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
+import static com.bigname.core.util.FindBy.INTERNAL_ID;
 
 /**
  * Created by sruthi on 20-02-2019.
@@ -168,6 +171,41 @@ public class BaseServiceSupportTest {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
     }
+
+    @Test
+    public void getTest() {
+        Website websiteDTO = new Website();
+        websiteDTO.setWebsiteName("Test1.com");
+        websiteDTO.setWebsiteId("TEST1");
+        websiteDTO.setActive("Y");
+        websiteDTO.setUrl("https://www.test1.com");
+        websiteDAO.insert(websiteDTO);
+
+        Website websiteDetails = websiteService.get("TEST1", EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(websiteDetails != null);
+        Map<String, Object> diff = websiteDTO.diff(websiteDetails);
+        Assert.assertEquals(diff.size(), 0);
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+
+        websiteDTO = new Website();
+        websiteDTO.setWebsiteName("Test2.com");
+        websiteDTO.setWebsiteId("TEST2");
+        websiteDTO.setActive("Y");
+        websiteDTO.setUrl("https://www.test2.com");
+        websiteDAO.insert(websiteDTO);
+
+        websiteDetails = websiteService.get(websiteDTO.getId(), INTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(websiteDetails != null);
+        diff = websiteDTO.diff(websiteDetails);
+        Assert.assertEquals(diff.size(), 0);
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+
+    }
+
+
+
 
     @After
     public void tearDown() {
