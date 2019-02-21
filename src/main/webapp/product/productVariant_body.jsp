@@ -647,7 +647,7 @@
                                                                                                         <select id="${attribute.id}" name="${attribute.id}" multiple="multiple" class="form-control${disabledClass}" ${disabled}>
                                                                                                             <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                                 <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                                <option value="${attributeOption.id}" <c:if test="${attributeValue.size() gt 0 && attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                                <option value="${attributeOption.id}" <c:if test="${attribute.id ne 'CARD_SLITS' && attributeValue.size() gt 0 && attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
                                                                                                             </c:forEach>
                                                                                                         </select>
                                                                                                         <script>

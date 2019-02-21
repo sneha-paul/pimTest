@@ -93,7 +93,7 @@ public class FeedController {
         Map<String, Object> model = new HashMap<>();
         boolean success = false;
         if(this.apiKey.equals(apiKey)) {
-            productLoader1.load(productFeedPath);
+//            productLoader1.load(productFeedPath);
             success = true;
         }
         model.put("success", success);

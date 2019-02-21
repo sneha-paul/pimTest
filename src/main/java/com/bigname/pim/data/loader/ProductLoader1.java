@@ -1,6 +1,7 @@
 package com.bigname.pim.data.loader;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.domain.ValidatableEntity;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.bigname.common.util.StringUtil.split;
 import static com.bigname.common.util.StringUtil.trim;
 import static com.bigname.common.util.ValidationUtil.*;
 
@@ -55,8 +57,8 @@ public class ProductLoader1 {
     //The attributeCollectionId that needs to be used for the import
     private String attributeCollectionId = "ENVELOPES";
 
-    //These are the four supported attribute types in the current version of PIM. Each importing attribute should be of one of this type
-    private List<String> availableAttributeTypes = Arrays.asList("INPUTBOX", "TEXTAREA", "DROPDOWN", "YES_NO");
+    //These are the five supported attribute types in the current version of PIM. Each importing attribute should be of one of this type
+    private List<String> availableAttributeTypes = Arrays.asList("INPUTBOX", "TEXTAREA", "DROPDOWN", "MULTI_SELECT", "YES_NO");
 
     //Map for family attribute's groupId and parentGroupIdLookup
     private Map<String, Object> familyAttributeGroupLookUp = new LinkedHashMap<>();
@@ -74,7 +76,7 @@ public class ProductLoader1 {
         familyAttributeGroupLookUp.put("Product Features^", "FEATURES_GROUP");
     }
 
-    public boolean load(String filePath) {
+    /*public boolean load(String filePath) {
         String channelId = "ECOMMERCE";
 
         //Product variant data WITH metadata
@@ -216,16 +218,16 @@ public class ProductLoader1 {
                 //The first column in the variants data is always empty
                 familyAttributesGrid.get(row).add(null);//for the first empty column
 
-                /*
+                *//*
                 Go through each column starting from the second column and add the attribute to the corresponding family's
                 attributes collection, if it is of known type and won't already exists
-                */
+                *//*
 
                 for (int col = 1; col < attributeNamesMetadata.size(); col++) {
-                    /*
+                    *//*
                     Add an empty attribute instance for the current column in the familyAttributesGrid to start with,
                     will be replaced with the proper attribute instance down the line
-                     */
+                     *//*
                     familyAttributesGrid.get(row).add(null);
 
                     //AttributeValue, which is the current cellValue
@@ -279,10 +281,10 @@ public class ProductLoader1 {
 
 
                     //TODO - Replace lookup with attributeName
-                    /*
+                    *//*
                     If this is a new family attribute, add the attribute to the corresponding attributeGroup and attributeSubGroup.
                     If the attributeGroup and/or attributeSubGroup won't exist, add them as well
-                    */
+                    *//*
                     if(!family.getAllAttributesMap(false).containsKey(attribute.getId())) {
                         //Starting with default familyAttributeGroups and subGroups, so lets assume not to update the lookup map
                         boolean updateLookup = false;
@@ -432,7 +434,7 @@ public class ProductLoader1 {
             familyService.saveAll(families.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList())).forEach(family -> families.put(family.getFamilyId(), family));
 
             // TODO - Batch creation logic - not complete - Need to optimize the below portion
-            /*
+            *//*
             //Map of all existing products
             Map<String, Product> existingProducts = productService.getAll(null, false).stream().collect(Collectors.toMap(Product::getProductId, p -> p));
             existingProducts.forEach((k, product) -> product.setChannelId(channelId));
@@ -518,16 +520,16 @@ public class ProductLoader1 {
                         });
 
 
-            }*/
+            }*//*
 
             //TODO - do batch insert of categoryProducts and productCategories
 
-            /*Map<Pair<String, String>, CategoryProduct> existingCategoryProducts = categoryService.getAllCategoryProducts()
+            *//*Map<Pair<String, String>, CategoryProduct> existingCategoryProducts = categoryService.getAllCategoryProducts()
                     .parallelStream().collect(Collectors.toMap(e -> Pair.with(e.getCategoryId(), e.getProductId()), e -> e));
 
-            Map<Pair<String, String>, CategoryProduct> newCategoryProducts = new HashMap<>();*/
+            Map<Pair<String, String>, CategoryProduct> newCategoryProducts = new HashMap<>();*//*
 
-            /*final int[] $row = {0}, $col = {0};
+            *//*final int[] $row = {0}, $col = {0};
             for (int row = 0; row < variantsData.size(); row++) {
                 $row[0] = row;
                 String productId = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID"));
@@ -584,10 +586,10 @@ public class ProductLoader1 {
 
                     //TODO - do batch insert of categoryProducts and productCategories
 
-                    *//*Pair<String, String> key = Pair.with(category.getId(), product.getId());
+                    *//**//*Pair<String, String> key = Pair.with(category.getId(), product.getId());
                     if(!existingCategories.containsKey(key) && !newCategoryProducts.containsKey(key)) {
                         newCategoryProducts.put(key, new CategoryProduct(category.getId(), product.getId(), 0));
-                    }*//*
+                    }*//**//*
 
                     String idOfProduct = product.getId();
                     List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 300, null, false).getContent();
@@ -654,7 +656,7 @@ public class ProductLoader1 {
                 } else {
                     LOGGER.info(".");
                 }
-            }*/
+            }*//*
             int assetFoundCount = 0;
             final int[] $row = {0}, $col = {0};
             for (int row = 0; row < variantsData.size(); row++) {
@@ -830,7 +832,7 @@ public class ProductLoader1 {
         });
 
         return true;
-    }
+    }*/
 
     public boolean load1(String filePath) {
         String channelId = "ECOMMERCE";
@@ -867,17 +869,23 @@ public class ProductLoader1 {
             // The metadata row containing the attributeType, this will be second row in the data sheet
             List<String> attributeTypesMetadata = data.get(1);
 
-            // The metadata row containing the familyAttributeGroup name, this will be third row in the data sheet
-            List<String> familyAttributeGroupMetadata = data.get(2);
+            // The metadata row containing the parent attribute name, this will be third row in the data sheet
+            List<String> parentAttributeMetadata = data.get(2);
 
-            // The metadata row containing the familyAttributeSubGroup name, this will be fourth row in the data sheet
-            List<String> familyAttributeSubgroupMetadata = data.get(3);
+            // The metadata row containing the delimiter characters for delimited attribute values, this will be fourth row in the data sheet
+            List<String> delimitersMetadata = data.get(3);
 
-            // The metadata row containing the attribute level value of each attribute (0 - Product Level & 1 - Variant Level), this will be fourth row in the data sheet
-            List<String> attributeLevelMetadata = data.get(4);
+            // The metadata row containing the familyAttributeGroup name, this will be fifth row in the data sheet
+            List<String> familyAttributeGroupMetadata = data.get(4);
+
+            // The metadata row containing the familyAttributeSubGroup name, this will be sixth row in the data sheet
+            List<String> familyAttributeSubgroupMetadata = data.get(5);
+
+            // The metadata row containing the attribute level value of each attribute (0 - Product Level & 1 - Variant Level), this will be seventh row in the data sheet
+            List<String> attributeLevelMetadata = data.get(6);
 
             //Number of metadata rows in the data sheet
-            int numOfMetadataRows = 5;
+            int numOfMetadataRows = 7;
 
             //Product variants data WITHOUT metadata, this will be a sublist of the complete data without the metadata rows
             List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
@@ -986,6 +994,9 @@ public class ProductLoader1 {
                     //AttributeValue, which is the current cellValue
                     String cellValue = variantsData.get(row).get(col);
 
+                    //Value delimiters for multi select/dependent options
+                    String delimiters = delimitersMetadata.get(col);
+
                     //AttributeName
                     String attributeName = attributeNamesMetadata.get(col);
 
@@ -1092,6 +1103,14 @@ public class ProductLoader1 {
                         familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
                         familyAttributeDTO.setAttribute(attribute);
 
+                        String parentAttributeName = parentAttributeMetadata.get(col);
+                        if(isNotEmpty(parentAttributeName)) {
+                            String parentAttributeId = ValidatableEntity.toId(parentAttributeName);
+                            FamilyAttribute parentAttribute = family.getAllAttributesMap().get(parentAttributeId);
+                            if (isNotEmpty(parentAttributeId)) {
+                                familyAttributeDTO.setParentAttributeId(parentAttribute != null ? parentAttribute.getFullId() : "FEATURES_GROUP|DEFAULT_GROUP|DEFAULT_GROUP|" + parentAttributeId);
+                            }
+                        }
                         //Add the family attribute to the family
                         family.addAttribute(familyAttributeDTO);
 
@@ -1119,37 +1138,38 @@ public class ProductLoader1 {
 
                     //If the current attribute is selectable, add any new attribute options, if any
                     if(isSelectable) {
-                        String attributeOptionValue = cellValue;
+                        // cellValue can either be a simple single value or delimited multiple values
+                        List<String> attributeOptionValues = StringUtil.split(cellValue, delimiters.split(""));
 
-                        // If the attribute option won't exist already for the attribute, add the attribute option to the attribute
-                        if (isNotEmpty(attributeOptionValue)) {
-                            if(!attribute.getOptions().containsKey(ValidatableEntity.toId(attributeOptionValue)))
-                            {
-                                AttributeOption attributeOption = new AttributeOption();
-                                attributeOption.setCollectionId(attributeCollectionId);
-                                attributeOption.setValue(attributeOptionValue);
-                                attributeOption.setAttributeId(attribute.getFullId());
-                                attributeOption.setActive("Y");
-                                attributeOption.orchestrate();
-                                attribute.getOptions().put(ValidatableEntity.toId(attributeOptionValue), attributeOption);
-                            }
+                        //Add the single or multi option values
+                        attributeOptionValues.forEach(attributeOptionValue -> {
+                            // If the attribute option won't exist already for the attribute, add the attribute option to the attribute
+                            if (isNotEmpty(attributeOptionValue)) {
+                                if(!attribute.getOptions().containsKey(ValidatableEntity.toId(attributeOptionValue)))
+                                {
+                                    AttributeOption attributeOption = new AttributeOption();
+                                    attributeOption.setCollectionId(attributeCollectionId);
+                                    attributeOption.setValue(attributeOptionValue);
+                                    attributeOption.setAttributeId(attribute.getFullId());
+                                    attributeOption.setActive("Y");
+                                    attributeOption.orchestrate();
+                                    attribute.getOptions().put(ValidatableEntity.toId(attributeOptionValue), attributeOption);
+                                }
 
-                            // If the familyAttribute option won't exist already for the familyAttribute, add the familyAttribute option to the familyAttribute
-                            AttributeOption attributeOption = attribute.getOptions().get(ValidatableEntity.toId(attributeOptionValue));
-                            if(!familyAttribute.getOptions().containsKey(attributeOption.getId())) {
-                                FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
-                                familyAttributeOption.setActive("Y");
-                                familyAttributeOption.setValue(attributeOption.getValue());
-                                familyAttributeOption.setId(attributeOption.getId());
-                                familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
-                                familyAttribute.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                                // If the familyAttribute option won't exist already for the familyAttribute, add the familyAttribute option to the familyAttribute
+                                AttributeOption attributeOption = attribute.getOptions().get(ValidatableEntity.toId(attributeOptionValue));
+                                if(!familyAttribute.getOptions().containsKey(attributeOption.getId())) {
+                                    FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                                    familyAttributeOption.setActive("Y");
+                                    familyAttributeOption.setValue(attributeOption.getValue());
+                                    familyAttributeOption.setId(attributeOption.getId());
+                                    familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                                    familyAttribute.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                                }
                             }
-                        }
+                        });
                     }
-
-
                 }
-
             }
 
             attributeCollection.setGroup("ATTRIBUTES");
@@ -1246,27 +1266,38 @@ public class ProductLoader1 {
                 Map<String, Object> variantAttributesMap = new HashMap<>();
                 for (int col = 1; col < attributeNamesMetadata.size(); col++) {
                     $col1[0] = col;
-                    String cellValue = variantsData.get(row).get(col);
-                    if (cellValue == null) {
-                        cellValue = "";
-                    }
-                    String attributeName = attributeNamesMetadata.get(col);
-                    int attributeLevel = (int) Double.parseDouble(attributeLevelMetadata.get(col));
+                    Object _cellValue = getCellValue(familyAttributesGrid.get(row).get(col), delimitersMetadata.get(col), variantsData.get(row).get(col), productAttributesMap, variantAttributesMap);
+                    if(_cellValue instanceof String) {
+                        String cellValue = (String) _cellValue;
+                        String attributeName = attributeNamesMetadata.get(col);
+                        int attributeLevel = (int) Double.parseDouble(attributeLevelMetadata.get(col));
 
-                    if (familyAttributes.get(familyId).contains(attributeName)) {
-                        FamilyAttribute familyAttribute = familyAttributesGrid.get(row).get(col);
-                        if (ConvertUtil.toBoolean(familyAttribute.getSelectable())) {
-                            Optional<FamilyAttributeOption> cellValueOption = familyAttributesGrid.get(row).get(col).getOptions().values().stream().filter(e -> e.getValue().equals(variantsData.get($row1[0]).get($col1[0]))).findFirst();
-                            if (cellValueOption.isPresent()) {
-                                cellValue = cellValueOption.get().getId();
+                        if (familyAttributes.get(familyId).contains(attributeName)) {
+                            FamilyAttribute familyAttribute = familyAttributesGrid.get(row).get(col);
+                            if (ConvertUtil.toBoolean(familyAttribute.getSelectable())) {
+
+                                Optional<FamilyAttributeOption> cellValueOption = familyAttributesGrid.get(row).get(col).getOptions().values().stream().filter(e -> e.getValue().equals(variantsData.get($row1[0]).get($col1[0]))).findFirst();
+                                if (cellValueOption.isPresent()) {
+                                    cellValue = cellValueOption.get().getId();
+                                }
+                            }
+                            cellValue = convertCellValue(attributeName, cellValue);
+                            if (attributeLevel == 0) {
+                                productAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
+                            } else {
+                                variantAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
                             }
                         }
-                        cellValue = convertCellValue(attributeName, cellValue);
-                        if (attributeLevel == 0) {
-                            productAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
-                        } else {
-                            variantAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), cellValue);
+                    } else {
+                        String attributeName = attributeNamesMetadata.get(col);
+                        int attributeLevel = (int) Double.parseDouble(attributeLevelMetadata.get(col));
 
+                        if (familyAttributes.get(familyId).contains(attributeName)) {
+                            if (attributeLevel == 0) {
+                                productAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), _cellValue);
+                            } else {
+                                variantAttributesMap.put(familyAttributesGrid.get(row).get(col).getId(), _cellValue);
+                            }
                         }
                     }
 
@@ -1415,7 +1446,7 @@ public class ProductLoader1 {
                         });
             }
 
-            for (int row = 0; row < variantsData.size(); row++) {
+            /*for (int row = 0; row < variantsData.size(); row++) {
                 String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")), true).toUpperCase();
                 productId = convertCellValue("", productId);
                 String productName = variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_NAME"));
@@ -1494,7 +1525,7 @@ public class ProductLoader1 {
                         }
                     }
                 }
-            }
+            }*/
             System.out.println("Done");
         });
 
@@ -1626,7 +1657,7 @@ public class ProductLoader1 {
 
         List<String> attributeNamesMetadata = data.get(0);
         List<String> attributeTypesMetadata = data.get(1);
-        int numOfMetadataRows = 5;
+        int numOfMetadataRows = 7;
         List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
 
         Map<String, Set<String>> familyAttributes = new HashMap<>();
@@ -1637,8 +1668,8 @@ public class ProductLoader1 {
             if(!isEmpty(familyId)) {
                 for (int col = 1; col < attributeNamesMetadata.size(); col++) {
                     String attributeName = attributeNamesMetadata.get(col);
-                    //String attributeValue = variantsData.get(row).get(col); - TODO verify the old logic
-                    if (isNotEmpty(attributeName) && availableAttributeTypes.contains(attributeTypesMetadata.get(col))) {
+                    String attributeValue = variantsData.get(row).get(col);
+                    if (isNotEmpty(attributeName) && isNotEmpty(attributeValue) && availableAttributeTypes.contains(attributeTypesMetadata.get(col))) {
                         if (!familyAttributes.containsKey(familyId)) {
                             familyAttributes.put(familyId, new HashSet<>());
                         }
@@ -1745,6 +1776,37 @@ public class ProductLoader1 {
     private String convertCellValue(String name, String cellValue) {
         if((!name.equals("Base Quantity Price") && !name.equals("Each Price")) && cellValue.endsWith(".0")) {
             return cellValue.substring(0, cellValue.length() - 2);
+        }
+        return cellValue;
+    }
+
+    /**
+     * This version supports only one level of parent attribute linking, multi-level linking will be implemented in future version, if required
+     * @param attribute
+     * @param delimiters
+     * @param cellValue
+     * @return
+     */
+    private Object getCellValue(FamilyAttribute attribute, String delimiters, String cellValue, Map<String, Object> productAttributesMap, Map<String, Object> variantAttributesMap) {
+        if(isEmpty(cellValue)) {
+            return "";
+        }
+        if(isNotEmpty(delimiters)) {
+            if(isNotEmpty(attribute.getParentAttributeId())) { // Dependent attribute options - multi value - possible multi level depth - attribute value is of type Map<String, Object>, where key will be the parent option Id and value will be the option ID
+                Map<String, Object> attributeValue = new LinkedHashMap<>();
+                FamilyAttribute parentAttribute = attribute.getFamily().getAttribute(attribute.getParentAttributeId()).orElse(null);
+                //Parent values will always be of List<String> type
+                List<String> parentAttributeValues = (List<String>) (productAttributesMap.containsKey(parentAttribute.getId()) ? productAttributesMap.get(parentAttribute.getId()) : variantAttributesMap.get(parentAttribute.getId()));
+                //If cellValue is multi delimited, then each child value will be a List<String> other wise, child value will be a string
+                String[] childValues = split(cellValue, delimiters.substring(0, 1));
+                for(int i = 0; i < childValues.length; i ++) {
+                    String[] childAttributeValue = {childValues[i]};
+                    attributeValue.put(parentAttributeValues.get(i), delimiters.length() == 1 ? attribute.getOptions().values().stream().filter(e -> e.getValue().equals(childAttributeValue[0])).findFirst().map(o -> o.getId()).orElse(childAttributeValue[0]) : ConversionUtil.toList(split(childAttributeValue[0], delimiters.substring(1, 2))).stream().map(value -> attribute.getOptions().values().stream().filter(e -> e.getValue().equals(value)).findFirst().map(o -> o.getId()).orElse(value)).collect(Collectors.toList()));
+                }
+                return attributeValue;
+            } else {    // standalone attribute options - multi values - single level depth - attribute value is of type List<String> where each element will be the option ID
+                return ConversionUtil.toList(split(cellValue, delimiters.substring(0, 1))).stream().map(value -> attribute.getOptions().values().stream().filter(e -> e.getValue().equals(value)).findFirst().map(o -> o.getId()).orElse(value)).collect(Collectors.toList());
+            }
         }
         return cellValue;
     }

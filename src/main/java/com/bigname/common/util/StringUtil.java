@@ -1,10 +1,9 @@
 package com.bigname.common.util;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
+
+import static com.bigname.common.util.ConversionUtil.*;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -17,6 +16,9 @@ public class StringUtil {
     }
 
     public static String[] split(String value, String delim) {
+        if("|".equals(delim)) {
+            delim = "\\|";
+        }
         if(ValidationUtil.isNull(value)) {
             return new String[0];
         } else if(ValidationUtil.isEmpty(delim)) {
@@ -24,6 +26,22 @@ public class StringUtil {
         } else {
             return value.split(delim);
         }
+    }
+
+    public static List<String> split(String value, String[] delimiters) {
+        return delimiters.length == 0 ? toList(value) : split(toList(value), toList(delimiters));
+    }
+
+    private static List<String> split(List<String> fragments, List<String> delimiters) {
+        List<String> tokens = new ArrayList<>();
+        for(String fragment : fragments) {
+            if(delimiters.size() == 1) {
+                tokens.addAll(Arrays.asList(split(fragment, delimiters.get(0))));
+            } else {
+                tokens.addAll(split(Arrays.asList(split(fragment, delimiters.remove(0))), delimiters));
+            }
+        }
+        return tokens;
     }
 
     public static String concatinate(List<String> values, String delim) {
