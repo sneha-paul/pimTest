@@ -2,6 +2,7 @@ package com.bigname.pim.data.exportor;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
 import com.bigname.core.data.exporter.BaseExporter;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.util.FindBy;
@@ -18,6 +19,8 @@ import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static com.bigname.common.util.StringUtil.*;
+
 /**
  * Created by sruthi on 31-01-2019.
  */
@@ -29,6 +32,10 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
 
     @Autowired
     private FamilyService familyService;
+
+    @Autowired
+    private AttributeCollectionService attributeCollectionService;
+
     @Autowired
     private ProductService productService;
 
@@ -106,6 +113,81 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
 
     public boolean exportFullJsonData(String filePath) {
         Map<String, Object> jsonData = new LinkedHashMap<>();
+        List<Map<String, Object>> attributeOptionsNode = new ArrayList<>();
+        Map<String, AttributeOption> attributeOptions = new HashMap<>();
+        attributeCollectionService.getAll(null, true, true, true)
+                .forEach(attributeCollection -> attributeCollection.getAllAttributes()
+                        .forEach(attribute -> {
+                            Map<String, AttributeOption> options = attribute.getOptions();
+                            options.forEach((attributeOptionId, attributeOption) -> attributeOption.setCollectionId(attributeCollection.getCollectionId()).setAttributeId(attribute.getId()));
+                            attributeOptions.putAll(options);
+                        }));
+
+        attributeOptions.forEach((optionId, attributeOption) -> {
+            Map<String, Object> optionNode = CollectionsUtil.toMap(
+                    "_ID",    attributeOption.getId(),
+                    "VALUE",         attributeOption.getValue(),
+                    "_COLLECTION_ID",attributeOption.getCollectionId(),
+                    "_ATTRIBUTE_ID", attributeOption.getAttributeId());
+
+            attributeOptionsNode.add(optionNode);
+        });
+        jsonData.put("ATTRIBUTE_OPTIONS", attributeOptionsNode);
+
+
+        List<Map<String, Object>> familiesNode = new ArrayList<>();
+        List<Family> familiesList = familyService.getAll(null, true, true, true);
+        familiesList.forEach(family -> {
+            Map<String, Object> familyNode = CollectionsUtil.toMap(
+                    "_ID",   family.getId(),
+                    "FAMILY_ID",    family.getFamilyId(),
+                    "NAME",         family.getFamilyName(),
+                    "ACTIVE",       family.getActive(),
+                    "DISCONTINUED", family.getDiscontinued());
+
+            int[] seqNum = {0};
+            familyNode.put("FAMILY_ATTRIBUTES", family.getAllAttributesMap(false).entrySet().stream().map(entry -> entry.getValue()).collect(Collectors.toList()).stream()
+                    .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                    .map(familyAttribute -> {
+                        Map<String, Object> familyAttributeNode = CollectionsUtil.toMap(
+                                "_ID",                 familyAttribute.getId(),
+                                "NAME",                       familyAttribute.getName(),
+                                "TYPE",                       familyAttribute.getUiType().name(),
+                                "DATA_TYPE",                  familyAttribute.getDataType(),
+                                "SELECTABLE",                 familyAttribute.getUiType().isSelectable(),
+                                "MULTI_SELECT",               familyAttribute.getUiType().isMultiSelect() ? "Y" : "N",
+                                "SCOPE",                      familyAttribute.getScope().get(PIMConstants.DEFAULT_CHANNEL_ID).name(),
+                                "COLLECTION_ID",              familyAttribute.getCollectionId(),
+                                "ATTRIBUTE_ID",               getSimpleId(familyAttribute.getAttributeId()),
+                                "PARENT_FAMILY_ATTRIBUTE_ID", getSimpleId(familyAttribute.getParentAttributeId()),
+                                "ACTIVE",                     familyAttribute.getActive(),
+                                "SEQUENCE_NUM",               seqNum[0] ++);
+
+                        int[] seqNum1 = {0};
+                        List<Map<String, Object>> familyAttributeOptionsNode = new ArrayList<>();
+                        familyAttribute.getOptions().entrySet().stream()
+                                .map(entry -> entry.getValue()).collect(Collectors.toList()).stream()
+                                .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                                .forEach(familyAttributeOption -> {
+                                    Map<String, Object> familyAttributeOptionNode = CollectionsUtil.toMap(
+                                            "_ID",   familyAttributeOption.getId(),
+                                            "VALUE",        familyAttributeOption.getValue(),
+                                            "ACTIVE",       familyAttributeOption.getActive(),
+                                            "SEQUENCE_NUM", seqNum1[0] ++);
+
+                                    familyAttributeOptionsNode.add(familyAttributeOptionNode);
+                                });
+
+                        familyAttributeNode.put("FAMILY_ATTRIBUTE_OPTIONS", familyAttributeOptionsNode);
+
+                        return familyAttributeNode;
+                    }).collect(Collectors.toList()));
+
+            familiesNode.add(familyNode);
+        });
+        jsonData.put("FAMILIES", familiesNode);
+
+
         List<Map<String, Object>> websitesNode = new ArrayList<>();
         List<Website> websitesList = websiteService.getAll(null, true, true, true);
         websitesList.forEach(website -> {
@@ -245,7 +327,6 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
             productsNode.add(productNode);
         });
         jsonData.put("PRODUCTS", productsNode);
-
 
         POIUtil.writeJsonData(filePath, "PIMExport", ConversionUtil.toJSONString(jsonData));
         return true;

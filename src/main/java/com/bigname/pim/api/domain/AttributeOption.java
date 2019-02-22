@@ -79,17 +79,19 @@ public class AttributeOption extends ValidatableEntity {
         return attributeId;
     }
 
-    public void setAttributeId(String attributeId) {
+    public AttributeOption setAttributeId(String attributeId) {
         this.attributeId = attributeId;
         orchestrate();
+        return this;
     }
 
     public String getCollectionId() {
         return collectionId;
     }
 
-    public void setCollectionId(String collectionId) {
+    public AttributeOption setCollectionId(String collectionId) {
         this.collectionId = collectionId;
+        return this;
     }
 
     public String getValue() {
