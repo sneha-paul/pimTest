@@ -73,4 +73,6 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
 
     Page<Map<String, Object>> findAllRootCategories(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
+    List<RootCategory> getAllRootCategories(String catalogInternalId);
+
 }

@@ -21,4 +21,6 @@ public interface RootCategoryDAO extends BaseAssociationDAO<RootCategory>, Mongo
     List<RootCategory> findByCatalogIdAndRootCategoryIdIn(String catalogId, String[] rootCategoryIds);
     Optional<RootCategory> findFirstByCatalogIdAndRootCategoryId(String catalogId, String rootCategoryIds);
     List<RootCategory> findByCatalogIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(String catalogId, long sequenceNum, int subSequenceNum);
+
+    Optional<RootCategory> findTopByCatalogIdAndSequenceNumOrderBySubSequenceNumDesc(String catalogId, long sequenceNum);
 }

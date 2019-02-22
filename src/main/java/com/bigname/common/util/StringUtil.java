@@ -1,7 +1,7 @@
 package com.bigname.common.util;
 
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.regex.*;
 
 import static com.bigname.common.util.ConversionUtil.*;
 
@@ -120,4 +120,30 @@ public class StringUtil {
     public static String trim(String s, boolean replaceNull) {
         return s == null ? replaceNull ? "" : s : s.trim();
     }
+
+    public static final java.util.regex.Pattern camelCasePattern = java.util.regex.Pattern.compile("(.+?)([A-Z])");
+    public static final java.util.regex.Pattern snakeCasePattern = java.util.regex.Pattern.compile("(.*?)_([a-zA-Z])");
+
+    public static String toSnakeCase(String camelCaseValue, boolean... lowerCase) {
+        Matcher matcher = camelCasePattern.matcher(camelCaseValue);
+        StringBuffer sb = new StringBuffer();
+        String suffix = camelCasePattern.matcher(camelCaseValue).replaceAll("");
+        while(matcher.find()) {
+            matcher.appendReplacement(sb, matcher.group(1) + "_" + matcher.group(2));
+        }
+        return getValue(lowerCase) ? sb.append(suffix).toString().toLowerCase() : sb.append(suffix).toString().toUpperCase();
+    }
+
+    public static String toCamelCase(String snakeCaseValue, boolean... lowerCase) {
+        Matcher matcher = snakeCasePattern.matcher(snakeCaseValue);
+        StringBuffer sb = new StringBuffer();
+        String suffix = snakeCasePattern.matcher(snakeCaseValue).replaceAll("");
+        while(matcher.find()) {
+            matcher.appendReplacement(sb, matcher.group(1).toLowerCase() + matcher.group(2).toUpperCase());
+        }
+        sb.append(suffix.toLowerCase());
+        return getValue(lowerCase) ? sb.replace(0, 1, sb.substring(0, 1).toLowerCase()).toString() : sb.replace(0, 1, sb.substring(0, 1).toUpperCase()).toString();
+    }
+
+
 }

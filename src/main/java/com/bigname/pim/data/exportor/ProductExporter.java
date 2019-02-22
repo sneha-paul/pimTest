@@ -5,15 +5,13 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.core.data.exporter.BaseExporter;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.util.FindBy;
-import com.bigname.pim.api.domain.Family;
-import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.ProductVariant;
-import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.api.service.ProductService;
-import com.bigname.pim.api.service.ProductVariantService;
+import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.service.*;
+import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.POIUtil;
 import com.bigname.pim.util.PimUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -33,6 +31,15 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
     private FamilyService familyService;
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private WebsiteService websiteService;
+
+    @Autowired
+    private CatalogService catalogService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     public boolean exportData(String filePath) {
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
@@ -95,6 +102,153 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
     @Override
     public String getFileName(Type fileType) {
         return "ProductExport" + PimUtil.getTimestamp() + fileType.getExt();
+    }
+
+    public boolean exportFullJsonData(String filePath) {
+        Map<String, Object> jsonData = new LinkedHashMap<>();
+        List<Map<String, Object>> websitesNode = new ArrayList<>();
+        List<Website> websitesList = websiteService.getAll(null, true, true, true);
+        websitesList.forEach(website -> {
+            Map<String, Object> websiteNode = CollectionsUtil.toMap(
+                                                        "_ID",  website.getId(),
+                                                        "WEBSITE_ID",   website.getWebsiteId(),
+                                                        "NAME",         website.getWebsiteName(),
+                                                        "URL",          website.getUrl(),
+                                                        "ACTIVE",       website.getActive(),
+                                                        "DISCONTINUED", website.getDiscontinued());
+            int[] seqNum = {0};
+            websiteNode.put("CATALOGS", websiteService.getAllWebsiteCatalogs(website.getId()).stream()
+                                                            .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                                                            .map(websiteCatalog -> CollectionsUtil.toMap("_ID", websiteCatalog.getCatalogId(), "ACTIVE", websiteCatalog.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
+                                                            .collect(Collectors.toList()));
+
+            websitesNode.add(websiteNode);
+        });
+        jsonData.put("WEBSITES", websitesNode);
+
+        List<Map<String, Object>> catalogsNode = new ArrayList<>();
+        List<Catalog> catalogsList = catalogService.getAll(null, true, true, true);
+        catalogsList.forEach(catalog -> {
+            Map<String, Object> catalogNode =  CollectionsUtil.toMap(
+                                                        "_ID",  catalog.getId(),
+                                                        "CATALOG_ID",   catalog.getCatalogId(),
+                                                        "NAME",         catalog.getCatalogName(),
+                                                        "DESCRIPTION",  catalog.getDescription(),
+                                                        "ACTIVE",       catalog.getActive(),
+                                                        "DISCONTINUED", catalog.getDiscontinued());
+            int[] seqNum = {0};
+            catalogNode.put("CATEGORIES", catalogService.getAllRootCategories(catalog.getId()).stream()
+                                                            .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                                                            .map(rootCategory -> CollectionsUtil.toMap("_ID", rootCategory.getRootCategoryId(), "ACTIVE", rootCategory.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
+                                                            .collect(Collectors.toList()));
+
+            catalogsNode.add(catalogNode);
+        });
+        jsonData.put("CATALOGS", catalogsNode);
+
+        List<Map<String, Object>> categoriesNode = new ArrayList<>();
+//        List<Category> categoriesList = categoryService.getAll(0, 10, null, true, true, true).getContent();
+        List<Category> categoriesList = categoryService.getAll(null, true, true, true);
+        categoriesList.forEach(category -> {
+            Map<String, Object> categoryNode =  CollectionsUtil.toMap(
+                                                        "_ID",      category.getId(),
+                                                        "CATEGORY_ID",      category.getCategoryId(),
+                                                        "NAME",             category.getCategoryName(),
+                                                        "DESCRIPTION",      category.getDescription(),
+                                                        "LONG_DESCRIPTION", category.getLongDescription(),
+                                                        "META_DESCRIPTION", category.getMetaDescription(),
+                                                        "META_KEYWORDS",    category.getMetaKeywords(),
+                                                        "META_TITLE",       category.getMetaTitle(),
+                                                        "ACTIVE",           category.getActive(),
+                                                        "DISCONTINUED",     category.getDiscontinued());
+            int[] seqNum = {0};
+            categoryNode.put("PRODUCTS", categoryService.getAllCategoryProducts(category.getId()).stream()
+                    .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                    .map(categoryProduct -> CollectionsUtil.toMap("_ID", categoryProduct.getProductId(), "ACTIVE", categoryProduct.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
+                    .collect(Collectors.toList()));
+
+            categoriesNode.add(categoryNode);
+        });
+        jsonData.put("CATEGORIES", categoriesNode);
+
+        List<Map<String, Object>> productsNode = new ArrayList<>();
+//        List<Product> productsList = productService.getAll(0, 10, null, true, true, true).getContent();
+        List<Product> productsList = productService.getAll(null, true, true, true);
+        productsList.forEach(product -> {
+            Map<String, Object> productNode =  CollectionsUtil.toMap(
+                    "_ID",       product.getId(),
+                    "PRODUCT_ID",       product.getProductId(),
+                    "NAME",             product.getProductName(),
+                    "_FAMILY_ID",       product.getProductFamilyId(),
+                    "FAMILY_ID",        product.getProductFamily().getFamilyId(),
+                    "ACTIVE",           product.getActive(),
+                    "DISCONTINUED",     product.getDiscontinued());
+
+            productNode.putAll(product.getScopedFamilyAttributes().get(PIMConstants.DEFAULT_CHANNEL_ID));
+
+            Map<String, Object> digitalAssets = new LinkedHashMap<>();
+            if(product.getScopedAssets().get(PIMConstants.DEFAULT_CHANNEL_ID) != null) {
+                product.getScopedAssets().get(PIMConstants.DEFAULT_CHANNEL_ID)
+                        .forEach((assetFamilyId, familyAssets) -> {
+                            List<Map<String, Object>> assetsMap = (List<Map<String, Object>>) familyAssets;
+                            digitalAssets.put(assetFamilyId, assetsMap.stream().map(assetMap -> CollectionsUtil.toMap(
+                                    "_ID",   assetMap.get("id"),
+                                    "NAME",         assetMap.get("name"),
+                                    "FILE_NAME",    assetMap.get("internalName"),
+                                    "IS_DEFAULT",   assetMap.get("defaultFlag"),
+                                    "SEQUENCE_NUM", assetMap.get("sequenceNum"),
+                                    "TYPE",         assetMap.get("type")
+                            )).collect(Collectors.toList()));
+                        });
+            }
+            productNode.put("DIGITAL_ASSETS", digitalAssets);
+            int[] seqNum = {0};
+            productNode.put("PRODUCT_VARIANTS", productService.getProductVariants(product.getProductId(), FindBy.EXTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, null, false).stream()
+                    .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                    .map(productVariant -> {
+                        Map<String, Object> variantNode =  CollectionsUtil.toMap(
+                                "_ID",           productVariant.getId(),
+                                "PRODUCT_VARIANT_ID",   productVariant.getProductVariantId(),
+                                "NAME",                 productVariant.getProductVariantName(),
+                                "_PRODUCT_ID",          product.getId(),
+                                "PRODUCT_ID",           product.getProductId(),
+                                "_FAMILY_ID",           product.getProductFamilyId(),
+                                "FAMILY_ID",            product.getProductFamily().getFamilyId(),
+                                "SEQUENCE_NUM",         seqNum[0] ++,
+                                "ACTIVE",               productVariant.getActive(),
+                                "DISCONTINUED",         productVariant.getDiscontinued());
+                        variantNode.putAll(product.getScopedFamilyAttributes().get(PIMConstants.DEFAULT_CHANNEL_ID));
+                        variantNode.putAll(productVariant.getVariantAttributes());
+                        variantNode.put("PRICING_DETAILS", productVariant.getPricingDetails());
+                        Map<String, Object> variantDigitalAssets = new LinkedHashMap<>();
+                        if(productVariant.getVariantAssets() != null) {
+                            productVariant.getVariantAssets()
+                                    .forEach((assetFamilyId, familyAssets) -> {
+                                        List<Map<String, Object>> assetsMap = (List<Map<String, Object>>) familyAssets;
+                                        variantDigitalAssets.put(assetFamilyId, assetsMap.stream().map(assetMap -> CollectionsUtil.toMap(
+                                                "_ID",   assetMap.get("id"),
+                                                "NAME",         assetMap.get("name"),
+                                                "FILE_NAME",    assetMap.get("internalName"),
+                                                "IS_DEFAULT",   assetMap.get("defaultFlag"),
+                                                "SEQUENCE_NUM", assetMap.get("sequenceNum"),
+                                                "TYPE",         assetMap.get("type")
+                                        )).collect(Collectors.toList()));
+                                    });
+                        }
+                        variantNode.put("DIGITAL_ASSETS", variantDigitalAssets);
+
+
+                        return variantNode;
+                    })
+                    .collect(Collectors.toList()));
+
+            productsNode.add(productNode);
+        });
+        jsonData.put("PRODUCTS", productsNode);
+
+
+        POIUtil.writeJsonData(filePath, "PIMExport", ConversionUtil.toJSONString(jsonData));
+        return true;
     }
 
     public boolean exportJsonData(String filePath) {

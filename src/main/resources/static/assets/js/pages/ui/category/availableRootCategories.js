@@ -26,11 +26,11 @@ $( document ).ready(function() {
                 $.refreshDataTable('availableRootCategories');
                 toastr.success('Successfully added the root category', 'Root Category Added');
             } else {
-                toastr.success('Error occurred while adding the root category', 'Error Adding Root Category');
+                toastr.error('Error occurred while adding the root category', 'Error Adding Root Category');
             }
 
         }).fail(function(jqXHR, status) {
-            toastr.success('Error occurred while adding the root category', 'Error Adding Root Category');
+            toastr.error('Error occurred while adding the root category', 'Error Adding Root Category');
         });
     }
 });

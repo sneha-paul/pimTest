@@ -66,6 +66,11 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
+    public List<CategoryProduct> getAllCategoryProducts(String categoryInternalId) {
+        return categoryProductDAO.findByCategoryId(categoryInternalId);
+    }
+
+    @Override
     public Page<Category> findAvailableSubCategoriesForCategory(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
                 .map(category -> categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), searchField, keyword, pageable, activeRequired))

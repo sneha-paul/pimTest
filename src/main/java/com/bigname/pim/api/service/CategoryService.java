@@ -129,5 +129,6 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
 
     Page<Map<String, Object>> findAllCategoryProducts(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
+    List<CategoryProduct> getAllCategoryProducts(String categoryInternalId);
 }
 

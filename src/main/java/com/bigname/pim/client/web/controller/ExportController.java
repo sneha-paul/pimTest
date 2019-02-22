@@ -6,6 +6,7 @@ import com.bigname.pim.data.exportor.CatalogExporter;
 import com.bigname.pim.data.exportor.CategoryExporter;
 import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.data.loader.exporter.WebsiteExporter;
+import com.bigname.pim.util.PimUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,6 +88,14 @@ public class ExportController {
     public Map<String, Object> exportProductJsonData(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
         productExporter.exportJsonData("/DevStudio/Docs/PIM_ExcelFiles/ProductData.json");
+        return model;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/pimData", method = RequestMethod.GET)
+    public Map<String, Object> exportPIMJsonData(HttpServletRequest request) {
+        Map<String, Object> model = new HashMap<>();
+        productExporter.exportFullJsonData("/DevStudio/Docs/PIM_Feeds/PIMExport" + PimUtil.getTimestamp() + ".json");
         return model;
     }
 

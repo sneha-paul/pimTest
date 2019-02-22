@@ -232,7 +232,6 @@ public class ProductVariant extends Entity<ProductVariant> {
         map.put("sequenceNum", String.valueOf(getSequenceNum()));
         return map;
     }
-    CollectionsUtil collectionsUtil = new CollectionsUtil();
 
     public Map<String, Object> diff(ProductVariant productVariant, boolean... ignoreInternalId) {
         boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
@@ -246,23 +245,23 @@ public class ProductVariant extends Entity<ProductVariant> {
         if (!this.getProductId().equals(productVariant.getProductId())) {
             diff.put("productId", productVariant.getProductId());
         }
-        Object axisAttributesDiff = collectionsUtil.compareMaps(productVariant.getAxisAttributes(),this.getAxisAttributes());
+        Object axisAttributesDiff = CollectionsUtil.compareMaps(productVariant.getAxisAttributes(),this.getAxisAttributes());
         if(axisAttributesDiff.equals(""))
         {
             diff.put("axisAttributes", axisAttributesDiff);
         }
 
-        Object variantAttributesDiff = collectionsUtil.compareMaps(productVariant.getVariantAttributes(),this.getVariantAttributes());
+        Object variantAttributesDiff = CollectionsUtil.compareMaps(productVariant.getVariantAttributes(),this.getVariantAttributes());
         if(axisAttributesDiff.equals(""))
         {
             diff.put("variantAttributes", variantAttributesDiff);
         }
-        Object variantAssetsDiff = collectionsUtil.compareMaps(productVariant.getVariantAssets(),this.getVariantAssets());
+        Object variantAssetsDiff = CollectionsUtil.compareMaps(productVariant.getVariantAssets(),this.getVariantAssets());
         if(axisAttributesDiff.equals(""))
         {
             diff.put("variantAssets", variantAssetsDiff);
         }
-        Object pricingDetailsDiff = collectionsUtil.compareMaps(productVariant.getPricingDetails(),this.getPricingDetails());
+        Object pricingDetailsDiff = CollectionsUtil.compareMaps(productVariant.getPricingDetails(),this.getPricingDetails());
         if(pricingDetailsDiff.equals(""))
         {
             diff.put("pricingDetails", pricingDetailsDiff);

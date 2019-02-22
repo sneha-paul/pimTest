@@ -50,6 +50,11 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     }
 
     @Override
+    public List<WebsiteCatalog> getAllWebsiteCatalogs(String websiteInternalId) {
+        return websiteCatalogDAO.findByWebsiteId(websiteInternalId);
+    }
+
+    @Override
     public Page<Catalog> findAvailableCatalogsForWebsite(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(websiteId, findBy, false)
                 .map(catalog -> websiteDAO.findAvailableCatalogsForWebsite(catalog.getId(), searchField, keyword, pageable, activeRequired))

@@ -61,6 +61,11 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     }
 
     @Override
+    public List<RootCategory> getAllRootCategories(String catalogInternalId) {
+        return rootCategoryDAO.findByCatalogId(catalogInternalId);
+    }
+
+    @Override
     public Page<Category> findAvailableRootCategoriesForCatalog(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         return get(catalogId, findBy, false)
                 .map(category -> catalogDAO.findAvailableRootCategoriesForCatalog(category.getId(), searchField, keyword, pageable, activeRequired))
@@ -278,7 +283,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         if(catalog.isPresent()) {
             Optional<Category> rootCategory = categoryService.get(rootCategoryId, findBy2, false);
             if(rootCategory.isPresent()) {
-                Optional<RootCategory> top = rootCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                Optional<RootCategory> top = rootCategoryDAO.findTopByCatalogIdAndSequenceNumOrderBySubSequenceNumDesc(catalog.get().getId(), 0);
                 return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
             }
         }
