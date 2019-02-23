@@ -87,38 +87,46 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach(websiteData -> {
             Website websiteDTO = new Website();
             websiteDTO.setWebsiteName((String)websiteData.get("name"));
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
             websiteDTO.setActive((String)websiteData.get("active"));
             websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
 
-        websiteService.create(websiteDTOs);
+            websiteService.create(websiteDTO);
 
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), websiteDTOs.size());
+            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(newWebsite != null);
+            Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
+        });
+
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false).getTotalElements(), websitesData.size());
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
     public void toggleTest() {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test1.com");
-        websiteDTO.setWebsiteId("TEST1");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test1.com");
-        websiteDAO.insert(websiteDTO);
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
-        Website websiteDetails = websiteService.get("TEST1", EXTERNAL_ID, false).orElse(null);
+        websitesData.forEach(websiteData -> {
+                    Website websiteDTO = new Website();
+                    websiteDTO.setWebsiteName((String) websiteData.get("name"));
+                    websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+                    websiteDTO.setActive((String) websiteData.get("active"));
+                    websiteDTO.setUrl((String) websiteData.get("url"));
+                    websiteDAO.insert(websiteDTO);
+        });
+
+        Website websiteDetails = websiteService.get(websitesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(websiteDetails != null);
         websiteService.toggle(websiteDetails.getWebsiteId(), EXTERNAL_ID, Toggle.get(websiteDetails.getActive()));
 
         Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(updatedWebsite != null);
-        Map<String, Object> diff = websiteDTO.diff(updatedWebsite);
+        Map<String, Object> diff = websiteDetails.diff(updatedWebsite);
         Assert.assertEquals(diff.size(), 1);
         Assert.assertEquals(diff.get("active"), "N");
 
@@ -127,31 +135,23 @@ public class BaseServiceSupportTest {
 
     @Test
     public void getTest() {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test1.com");
-        websiteDTO.setWebsiteId("TEST1");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test1.com");
-        websiteDAO.insert(websiteDTO);
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test1.com", "active", "Y"));
 
-        Website websiteDetails = websiteService.get("TEST1", EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(websiteDetails != null);
-        Map<String, Object> diff = websiteDTO.diff(websiteDetails);
-        Assert.assertEquals(diff.size(), 0);
+        websitesData.forEach(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
 
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-
-        websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test2.com");
-        websiteDTO.setWebsiteId("TEST2");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test2.com");
-        websiteDAO.insert(websiteDTO);
-
-        websiteDetails = websiteService.get(websiteDTO.getId(), INTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(websiteDetails != null);
-        diff = websiteDTO.diff(websiteDetails);
-        Assert.assertEquals(diff.size(), 0);
+            Website websiteDetails = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(websiteDetails != null);
+            Map<String, Object> diff = websiteDTO.diff(websiteDetails);
+            Assert.assertEquals(diff.size(), 0);
+        });
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
@@ -169,19 +169,17 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
-
-        websiteDAO.insert(websiteDTOs);
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
         Page<Website> paginatedResult = websiteService.getAll(0, 10, null,false);
-        Assert.assertEquals(paginatedResult.getContent().size(), websiteDTOs.size());
+        Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
@@ -199,16 +197,14 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
-
-        websiteDAO.insert(websiteDTOs);
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
         List<Website> result = websiteService.getAll(Sort.by("websiteName").ascending(), false);
         String[] actual = result.stream().map(website -> website.getWebsiteName()).collect(Collectors.toList()).toArray(new String[0]);
@@ -228,16 +224,14 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
-
-        websiteDAO.insert(websiteDTOs);
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
         result = websiteService.getAll(Sort.by("websiteName").descending(), false);
         actual = result.stream().map(website -> website.getWebsiteName()).collect(Collectors.toList()).toArray(new String[0]);
@@ -260,18 +254,16 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        String[] ids = {"TEST_1", "TEST_2", "TEST_3"};
+        String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
 
         Page<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
         Map<String, Website> websitesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
@@ -293,18 +285,16 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        String[] ids = {"TEST_1", "TEST_2", "TEST_3"};
+        String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
 
         List<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, null, false);
         Map<String, Website> websitesMap = paginatedResult.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
@@ -326,18 +316,16 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        String[] ids = {"TEST_1", "TEST_2", "TEST_3"};
+        String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
 
         Page<Website> paginatedResult = websiteService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
         Map<String, Website> websitesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
@@ -359,18 +347,16 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        String[] ids = {"TEST_1", "TEST_2", "TEST_3"};
+        String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
 
         List<Website> paginatedResult = websiteService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
         Map<String, Website> websitesMap = paginatedResult.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
@@ -392,18 +378,16 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websiteDTOs.size()), false);
+        Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websitesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), 9);
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
@@ -422,18 +406,16 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websiteDTOs.size()), false);
+        Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websitesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), 9);
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
@@ -441,25 +423,30 @@ public class BaseServiceSupportTest {
 
     @Test
     public void updateEntityTest() {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test1.com");
-        websiteDTO.setWebsiteId("TEST1");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test1.com");
-        websiteDAO.insert(websiteDTO);
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
-        Website websiteDetails = websiteService.get("TEST1", EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(websiteDetails != null);
-        websiteDetails.setUrl("https://www.test11.com");
-        websiteDetails.setGroup("DETAILS");
+        websitesData.forEach(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
 
-        websiteService.update(websiteDetails.getWebsiteId(), EXTERNAL_ID, websiteDetails);
+            Website websiteDetails = websiteService.get(websitesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(websiteDetails != null);
+            websiteDetails.setUrl("https://www.test11.com");
+            websiteDetails.setGroup("DETAILS");
 
-        Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(updatedWebsite != null);
-        Map<String, Object> diff = websiteDTO.diff(updatedWebsite);
-        Assert.assertEquals(diff.size(), 1);
-        Assert.assertEquals(diff.get("url"), "https://www.test11.com");
+            websiteService.update(websiteDetails.getWebsiteId(), EXTERNAL_ID, websiteDetails);
+
+            Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(updatedWebsite != null);
+            Map<String, Object> diff = websiteDTO.diff(updatedWebsite);
+            Assert.assertEquals(diff.size(), 1);
+            Assert.assertEquals(diff.get("url"), "https://www.test11.com");
+        });
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
@@ -477,18 +464,16 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        String[] ids = {"TEST_1", "TEST_2", "TEST_3"};
+        String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
 
         List<Website> result = websiteService.getAll(ids, EXTERNAL_ID, null, false);
         Map<String, Website> websitesMap = result.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
@@ -512,20 +497,24 @@ public class BaseServiceSupportTest {
 
     @Test
     public void cloneInstance() {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test1.com");
-        websiteDTO.setWebsiteId("TEST1");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test1.com");
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
-        websiteDAO.insert(websiteDTO);
+        websitesData.forEach(websiteData -> {
+                    Website websiteDTO = new Website();
+                    websiteDTO.setWebsiteName((String) websiteData.get("name"));
+                    websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+                    websiteDTO.setActive((String) websiteData.get("active"));
+                    websiteDTO.setUrl((String) websiteData.get("url"));
+                    websiteDAO.insert(websiteDTO);
 
-        Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newWebsite != null);
-        Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
+            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(newWebsite != null);
+            Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
 
-        Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
-        Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
+            Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
+        });
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
@@ -543,16 +532,14 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "N"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "N"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
-
-        websiteDAO.insert(websiteDTOs);
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
         List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"));
         Assert.assertTrue(result.size() == 2);
@@ -573,16 +560,14 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "N"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "N"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
-
-        websiteDAO.insert(websiteDTOs);
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Website> result = websiteService.findAll(criteria);
@@ -604,19 +589,17 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "N"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "N"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        Optional<Website> result = websiteService.findOne(CollectionsUtil.toMap("websiteName", "Test1.com"));
-        Assert.assertEquals(websiteDTOs.get(0).getWebsiteName(), result.get().getWebsiteName());
+        Optional<Website> result = websiteService.findOne(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
+        Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
@@ -634,20 +617,18 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "N"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "N"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName((String)websiteData.get("name"));
-            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
-            websiteDTO.setActive((String)websiteData.get("active"));
-            websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("websiteName", "Test1.com"));
+        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
         Optional<Website> result = websiteService.findOne(criteria);
-        Assert.assertEquals(websiteDTOs.get(0).getWebsiteName(), result.get().getWebsiteName());
+        Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
