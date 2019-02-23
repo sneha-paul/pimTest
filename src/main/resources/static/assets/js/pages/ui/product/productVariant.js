@@ -50,8 +50,50 @@ $( document ).ready(function() {
                 $.refreshPage();
             });
 
+        },
+        linkDependentAttributes: function() {
+            let parentAttributeIds = new Set([]);
+            $('[data-parent-attr-id]').each(function(){
+                parentAttributeIds.add($(this).data('parent-attr-id'));
+            });
+
+            parentAttributeIds.forEach(function(value1){
+                let parentEl = $('[data-attr-id="' + value1 + '"]')[0];
+                $(parentEl).on('change', function(){
+                    $.updateDependentAttributes($('[data-parent-attr-id="' + value1 + '"]'), $(this).find('option:selected'), $(this).val());
+                });
+            });
+        },
+        updateDependentAttributes: function(dependentAttributes, parentOptionEls, parentOptionValues) {
+            $(dependentAttributes).each(function(i, dependentAttribute){
+                const dependentAttributeContainer = $(dependentAttribute).closest('.ig-container');
+                let dependentChildAttributes = $(dependentAttributeContainer).find('.js-dependent-child');
+                if(dependentChildAttributes.length < parentOptionValues.length) {
+                    for(let i = 0; i < parentOptionValues.length; i ++) {
+                        if($(dependentAttributeContainer).find('[data-parent-option="' + parentOptionValues[i] +'"]').length === 0) {
+                            let newDependentChildAttribute = $(dependentAttributeContainer).find('.js-template').clone();
+                            $(newDependentChildAttribute).removeClass('js-template').addClass('js-dependent-child').find('.js-parentOptionName').text($(parentOptionEls[i]).text());
+                            let selectEl = $(newDependentChildAttribute).find('select');
+                            $(selectEl).attr('name', $(selectEl).attr('data-attr-id') + '[' + parentOptionValues[i] + ']').attr('data-parent-option', parentOptionValues[i]).removeAttr('data-parent-attr-id');
+                            $(dependentAttributeContainer).append(newDependentChildAttribute);
+                            break;
+                        }
+                    }
+                } else {
+
+                    $(dependentChildAttributes).each(function(i, dependentChildAttribute){
+                        var currentParentOption = $(dependentChildAttribute).find('select').data('parent-option');
+                        if(currentParentOption && !parentOptionValues.includes(currentParentOption)){
+                            $(dependentChildAttribute).remove();
+                            return false;
+                        }
+                    });
+                }
+            });
         }
     });
+
+    $.linkDependentAttributes();
 
     $.addModal({
         selector: '#js-add-asset',
