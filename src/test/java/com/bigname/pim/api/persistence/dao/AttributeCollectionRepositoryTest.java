@@ -7,6 +7,7 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeGroup;
+import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -43,13 +44,23 @@ public class AttributeCollectionRepositoryTest {
 
     @Test
     public void createAttributeCollectionTest() {
-        AttributeCollection attributeCollectionDTO = new AttributeCollection();
-        attributeCollectionDTO.setCollectionName("Test1");
-        attributeCollectionDTO.setCollectionId("TEST1");
-        attributeCollectionDTO.setActive("Y");
-        attributeCollectionDTO.setDiscontinued("N");
-        AttributeCollection attributeCollection = attributeCollectionDAO.insert(attributeCollectionDTO);
-        Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y", "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "N", "discontinued", "Y"));
+
+        collectionsData.forEach(colletcionData -> {
+            AttributeCollection attributeCollectionDTO = new AttributeCollection();
+            attributeCollectionDTO.setCollectionName((String)colletcionData.get("name"));
+            attributeCollectionDTO.setCollectionId((String)colletcionData.get("externalId"));
+            attributeCollectionDTO.setActive((String)colletcionData.get("active"));
+            attributeCollectionDTO.setDiscontinued((String)colletcionData.get("discontinued"));
+
+            AttributeCollection attributeCollection = attributeCollectionDAO.insert(attributeCollectionDTO);
+            Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        });
+
+        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
     }
 
     @Test
@@ -71,77 +82,38 @@ public class AttributeCollectionRepositoryTest {
 
     @Test
     public void updateAttributeCollectionTest() {
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y", "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "N", "discontinued", "Y"));
 
-        Attribute attribute = new Attribute();
-        attribute.setUiType(Attribute.UIType.DROPDOWN);
-        attribute.setDataType("string");
-        attribute.setLabel("Style");
-        attribute.setName("Style");
-        attribute.setActive("Y");
-        attribute.setId("STYLE");
-
-        Attribute attribute1 = new Attribute();
-        attribute1.setUiType(Attribute.UIType.DROPDOWN);
-        attribute1.setDataType("string");
-        attribute1.setLabel("Color");
-        attribute1.setName("Color");
-        attribute1.setActive("Y");
-        attribute1.setId("COLOR");
-
-        Map<String, Attribute> attributes = new LinkedHashMap<>();
-        attributes.put("STYLE",attribute);
-        attributes.put("COLOR",attribute1);
-
-        AttributeGroup attributeGroupData = new AttributeGroup();
-        attributeGroupData.setAttributes(attributes);
-        attributeGroupData.setName("Default Group");
-        attributeGroupData.setLabel("Default Group");
-        attributeGroupData.setFullId("Default Group");
-        attributeGroupData.setActive("Y");
-        attributeGroupData.setId("DEFAULT_GROUP");
-
-        Map<String, AttributeGroup> attributeGroupMap = new HashMap<>();
-        attributeGroupMap.put("DEFAULT_GROUP", attributeGroupData);
-
-        AttributeCollection attributeCollectionDTO = new AttributeCollection();
-        attributeCollectionDTO.setCollectionName("Envelopes Attributes Collection");
-        attributeCollectionDTO.setCollectionId("ENVELOPES");
-        attributeCollectionDTO.setActive("Y");
-        attributeCollectionDTO.setDiscontinued("N");
-        attributeCollectionDTO.setAttributes(attributeGroupMap);
-        attributeCollectionDAO.insert(attributeCollectionDTO);
-
-       AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
-       Assert.assertTrue(attributeCollectionDetails != null);
-       attributeCollectionDetails.setCollectionName("New Envelopes Attributes Collection");
-       attributeCollectionDetails.setGroup("DETAILS");
-       attributeCollectionDAO.save(attributeCollectionDetails);
-
-        Optional<AttributeCollection> attributeCollection = attributeCollectionDAO.findByExternalId(attributeCollectionDetails.getCollectionId());
-        Assert.assertTrue(attributeCollection.isPresent());
-        attributeCollection = attributeCollectionDAO.findById(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(attributeCollection.isPresent());
-        attributeCollection = attributeCollectionDAO.findById(attributeCollectionDetails.getId(), FindBy.INTERNAL_ID);
-        Assert.assertTrue(attributeCollection.isPresent());
-
-
+        collectionsData.forEach(collectionData -> {
+            AttributeCollection attributeCollectionDTO = new AttributeCollection();
+            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
+            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
+            attributeCollectionDTO.setActive((String)collectionData.get("active"));
+            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
+            AttributeCollection attributeCollection = attributeCollectionDAO.insert(attributeCollectionDTO);
+            Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        });
+        //TODO update
     }
 
     @Test
     public void retrieveAttributeCollectionsTest() {
 
-        List<Map<String, Object>> categoriesData = new ArrayList<>();
-        categoriesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test4", "externalId", "TEST_4", "active", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test5", "externalId", "TEST_5", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test6", "externalId", "TEST_6", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test7", "externalId", "TEST_7", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test8", "externalId", "TEST_8", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test9", "externalId", "TEST_9", "active", "N"));
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test4", "externalId", "TEST_4", "active", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test5", "externalId", "TEST_5", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test6", "externalId", "TEST_6", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test7", "externalId", "TEST_7", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test8", "externalId", "TEST_8", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test9", "externalId", "TEST_9", "active", "N"));
 
-        List<AttributeCollection> attributeCollectionDTOs = categoriesData.stream().map(attributeCollectionData -> {
+        List<AttributeCollection> attributeCollectionDTOs = collectionsData.stream().map(attributeCollectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)attributeCollectionData.get("name"));
             attributeCollectionDTO.setCollectionId((String)attributeCollectionData.get("externalId"));
@@ -161,17 +133,17 @@ public class AttributeCollectionRepositoryTest {
 
         attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
 
-        categoriesData = new ArrayList<>();
-        categoriesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "N", "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "N", "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "N", "discontinued", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test4", "externalId", "TEST_4", "active", "N", "discontinued", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test5", "externalId", "TEST_5", "active", "Y", "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test6", "externalId", "TEST_6", "active", "Y", "discontinued", "N"));
+        collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "N", "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "N", "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "N", "discontinued", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test4", "externalId", "TEST_4", "active", "N", "discontinued", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test5", "externalId", "TEST_5", "active", "Y", "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test6", "externalId", "TEST_6", "active", "Y", "discontinued", "N"));
 
         int[] activeCount = {0}, inactiveCount = {0};
         int[] discontinued = {0};
-        attributeCollectionDTOs = categoriesData.stream().map(attributeCollectionData -> {
+        attributeCollectionDTOs = collectionsData.stream().map(attributeCollectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)attributeCollectionData.get("name"));
             attributeCollectionDTO.setCollectionId((String)attributeCollectionData.get("externalId"));
@@ -207,19 +179,19 @@ public class AttributeCollectionRepositoryTest {
         LocalDateTime tomorrow = today.plusDays(1);
         LocalDateTime tomorrowEOD = todayEOD.plusDays(1);
 
-        categoriesData = new ArrayList<>();
+        collectionsData = new ArrayList<>();
 
-        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "activeFrom", yesterday, "activeTo", todayEOD, "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "activeFrom", null, "activeTo", todayEOD, "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "activeFrom", tomorrow, "discontinued", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "active", "N", "activeFrom", null, "activeTo", null, "discontinued", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "activeFrom", yesterday, "activeTo", tomorrowEOD, "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "activeFrom", yesterday, "activeTo", null, "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "activeFrom", null, "activeTo", null, "discontinued", "N"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "active", "Y", "activeFrom", null, "activeTo", null, "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "activeFrom", yesterday, "activeTo", todayEOD, "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "activeFrom", null, "activeTo", todayEOD, "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "activeFrom", tomorrow, "discontinued", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "active", "N", "activeFrom", null, "activeTo", null, "discontinued", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "activeFrom", yesterday, "activeTo", tomorrowEOD, "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "activeFrom", yesterday, "activeTo", null, "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "activeFrom", null, "activeTo", null, "discontinued", "N"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "active", "Y", "activeFrom", null, "activeTo", null, "discontinued", "N"));
         int[] activeCount1 = {0}, inactiveCount1 = {0}, discontinued1 = {0};
 
-        attributeCollectionDTOs = categoriesData.stream().map(attributeCollectionData -> {
+        attributeCollectionDTOs = collectionsData.stream().map(attributeCollectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)attributeCollectionData.get("name"));
             attributeCollectionDTO.setCollectionId((String)attributeCollectionData.get("externalId"));
@@ -250,6 +222,111 @@ public class AttributeCollectionRepositoryTest {
         /*Assert.assertEquals(attributeCollectionDAO.findAll(PageRequest.of(0, attributeCollectionDTOs.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0] + discontinued1[0]);*/
         Assert.assertEquals(attributeCollectionDAO.findAll(PageRequest.of(0, attributeCollectionDTOs.size()), false, false, true).getTotalElements(), discontinued1[0]);
     }
+
+    @Test
+    public void createAttributeTest() {
+
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection", "externalId", "ENVELOPE", "active", "Y", "discontinued", "N"));
+        collectionsData.forEach(collectionData -> {
+            AttributeCollection attributeCollectionDTO = new AttributeCollection();
+            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
+            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
+            attributeCollectionDTO.setActive((String)collectionData.get("active"));
+            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
+            attributeCollectionDAO.insert(attributeCollectionDTO);
+
+            AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+            List<Map<String, Object>> attributesData = new ArrayList<>();
+            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("name", "color", "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("name", "size", "active", "Y"));
+            attributesData.forEach(attributeData -> {
+                Attribute attribute = new Attribute();
+                attribute.setActive((String)attributeData.get("active"));
+                attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                attribute.setName((String)attributeData.get("name"));
+                attributeCollectionDetails.addAttribute(attribute);
+            });
+            attributeCollectionDAO.save(attributeCollectionDetails);
+        });
+    }
+
+    @Test
+    public void retrieveAttributeTest() {
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection", "externalId", "ENVELOPE", "active", "Y", "discontinued", "N"));
+        collectionsData.forEach(collectionData -> {
+            AttributeCollection attributeCollectionDTO = new AttributeCollection();
+            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
+            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
+            attributeCollectionDTO.setActive((String)collectionData.get("active"));
+            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
+            attributeCollectionDAO.insert(attributeCollectionDTO);
+
+            AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+            List<Map<String, Object>> attributesData = new ArrayList<>();
+            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("name", "color", "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("name", "size", "active", "Y"));
+            attributesData.forEach(attributeData -> {
+                Attribute attribute = new Attribute();
+                attribute.setActive((String)attributeData.get("active"));
+                attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                attribute.setName((String)attributeData.get("name"));
+                attributeCollectionDetails.addAttribute(attribute);
+            });
+            attributeCollectionDAO.save(attributeCollectionDetails);
+
+            //TODO assert check
+        });
+    }
+
+    @Test
+    public void createAttributeOptionTest() {
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection", "externalId", "ENVELOPE", "active", "Y", "discontinued", "N"));
+        collectionsData.forEach(collectionData -> {
+            AttributeCollection attributeCollectionDTO = new AttributeCollection();
+            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
+            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
+            attributeCollectionDTO.setActive((String)collectionData.get("active"));
+            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
+            attributeCollectionDAO.insert(attributeCollectionDTO);
+
+            AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+            List<Map<String, Object>> attributesData = new ArrayList<>();
+            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y"));
+            attributesData.forEach(attributeData -> {
+                Attribute attribute = new Attribute();
+                attribute.setActive((String)attributeData.get("active"));
+                attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                attribute.setName((String)attributeData.get("name"));
+                attributeCollectionDetails.addAttribute(attribute);
+
+                List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "PAPER", "active", "Y"));
+                attributesOptionsData.forEach(attributesOptionData ->{
+                    AttributeOption attributeOption = new AttributeOption();
+                    attributeOption.setValue((String)attributesOptionData.get("value"));
+                    attributeOption.setActive((String)attributesOptionData.get("active"));
+                    attributeOption.setFullId(attribute.getFullId());
+
+                    
+                 });
+            });
+            attributeCollectionDAO.save(attributeCollectionDetails);
+
+        });
+    }
+
+
+
 
     @After
     public void tearDown() {
