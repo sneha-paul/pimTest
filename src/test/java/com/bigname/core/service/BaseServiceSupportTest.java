@@ -52,17 +52,24 @@ public class BaseServiceSupportTest {
 
     @Test
     public void createEntityTest() {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test1.com");
-        websiteDTO.setWebsiteId("TEST1");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test1.com");
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
 
-        websiteService.create(websiteDTO);
+        websitesData.forEach(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
 
-        Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newWebsite != null);
-        Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
+            websiteService.create(websiteDTO);
+
+            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(newWebsite != null);
+            Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
+        });
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
