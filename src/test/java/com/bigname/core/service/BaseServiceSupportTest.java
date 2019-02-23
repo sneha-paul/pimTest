@@ -633,6 +633,50 @@ public class BaseServiceSupportTest {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
+    @Test
+    public void getEntityName() throws Exception {
+    }
+
+    @Test
+    public void validate() throws Exception {
+    }
+
+    @Test
+    public void validate1() throws Exception {
+    }
+
+    @Test
+    public void paginate() throws Exception {
+    }
+
+    @Test
+    public void sort() throws Exception {
+    }
+
+    @Test
+    public void paginate1() throws Exception {
+    }
+
+    @Test
+    public void cloneInstance1() throws Exception {
+    }
+
+    @Test
+    public void proxy() throws Exception {
+    }
+
+    @Test
+    public void getCurrentUser() throws Exception {
+    }
+
+    @Test
+    public void getExternalIdProperty() throws Exception {
+    }
+
+    @Test
+    public void getExternalIdPropertyLabel() throws Exception {
+    }
+
     @After
     public void tearDown() {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
