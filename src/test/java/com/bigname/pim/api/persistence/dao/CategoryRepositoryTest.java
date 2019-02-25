@@ -5,7 +5,6 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Created by dona on 19-02-2019.
