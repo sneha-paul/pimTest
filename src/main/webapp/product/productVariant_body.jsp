@@ -3,7 +3,26 @@
 <c:set var="masterGroups" value="${product.productFamily.addonMasterGroups}"/>
 <c:set var="detailsMasterGroup" value="${product.productFamily.detailsMasterGroup}"/>
 <c:set var="featuresMasterGroup" value="${product.productFamily.featuresMasterGroup}"/>
-<style>.ms-container .ms-selection {float: none !important;}.ms-container .ms-selectable {float: right !important;}</style>
+<style>
+    .ms-container .ms-selection {float: none !important;}
+    .ms-container .ms-selectable {float: right !important;}
+    .js-attribute-group .card-header {
+        border-bottom: none !important;
+        margin-bottom: 5px !important;
+    }
+    .js-attribute-group .card-body {
+        background-color: #f0f8ff;
+        margin-top:-5px;
+        margin-bottom: 5px;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+    }
+    .js-attribute-group .card-header .btn {
+        padding: 3px 3px 3px 10px;
+        background: #000;
+        color: #fff;
+    }
+</style>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
@@ -615,12 +634,12 @@
                                                                                                         <c:choose>
                                                                                                             <c:when test="${not empty parentAttribute}">
                                                                                                                 <div class="card">
-                                                                                                                    <div class="body ig-container">
-                                                                                                                        <div class="input-group mb-3 js-template">
+                                                                                                                    <div class="body dropdown ig-container">
+                                                                                                                        <div class="input-group mb-3 js-template" data-attr-id="${attribute.id}" data-parent-attr-id="${parentAttribute.id}">
                                                                                                                             <div class="input-group-prepend">
                                                                                                                                 <label class="input-group-text js-parentOptionName">${parentAttribute.options[parentOption].value}</label>
                                                                                                                             </div>
-                                                                                                                            <select data-attr-id="${attribute.id}" data-parent-attr-id="${parentAttribute.id}" class="custom-select">
+                                                                                                                            <select class="custom-select js-root-element">
                                                                                                                                 <option value="">Select One</option>
                                                                                                                                 <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                                                     <c:set var="attributeOption" value="${optionEntry.value}"/>
@@ -629,11 +648,11 @@
                                                                                                                             </select>
                                                                                                                         </div>
                                                                                                                     <c:forEach items="${parentAttributeValue}" var="parentOption">
-                                                                                                                        <div class="input-group mb-3 js-dependent-child">
+                                                                                                                        <div class="input-group mb-3 js-dependent-child" data-parent-option="${parentOption}" data-attr-id="${attribute.id}">
                                                                                                                             <div class="input-group-prepend">
                                                                                                                                 <label class="input-group-text">${parentAttribute.options[parentOption].value}</label>
                                                                                                                             </div>
-                                                                                                                            <select name="${attribute.id}[${parentOption}]" data-parent-option="${parentOption}" data-attr-id="${attribute.id}" class="custom-select">
+                                                                                                                            <select name="${attribute.id}.${parentOption}" class="custom-select">
                                                                                                                                 <option value="">Select One</option>
                                                                                                                                 <c:forEach items="${attribute.options}" var="optionEntry">
                                                                                                                                     <c:set var="attributeOption" value="${optionEntry.value}"/>
@@ -658,20 +677,74 @@
 
                                                                                                     </c:when>
                                                                                                     <c:when test="${attribute.uiType eq 'MULTI_SELECT'}">
-                                                                                                        <select id="${attribute.id}" name="${attribute.id}" multiple="multiple" data-attr-id="${attribute.id}" class="form-control${disabledClass}" ${disabled}>
-                                                                                                            <c:forEach items="${attribute.options}" var="optionEntry">
-                                                                                                                <c:set var="attributeOption" value="${optionEntry.value}"/>
-                                                                                                                <option value="${attributeOption.id}" <c:if test="${attribute.id ne 'CARD_SLITS' && not empty attributeValue && attributeValue.size() gt 0 && attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
-                                                                                                            </c:forEach>
-                                                                                                        </select>
-                                                                                                        <script>
-                                                                                                            $('#${attribute.id}').multiSelect({
-                                                                                                                selectableHeader: "<div class='custom-header'>Available</div>",
-                                                                                                                selectionHeader: "<div class='custom-header'>Selected</div>",
-                                                                                                                keepOrder: true,
-                                                                                                                dblClick: true
-                                                                                                            });
-                                                                                                        </script>
+                                                                                                        <c:choose>
+                                                                                                            <c:when test="${not empty parentAttribute}">
+                                                                                                                <div class="card">
+                                                                                                                    <div class="body">
+                                                                                                                        <div class="accordion js-attribute-group ig-container" id="accordion">
+                                                                                                                            <div class="js-template" data-attr-id="${attribute.id}" data-parent-attr-id="${parentAttribute.id}">
+                                                                                                                                <div class="card-header" id="heading-">
+                                                                                                                                    <h5 class="mb-0">
+                                                                                                                                        <button class="btn btn-link js-parentOptionName" type="button" data-toggle="collapse" data-target="#collapse-" aria-expanded="true" aria-controls="collapse-"></button>
+                                                                                                                                    </h5>
+                                                                                                                                </div>
+                                                                                                                                <div id="collapse-" class="collapse show" aria-labelledby="heading-">
+                                                                                                                                    <div class="card-body">
+                                                                                                                                        <c:forEach items="${attribute.options}" var="optionEntry">
+                                                                                                                                            <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                                                                                                                            <label class="fancy-checkbox" style="display: block">
+                                                                                                                                                <input type="checkbox" class="js-checkbox js-root-element" value="${attributeOption.id}">
+                                                                                                                                                <span>${attributeOption.value}</span>
+                                                                                                                                            </label>
+                                                                                                                                        </c:forEach>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </div>
+
+                                                                                                                            <c:forEach items="${parentAttributeValue}" var="parentOption">
+                                                                                                                                <div class="js-dependent-child" data-parent-option="${parentOption}" data-attr-id="${attribute.id}">
+                                                                                                                                    <div class="card-header" id="heading-${parentOption}">
+                                                                                                                                        <h5 class="mb-0">
+                                                                                                                                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-${parentOption}" aria-expanded="true" aria-controls="collapse-${parentOption}">
+                                                                                                                                                ${parentAttribute.options[parentOption].value}
+                                                                                                                                            </button>
+                                                                                                                                        </h5>
+                                                                                                                                    </div>
+                                                                                                                                    <div id="collapse-${parentOption}" class="collapse show" aria-labelledby="heading-${parentOption}">
+                                                                                                                                        <div class="card-body">
+                                                                                                                                            <c:forEach items="${attribute.options}" var="optionEntry">
+                                                                                                                                                <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                                                                                                                                <label class="fancy-checkbox" style="display: block">
+                                                                                                                                                    <input type="checkbox" class="js-checkbox" name="${attribute.id}.${parentOption}" value="${attributeOption.id}" <c:if test="${attributeValue[parentOption].contains(attributeOption.id)}">checked="checked"</c:if>>
+                                                                                                                                                    <span>${attributeOption.value}</span>
+                                                                                                                                                </label>
+                                                                                                                                            </c:forEach>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </c:forEach>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </c:when>
+                                                                                                            <c:otherwise>
+                                                                                                                <select id="${attribute.id}" name="${attribute.id}" multiple="multiple" data-attr-id="${attribute.id}" class="form-control${disabledClass}" ${disabled}>
+                                                                                                                    <c:forEach items="${attribute.options}" var="optionEntry">
+                                                                                                                        <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                                                                                                        <option value="${attributeOption.id}" <c:if test="${attribute.id ne 'CARD_SLITS' && not empty attributeValue && attributeValue.size() gt 0 && attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                                    </c:forEach>
+                                                                                                                </select>
+                                                                                                                <script>
+                                                                                                                    $('#${attribute.id}').multiSelect({
+                                                                                                                        selectableHeader: "<div class='custom-header'>Available</div>",
+                                                                                                                        selectionHeader: "<div class='custom-header'>Selected</div>",
+                                                                                                                        keepOrder: true,
+                                                                                                                        dblClick: true
+                                                                                                                    });
+                                                                                                                </script>
+                                                                                                            </c:otherwise>
+                                                                                                        </c:choose>
+
                                                                                                     </c:when>
                                                                                                     <c:when test="${attribute.uiType eq 'TEXTAREA'}">
                                                                                                         <textarea id="${attribute.id}" class="form-control auto-resize${disabledClass}" name="${attribute.id}" ${disabled}>${attributeValue}</textarea>

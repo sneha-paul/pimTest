@@ -236,8 +236,8 @@ public class ProductVariantController extends ControllerSupport {
                     } else {
                         Map<String, Object> valueMap = new LinkedHashMap<>();
                         attributesMap.entrySet().stream()
-                                .filter(e -> e.getKey().startsWith(attributeId + "["))
-                                .forEach(e -> valueMap.put(e.getKey().substring(e.getKey().lastIndexOf("[") + 1, e.getKey().length() - 1), e.getValue()));
+                                .filter(e -> e.getKey().startsWith(attributeId + "."))
+                                .forEach(e -> valueMap.put(e.getKey().substring(e.getKey().lastIndexOf(".") + 1), e.getValue()));
                         if(!valueMap.isEmpty()) {
                             productVariantDTO.getVariantAttributes().put(attributeId, valueMap);
                         }

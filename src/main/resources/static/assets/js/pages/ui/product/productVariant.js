@@ -12,7 +12,7 @@ $( document ).ready(function() {
                 }
             });
         },
-        addAssets: function(assetIds) {console.log(assetIds);
+        addAssets: function(assetIds) {
             $.ajaxSubmit({
                 url: '/pim/products/{productId}/variants/{productVariantId}/assets',
                 data: {assetFamily: 'ASSETS', assetIds: assetIds, channelId: $.getPageAttribute('channelId')},
@@ -67,14 +67,22 @@ $( document ).ready(function() {
         updateDependentAttributes: function(dependentAttributes, parentOptionEls, parentOptionValues) {
             $(dependentAttributes).each(function(i, dependentAttribute){
                 const dependentAttributeContainer = $(dependentAttribute).closest('.ig-container');
+                const uiType = $(dependentAttributeContainer).hasClass('dropdown') ? 'DROPDOWN' : $(dependentAttributeContainer).hasClass('accordion') ? 'ACCORDION' : 'UNKNOWN';
                 let dependentChildAttributes = $(dependentAttributeContainer).find('.js-dependent-child');
                 if(dependentChildAttributes.length < parentOptionValues.length) {
                     for(let i = 0; i < parentOptionValues.length; i ++) {
                         if($(dependentAttributeContainer).find('[data-parent-option="' + parentOptionValues[i] +'"]').length === 0) {
                             let newDependentChildAttribute = $(dependentAttributeContainer).find('.js-template').clone();
+                            let attrId = $(newDependentChildAttribute).data('attr-id');
                             $(newDependentChildAttribute).removeClass('js-template').addClass('js-dependent-child').find('.js-parentOptionName').text($(parentOptionEls[i]).text());
-                            let selectEl = $(newDependentChildAttribute).find('select');
-                            $(selectEl).attr('name', $(selectEl).attr('data-attr-id') + '[' + parentOptionValues[i] + ']').attr('data-parent-option', parentOptionValues[i]).removeAttr('data-parent-attr-id');
+
+                            $(newDependentChildAttribute).attr('data-parent-option', parentOptionValues[i]).removeAttr('data-parent-attr-id')
+                                .find('.js-root-element').attr('name', $(newDependentChildAttribute).attr('data-attr-id') + '.' + parentOptionValues[i]);
+                            if(uiType === 'ACCORDION') {
+                                $(newDependentChildAttribute).find('#heading-').attr('id', 'heading-' + attrId)
+                                    .find('.btn-link').attr('data-target', '#collapse-' + attrId).attr('aria-controls', 'collapse-' + attrId);
+                                $(newDependentChildAttribute).find('#collapse-').attr('id', 'collapse-' + attrId).attr('aria-labelledby', 'heading-' + attrId);
+                            }
                             $(dependentAttributeContainer).append(newDependentChildAttribute);
                             break;
                         }
@@ -82,7 +90,7 @@ $( document ).ready(function() {
                 } else {
 
                     $(dependentChildAttributes).each(function(i, dependentChildAttribute){
-                        var currentParentOption = $(dependentChildAttribute).find('select').data('parent-option');
+                        var currentParentOption = $(dependentChildAttribute).data('parent-option');
                         if(currentParentOption && !parentOptionValues.includes(currentParentOption)){
                             $(dependentChildAttribute).remove();
                             return false;
@@ -144,8 +152,6 @@ $( document ).ready(function() {
         },
         onDrop: function (item, container, _super) {
             var newSequence = $("div.js-draggable").sortable("serialize").get();
-            console.log(startSequence[0]);
-            console.log(newSequence[0]);
             if(startSequence[0] !== newSequence[0]) {
                 $.reorderAssets(newSequence[0].split(','));
             }
