@@ -4,9 +4,7 @@ import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.cache.PIMCache;
 import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -46,31 +43,48 @@ public class WebsiteRepositoryTest {
 
     @Test
     public void createWebsiteTest() {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test1.com");
-        websiteDTO.setWebsiteId("TEST1");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test1.com");
-        Website website = websiteDAO.insert(websiteDTO);
-        Assert.assertTrue(website.diff(websiteDTO).isEmpty());
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
 
+        websitesData.forEach(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+
+            Website website = websiteDAO.insert(websiteDTO);
+            Assert.assertTrue(website.diff(websiteDTO).isEmpty());
+        });
+
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
     public void retrieveWebsiteTest() {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("Test1.com");
-        websiteDTO.setWebsiteId("TEST1");
-        websiteDTO.setActive("Y");
-        websiteDTO.setUrl("https://www.test1.com");
-        websiteDAO.insert(websiteDTO);
-        Optional<Website> website = websiteDAO.findByExternalId(websiteDTO.getWebsiteId());
-        Assert.assertTrue(website.isPresent());
-        website = websiteDAO.findById(websiteDTO.getWebsiteId(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(website.isPresent());
-        website = websiteDAO.findById(websiteDTO.getId(), FindBy.INTERNAL_ID);
-        Assert.assertTrue(website.isPresent());
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "url", "www.test3.com", "active", "Y"));
 
+        websitesData.forEach(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+
+            Optional<Website> website = websiteDAO.findByExternalId(websiteDTO.getWebsiteId());
+            Assert.assertTrue(website.isPresent());
+            website = websiteDAO.findById(websiteDTO.getWebsiteId(), FindBy.EXTERNAL_ID);
+            Assert.assertTrue(website.isPresent());
+            website = websiteDAO.findById(websiteDTO.getId(), FindBy.INTERNAL_ID);
+            Assert.assertTrue(website.isPresent());
+        });
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -86,23 +100,21 @@ public class WebsiteRepositoryTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach(websiteData -> {
             Website websiteDTO = new Website();
             websiteDTO.setWebsiteName((String)websiteData.get("name"));
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
             websiteDTO.setActive((String)websiteData.get("active"));
             websiteDTO.setUrl((String)websiteData.get("url"));
-            return websiteDTO;
-        }).collect(Collectors.toList());
+            websiteDAO.insert(websiteDTO);
+        });
 
-        websiteDAO.insert(websiteDTOs);
-
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), websiteDTOs.size());
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size() - 1), false).getTotalElements(), websiteDTOs.size());
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size() - 1), false).getContent().size(), websiteDTOs.size() - 1);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false).getTotalElements(), websitesData.size());
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size() - 1), false).getTotalElements(), websitesData.size());
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size() - 1), false).getContent().size(), websitesData.size() - 1);
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(1, 1), false).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(1, websiteDTOs.size() - 1), false).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size() - 1), false).getTotalPages(), 2);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(1, websitesData.size() - 1), false).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size() - 1), false).getTotalPages(), 2);
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
@@ -116,8 +128,10 @@ public class WebsiteRepositoryTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
+
         int[] activeCount = {0}, inactiveCount = {0};
-        websiteDTOs = websitesData.stream().map(websiteData -> {
+
+        websitesData.forEach(websiteData -> {
             Website websiteDTO = new Website();
             websiteDTO.setWebsiteName((String)websiteData.get("name"));
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
@@ -128,16 +142,14 @@ public class WebsiteRepositoryTest {
             } else {
                 inactiveCount[0] ++;
             }
-            return websiteDTO;
-        }).collect(Collectors.toList());
-
-        websiteDAO.insert(websiteDTOs);
+            websiteDAO.insert(websiteDTO);
+        });
 
 //        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size())).getTotalElements(), activeCount[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), true).getTotalElements(), activeCount[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, true).getTotalElements(), inactiveCount[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, false, true).getTotalElements(), 0);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), true).getTotalElements(), activeCount[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false, true).getTotalElements(), inactiveCount[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false, false, true).getTotalElements(), 0);
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
@@ -157,31 +169,27 @@ public class WebsiteRepositoryTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "activeFrom", yesterday, "activeTo", null));
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "activeFrom", null, "activeTo", null));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y", "activeFrom", null, "activeTo", null));
+
         int[] activeCount1 = {0}, inactiveCount1 = {0};
-        websiteDTOs = websitesData.stream().map(websiteData -> {
+        websitesData.forEach(websiteData -> {
             Website websiteDTO = new Website();
             websiteDTO.setWebsiteName((String)websiteData.get("name"));
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
             websiteDTO.setActive((String)websiteData.get("active"));
             websiteDTO.setUrl((String)websiteData.get("url"));
-            websiteDTO.setActiveFrom((LocalDateTime) websiteData.get("activeFrom"));
-            websiteDTO.setActiveTo((LocalDateTime) websiteData.get("activeTo"));
-            if(PimUtil.isActive(websiteDTO.getActive(), websiteDTO.getActiveFrom(), websiteDTO.getActiveTo())) {
+            if("Y".equals(websiteData.get("active"))) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;
             }
-            return websiteDTO;
-        }).collect(Collectors.toList());
-
-        websiteDAO.insert(websiteDTOs);
+            websiteDAO.insert(websiteDTO);
+        });
 
 //        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size())).getTotalElements(), activeCount[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), true).getTotalElements(), activeCount1[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, true).getTotalElements(), inactiveCount1[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false, false, true).getTotalElements(), 0);
-
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), true).getTotalElements(), activeCount1[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false, true).getTotalElements(), inactiveCount1[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false, false, true).getTotalElements(), 0);
 
     }
 
@@ -189,7 +197,5 @@ public class WebsiteRepositoryTest {
     public void tearDown() {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
-
-
 
 }

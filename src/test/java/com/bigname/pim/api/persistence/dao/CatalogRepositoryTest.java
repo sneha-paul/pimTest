@@ -44,53 +44,79 @@ public class CatalogRepositoryTest {
 
     @Test
     public void createCatalogTest() {
-        Catalog catalogDTO = new Catalog();
-        catalogDTO.setCatalogName("Test1");
-        catalogDTO.setCatalogId("TEST1");
-        catalogDTO.setDescription("Test catalog");
-        catalogDTO.setActive("Y");
-        Catalog catalog = catalogDAO.insert(catalogDTO);
-        Assert.assertTrue(catalog.diff(catalogDTO).isEmpty());
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "Y"));
+        catalogsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "Y"));
+
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+
+            Catalog catalog = catalogDAO.insert(catalogDTO);
+            Assert.assertTrue(catalog.diff(catalogDTO).isEmpty());
+        });
+
+        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
 
     }
 
     @Test
     public void retrieveCatalogTest() {
-        Catalog catalogDTO = new Catalog();
-        catalogDTO.setCatalogName("Test1");
-        catalogDTO.setCatalogId("TEST1");
-        catalogDTO.setDescription("Test catalog");
-        catalogDTO.setActive("Y");
-        catalogDAO.insert(catalogDTO);
-        Optional<Catalog> catalog = catalogDAO.findByExternalId(catalogDTO.getCatalogId());
-        Assert.assertTrue(catalog.isPresent());
-        catalog = catalogDAO.findById(catalogDTO.getCatalogId(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(catalog.isPresent());
-        catalog = catalogDAO.findById(catalogDTO.getId(), FindBy.INTERNAL_ID);
-        Assert.assertTrue(catalog.isPresent());
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "Y"));
+        catalogsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "Y"));
+
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
+
+            Optional<Catalog> catalog = catalogDAO.findByExternalId(catalogsData.get(0).get("externalId").toString());
+            Assert.assertTrue(catalog.isPresent());
+            catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID);
+            Assert.assertTrue(catalog.isPresent());
+            catalog = catalogDAO.findById(catalogDTO.getId(), FindBy.INTERNAL_ID);
+            Assert.assertTrue(catalog.isPresent());
+        });
+
+        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
     }
 
     @Test
     public void updateCatalogTest() {
-        Catalog catalogDTO = new Catalog();
-        catalogDTO.setCatalogName("Test1");
-        catalogDTO.setCatalogId("TEST1");
-        catalogDTO.setDescription("Test catalog");
-        catalogDTO.setActive("Y");
-        catalogDAO.insert(catalogDTO);
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "Y"));
+        catalogsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "Y"));
 
-        Catalog catalogDetails = catalogDAO.findByExternalId(catalogDTO.getCatalogId()).orElse(null);
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
+        });
+
+        Catalog catalogDetails = catalogDAO.findByExternalId(catalogsData.get(0).get("externalId").toString()).orElse(null);
         Assert.assertTrue(catalogDetails != null);
         catalogDetails.setDescription("Test1 catalog description");
         catalogDetails.setGroup("DETAILS");
         catalogDAO.save(catalogDetails);
-        
+
         Optional<Catalog> catalog = catalogDAO.findByExternalId(catalogDetails.getCatalogId());
         Assert.assertTrue(catalog.isPresent());
         catalog = catalogDAO.findById(catalogDetails.getCatalogId(), FindBy.EXTERNAL_ID);
         Assert.assertTrue(catalog.isPresent());
         catalog = catalogDAO.findById(catalogDetails.getId(), FindBy.INTERNAL_ID);
         Assert.assertTrue(catalog.isPresent());
+
+        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
     }
 
     @Test
@@ -107,22 +133,25 @@ public class CatalogRepositoryTest {
         catalogsData.add(CollectionsUtil.toMap("name", "Test8", "externalId", "TEST_8", "description", "TEST_8description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test9", "externalId", "TEST_9", "description", "TEST_9description", "active", "Y"));
 
-        List<Catalog> catalogDTOs = catalogsData.stream().map(catalogData -> {
+        catalogsData.forEach(catalogData -> {
             Catalog catalogDTO = new Catalog();
             catalogDTO.setCatalogName((String)catalogData.get("name"));
             catalogDTO.setCatalogId((String)catalogData.get("externalId"));
             catalogDTO.setActive((String)catalogData.get("active"));
-            return catalogDTO;
-        }).collect(Collectors.toList());
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
 
-        catalogDAO.insert(catalogDTOs);
+            Optional<Catalog> catalog = catalogDAO.findById(catalogDTO.getId(), FindBy.INTERNAL_ID);
+            Assert.assertTrue(catalog.isPresent());
+        });
 
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), false).getTotalElements(), catalogDTOs.size());
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size() - 1), false).getTotalElements(), catalogDTOs.size());
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size() - 1), false).getContent().size(), catalogDTOs.size() - 1);
+
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size() - 1), false).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size() - 1), false).getContent().size(), catalogsData.size() - 1);
         Assert.assertEquals(catalogDAO.findAll(PageRequest.of(1, 1), false).getContent().size(), 1);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(1, catalogDTOs.size() - 1), false).getContent().size(), 1);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size() - 1), false).getTotalPages(), 2);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(1, catalogsData.size() - 1), false).getContent().size(), 1);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size() - 1), false).getTotalPages(), 2);
 
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
 
@@ -136,26 +165,30 @@ public class CatalogRepositoryTest {
         catalogsData.add(CollectionsUtil.toMap("name", "Test7", "externalId", "TEST_7", "description", "TEST_7description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test8", "externalId", "TEST_8", "description", "TEST_8description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test9", "externalId", "TEST_9", "description", "TEST_9description", "active", "Y"));
+
         int[] activeCount = {0}, inactiveCount = {0};
-        catalogDTOs = catalogsData.stream().map(catalogData -> {
+
+        catalogsData.forEach(catalogData -> {
             Catalog catalogDTO = new Catalog();
             catalogDTO.setCatalogName((String)catalogData.get("name"));
             catalogDTO.setCatalogId((String)catalogData.get("externalId"));
             catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
             if("Y".equals(catalogData.get("active"))) {
                 activeCount[0] ++;
             } else {
                 inactiveCount[0] ++;
             }
-            return catalogDTO;
-        }).collect(Collectors.toList());
+            catalogDAO.insert(catalogDTO);
 
-        catalogDAO.insert(catalogDTOs);
+            Optional<Catalog> catalog = catalogDAO.findById(catalogDTO.getId(), FindBy.INTERNAL_ID);
+            Assert.assertTrue(catalog.isPresent());
+        });
 
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), true).getTotalElements(), activeCount[0]);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), false, true).getTotalElements(), inactiveCount[0]);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), false, false, true).getTotalElements(), 0);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), true).getTotalElements(), activeCount[0]);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false, true).getTotalElements(), inactiveCount[0]);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false, false, true).getTotalElements(), 0);
 
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
 
@@ -175,28 +208,30 @@ public class CatalogRepositoryTest {
         catalogsData.add(CollectionsUtil.toMap("name", "Test7", "externalId", "TEST_7", "description", "TEST_6description", "activeFrom", yesterday, "activeTo", null));
         catalogsData.add(CollectionsUtil.toMap("name", "Test8", "externalId", "TEST_8", "description", "TEST_7description", "activeFrom", null, "activeTo", null));
         catalogsData.add(CollectionsUtil.toMap("name", "Test9", "externalId", "TEST_9", "description", "TEST_8description", "active", "Y", "activeFrom", null, "activeTo", null));
+
         int[] activeCount1 = {0}, inactiveCount1 = {0};
-        catalogDTOs = catalogsData.stream().map(catalogData -> {
+
+        catalogsData.forEach(catalogData -> {
             Catalog catalogDTO = new Catalog();
             catalogDTO.setCatalogName((String)catalogData.get("name"));
             catalogDTO.setCatalogId((String)catalogData.get("externalId"));
             catalogDTO.setActive((String)catalogData.get("active"));
-            catalogDTO.setActiveFrom((LocalDateTime) catalogData.get("activeFrom"));
-            catalogDTO.setActiveTo((LocalDateTime) catalogData.get("activeTo"));
-            if(PimUtil.isActive(catalogDTO.getActive(), catalogDTO.getActiveFrom(), catalogDTO.getActiveTo())) {
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            if("Y".equals(catalogData.get("active"))) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;
             }
-            return catalogDTO;
-        }).collect(Collectors.toList());
+            catalogDAO.insert(catalogDTO);
 
-        catalogDAO.insert(catalogDTOs);
+            Optional<Catalog> catalog = catalogDAO.findById(catalogDTO.getId(), FindBy.INTERNAL_ID);
+            Assert.assertTrue(catalog.isPresent());
+        });
 
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), true).getTotalElements(), activeCount1[0]);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), false, true).getTotalElements(), inactiveCount1[0]);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
-        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogDTOs.size()), false, false, true).getTotalElements(), 0);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), true).getTotalElements(), activeCount1[0]);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false, true).getTotalElements(), inactiveCount1[0]);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
+        Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false, false, true).getTotalElements(), 0);
     }
 
     @After
