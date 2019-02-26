@@ -2,6 +2,7 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Attribute;
@@ -62,8 +63,6 @@ public class AttributeCollectionRepositoryTest {
             AttributeCollection attributeCollection = attributeCollectionDAO.insert(attributeCollectionDTO);
             Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         });
-
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
     }
 
     @Test
@@ -86,43 +85,30 @@ public class AttributeCollectionRepositoryTest {
     @Test
     public void updateAttributeCollectionTest() {
         List<Map<String, Object>> collectionsData = new ArrayList<>();
-        collectionsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinued", "N"));
-        collectionsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y", "discontinued", "N"));
-        collectionsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "N", "discontinued", "Y"));
-
+        collectionsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST1", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST2", "active", "Y"));
+        collectionsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST3", "active", "N"));
         collectionsData.forEach(collectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
             attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
             attributeCollectionDTO.setActive((String)collectionData.get("active"));
-            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             AttributeCollection attributeCollection = attributeCollectionDAO.insert(attributeCollectionDTO);
             Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         });
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
-
         List<Map<String, Object>> collectionsUpdateData = new ArrayList<>();
-        collectionsUpdateData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "N", "discontinued", "Y"));
-        /*collectionsUpdateData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y", "discontinued", "N"));*/
-        collectionsUpdateData.add(CollectionsUtil.toMap("name", "Test3_Name", "externalId", "TEST_3", "active", "N", "discontinued", "Y"));
-
+        collectionsUpdateData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST1", "active", "N"));
         collectionsUpdateData.forEach(collectionUpdateData -> {
             AttributeCollection attributeCollectionDTO1 = new AttributeCollection();
             attributeCollectionDTO1.setCollectionName((String)collectionUpdateData.get("name"));
             attributeCollectionDTO1.setCollectionId((String)collectionUpdateData.get("externalId"));
             attributeCollectionDTO1.setActive((String)collectionUpdateData.get("active"));
-            attributeCollectionDTO1.setDiscontinued((String)collectionUpdateData.get("discontinued"));
             attributeCollectionDTO1.setGroup("DETAILS");
             attributeCollectionDAO.save(attributeCollectionDTO1);
-
-            Optional<AttributeCollection> attributeCollection1 = attributeCollectionDAO.findByExternalId(attributeCollectionDTO1.getCollectionId());
-            Assert.assertTrue(attributeCollection1.isPresent());
-             attributeCollection1 = attributeCollectionDAO.findById(attributeCollectionDTO1.getCollectionId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(attributeCollection1.isPresent());
-
         });
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        Optional<AttributeCollection> attributeCollection1 = attributeCollectionDAO.findById(collectionsUpdateData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        Assert.assertTrue(attributeCollection1.isPresent());
     }
 
     @Test
@@ -277,6 +263,8 @@ public class AttributeCollectionRepositoryTest {
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
         });
+        AttributeCollection attributeCollection1 = attributeCollectionDAO.findById(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Assert.assertTrue(attributeCollection1.getAttributes() != null);
     }
 
     @Test
@@ -303,18 +291,13 @@ public class AttributeCollectionRepositoryTest {
                 attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
                 attribute.setName((String)attributeData.get("name"));
                 attributeCollectionDetails.addAttribute(attribute);
-                /*Attribute attributeCheck = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
-                Assert.assertTrue(attributeCheck != null);*/
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
-
-            Optional<AttributeCollection> attributeCollectionTest = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId());
-            Assert.assertTrue(attributeCollectionTest.isPresent());
-            attributeCollectionTest = attributeCollectionDAO.findById(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(attributeCollectionTest.isPresent());
         });
         AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
-        Assert.assertTrue(attributeCollection.getAttributes() != null); //TODO check assert
+        Assert.assertTrue(attributeCollection.getAttributes() != null);
+        attributeCollection = attributeCollectionDAO.findById(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Assert.assertTrue(attributeCollection.getAttributes() != null);
     }
 
     @Test
@@ -346,9 +329,10 @@ public class AttributeCollectionRepositoryTest {
             attributeCollectionDAO.save(attributeCollectionDetails);
 
             AttributeCollection attributeCollectionUpdate = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+
             List<Map<String, Object>> attributesUpdateData = new ArrayList<>();
             attributesUpdateData.add(CollectionsUtil.toMap("name", "styleNew", "active", "Y", "id", "STYLE"));
-            attributesUpdateData.add(CollectionsUtil.toMap("name", "sizeCode", "active", "Y", "id", "SIZE"));
             attributesUpdateData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
                 attribute.setActive((String) attributeData.get("active"));
@@ -360,10 +344,10 @@ public class AttributeCollectionRepositoryTest {
             attributeCollectionDAO.save(attributeCollectionUpdate);
         });
 
-        Optional<AttributeCollection> attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString());
-        Assert.assertTrue(attributeCollection.isPresent());
-        attributeCollection = attributeCollectionDAO.findById(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(attributeCollection.isPresent());
+        AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
+        Assert.assertTrue(attributeCollection.getAttributes() != null);
+        attributeCollection = attributeCollectionDAO.findById(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Assert.assertTrue(attributeCollection.getAttributes() != null);
     }
 
     @Test
@@ -391,6 +375,8 @@ public class AttributeCollectionRepositoryTest {
                 attribute.setUiType(Attribute.UIType.DROPDOWN);
                 attributeCollectionDetails.addAttribute(attribute);
 
+                Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
+
                 List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
@@ -402,13 +388,16 @@ public class AttributeCollectionRepositoryTest {
                     attributeOption.setActive((String)attributeOptionData.get("active"));
                     attributeOption.setAttributeId(attribute.getFullId());
                     attributeOption.orchestrate();
-                    //attribute.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
-                    attributeCollectionDetails.addAttributeOption(attributeOption);
+                    attribute1.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
                  });
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
-            //TODO assert
         });
+
+        AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
+        Assert.assertTrue(attributeCollection.getAttributes() != null);
+        attributeCollection = attributeCollectionDAO.findById(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Assert.assertTrue(attributeCollection.getAttributes() != null);
     }
 
     @Test
@@ -426,7 +415,6 @@ public class AttributeCollectionRepositoryTest {
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
             List<Map<String, Object>> attributesData = new ArrayList<>();
-            List<Attribute> allAttributes = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
             attributesData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
@@ -436,6 +424,8 @@ public class AttributeCollectionRepositoryTest {
                 attribute.setId((String)attributeData.get("id"));
                 attribute.setUiType(Attribute.UIType.DROPDOWN);
                 attributeCollectionDetails.addAttribute(attribute);
+
+                Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
 
                 List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
@@ -448,17 +438,15 @@ public class AttributeCollectionRepositoryTest {
                     attributeOption.setActive((String)attributeOptionData.get("active"));
                     attributeOption.setAttributeId(attribute.getFullId());
                     attributeOption.orchestrate();
-                    //attribute.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
-                    attributeCollectionDetails.addAttributeOption(attributeOption);
+                    attribute1.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
                 });
 
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
 
             AttributeCollection attributeCollectionUpdate = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
-            //TODO
-            attributeCollectionUpdate.getAllAttributes().forEach(attributes1 -> {
-                List<Map<String, Object>> attributesOptionsUpdateData = new ArrayList<>();
+
+               /* List<Map<String, Object>> attributesOptionsUpdateData = new ArrayList<>();
                 attributesOptionsUpdateData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsUpdateData.add(CollectionsUtil.toMap("value", "OPEN_END1", "active", "Y"));
                 attributesOptionsUpdateData.add(CollectionsUtil.toMap("value", "PAPERS", "active", "Y"));
@@ -467,12 +455,12 @@ public class AttributeCollectionRepositoryTest {
                     attributeOption.setValue((String)attributeOptionData.get("value"));
                     attributeOption.setCollectionId(attributeCollectionUpdate.getCollectionId());
                     attributeOption.setActive((String)attributeOptionData.get("active"));
-                    attributeOption.setAttributeId(attributes1.getFullId());
+                    attributeOption.setAttributeId(attributeUpdate.getFullId());
                     attributeOption.orchestrate();
                     //attribute.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
                     attributeCollectionUpdate.addAttributeOption(attributeOption);
-                });
-            });
+                });*/
+
             attributeCollectionDAO.save(attributeCollectionUpdate);
         });
     }
@@ -502,6 +490,8 @@ public class AttributeCollectionRepositoryTest {
                 attribute.setUiType(Attribute.UIType.DROPDOWN);
                 attributeCollectionDetails.addAttribute(attribute);
 
+                Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
+
                 List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
@@ -513,15 +503,14 @@ public class AttributeCollectionRepositoryTest {
                     attributeOption.setActive((String)attributeOptionData.get("active"));
                     attributeOption.setAttributeId(attribute.getFullId());
                     attributeOption.orchestrate();
-                    //attribute.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
-                    attributeCollectionDetails.addAttributeOption(attributeOption);
+                    attribute1.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
 
-                    AttributeOption attributeOptionCheck = attributeCollectionDetails.getAttributeOption(attributeOption.getFullId()).orElse(null);
-                    Assert.assertTrue(attributeOptionCheck != null);
                 });
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
         });
+        //AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
+
     }
 
     @After
