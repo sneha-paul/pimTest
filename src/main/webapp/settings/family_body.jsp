@@ -54,7 +54,7 @@
                                                             <span>Active</span>
                                                         </label>
                                                     </div>
-                                                    <div class="js-dateRange">
+                                                    <%--<div class="js-dateRange">
                                                         <div class="form-group">
                                                             <label>Active From </label>
                                                             <input type="text" class="form-control dateUI js-start" name="activeFrom" value="${family.activeFrom}">
@@ -63,7 +63,7 @@
                                                             <label>Active To </label>
                                                             <input type="text" class="form-control dateUI js-end" name="activeTo" value="${family.activeTo}">
                                                         </div>
-                                                    </div>
+                                                    </div>--%>
                                                 </div>
                                             </div>
                                             <br>

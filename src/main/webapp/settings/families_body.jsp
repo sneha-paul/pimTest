@@ -38,7 +38,7 @@
         selector: '#js-create-family',
         url: $.getURL('/pim/families/create'),
         name:'create-family',
-        title:'Create Family',
+        title:'Create Product Type',
         buttons: [
             {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('families');$.closeModal();});}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
