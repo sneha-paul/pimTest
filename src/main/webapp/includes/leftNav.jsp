@@ -7,10 +7,6 @@
             <li <c:if test="${active eq 'CATEGORIES'}">class="active"</c:if>><a href="/pim/categories"><i class="icon-list"></i>All Categories</a></li>
             <li <c:if test="${active eq 'CATALOGS'}">class="active"</c:if>><a href="/pim/catalogs"><i class="icon-grid"></i>Catalogs</a></li>
             <li <c:if test="${active eq 'WEBSITES'}">class="active"</c:if>><a href="/pim/websites"><i class="icon-globe"></i>Websites</a></li>
-            <li <c:if test="${active eq 'CONFIGS'}">class="active"</c:if>><a href="/pim/configs"><i class="icon-settings"></i>Config</a></li>
-            <%--<li <c:if test="${active eq 'SETTINGS'}">class="active"</c:if>><a href="/pim/attributeCollections"><i class="icon-settings"></i>Attribute Collections</a></li>
-            <li <c:if test="${active eq 'FAMILIES'}">class="active"</c:if>><a href="/pim/families"><i class="icon-list"></i>Families</a></li>
-            <li <c:if test="${active eq 'SETTINGS'}">class="active"</c:if>><a href="/pim/pricingAttributes"><i class="icon-user"></i>Pricing Attributes</a></li>--%>
             <li <c:if test="${active eq 'USERS'}">class="active"</c:if>><a href="/pim/users"><i class="icon-users"></i>Users</a></li>
             <c:set var="expanded" value="${active eq 'ASSET_COLLECTIONS' or active eq 'ATTRIBUTE_COLLECTIONS' or active eq 'FAMILIES' or active eq 'PRICING_ATTRIBUTES' or active eq 'EVENTS'}"/>
             <li <c:if test="${expanded}">class="active"</c:if>>

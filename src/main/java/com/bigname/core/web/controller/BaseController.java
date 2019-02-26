@@ -126,7 +126,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
             model.put("success", true);
             if(!id.equals(entity.getExternalId())) {
                 model.put("refreshUrl", baseMapping + entity.getExternalId());
-            } else if(entity.getGroup()[0].equals("DETAILS") && (!active.equals(entity.getActive()) || !discontinued.equals(entity.getDiscontinued()))) {
+            } else if(entity.getGroup().length > 0 && entity.getGroup()[0].equals("DETAILS") && (!active.equals(entity.getActive()) || !discontinued.equals(entity.getDiscontinued()))) {
                 model.put("refresh", true);
             }
         }

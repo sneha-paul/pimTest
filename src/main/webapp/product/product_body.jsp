@@ -9,7 +9,10 @@
 <c:set var="masterGroups" value="${product.productFamily.addonMasterGroups}"/>
 <c:set var="detailsMasterGroup" value="${product.productFamily.detailsMasterGroup}"/>
 <c:set var="featuresMasterGroup" value="${product.productFamily.featuresMasterGroup}"/>
-
+<style>
+    .ms-container .ms-selection {float: none !important;}
+    .ms-container .ms-selectable {float: right !important;}
+</style>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
@@ -95,6 +98,30 @@
                                                                                                         <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.channelFamilyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
                                                                                                     </c:forEach>
                                                                                                 </select>
+                                                                                            </c:when>
+                                                                                            <c:when test="${attribute.uiType eq 'MULTI_SELECT'}">
+                                                                                                <c:set var="attributeValue" value="${product.channelFamilyAttributes[attribute.id]}"/>
+                                                                                                <select id="${attribute.id}" name="${attribute.id}" multiple="multiple" data-attr-id="${attribute.id}" class="form-control${disabledClass}" ${disabled}>
+                                                                                                    <c:forEach items="${attribute.options}" var="optionEntry">
+                                                                                                        <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                                                                                        <c:choose>
+                                                                                                            <c:when test="${attributeValue.getClass().name eq 'java.util.ArrayList'}">
+                                                                                                                <option value="${attributeOption.id}" <c:if test="${attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                            </c:when>
+                                                                                                            <c:otherwise>
+                                                                                                                <option value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                            </c:otherwise>
+                                                                                                        </c:choose>
+                                                                                                    </c:forEach>
+                                                                                                </select>
+                                                                                                <script>
+                                                                                                    $('#${attribute.id}').multiSelect({
+                                                                                                        selectableHeader: "<div class='custom-header'>Available</div>",
+                                                                                                        selectionHeader: "<div class='custom-header'>Selected</div>",
+                                                                                                        keepOrder: true,
+                                                                                                        dblClick: true
+                                                                                                    });
+                                                                                                </script>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'TEXTAREA'}">
                                                                                                 <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
@@ -217,6 +244,23 @@
                                                                                                         <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.channelFamilyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
                                                                                                     </c:forEach>
                                                                                                 </select>
+                                                                                            </c:when>
+                                                                                            <c:when test="${attribute.uiType eq 'MULTI_SELECT'}">
+                                                                                                <c:set var="attributeValue" value="${product.channelFamilyAttributes[attribute.id]}"/>
+                                                                                                <select id="${attribute.id}" name="${attribute.id}" multiple="multiple" data-attr-id="${attribute.id}" class="form-control${disabledClass}" ${disabled}>
+                                                                                                    <c:forEach items="${attribute.options}" var="optionEntry">
+                                                                                                        <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                                                                                        <option value="${attributeOption.id}" <c:if test="${not empty attributeValue && attributeValue.size() gt 0 && attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                    </c:forEach>
+                                                                                                </select>
+                                                                                                <script>
+                                                                                                    $('#${attribute.id}').multiSelect({
+                                                                                                        selectableHeader: "<div class='custom-header'>Available</div>",
+                                                                                                        selectionHeader: "<div class='custom-header'>Selected</div>",
+                                                                                                        keepOrder: true,
+                                                                                                        dblClick: true
+                                                                                                    });
+                                                                                                </script>
                                                                                             </c:when>
                                                                                             <c:when test="${attribute.uiType eq 'TEXTAREA'}">
                                                                                                 <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
@@ -402,6 +446,23 @@
                                                                                                                 </c:forEach>
                                                                                                             </select>
                                                                                                         </c:when>
+                                                                                                        <c:when test="${attribute.uiType eq 'MULTI_SELECT'}">
+                                                                                                            <c:set var="attributeValue" value="${product.channelFamilyAttributes[attribute.id]}"/>
+                                                                                                            <select id="${attribute.id}" name="${attribute.id}" multiple="multiple" data-attr-id="${attribute.id}" class="form-control${disabledClass}" ${disabled}>
+                                                                                                                <c:forEach items="${attribute.options}" var="optionEntry">
+                                                                                                                    <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                                                                                                    <option value="${attributeOption.id}" <c:if test="${not empty attributeValue && attributeValue.size() gt 0 && attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                                </c:forEach>
+                                                                                                            </select>
+                                                                                                            <script>
+                                                                                                                $('#${attribute.id}').multiSelect({
+                                                                                                                    selectableHeader: "<div class='custom-header'>Available</div>",
+                                                                                                                    selectionHeader: "<div class='custom-header'>Selected</div>",
+                                                                                                                    keepOrder: true,
+                                                                                                                    dblClick: true
+                                                                                                                });
+                                                                                                            </script>
+                                                                                                        </c:when>
                                                                                                         <c:when test="${attribute.uiType eq 'TEXTAREA'}">
                                                                                                             <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
                                                                                                         </c:when>
@@ -523,6 +584,23 @@
                                                                                                             <option value="${attributeOption.id}" <c:if test="${attributeOption.id eq product.channelFamilyAttributes[attribute.id]}">selected</c:if>>${attributeOption.value}</option>
                                                                                                         </c:forEach>
                                                                                                     </select>
+                                                                                                </c:when>
+                                                                                                <c:when test="${attribute.uiType eq 'MULTI_SELECT'}">
+                                                                                                    <c:set var="attributeValue" value="${product.channelFamilyAttributes[attribute.id]}"/>
+                                                                                                    <select id="${attribute.id}" name="${attribute.id}" multiple="multiple" data-attr-id="${attribute.id}" class="form-control${disabledClass}" ${disabled}>
+                                                                                                        <c:forEach items="${attribute.options}" var="optionEntry">
+                                                                                                            <c:set var="attributeOption" value="${optionEntry.value}"/>
+                                                                                                            <option value="${attributeOption.id}" <c:if test="${not empty attributeValue && attributeValue.size() gt 0 && attributeValue.contains(attributeOption.id)}">selected</c:if>>${attributeOption.value}</option>
+                                                                                                        </c:forEach>
+                                                                                                    </select>
+                                                                                                    <script>
+                                                                                                        $('#${attribute.id}').multiSelect({
+                                                                                                            selectableHeader: "<div class='custom-header'>Available</div>",
+                                                                                                            selectionHeader: "<div class='custom-header'>Selected</div>",
+                                                                                                            keepOrder: true,
+                                                                                                            dblClick: true
+                                                                                                        });
+                                                                                                    </script>
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'TEXTAREA'}">
                                                                                                     <textarea id="${attribute.id}" class="form-control auto-resize" name="${attribute.id}">${product.channelFamilyAttributes[attribute.id]}</textarea>
