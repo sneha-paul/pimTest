@@ -114,6 +114,9 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     }
 
     public LocalDate getActiveFromDate() {
+        if(activeFromDate == null && activeFrom != null){
+            activeFromDate = activeFrom.toLocalDate();
+        }
         return activeFromDate;
     }
 
@@ -122,6 +125,9 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     }
 
     public LocalDate getActiveToDate() {
+        if(activeToDate == null && activeTo != null){
+            activeToDate = activeTo.toLocalDate();
+        }
         return activeToDate;
     }
 
@@ -163,6 +169,9 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     }
 
     public LocalDate getDiscontinuedFromDate() {
+        if(discontinuedFromDate == null && discontinuedFrom != null){
+            discontinuedFromDate = discontinuedFrom.toLocalDate();
+        }
         return discontinuedFromDate;
     }
 
@@ -171,6 +180,9 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     }
 
     public LocalDate getDiscontinuedToDate() {
+        if(discontinuedToDate == null && discontinuedTo != null){
+            discontinuedToDate = discontinuedTo.toLocalDate();
+        }
         return discontinuedToDate;
     }
 
@@ -179,6 +191,9 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     }
 
     public LocalDateTime getDiscontinuedFrom() {
+        if(discontinuedFrom == null && discontinuedFromDate != null){
+            discontinuedFrom = discontinuedFromDate.atStartOfDay();
+        }
         return discontinuedFrom;
     }
 
@@ -187,6 +202,9 @@ abstract public class Entity<T extends Entity<T>> extends ValidatableEntity impl
     }
 
     public LocalDateTime getDiscontinuedTo() {
+        if(discontinuedTo == null && discontinuedToDate != null){
+            discontinuedTo = discontinuedToDate.plusDays(1).atStartOfDay().minusSeconds(1);
+        }
         return discontinuedTo;
     }
 

@@ -204,11 +204,11 @@
                                                                         <div class="js-dateRange">
                                                                             <div class="form-group">
                                                                                 <label>Active From </label>
-                                                                                <input type="text" class="form-control dateUI js-start" name="activeFrom" value="${productVariant.activeFrom}">
+                                                                                <input type="text" class="form-control dateUI js-start" name="activeFromDate" value="${productVariant.activeFromDate}">
                                                                             </div>
                                                                             <div class="form-group">
                                                                                 <label>Active To </label>
-                                                                                <input type="text" class="form-control dateUI js-end" name="activeTo" value="${productVariant.activeTo}">
+                                                                                <input type="text" class="form-control dateUI js-end" name="activeToDate" value="${productVariant.activeToDate}">
                                                                             </div>
                                                                         </div>
                                                                        <%-- <div class="js-dateRange">

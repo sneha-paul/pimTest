@@ -36,6 +36,16 @@
                                                             <span>Active</span>
                                                         </label>
                                                     </div>
+                                                    <%--<div class="js-dateRange">
+                                                        <div class="form-group">
+                                                            <label>Active From </label>
+                                                            <input type="text" class="form-control dateUI js-start" name="activeFromDate" value="${pricingAttribute.activeFromDate}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Active To </label>
+                                                            <input type="text" class="form-control dateUI js-end" name="activeToDate" value="${pricingAttribute.activeToDate}">
+                                                        </div>
+                                                    </div>--%>
                                                 </div>
                                             </div>
                                             <br>
