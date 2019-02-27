@@ -80,7 +80,7 @@
                                             <br>
                                             <input type="hidden" name="group" value="DETAILS"/>
                                             <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
-                                            <a href="${backURL}"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                            <a href="${breadcrumbs.backURL}"><button type="button" class="btn btn-danger">Cancel</button></a>
                                         </form>
                                     </div>
                                 </div>
