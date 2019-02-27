@@ -1,6 +1,8 @@
 package com.bigname.common.util;
 
+import com.bigname.pim.api.domain.Website;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,6 +22,7 @@ public class ReflectionUtilTest {
 
     @Test
     public void newInstance() throws Exception {
+        Assert.assertNotEquals(ReflectionUtil.newInstance(Website.class), new Website());
     }
 
 }

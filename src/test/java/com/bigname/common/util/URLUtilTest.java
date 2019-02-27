@@ -1,6 +1,7 @@
 package com.bigname.common.util;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,6 +21,8 @@ public class URLUtilTest {
 
     @Test
     public void encode() throws Exception {
+        String actual = "http%3A%2F%2Flocalhost%3A8081%2Fpim%2Fwebsites";
+        Assert.assertEquals(URLUtil.encode("http://localhost:8081/pim/websites"), actual);
     }
 
 }
