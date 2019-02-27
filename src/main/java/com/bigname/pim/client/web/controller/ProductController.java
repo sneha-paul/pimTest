@@ -157,7 +157,9 @@ public class ProductController extends BaseController<Product, ProductService> {
     public ModelAndView all(){
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
-        return new ModelAndView("product/products", model);
+        model.put("view", "product/products");
+        model.put("title", "Products");
+        return all(model);
     }
 
     @RequestMapping(value =  {"/list", "/data"})

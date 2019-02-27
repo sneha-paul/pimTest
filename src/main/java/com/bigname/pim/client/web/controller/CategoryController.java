@@ -93,9 +93,10 @@ public class CategoryController extends BaseController<Category, CategoryService
     public ModelAndView all(@RequestParam(name = "reload", required = false) boolean reload){
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATEGORIES");
-        return new ModelAndView("category/categories" + (reload ? "_body" : ""), model);
+        model.put("view", "category/categories" + (reload ? "_body" : ""));
+        model.put("title", "Categories");
+        return all(model);
     }
-
 
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody

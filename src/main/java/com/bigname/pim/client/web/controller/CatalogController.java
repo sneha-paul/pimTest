@@ -95,7 +95,9 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     public ModelAndView all() {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "CATALOGS");
-        return new ModelAndView("catalog/catalogs", model);
+        model.put("view", "catalog/catalogs");
+        model.put("title", "Catalogs");
+        return all(model);
     }
 
 

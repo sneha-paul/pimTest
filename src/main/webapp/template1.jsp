@@ -97,8 +97,8 @@
             <div class="block-header p-l-25">
                 <div class="row">
                     <div>
+                        <c:if test="${not empty breadcrumbs}"><h2>${breadcrumbs.title}</h2></c:if>
                         <c:forEach items="${breadcrumbs.breadcrumbs}" var="breadcrumb" varStatus="crumbStatus">
-                            <c:if test="${crumbStatus.first}"><h2>${breadcrumbs.title}</h2></c:if>
                             <c:if test="${crumbStatus.first}"><ul class="breadcrumb" style="position: relative; top: 17px"></c:if>
                             <li class="breadcrumb-item"><c:if test="${breadcrumb[1] ne ''}"><a href="${breadcrumb[1]}"></c:if> <c:choose><c:when test="${breadcrumb[0] eq 'HOME'}"><i class="icon-home"></i></c:when><c:otherwise>${breadcrumb[0]}</c:otherwise></c:choose><c:if test="${breadcrumb[1] ne ''}"></a></c:if></li>
                             <c:if test="${crumbStatus.last}"></ul></c:if>

@@ -1,5 +1,6 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.common.datatable.model.Result;
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
@@ -7,9 +8,12 @@ import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.AssetFamily;
 import com.bigname.pim.api.service.AssetFamilyService;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,8 +80,10 @@ public class AssetFamilyController extends BaseController<AssetFamily ,AssetFami
     @RequestMapping()
     public ModelAndView all() {
         Map<String, Object> model = new HashMap<>();
-        model.put("assetFamily", "ASSET_FAMILY");
-        return new ModelAndView("settings/assetFamilies", model);
+        model.put("active", "ASSET_FAMILY");
+        model.put("view", "settings/assetFamilies");
+        model.put("title", "Asset Families");
+        return all(model);
     }
 
 

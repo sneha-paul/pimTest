@@ -116,6 +116,11 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return downloadFile(fileLocation, fileName, request);
     }
 
+    protected ModelAndView all(Map<String, Object> model) {
+        model.put("breadcrumbs", new Breadcrumbs((String)model.get("title"), (String)model.get("title"), ""));
+        return new ModelAndView((String)model.remove("view"), model);
+    }
+
     protected Map<String, Object> update(String id, T entity, String baseMapping, Class<?>... groups) {
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("id", id));

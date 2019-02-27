@@ -125,8 +125,11 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     public ModelAndView all() {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "WEBSITES");
-        return new ModelAndView("website/websites", model);
+        model.put("view", "website/websites");
+        model.put("title", "Websites");
+        return all(model);
     }
+
 
     /**
      * Handler method to load a list of all the catalogs associated with the given websiteId.
