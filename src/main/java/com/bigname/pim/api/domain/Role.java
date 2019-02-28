@@ -12,7 +12,7 @@ import java.util.Map;
 @Document
 public class Role extends Entity<Role> {
 
-    private String userName1;
+    private String roleId;
 
     private String role;
 
@@ -20,17 +20,18 @@ public class Role extends Entity<Role> {
         super();
     }
 
-   public Role(String userRole, String userName) {
-        this.userName1 = userName;
+   public Role(String userRole, String roleId) {
+        this.roleId = roleId;
         this.role = userRole;
     }
 
-    public String getUserName() {
-        return userName1;
+    public String getRoleId() {
+        return getExternalId();
     }
 
-    public void setUserName(String userName) {
-        this.userName1 = userName;
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+        setExternalId(roleId);
     }
 
     public String getUserRole() {
@@ -43,7 +44,7 @@ public class Role extends Entity<Role> {
 
     @Override
     protected void setExternalId() {
-
+        this.roleId = getExternalId();
     }
 
     @Override

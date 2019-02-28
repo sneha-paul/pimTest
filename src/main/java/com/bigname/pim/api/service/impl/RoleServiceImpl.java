@@ -1,4 +1,4 @@
-/*
+
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.core.service.BaseServiceSupport;
@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.Validator;
 
-*/
+
 /**
  * Created by sruthi on 27-02-2019.
- *//*
+ */
 
 public class RoleServiceImpl extends BaseServiceSupport<Role, RoleDAO, RoleService> implements RoleService {
     private RoleDAO roleDAO;
@@ -23,4 +23,4 @@ public class RoleServiceImpl extends BaseServiceSupport<Role, RoleDAO, RoleServi
         this.roleDAO = roleDAO;
     }
 }
-*/
+

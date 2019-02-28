@@ -34,6 +34,8 @@ public class User extends Entity<User> implements UserDetails {
 
     private String status;
 
+    private List<String> userRole;
+
     public User() {
         super();
     }
@@ -82,6 +84,14 @@ public class User extends Entity<User> implements UserDetails {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<String> getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(List<String> userRole) {
+        this.userRole = userRole;
     }
 
     @Override
