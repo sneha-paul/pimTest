@@ -55,7 +55,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void loadUserByUsername() throws Exception {
+    public void loadUserByUsernameTest() throws Exception {
         List<Map<String, Object>> usersData = new ArrayList<>();
         usersData.add(CollectionsUtil.toMap("name", "TestUser", "password", "test123", "externalId", "testUser@gmail.com", "email", "testUser@gmail.com", "active", "Y"));
 
@@ -79,7 +79,6 @@ public class UserServiceImplTest {
             Assert.assertTrue(userDetails.getUsername() .equals(newUser.getUserName()) && userDetails.getPassword().equals(newUser.getPassword()));
         });
 
-        userDAO.getMongoTemplate().dropCollection(User.class);
     }
 
     @Test

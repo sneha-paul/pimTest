@@ -55,7 +55,7 @@ public class RegistrationServiceImplTest {
     }
 
     @Test
-    public void sendVerificationEmail() throws Exception {
+    public void sendVerificationEmailTest() throws Exception {
         List<Map<String, Object>> usersData = new ArrayList<>();
         usersData.add(CollectionsUtil.toMap("name", "TestUser", "password", "test123", "externalId", "testUser@gmail.com", "email", "testUser@gmail.com", "active", "Y"));
 
@@ -83,7 +83,6 @@ public class RegistrationServiceImplTest {
 
         registrationService.sendVerificationEmail(subject, recipientAddress, message); //TODO : returnType void, so didn;t write anyAssert
 
-        userDAO.getMongoTemplate().dropCollection(User.class);
     }
 
     @After

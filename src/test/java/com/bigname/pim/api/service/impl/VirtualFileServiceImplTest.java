@@ -47,21 +47,16 @@ public class VirtualFileServiceImplTest {
         assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+    @Test
+    public void createTest() throws Exception {
     }
 
     @Test
-    public void create() throws Exception {
+    public void updateTest() throws Exception {
     }
 
     @Test
-    public void update() throws Exception {
-    }
-
-    @Test
-    public void getFiles() throws Exception {
+    public void getFilesTest() throws Exception {
         List<Map<String, Object>> assetCollectionData = new ArrayList<>();
         assetCollectionData.add(CollectionsUtil.toMap("name", "TestAssetCollection"));
 
@@ -81,16 +76,19 @@ public class VirtualFileServiceImplTest {
             List<VirtualFile> assets = assetService.getFiles(newAssetCollection.getRootId());
             Assert.assertTrue(assets != null);
         });
+    }
+
+    @Test
+    public void getFileTest() throws Exception {
+    }
+
+    @Test
+    public void validateTest() throws Exception {
+    }
+
+    @After
+    public void tearDown() throws Exception {
         assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
-
-    }
-
-    @Test
-    public void getFile() throws Exception {
-    }
-
-    @Test
-    public void validate() throws Exception {
     }
 
 }

@@ -48,11 +48,11 @@ public class AssetCollectionServiceImplTest {
     }
 
     @Test
-    public void getAssetsHierarchy() throws Exception {
+    public void getAssetsHierarchyTest() throws Exception {
     }
 
     @Test
-    public void getAssetCollection() throws Exception {
+    public void getAssetCollectionTest() throws Exception {
         List<Map<String, Object>> assetCollectionData = new ArrayList<>();
         assetCollectionData.add(CollectionsUtil.toMap("name", "TestAssetCollection"));
 
@@ -73,7 +73,6 @@ public class AssetCollectionServiceImplTest {
         AssetCollection assetCollection = assetCollectionService.getAssetCollection(assetCollectionData.get(0).get("name").toString()).orElse(null);
         Assert.assertEquals(assetCollection.getExternalId().toString(), assetCollectionData.get(0).get("name").toString().toUpperCase());
 
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
     }
 
     @After
