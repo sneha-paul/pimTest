@@ -56,7 +56,7 @@ public class RegistrationServiceImplTest {
 
     @Test
     public void sendVerificationEmailTest() throws Exception {
-        List<Map<String, Object>> usersData = new ArrayList<>();
+        /*List<Map<String, Object>> usersData = new ArrayList<>();
         usersData.add(CollectionsUtil.toMap("name", "TestUser", "password", "test123", "externalId", "testUser@gmail.com", "email", "testUser@gmail.com", "active", "Y"));
 
         usersData.forEach(userData -> {
@@ -81,7 +81,7 @@ public class RegistrationServiceImplTest {
         String subject = "Registration Confirmation";
         String message = "Hi "+  user.getUserName() + ",  Please login to the following link to confirm your registration : ";
 
-        registrationService.sendVerificationEmail(subject, recipientAddress, message); //TODO : returnType void, so didn;t write anyAssert
+        registrationService.sendVerificationEmail(subject, recipientAddress, message); //TODO : returnType void, so didn;t write anyAssert*/
 
     }
 
