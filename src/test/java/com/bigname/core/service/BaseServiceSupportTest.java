@@ -7,7 +7,6 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.WebsiteService;
-
 import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -24,11 +23,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static com.bigname.core.util.FindBy.INTERNAL_ID;
 
 /**
  * Created by sruthi on 20-02-2019.
@@ -643,6 +644,36 @@ public class BaseServiceSupportTest {
 
     @Test
     public void validate1() throws Exception {
+        /*Website websiteDTO = new Website();
+        websiteDTO.setWebsiteName("test");
+        websiteDTO.setUrl("wwww.test");
+        websiteDTO.setWebsiteId("TEST");
+        websiteDTO.setActive("Y");
+
+        Map<String, Object> context = new HashedMap();
+        context.put("id","");
+
+        Map<String, Object> actual = new HashedMap();
+
+        Class groups = ValidatableEntity.CreateGroup.class;
+        Assert.assertEquals(websiteService.validate(websiteDTO, context, groups), actual);
+
+
+        Website websiteDTO1 = new Website();
+        websiteDTO1.setWebsiteName("Envelope");
+        websiteDTO1.setUrl("wwww.envelope");
+        websiteDTO1.setWebsiteId("ENVELOPE");
+        websiteDTO1.setActive("Y");
+        websiteDAO.insert(websiteDTO1);
+
+        Website website = websiteDAO.findById(websiteDTO1.getWebsiteId(), FindBy.EXTERNAL_ID).orElse(null);
+        website.setUrl("www.envelope");
+        website.setGroup("DETAILS");
+        website.setActive("Y");
+        context.put("id", website.getExternalId());
+        context.put("forceUniqueId", true);
+        groups = ValidatableEntity.DetailsGroup.class;
+        Assert.assertEquals(websiteService.validate(website, context, groups).size(), actual);*/
     }
 
     @Test
