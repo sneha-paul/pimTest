@@ -145,6 +145,33 @@ public class PimUtilTest {
     }
 
     @Test
+    public void isBetween(){
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
+        LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime yesterdayEOD = todayEOD.minusDays(1);
+        LocalDateTime tomorrow = today.plusDays(1);
+        LocalDateTime tomorrowEOD = todayEOD.plusDays(1);
+
+        Assert.assertTrue(PimUtil.isActive("Y", null, null));
+        Assert.assertFalse(PimUtil.isActive("N", null, null));
+
+        Assert.assertTrue(PimUtil.isActive("Y", yesterday, null));
+        Assert.assertTrue(PimUtil.isActive("N", yesterday, null));
+        Assert.assertTrue(PimUtil.isActive("Y", today, null));
+        Assert.assertTrue(PimUtil.isActive("N", today, null));
+        Assert.assertTrue(PimUtil.isActive("Y", tomorrow, null));
+        Assert.assertFalse(PimUtil.isActive("N", tomorrow, null));
+
+        Assert.assertTrue(PimUtil.isActive("Y", null, yesterdayEOD));
+        Assert.assertFalse(PimUtil.isActive("N", null, yesterdayEOD));
+        Assert.assertTrue(PimUtil.isActive("Y", null, todayEOD));
+        Assert.assertTrue(PimUtil.isActive("N", null, todayEOD));
+        Assert.assertTrue(PimUtil.isActive("Y", null, tomorrowEOD));
+        Assert.assertTrue(PimUtil.isActive("N", null ,tomorrowEOD));
+    }
+
+    @Test
     public void hasDiscontinued(){
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());

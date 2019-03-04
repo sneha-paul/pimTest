@@ -1,6 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
@@ -54,6 +55,7 @@ public class CategoryServiceImplTest {
     @Before
     public void setUp() throws Exception {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        relatedCategoryDAO.deleteAll();
     }
 
     @Test
@@ -75,12 +77,12 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
 
         RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(newRelatedCategory1 != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory1));
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
@@ -90,7 +92,7 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
@@ -118,12 +120,12 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
 
         RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(newRelatedCategory1 != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory1));
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
@@ -133,7 +135,7 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
@@ -145,11 +147,11 @@ public class CategoryServiceImplTest {
     @Test
     public void getCategoryHierarchyTest() throws Exception {
         List<Map<String, Object>> categoriesData = new ArrayList<>();
-        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Test Category4", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Test Category5", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y", "parent", "0", "isParent", "true", "level", "0", "parentChain", ""));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Test Category4", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Test Category5", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
 
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
@@ -161,7 +163,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
@@ -172,14 +174,17 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
 
         List<Map<String, Object>> subCategories = categoryService.getCategoryHierarchy(false);
-        Assert.assertTrue(subCategories != null);
-        Assert.assertTrue(subCategories.get(0).get("parent").equals("0") && subCategories.get(1).get("parent").equals(subCategories.get(0).get("key")));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(subCategories));
+        Assert.assertEquals(subCategories.get(0).get("parent"), categoriesData.get(0).get("parent"));
+        Assert.assertEquals(subCategories.get(0).get("level").toString(), categoriesData.get(0).get("level"));
+        Assert.assertEquals(subCategories.get(1).get("parent"), categoriesData.get(1).get("parent"));
+        Assert.assertEquals(subCategories.get(1).get("parentChain"), categoriesData.get(1).get("parentChain"));
     }
 
     @Test
@@ -201,12 +206,12 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
 
         RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(newRelatedCategory1 != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory1));
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
@@ -216,7 +221,7 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
@@ -242,7 +247,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
@@ -253,7 +258,7 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
@@ -281,7 +286,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
@@ -292,7 +297,7 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
@@ -318,7 +323,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
@@ -329,7 +334,7 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
@@ -352,7 +357,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
@@ -363,7 +368,7 @@ public class CategoryServiceImplTest {
 
         categories.forEach(relatedCategory -> {
             RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
-            Assert.assertTrue(newRelatedCategory != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
@@ -413,6 +418,7 @@ public class CategoryServiceImplTest {
     @After
     public void tearDown() throws Exception {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        relatedCategoryDAO.deleteAll();
     }
 
 }
