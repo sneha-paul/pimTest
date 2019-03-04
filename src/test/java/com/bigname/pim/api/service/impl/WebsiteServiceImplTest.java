@@ -55,6 +55,7 @@ public class WebsiteServiceImplTest {
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        websiteCatalogDAO.deleteAll();
     }
 
     @Test
@@ -387,6 +388,7 @@ public class WebsiteServiceImplTest {
     public void tearDown() throws Exception {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        websiteCatalogDAO.deleteAll();
     }
 
 }
