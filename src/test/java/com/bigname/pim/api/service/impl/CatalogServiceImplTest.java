@@ -58,6 +58,8 @@ public class CatalogServiceImplTest {
     public void setUp() throws Exception {
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        rootCategoryDAO.deleteAll();
+        relatedCategoryDAO.deleteAll();
     }
 
     @Test
@@ -277,7 +279,6 @@ public class CatalogServiceImplTest {
 
         RootCategory updatedRootCategory = rootCategoryDAO.findById(rootCategory.getId()).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedRootCategory));
-
         Assert.assertEquals(updatedRootCategory.getActive(), "N");
 
     }
@@ -342,8 +343,9 @@ public class CatalogServiceImplTest {
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
-        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y", "parent", "0", "isParent", true, "level", "0", "parentChain", ""));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", false,"level", "1", "parentChain", "TEST_CATEGORY_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 3", "externalId", "TEST_CATEGORY_3", "description", "Test description 3", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", false,"level", "1", "parentChain", "TEST_CATEGORY_1"));
 
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
@@ -355,7 +357,6 @@ public class CatalogServiceImplTest {
         });
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        Category category1 = categoryService.get(categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
         RootCategory rootCategory = new RootCategory();
         rootCategory.setCatalogId(catalog.getId());
@@ -365,14 +366,23 @@ public class CatalogServiceImplTest {
         rootCategory.setActive(category.getActive());
         rootCategoryDAO.insert(rootCategory);
 
-        RelatedCategory relatedCategory = new RelatedCategory();
-        relatedCategory.setCategoryId(category.getId());
-        relatedCategory.setSubCategoryId(category1.getId());
-        relatedCategoryDAO.insert(relatedCategory);
-        RelatedCategory relatedCategory1 = relatedCategoryDAO.findById(relatedCategory.getId()).orElse(null);
-        Assert.assertTrue(ValidationUtil.isNotEmpty(relatedCategory1));
+        categoriesData.stream().skip(1).forEach(categoryData -> {
+            Category category1 = categoryService.get(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+            RelatedCategory relatedCategory = new RelatedCategory();
+            relatedCategory.setCategoryId(category.getId());
+            relatedCategory.setSubCategoryId(category1.getId());
+            relatedCategory.setActive("Y");
+            relatedCategoryDAO.insert(relatedCategory);
+            RelatedCategory relatedCategory1 = relatedCategoryDAO.findById(relatedCategory.getId()).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(relatedCategory1));
+        });
 
-        List<Map<String, Object>> categoryHierarchy = catalogService.getCategoryHierarchy(catalogsData.get(0).get("externalId").toString());// TODO verify code
+        List<Map<String, Object>> categoryHierarchy = catalogService.getCategoryHierarchy(catalogsData.get(0).get("externalId").toString());
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryHierarchy));
+        Assert.assertEquals(categoryHierarchy.get(0).get("parent").toString(), categoriesData.get(0).get("parent").toString());
+        Assert.assertEquals(categoryHierarchy.get(1).get("parent").toString(), categoriesData.get(1).get("parent").toString());
+        Assert.assertEquals(categoryHierarchy.get(2).get("parent").toString(), categoriesData.get(2).get("parent").toString());
 
 
     }
@@ -457,6 +467,8 @@ public class CatalogServiceImplTest {
     public void tearDown() throws Exception {
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        rootCategoryDAO.deleteAll();
+        relatedCategoryDAO.deleteAll();
     }
 
 }
