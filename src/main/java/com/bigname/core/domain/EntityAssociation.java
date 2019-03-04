@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.bigname.core.domain.ValidatableEntity.toYesNo;
+
 /**
  * Created by manu on 8/19/18.
  */
@@ -24,7 +26,7 @@ abstract public class EntityAssociation<P extends Entity, C extends Entity> {
 
     private long sequenceNum;
     private int subSequenceNum;
-    private String active;
+    private String active = "N";
 
     protected EntityAssociation init(P parent, C child) {
         this.parent = parent;
@@ -81,7 +83,10 @@ abstract public class EntityAssociation<P extends Entity, C extends Entity> {
     }
 
     public void setActive(String active) {
-        this.active = active;
+        if(active == null) {
+            active = "N";
+        }
+        this.active = toYesNo(active,"Y");
     }
 
     @Deprecated
