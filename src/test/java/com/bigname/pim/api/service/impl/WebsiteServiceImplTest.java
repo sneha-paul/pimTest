@@ -2,6 +2,7 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Catalog;
@@ -25,10 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -382,6 +380,57 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void validate() throws Exception {
+        /* Create a valid new instance with id TEST */
+        Website websiteDTO = new Website();
+        websiteDTO.setWebsiteName("test");
+        websiteDTO.setUrl("www.test");
+        websiteDTO.setWebsiteId("TEST");
+        websiteDTO.setActive("Y");
+
+        Map<String, Object> context = new HashMap<>();
+
+        Class groups = ValidatableEntity.CreateGroup.class;
+//        validate
+        Assert.assertTrue(websiteService.validate(websiteDTO, context, groups).isEmpty());
+//        insert the valid instance
+        websiteDAO.insert(websiteDTO);
+
+        /*Create a second instance with the same id TEST to check the unique constraint violation of websiteName*/
+
+        Website websiteDTO1 = new Website();
+        websiteDTO1.setWebsiteName("test");
+        websiteDTO1.setUrl("www.envelope.com");
+        websiteDTO1.setWebsiteId("ENVELOPE");
+        websiteDTO1.setActive("Y");
+        Assert.assertEquals(websiteService.validate(websiteDTO1, context, groups).size(), 1);
+
+
+        //*Testing unique websiteName*//*
+        context.put("forceUniqueId", true);
+        websiteDTO1.setWebsiteName("Envelope");
+        Assert.assertTrue(websiteService.validate(websiteDTO1, context, groups).isEmpty());
+        Assert.assertEquals(websiteDTO1.getWebsiteName(), "Envelope");
+        websiteDAO.insert(websiteDTO1);
+
+        context.clear();
+
+        //*Testing uniqueConstraint violation of websiteUrl with update operation*//*
+        Website website = websiteDAO.findById(websiteDTO.getWebsiteId(), FindBy.EXTERNAL_ID).orElse(null);
+        website.setUrl("www.envelope.com");
+        website.setGroup("DETAILS");
+        website.setActive("Y");
+        context.put("id", websiteDTO.getExternalId());
+
+        groups = ValidatableEntity.DetailsGroup.class;
+        Assert.assertEquals(websiteService.validate(website, context, groups).size(), 1);
+
+        //*Testing unique websiteUrl*//*
+        context.put("forceUniqueId", true);
+        website.setUrl("www.test.com");
+        Assert.assertTrue(websiteService.validate(website, context, groups).isEmpty());
+        Assert.assertEquals(website.getUrl(), "www.test.com");
+        websiteDAO.save(website);
+
     }
 
     @After
