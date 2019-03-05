@@ -143,33 +143,20 @@ public class CollectionsUtilTest {
 
     @Test
     public void buildMapString() throws Exception {
-       /* Map<String, Map<String, Object>> input = new HashMap<>();
+        Map<String, Map<String, Object>> input = new HashMap<>();
         Map<String, Object> objInput=new HashMap<>();
         Map<String, Object> objInput1=new HashMap<>();
 
         objInput.put("25",6);
+        objInput.put("50",61);
         input.put("plan",objInput);
 
         objInput1.put("25",45);
+        objInput1.put("50",20);
         input.put("map1",objInput1);
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("25");
-        builder.append(",");
-        builder.append("0");
-        builder.append(",");
-        builder.append("45");
-        builder.append(";");
-        builder.append("25");
-        builder.append(",");
-        builder.append("1");
-        builder.append(",");
-        builder.append("6");
-        builder.append(";");
-
-       // StringBuilder builder = new StringBuilder("25,0,2;50,0,1;10,0,3;25,1,77;50,1,3;10,1,6;25,2,45;50,2,4;10,2,66;25,3,6;50,3,9;10,3,3;");
-    //    String out= "25,0,2;50,0,1;10,0,3;25,1,77;50,1,3;10,1,6;25,2,45;50,2,4;10,2,66;25,3,6;50,3,9;10,3,3;";
-        Assert.assertEquals(CollectionsUtil.buildMapString(input,0),builder);*/
+        String out= "25,0,45;50,0,20;25,1,6;50,1,61;";
+        Assert.assertEquals(CollectionsUtil.buildMapString(input,0).toString(),out);
     }
 
 }
