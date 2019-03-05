@@ -124,6 +124,14 @@ public class Website extends Entity<Website> {
         ID, WEBSITE_ID, WEBSITE_NAME, URL, ACTIVE
     }
 
+    @Override
+    public void orchestrate() {
+        super.orchestrate();
+        if(isEmpty(this.websiteId)){
+            this.websiteId = getExternalId();
+        }
+    }
+
     public Map<String, Object> diff(Website website, boolean... ignoreInternalId) {
         boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
         Map<String, Object> diff = new HashMap<>();
