@@ -59,11 +59,11 @@ public class StringUtilTest {
     public void toMap() throws Exception {
         String[] stringArray= "name,Test1.com,externalId,TEST_1,url,www.test1.com,active,Y".split(",");
         Map<String, String> map=new HashMap<>();
-        map.put("name","Test1.com");
-        map.put("externalId","TEST_1");
-        map.put("url","www.test1.com");
-        map.put("active","Y");
-        Assert.assertEquals(StringUtil.toMap(stringArray),map);
+        map.put("name", "Test1.com");
+        map.put("externalId", "TEST_1");
+        map.put("url", "www.test1.com");
+        map.put("active", "Y");
+        Assert.assertEquals(StringUtil.toMap(stringArray), map);
     }
 
     @Test
@@ -108,12 +108,12 @@ public class StringUtilTest {
         stringList.add("name");
         stringList.add("is");
         stringList.add("duke");
-        Assert.assertEquals(StringUtil.getUniqueName("duke",stringList),"duke_1");
+        Assert.assertEquals(StringUtil.getUniqueName("duke", stringList),"duke_1");
     }
 
     @Test
     public void trim() throws Exception {
-        Assert.assertEquals(StringUtil.trim("  my name is duke"),"my name is duke");
+        Assert.assertEquals(StringUtil.trim("  my name is duke"), "my name is duke");
     }
 
     @Test
