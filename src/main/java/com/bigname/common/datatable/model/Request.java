@@ -324,10 +324,12 @@ public class Request {
 
         FilterBy filterBy = new FilterBy();
         filterBy.setGlobalSearch(this.isGlobalSearch());
-        for(Column column : this.getColumns()) {
-            if(column.isSearchable()) {
-                if(isNotEmpty(this.getSearch()) || isNotEmpty(column.getSearch())) {
-                    filterBy.addFilter(column.getData(), (this.isGlobalSearch()) ? this.getSearch() : column.getSearch());
+        if(isNotEmpty(this.getColumns())) {
+            for (Column column : this.getColumns()) {
+                if (column.isSearchable()) {
+                    if (isNotEmpty(this.getSearch()) || isNotEmpty(column.getSearch())) {
+                        filterBy.addFilter(column.getData(), (this.isGlobalSearch()) ? this.getSearch() : column.getSearch());
+                    }
                 }
             }
         }
