@@ -4,6 +4,7 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.Entity;
+import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.pim.api.domain.Event;
 import com.bigname.pim.api.domain.User;
 import com.bigname.core.domain.ValidatableEntity;
@@ -184,8 +185,11 @@ abstract public class BaseServiceSupport<T extends Entity, DAO extends GenericDA
                     dataObj.put("createdDateTime", _t.getCreatedDateTime());
                     event.setData(dataObj);
                 }
+                return _t;
+            } else {
+                throw new EntityNotFoundException("Unable to find " + getEntityName() + " instance with " + getExternalIdPropertyLabel() + ":" + id);
             }
-            return _t;
+
         } catch (Exception e) {
             String message = "Illegal operation";
             if(!t.getClass().equals(Event.class)) {
