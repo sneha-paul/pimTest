@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.Entity;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
@@ -41,134 +42,74 @@ public class WebsiteTest {
     public void setUp() throws Exception {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
+    @Test
+    public void accessorsTest(){
+        Website websiteDTO = new Website();
+        websiteDTO.setWebsiteId("test");
+        websiteDTO.setWebsiteName("Test.com");
+        websiteDTO.setUrl("www.test.com");
 
-    @After
-    public void tearDown() throws Exception {
+        websiteDTO.orchestrate();
+
+        Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
+        Assert.assertEquals(websiteDTO.getWebsiteName(), "Test.com");
+        Assert.assertEquals(websiteDTO.getUrl(), "www.test.com");
+        Assert.assertEquals(websiteDTO.getActive(), "N");
+
+        websiteService.create(websiteDTO);
+        Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
+        Assert.assertEquals(newWebsite.getWebsiteId(), websiteDTO.getWebsiteId());
+        Assert.assertEquals(newWebsite.getWebsiteName(), websiteDTO.getWebsiteName());
+        Assert.assertEquals(newWebsite.getUrl(), websiteDTO.getUrl());
+        Assert.assertEquals(newWebsite.getActive(), websiteDTO.getActive());
+    }
+
+    @Test
+    public void cloneInstance() throws Exception {
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
+
+        websitesData.forEach(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String) websiteData.get("name"));
+            websiteDTO.setWebsiteId((String) websiteData.get("externalId"));
+            websiteDTO.setActive((String) websiteData.get("active"));
+            websiteDTO.setUrl((String) websiteData.get("url"));
+            websiteDAO.insert(websiteDTO);
+
+            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(newWebsite != null);
+            Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
+
+            Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
+        });
+
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
-    public void getWebsiteId() throws Exception {
-        Website websiteDTO = new Website();
-        websiteDTO.setWebsiteName("test");
-        websiteDTO.setUrl("www.test");
-        websiteDTO.setWebsiteId("TEST");
-        websiteDTO.setActive("Y");
-
-        websiteService.create(websiteDTO);
-        Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newWebsite != null);
-        Assert.assertEquals(newWebsite.getWebsiteId(), websiteDTO.getWebsiteId());
+    public void merge() throws Exception {
     }
 
-        @Test
-        public void setWebsiteId () throws Exception {
-            Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName("test");
-            websiteDTO.setWebsiteId("TEST");
-            websiteDTO.setUrl("www.test");
-            websiteDTO.setActive("Y");
-
-            websiteService.create(websiteDTO);
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
-            Assert.assertEquals(newWebsite.getWebsiteId(),websiteDTO.getWebsiteId());
-        }
-
-        @Test
-        public void getWebsiteName () throws Exception {
-            Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName("test");
-            websiteDTO.setWebsiteId("TEST");
-            websiteDTO.setUrl("www.test");
-            websiteDTO.setActive("Y");
-
-            websiteService.create(websiteDTO);
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
-            Assert.assertEquals(newWebsite.getWebsiteName(),websiteDTO.getWebsiteName());
-        }
-
-        @Test
-        public void setWebsiteName () throws Exception {
-            Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName("test");
-            websiteDTO.setWebsiteId("TEST");
-            websiteDTO.setUrl("www.test");
-            websiteDTO.setActive("Y");
-
-            websiteService.create(websiteDTO);
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
-            Assert.assertEquals(newWebsite.getWebsiteName(),websiteDTO.getWebsiteName());
-        }
-
-        @Test
-        public void getUrl () throws Exception {
-            Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName("test");
-            websiteDTO.setWebsiteId("TEST");
-            websiteDTO.setUrl("www.test");
-            websiteDTO.setActive("Y");
-
-            websiteService.create(websiteDTO);
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
-            Assert.assertEquals(newWebsite.getUrl(),websiteDTO.getUrl());
-        }
-
-        @Test
-        public void setUrl () throws Exception {
-            Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName("test");
-            websiteDTO.setWebsiteId("TEST");
-            websiteDTO.setUrl("www.test");
-            websiteDTO.setActive("Y");
-
-            websiteService.create(websiteDTO);
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
-            Assert.assertEquals(newWebsite.getUrl(),websiteDTO.getUrl());
-        }
-
-        @Test
-        public void setExternalId () throws Exception {
-            Website websiteDTO = new Website();
-            websiteDTO.setWebsiteName("test");
-            websiteDTO.setWebsiteId("TEST");
-            websiteDTO.setUrl("www.test");
-            websiteDTO.setActive("Y");
-
-            websiteService.create(websiteDTO);
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
-            Assert.assertEquals(newWebsite.getExternalId(),websiteDTO.getExternalId());
-        }
-
-        @Test
-        public void cloneInstance () throws Exception {
-
-        }
-
-
-        @Test
-        public void merge () throws Exception {
-        }
-
-        @Test
-        public void toMap () throws Exception {
-        }
-
-        @Test
-        public void equals () throws Exception {
-        }
-
-        @Test
-        public void orchestrate () throws Exception {
-        }
-
-        @Test
-        public void diff () throws Exception {
-        }
-
+    @Test
+    public void toMap() throws Exception {
     }
+
+    @Test
+    public void equals() throws Exception {
+    }
+
+    @Test
+    public void orchestrate() throws Exception {
+    }
+
+    @Test
+    public void diff() throws Exception {
+    }
+    @After
+    public void tearDown() throws Exception {
+        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+    }
+}
