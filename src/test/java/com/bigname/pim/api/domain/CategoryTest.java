@@ -1,5 +1,8 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.Entity;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
@@ -13,6 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 import static org.junit.Assert.*;
@@ -35,267 +42,38 @@ public class CategoryTest {
     public void setUp() throws Exception {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
     }
-
-    @After
-    public void tearDown() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
-    }
-
     @Test
-    public void getCategoryId() throws Exception {
+    public void accessorsTest(){
         Category categoryDTO = new Category();
         categoryDTO.setCategoryName("test");
         categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
+        categoryDTO.setCategoryId("test");
         categoryDTO.setLongDescription("test");
         categoryDTO.setMetaTitle("test");
         categoryDTO.setMetaDescription("test");
 
+        categoryDTO.orchestrate();
+
+        Assert.assertEquals(categoryDTO.getCategoryId(), "TEST");
+        Assert.assertEquals(categoryDTO.getCategoryName(), "test");
+        Assert.assertEquals(categoryDTO.getDescription(), "test");
+        Assert.assertEquals(categoryDTO.getLongDescription(), "test");
+        Assert.assertEquals(categoryDTO.getMetaTitle(), "test");
+        Assert.assertEquals(categoryDTO.getMetaDescription(), "test");
+        Assert.assertEquals(categoryDTO.getActive(), "N");
+
         categoryService.create(categoryDTO);
         Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
+
         Assert.assertEquals(newCategory.getCategoryId(), categoryDTO.getCategoryId());
-    }
-
-    @Test
-    public void setCategoryId() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getCategoryId(), categoryDTO.getCategoryId());
-    }
-
-    @Test
-    public void getCategoryName() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
         Assert.assertEquals(newCategory.getCategoryName(), categoryDTO.getCategoryName());
-    }
-
-    @Test
-    public void setCategoryName() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getCategoryName(), categoryDTO.getCategoryName());
-    }
-
-    @Test
-    public void getDescription() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
         Assert.assertEquals(newCategory.getDescription(), categoryDTO.getDescription());
-
-    }
-
-    @Test
-    public void setDescription() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getDescription(), categoryDTO.getDescription());
-    }
-
-    @Test
-    public void getLongDescription() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
         Assert.assertEquals(newCategory.getLongDescription(), categoryDTO.getLongDescription());
-
-    }
-
-    @Test
-    public void setLongDescription() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getLongDescription(), categoryDTO.getLongDescription());
-    }
-
-    @Test
-    public void getMetaTitle() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
         Assert.assertEquals(newCategory.getMetaTitle(), categoryDTO.getMetaTitle());
-    }
-
-    @Test
-    public void setMetaTitle() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getMetaTitle(), categoryDTO.getMetaTitle());
-    }
-
-    @Test
-    public void getMetaDescription() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
         Assert.assertEquals(newCategory.getMetaDescription(), categoryDTO.getMetaDescription());
-    }
+        Assert.assertEquals(newCategory.getActive(), categoryDTO.getActive());
 
-    @Test
-    public void setMetaDescription() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getMetaDescription(), categoryDTO.getMetaDescription());
-    }
-
-    @Test
-    public void getMetaKeywords() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getMetaKeywords(), categoryDTO.getMetaKeywords());
-    }
-
-    @Test
-    public void setMetaKeywords() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getMetaKeywords(), categoryDTO.getMetaKeywords());
-    }
-
-    @Test
-    public void setExternalId() throws Exception {
-        Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setDescription("test");
-        categoryDTO.setCategoryId("TEST");
-        categoryDTO.setActive("Y");
-        categoryDTO.setLongDescription("test");
-        categoryDTO.setMetaTitle("test");
-        categoryDTO.setMetaDescription("test");
-
-        categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(newCategory != null);
-        Assert.assertEquals(newCategory.getExternalId(), categoryDTO.getExternalId());
     }
     @Test
     public void getSubCategories() throws Exception {
@@ -311,6 +89,7 @@ public class CategoryTest {
 
     @Test
     public void cloneInstance() throws Exception {
+
     }
 
     @Test
@@ -331,6 +110,10 @@ public class CategoryTest {
 
     @Test
     public void diff() throws Exception {
+    }
+    @After
+    public void tearDown() throws Exception {
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);
     }
 
 }
