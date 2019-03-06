@@ -1,11 +1,17 @@
 package com.bigname.pim.util;
 
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.StringUtil;
+import com.bigname.core.util.FindBy;
+import com.bigname.pim.api.domain.Website;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -90,31 +96,107 @@ public class PimUtilTest {
     }
 
     @Test
+    public void showDiscontinued() throws Exception {
+        Assert.assertEquals(PimUtil.showDiscontinued(true), false);
+        Assert.assertEquals(PimUtil.showDiscontinued(false), false);
+    }
+
+    @Test
+    public void getActiveFlags() throws Exception {
+        Assert.assertArrayEquals(PimUtil.getActiveFlags(true), new boolean[] {true, false, false});
+        Assert.assertArrayEquals(PimUtil.getActiveFlags(false), new boolean[] {true, true, false});
+
+    }
+
+    @Test
+    public void getLength() throws Exception {
+        Assert.assertEquals(PimUtil.getLength(true), 1);
+        Assert.assertEquals(PimUtil.getLength(), 0);
+    }
+
+    @Test
     public void getValue() throws Exception {
-    }
-
-    @Test
-    public void getValue1() throws Exception {
-    }
-
-    @Test
-    public void getValue2() throws Exception {
+        Assert.assertEquals(PimUtil.getValue("name").toString(), Optional.of("name").toString());
+        Assert.assertEquals(PimUtil.getValue("").toString(), Optional.of("").toString());
+        Assert.assertEquals(PimUtil.getValue(0,false).toString(), Optional.of(false).toString());
+        Assert.assertEquals(PimUtil.getValue(1,false).toString(), Optional.empty().toString());
     }
 
     @Test
     public void sort() throws Exception {
+
+        Website website = new Website();
+        website.setWebsiteName("Envelope");
+        website.setWebsiteId("ENVELOPE");
+        website.setUrl("www.envelope.com");
+        Website website1 = new Website();
+        website1.setWebsiteName("folders");
+        website1.setWebsiteId("FOLDERS");
+        website1.setUrl("www.folders.com");
+        List<Website> websiteList= new ArrayList<>();
+        websiteList.add(website);
+        websiteList.add(website1);
+
+        List<String> sortedIds = new ArrayList<>();
+        sortedIds.add("FOLDERS");
+        sortedIds.add("ENVELOPE");
+
+        List<Website> sortedList= new ArrayList<>();
+        sortedList.add(website1);
+        sortedList.add(website);
+
+        Assert.assertEquals(PimUtil.sort(websiteList, sortedIds), sortedList);
     }
 
     @Test
     public void getIdedMap() throws Exception {
+        Website website = new Website();
+        website.setWebsiteName("Envelope");
+        website.setWebsiteId("ENVELOPE");
+        website.setUrl("www.envelope.com");
+
+        List<Website> Ids = new ArrayList<>();
+        Ids.add(website);
+
+        Map<String,Website> map= new HashMap<>();
+        map.put(website.getId(), website);
+
+        Assert.assertEquals(PimUtil.getIdedMap(Ids, FindBy.INTERNAL_ID), map);
+        Map<String, Website> map1= new HashMap<>();
+        map1.put(website.getExternalId(), website);
+        Assert.assertEquals(PimUtil.getIdedMap(Ids, FindBy.EXTERNAL_ID), map1);
+
     }
 
     @Test
     public void getTokenizedParameter() throws Exception {
+        Map<String, String> map=new HashMap<>();
+        map.put("my", "name");
+        map.put("is", "duke");
+        Assert.assertEquals(PimUtil.getTokenizedParameter("my|name|is|duke"), map);
     }
 
     @Test
     public void buildCriteria() throws Exception {
+/*        Map<String, Object> map=new HashMap<>();
+        map.put("name", "Test1.com");
+        map.put("externalId", "TEST_1");
+        map.put("url", "www.test1.com");
+        map.put("active", "Y");
+        Criteria criteria = new Criteria();
+
+       Assert.assertEquals(PimUtil.buildCriteria(map), null);*/
+    }
+
+    @Test
+    public void getStatusOptions() throws Exception {
+        Assert.assertArrayEquals(PimUtil.getStatusOptions("Active"), new boolean[] {false, false, false});
+        Assert.assertArrayEquals(PimUtil.getStatusOptions(""), new boolean[] {true,true,false});
+    }
+
+    @Test
+    public void getTimestamp() throws Exception {
+        Assert.assertEquals(PimUtil.getTimestamp(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
     }
 
     @Test
