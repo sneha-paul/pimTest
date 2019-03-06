@@ -41,12 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by sruthi on 23-02-2019.
  */
-/*@RunWith(SpringRunner.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@AutoConfigureMockMvc
-@ContextConfiguration(classes={PimApplication.class})
-@WebAppConfiguration*/
 @ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -61,7 +55,7 @@ public class WebsiteControllerTest {
     private UserService userService;
 
     @Autowired
-    WebsiteController websiteController;
+    private WebsiteController websiteController;
 
     @Autowired
     private WebsiteDAO websiteDAO;
