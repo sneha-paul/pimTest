@@ -94,10 +94,74 @@ public class CategoryTest {
 
     @Test
     public void merge() throws Exception {
+        //Create Website Original
+        Category original = new Category();
+        original.setCategoryId("One");
+        original.setCategoryName("ONE");
+        original.setExternalId("ONE");
+        original.setDescription("ONE");
+        original.setLongDescription("ONE");
+
+        //Add Details
+        Category modified = new Category();
+        modified.setGroup("DETAILS");
+        modified.setCategoryName("One-A");
+        modified.setCategoryId("ONE-A");
+        modified.setExternalId("ONE-A");
+        modified.setDescription("ONE-A");
+        modified.setLongDescription("ONE-A");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getCategoryName(), "One-A");
+        Assert.assertEquals(original.getCategoryId(), "ONE-A");
+        Assert.assertEquals(original.getExternalId(), "ONE-A");
+        Assert.assertEquals(original.getDescription(), "ONE-A");
+        Assert.assertEquals(original.getLongDescription(), "ONE-A");
+
+        //Without Details
+        Category modified1 = new Category();
+        modified1.setCategoryName("One");
+        modified1.setCategoryId("ONE");
+        modified1.setExternalId("ONE");
+        modified1.setDescription("ONE");
+        modified1.setLongDescription("ONE");
+
+        original = original.merge(modified1);
+        Assert.assertEquals(original.getCategoryName(), "One-A");
+        Assert.assertEquals(original.getCategoryId(), "ONE-A");
+        Assert.assertEquals(original.getExternalId(), "ONE-A");
+        Assert.assertEquals(original.getDescription(), "ONE-A");
+        Assert.assertEquals(original.getLongDescription(), "ONE-A");
+
+        //Add Seo
+        Category modified2 = new Category();
+        modified2.setGroup("SEO");
+        modified2.setMetaTitle("One-A");
+        modified2.setMetaDescription("ONE-A");
+        modified2.setMetaKeywords("ONE-A");
+
+        original = original.merge(modified2);
+        Assert.assertEquals(original.getMetaTitle(), "One-A");
+        Assert.assertEquals(original.getMetaDescription(), "ONE-A");
+        Assert.assertEquals(original.getMetaKeywords(), "ONE-A");
+
     }
 
     @Test
     public void toMap() throws Exception {
+        //Create new Instance
+        Category categoryDTO = new Category();
+        categoryDTO.setCategoryName("test");
+        categoryDTO.setCategoryId("test");
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDTO.getCategoryId()));
+
+        //Testing equals with id
+        Assert.assertEquals(categoryDTO.getCategoryId(), "TEST");
+        Assert.assertEquals(categoryDTO.getCategoryName(), "test");
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDTO.getCategoryId()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDTO.getCategoryName()));
     }
 
     @Test
