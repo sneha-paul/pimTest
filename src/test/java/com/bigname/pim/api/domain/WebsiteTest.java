@@ -91,6 +91,18 @@ public class WebsiteTest {
 
     @Test
     public void merge() throws Exception {
+        Website original = new Website();
+        original.setWebsiteName("One");
+        original.setWebsiteId("ONE");
+        original.setUrl("www.one.com");
+
+        Website modified = new Website();
+//        modified.setGroup("DETAILS");
+        modified.setWebsiteName("One-A");
+
+        original = original.merge(modified);
+
+        Assert.assertEquals(original.getWebsiteName(), "One");
     }
 
     @Test
