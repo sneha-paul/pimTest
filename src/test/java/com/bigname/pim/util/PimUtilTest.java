@@ -1,10 +1,8 @@
 package com.bigname.pim.util;
 
 import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.Website;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.query.Criteria;
