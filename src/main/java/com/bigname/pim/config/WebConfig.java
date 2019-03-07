@@ -80,30 +80,30 @@ public class WebConfig implements WebMvcConfigurer {
         return conversionService;
     }
 
-    @Bean
+    /*@Bean
     public SimpleMappingExceptionResolver exceptionResolver() {
         SimpleMappingExceptionResolver exceptionResolver = new SimpleMappingExceptionResolver();
 
         Properties exceptionMappings = new Properties();
 
-        exceptionMappings.put("com.bigname.core.exception.EntityNotFoundException", "error/500");
-        exceptionMappings.put("com.bigname.core.exception.GenericEntityException", "error/500");
-        exceptionMappings.put("com.bigname.core.exception.GenericPlatformException", "error/500");
-        exceptionMappings.put("com.bigname.core.exception.DuplicateEntityException", "error/500");
-        exceptionMappings.put("com.bigname.core.exception.EntityCreateException", "error/500");
-        exceptionMappings.put("com.bigname.core.exception.EntityUpdateException", "error/500");
-        exceptionMappings.put("java.lang.Exception", "error/error");
-        exceptionMappings.put("java.lang.RuntimeException", "error/error");
+        exceptionMappings.put("com.bigname.core.exception.EntityNotFoundException", "error");
+        exceptionMappings.put("com.bigname.core.exception.GenericEntityException", "error");
+        exceptionMappings.put("com.bigname.core.exception.GenericPlatformException", "error");
+        exceptionMappings.put("com.bigname.core.exception.DuplicateEntityException", "error");
+        exceptionMappings.put("com.bigname.core.exception.EntityCreateException", "error");
+        exceptionMappings.put("com.bigname.core.exception.EntityUpdateException", "error");
+        exceptionMappings.put("java.lang.Exception", "error");
+        exceptionMappings.put("java.lang.RuntimeException", "error");
 
         exceptionResolver.setExceptionMappings(exceptionMappings);
 
         Properties statusCodes = new Properties();
 
         statusCodes.put("error/404", "404");
-        statusCodes.put("error/error", "500");
+        statusCodes.put("error", "500");
 
         exceptionResolver.setStatusCodes(statusCodes);
 
         return exceptionResolver;
-    }
+    }*/
 }
