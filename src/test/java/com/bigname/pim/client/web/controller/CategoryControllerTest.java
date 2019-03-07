@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,8 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -80,7 +80,8 @@ public class CategoryControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void create() throws Exception {
+    public void createTest() throws Exception {
+        //Creating category
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("categoryName", ConversionUtil.toList("TestCategory"));
@@ -101,7 +102,9 @@ public class CategoryControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void update() throws Exception {
+    public void updateTest() throws Exception {
+
+        //Creating category
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("categoryName", ConversionUtil.toList("TestCategory"));
@@ -115,7 +118,7 @@ public class CategoryControllerTest {
 
         result.andExpect(status().isOk());
 
-
+        //Updating category
         params.put("group", ConversionUtil.toList("DETAILS"));
         params.put("categoryName", ConversionUtil.toList("TestCategoryNew"));
         ResultActions result1 = mockMvc.perform(
@@ -130,17 +133,64 @@ public class CategoryControllerTest {
         result1.andExpect(jsonPath("$.group.length()").value(1));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
-    public void details() throws Exception {
-    }
+    public void detailsTest() throws Exception {
 
-    @Test
-    public void all() throws Exception {
+        /*//Create mode
+        mockMvc.perform(
+                get("/pim/categories/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/category"))
+                .andExpect(forwardedUrl("/category/category.jsp"))
+                .andExpect(model().attribute("mode", is("CREATE")))
+                .andExpect(model().attribute("active", is("CATEGORIES")));
+
+        //Details mode, with non=existing categoryID - TODO
+
+        //Add a website instance
+        List<Category> createdCategoryInstances = addCategoryInstances();
+        Assert.assertFalse(createdCategoryInstances.isEmpty());
+
+        String categoryId = createdCategoryInstances.get(0).getCategoryId();
+
+        mockMvc.perform(
+                get("/pim/categories/" + categoryId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/category"))
+                .andExpect(forwardedUrl("/category/category.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("CATEGORIES")))
+                .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId))));
+        //Details mode with reload true
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("reload", ConversionUtil.toList("true"));
+
+        mockMvc.perform(
+                get("/pim/categories/" + categoryId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/category"))
+                .andExpect(forwardedUrl("/category/category.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("CATEGORIES")))
+                .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId))));*/
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void all1() throws Exception {
+    public void allTest() throws Exception {
+        mockMvc.perform(
+                get("/pim/categories"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/categories"))
+                .andExpect(forwardedUrl("/category/categories.jsp"));
+    }
+
+    @WithUserDetails("manu@blacwood.com")
+    @Test
+    public void all1Test() throws Exception {
+
+        //Creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test 1", "externalId", "TEST_1", "description", "TEST 1 description", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test 2", "externalId", "TEST_2", "description", "TEST 2 description", "active", "Y"));
@@ -151,7 +201,6 @@ public class CategoryControllerTest {
         categoriesData.add(CollectionsUtil.toMap("name", "Test 7", "externalId", "TEST_7", "description", "TEST 7 description", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test 8", "externalId", "TEST_8", "description", "TEST 8 description", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test 9", "externalId", "TEST_9", "description", "TEST 9 description", "active", "Y"));
-
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
@@ -161,6 +210,7 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
+        //Getting categories as page
         MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
         detailsParams.put("start", ConversionUtil.toList("0"));
         detailsParams.put("length", ConversionUtil.toList("5"));
@@ -195,19 +245,20 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void getAllAsHierarchy() throws Exception {
+    public void getAllAsHierarchyTest() throws Exception {
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void getSubCategories() throws Exception {
+    public void getSubCategoriesTest() throws Exception {
+
+        //Creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Category4", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Category5", "active", "Y"));
-
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
@@ -217,8 +268,10 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
+        //Adding subCategory
         categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
 
+        //Getting subCategories
         MultiValueMap<String, String> detailsParams1 = new LinkedMultiValueMap<>();
         detailsParams1.put("start", ConversionUtil.toList("0"));
         detailsParams1.put("length", ConversionUtil.toList("2"));
@@ -237,31 +290,44 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void setSubCategoriesSequence() throws Exception {
+    public void setSubCategoriesSequenceTest() throws Exception {
     }
 
     @Test
-    public void getCategoryProducts() throws Exception {
+    public void getCategoryProductsTest() throws Exception {
     }
 
     @Test
-    public void setProductsSequence() throws Exception {
+    public void setProductsSequenceTest() throws Exception {
     }
 
     @Test
-    public void availableCategories() throws Exception {
+    public void availableCategoriesTest() throws Exception {
+
+       /* //Add a website instance
+        List<Category> createdCategoryInstances = addCategoryInstances();
+        Assert.assertFalse(createdCategoryInstances.isEmpty());
+
+        //AvailableCatalogs with valid websiteID
+        String categoryId = createdCategoryInstances.get(0).getCategoryId();
+        mockMvc.perform(
+                get("/pim/categories/" + categoryId + "/subCategories/available"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/availableSubCategories"))
+                .andExpect(forwardedUrl("/category/availableSubCategories.jsp"));*/
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void getAvailableSubCategories() throws Exception {
+    public void getAvailableSubCategoriesTest() throws Exception {
+
+        //Creating Categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Category4", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Category5", "active", "Y"));
-
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
@@ -271,8 +337,10 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
+        //Adding subCategory
         categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
 
+        //Getting availableSubCategories
         MultiValueMap<String, String> detailsParams1 = new LinkedMultiValueMap<>();
         detailsParams1.put("start", ConversionUtil.toList("0"));
         detailsParams1.put("length", ConversionUtil.toList("3"));
@@ -292,22 +360,26 @@ public class CategoryControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void addSubCategory() throws Exception {
+    public void addSubCategoryTest() throws Exception {
 
+        //Creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
-
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
             categoryDTO.setCategoryId((String)categoryData.get("externalId"));
             categoryDTO.setActive((String)categoryData.get("active"));
             categoryDTO.setDescription((String)categoryData.get("description"));
-
             categoryService.create(categoryDTO);
         });
+
+        //Adding subCategoriues
+
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Page<Category> availableSubCategories = categoryService.getAvailableSubCategoriesForCategory(category.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
 
         MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
         detailsParams.put("id", ConversionUtil.toList("TEST_1"));
@@ -321,18 +393,22 @@ public class CategoryControllerTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.size()").value(1));
         result.andExpect(jsonPath("$.success").value(true));
+
+        Page<Category> availableSubCategories1 = categoryService.getAvailableSubCategoriesForCategory(category.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
+        Assert.assertEquals(availableSubCategories1.getTotalElements(), availableSubCategories.getTotalElements() - 1);
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void toggleSubCategory() throws Exception {
+    public void toggleSubCategoryTest() throws Exception {
+
+        //Creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Category4", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Category5", "active", "Y"));
-
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
@@ -342,6 +418,7 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
+        //Toggle
         categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("id", ConversionUtil.toList("TEST_4"));
@@ -358,24 +435,43 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void availableProducts() throws Exception {
+    public void availableProductsTest() throws Exception {
+
     }
 
     @Test
-    public void getAvailableProducts() throws Exception {
+    public void getAvailableProductsTest() throws Exception {
     }
 
     @Test
-    public void addProduct() throws Exception {
+    public void addProductTest() throws Exception {
     }
 
     @Test
-    public void toggleProduct() throws Exception {
+    public void toggleProductTest() throws Exception {
     }
 
     @After
     public void tearDown() throws Exception {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+    }
+
+    private List<Category> addCategoryInstances() {
+        List<Category> createdCategoryInstances = new ArrayList<>();
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test 1", "externalId", "TEST_1", "description", "Test Category 1", "active", "Y", "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test 2", "externalId", "TEST_2", "description", "Test Category 2", "active", "Y", "discontinued", "N"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test 3", "externalId", "TEST_3", "description", "Test Category 3", "active", "Y", "discontinued", "N"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDTO.setDiscontinued((String)categoryData.get("discontinued"));
+            createdCategoryInstances.add(categoryService.create(categoryDTO));
+        });
+        return createdCategoryInstances;
     }
 
 }
