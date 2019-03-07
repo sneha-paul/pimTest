@@ -30,15 +30,15 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.*;
+
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -142,13 +142,62 @@ public class WebsiteControllerTest {
         result1.andExpect(jsonPath("$.group.length()").value(1));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void details() throws Exception {
+        //Create mode
+        mockMvc.perform(
+                get("/pim/websites/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("website/website"))
+                .andExpect(forwardedUrl("/website/website.jsp"))
+                .andExpect(model().attribute("mode", is("CREATE")))
+                .andExpect(model().attribute("active", is("WEBSITES")));
+
+        //Details mode, with non=existing websiteID
+        mockMvc.perform(
+                get("/pim/websites/TEST"))
+                .andExpect(view().name("error/500"))
+                .andExpect(forwardedUrl("/error/500.jsp"));
+
+        //Add a website instance
+        List<Website> createdWebsiteInstances = addWebsiteInstances();
+        Assert.assertFalse(createdWebsiteInstances.isEmpty());
+
+        //Details mode with valid websiteID
+        String websiteId = createdWebsiteInstances.get(0).getWebsiteId();
+        mockMvc.perform(
+                get("/pim/websites/" + websiteId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("website/website"))
+                .andExpect(forwardedUrl("/website/website.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("WEBSITES")))
+                .andExpect(model().attribute("website", hasProperty("externalId", is(websiteId))));
+
+        //Details mode with reload true
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("reload", ConversionUtil.toList("true"));
+
+        mockMvc.perform(
+                get("/pim/websites/" + websiteId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("website/website_body"))
+                .andExpect(forwardedUrl("/website/website_body.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("WEBSITES")))
+                .andExpect(model().attribute("website", hasProperty("externalId", is(websiteId))));
+
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void all() throws Exception {
-
+        mockMvc.perform(
+                get("/pim/websites"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("website/websites"))
+                .andExpect(forwardedUrl("/website/websites.jsp"));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -291,6 +340,21 @@ public class WebsiteControllerTest {
     public void tearDown() throws Exception {
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
         categoryDAO.getMongoTemplate().dropCollection(Catalog.class);
+    }
+
+    private List<Website> addWebsiteInstances() {
+        List<Website> createdWebsiteInstances = new ArrayList<>();
+        List<Map<String, Object>> websitesData = new ArrayList<>();
+        websitesData.add(CollectionsUtil.toMap("name", "Test Website 1", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
+        websitesData.forEach(websiteData -> {
+            Website websiteDTO = new Website();
+            websiteDTO.setWebsiteName((String)websiteData.get("name"));
+            websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
+            websiteDTO.setActive((String)websiteData.get("active"));
+            websiteDTO.setUrl((String)websiteData.get("url"));
+            createdWebsiteInstances.add(websiteService.create(websiteDTO));
+        });
+        return createdWebsiteInstances;
     }
 
 }

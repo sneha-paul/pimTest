@@ -13,6 +13,9 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+
+import java.util.Properties;
 
 /**
  * Created by Manu on 8/3/2018.
@@ -75,5 +78,32 @@ public class WebConfig implements WebMvcConfigurer {
 //        registrar.setDateTimeFormatter(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
         registrar.registerFormatters(conversionService);
         return conversionService;
+    }
+
+    @Bean
+    public SimpleMappingExceptionResolver exceptionResolver() {
+        SimpleMappingExceptionResolver exceptionResolver = new SimpleMappingExceptionResolver();
+
+        Properties exceptionMappings = new Properties();
+
+        exceptionMappings.put("com.bigname.core.exception.EntityNotFoundException", "error/500");
+        exceptionMappings.put("com.bigname.core.exception.GenericEntityException", "error/500");
+        exceptionMappings.put("com.bigname.core.exception.GenericPlatformException", "error/500");
+        exceptionMappings.put("com.bigname.core.exception.DuplicateEntityException", "error/500");
+        exceptionMappings.put("com.bigname.core.exception.EntityCreateException", "error/500");
+        exceptionMappings.put("com.bigname.core.exception.EntityUpdateException", "error/500");
+        exceptionMappings.put("java.lang.Exception", "error/error");
+        exceptionMappings.put("java.lang.RuntimeException", "error/error");
+
+        exceptionResolver.setExceptionMappings(exceptionMappings);
+
+        Properties statusCodes = new Properties();
+
+        statusCodes.put("error/404", "404");
+        statusCodes.put("error/error", "500");
+
+        exceptionResolver.setStatusCodes(statusCodes);
+
+        return exceptionResolver;
     }
 }
