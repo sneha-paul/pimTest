@@ -44,29 +44,36 @@ public class WebsiteTest {
     }
     @Test
     public void accessorsTest(){
+        //Create new instance
         Website websiteDTO = new Website();
         websiteDTO.setWebsiteId("test");
         websiteDTO.setWebsiteName("Test.com");
         websiteDTO.setUrl("www.test.com");
+        websiteDTO.setExternalId("test");
 
         websiteDTO.orchestrate();
 
+        //Testing equals unique id
         Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
         Assert.assertEquals(websiteDTO.getWebsiteName(), "Test.com");
         Assert.assertEquals(websiteDTO.getUrl(), "www.test.com");
+        Assert.assertEquals(websiteDTO.getExternalId(), "TEST");
         Assert.assertEquals(websiteDTO.getActive(), "N");
 
+        //Update
         websiteService.create(websiteDTO);
         Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
         Assert.assertEquals(newWebsite.getWebsiteId(), websiteDTO.getWebsiteId());
         Assert.assertEquals(newWebsite.getWebsiteName(), websiteDTO.getWebsiteName());
         Assert.assertEquals(newWebsite.getUrl(), websiteDTO.getUrl());
+        Assert.assertEquals(newWebsite.getExternalId(), websiteDTO.getExternalId());
         Assert.assertEquals(newWebsite.getActive(), websiteDTO.getActive());
     }
 
     @Test
     public void cloneInstance() throws Exception {
+        //Adding website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
@@ -78,6 +85,7 @@ public class WebsiteTest {
             websiteDTO.setUrl((String) websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
 
+            //Clone website
             Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(newWebsite != null);
             Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
@@ -91,23 +99,66 @@ public class WebsiteTest {
 
     @Test
     public void merge() throws Exception {
+        //Create Website Original
         Website original = new Website();
         original.setWebsiteName("One");
         original.setWebsiteId("ONE");
+        original.setExternalId("ONE");
         original.setUrl("www.one.com");
 
+        //Add Details
         Website modified = new Website();
-//        modified.setGroup("DETAILS");
+        modified.setGroup("DETAILS");
         modified.setWebsiteName("One-A");
+        modified.setWebsiteId("ONE-A");
+        modified.setExternalId("ONE-A");
+        modified.setUrl("www.one.com");
 
         original = original.merge(modified);
+        Assert.assertEquals(original.getWebsiteName(), "One-A");
+        Assert.assertEquals(original.getWebsiteId(), "ONE-A");
+        Assert.assertEquals(original.getExternalId(), "ONE-A");
+        Assert.assertEquals(original.getUrl(), "www.one.com");
 
-        Assert.assertEquals(original.getWebsiteName(), "One");
+        //Without Details
+        Website modified1 = new Website();
+        modified1.setWebsiteName("One");
+        modified1.setWebsiteId("ONE");
+        modified1.setExternalId("ONE");
+        modified1.setUrl("www.one.com");
+
+        original = original.merge(modified1);
+        Assert.assertEquals(original.getWebsiteName(), "One-A");
+       Assert.assertEquals(original.getWebsiteId(), "ONE-A");
+        Assert.assertEquals(original.getExternalId(), "ONE-A");
+        Assert.assertEquals(original.getUrl(), "www.one.com");
+
+
     }
 
     @Test
     public void toMap() throws Exception {
-    }
+        //Create new Instance
+        Website websiteDTO = new Website();
+        websiteDTO.setWebsiteName("Test.com");
+        websiteDTO.setWebsiteId("test");
+        websiteDTO.setUrl("www.test.com");
+        websiteDTO.setExternalId("test");
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
+
+        //Testing equals with id
+        Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
+        Assert.assertEquals(websiteDTO.getWebsiteName(), "Test.com");
+        Assert.assertEquals(websiteDTO.getExternalId(), "TEST");
+        Assert.assertEquals(websiteDTO.getUrl(), "www.test.com");
+        Assert.assertEquals(websiteDTO.getActive(), "N");
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteName()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getExternalId()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getUrl()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getActive()));    }
 
     @Test
     public void equals() throws Exception {
@@ -115,6 +166,7 @@ public class WebsiteTest {
 
     @Test
     public void orchestrate() throws Exception {
+
     }
 
     @Test
