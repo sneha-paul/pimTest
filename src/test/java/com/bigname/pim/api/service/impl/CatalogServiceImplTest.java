@@ -42,17 +42,22 @@ import java.util.Map;
 public class CatalogServiceImplTest {
 
     @Autowired
-    CatalogService catalogService;
+    private CatalogService catalogService;
+
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
+
     @Autowired
-    RootCategoryDAO rootCategoryDAO;
+    private RootCategoryDAO rootCategoryDAO;
+
     @Autowired
-    CatalogDAO catalogDAO;
+    private CatalogDAO catalogDAO;
+
     @Autowired
-    CategoryDAO categoryDAO;
+    private CategoryDAO categoryDAO;
+
     @Autowired
-    RelatedCategoryDAO relatedCategoryDAO;
+    private RelatedCategoryDAO relatedCategoryDAO;
 
     @Before
     public void setUp() throws Exception {

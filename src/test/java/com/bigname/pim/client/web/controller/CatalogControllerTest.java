@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,14 +36,10 @@ import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -108,7 +105,10 @@ public class CatalogControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void create() throws Exception {
+    public void createTest() throws Exception {
+
+        //Create a new Catalog
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("catalogName", ConversionUtil.toList("TestCatalog"));
@@ -129,7 +129,8 @@ public class CatalogControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void update() throws Exception {
+    public void updateTest() throws Exception {
+        //Create a new Catalog
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("catalogName", ConversionUtil.toList("TestCatalog"));
@@ -144,6 +145,7 @@ public class CatalogControllerTest {
 
         result.andExpect(status().isOk());
 
+        //update the Catalog
         MultiValueMap<String, String> updateParams = new LinkedMultiValueMap<>();
         updateParams.put("group", ConversionUtil.toList("DETAILS"));
         updateParams.put("catalogName", ConversionUtil.toList("TestCatalog1"));
@@ -162,17 +164,63 @@ public class CatalogControllerTest {
         updateResult.andExpect(jsonPath("$.group.length()").value(1));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
-    public void details() throws Exception {
-    }
+    public void detailsTest() throws Exception {
+        //Create mode
+        mockMvc.perform(
+                get("/pim/catalogs/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("catalog/catalog"))
+                .andExpect(forwardedUrl("/catalog/catalog.jsp"))
+                .andExpect(model().attribute("mode", is("CREATE")))
+                .andExpect(model().attribute("active", is("CATALOGS")));
 
-    @Test
-    public void all() throws Exception {
+        //Details mode, with non=existing catalogID - TODO
+
+        //Add a catalog instance
+        List<Catalog> createdCatalogInstances = addCatalogInstances();
+        Assert.assertFalse(createdCatalogInstances.isEmpty());
+
+        //Details mode with valid catalogID
+        String catalogId = createdCatalogInstances.get(0).getCatalogId();
+        mockMvc.perform(
+                get("/pim/catalogs/" + catalogId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("catalog/catalog"))
+                .andExpect(forwardedUrl("/catalog/catalog.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("CATALOGS")))
+                .andExpect(model().attribute("catalog", hasProperty("externalId", is(catalogId))));
+
+        //Details mode with reload true
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("reload", ConversionUtil.toList("true"));
+
+        mockMvc.perform(
+                get("/pim/catalogs/" + catalogId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("catalog/catalog_body"))
+                .andExpect(forwardedUrl("/catalog/catalog_body.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("CATALOGS")))
+                .andExpect(model().attribute("catalog", hasProperty("externalId", is(catalogId))));
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void all1() throws Exception {
+    public void allTest() throws Exception {
+        mockMvc.perform(
+                get("/pim/catalogs"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("catalog/catalogs"))
+                .andExpect(forwardedUrl("/catalog/catalogs.jsp"));
+    }
+
+    @WithUserDetails("manu@blacwood.com")
+    @Test
+    public void allTest1() throws Exception {
+        //Create Catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "Y"));
@@ -193,6 +241,7 @@ public class CatalogControllerTest {
             catalogService.create(catalogDTO);
         });
 
+        //retrieve those entries by pagination
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
         detailParams.put("start", ConversionUtil.toList("0"));
         detailParams.put("length", ConversionUtil.toList("5"));
@@ -230,7 +279,8 @@ public class CatalogControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void getRootCategories() throws Exception {
+    public void getRootCategoriesTest() throws Exception {
+        //Create a new Catalog
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -242,6 +292,7 @@ public class CatalogControllerTest {
             catalogService.create(catalogDTO);
         });
 
+        //Create Categories and add them as rootCategories
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
@@ -279,16 +330,28 @@ public class CatalogControllerTest {
     }
 
     @Test
-    public void setRootCategoriesSequence() throws Exception {
-    }
-
-    @Test
-    public void availableCategories() throws Exception {
+    public void setRootCategoriesSequenceTest() throws Exception {
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void getAvailableRootCategories() throws Exception {
+    public void availableCategoriesTest() throws Exception {
+        //Add a catalog instance
+        List<Catalog> createdCatalogInstances = addCatalogInstances();
+        Assert.assertFalse(createdCatalogInstances.isEmpty());
+
+        //Details mode with valid catalogID
+        String catalogId = createdCatalogInstances.get(0).getCatalogId();
+        mockMvc.perform(
+                get("/pim/catalogs/" + catalogId + "/rootCategories/available"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/availableRootCategories"))
+                .andExpect(forwardedUrl("/category/availableRootCategories.jsp"));
+    }
+
+    @WithUserDetails("manu@blacwood.com")
+    @Test
+    public void getAvailableRootCategoriesTest() throws Exception {
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -339,7 +402,7 @@ public class CatalogControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void addRootCategory() throws Exception {
+    public void addRootCategoryTest() throws Exception {
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -364,6 +427,10 @@ public class CatalogControllerTest {
             categoryService.create(categoryDTO);
         });
 
+        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        Page<Category> rootCategories = catalogService.getAvailableRootCategoriesForCatalog(catalog.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
+
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
         detailParams.put("id", ConversionUtil.toList("TEST_CATALOG_MAIN"));
         detailParams.put("rootCategoryId", ConversionUtil.toList("TEST_CATEGORY_1"));
@@ -377,11 +444,14 @@ public class CatalogControllerTest {
         result1.andExpect(status().isOk());
         result1.andExpect(jsonPath("$.size()").value(1));
         result1.andExpect(jsonPath("$.success").value(true));
+
+        Page<Category> availableRootCategories = catalogService.getAvailableRootCategoriesForCatalog(catalog.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
+        Assert.assertEquals(availableRootCategories.getTotalElements(), rootCategories.getTotalElements()-1);
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void toggleRootCategory() throws Exception {
+    public void toggleRootCategoryTest() throws Exception {
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -428,8 +498,23 @@ public class CatalogControllerTest {
     }
 
     @Test
-    public void getCategoriesHierarchy() throws Exception {
+    public void getCategoriesHierarchyTest() throws Exception {
 
+    }
+
+    private List<Catalog> addCatalogInstances() {
+        List<Catalog> createdCatalogInstances = new ArrayList<>();
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            createdCatalogInstances.add(catalogService.create(catalogDTO));
+        });
+        return createdCatalogInstances;
     }
 
 }

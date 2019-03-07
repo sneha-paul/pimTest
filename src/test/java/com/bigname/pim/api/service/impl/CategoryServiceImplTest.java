@@ -43,13 +43,13 @@ import static org.junit.Assert.*;
 public class CategoryServiceImplTest {
 
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
 
     @Autowired
-    CategoryDAO categoryDAO;
+    private CategoryDAO categoryDAO;
 
     @Autowired
-    RelatedCategoryDAO relatedCategoryDAO;
+    private RelatedCategoryDAO relatedCategoryDAO;
 
 
     @Before
