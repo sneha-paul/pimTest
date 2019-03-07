@@ -38,7 +38,7 @@ public class PimUtil {
         boolean flag1, flag2, flag3;
         if(getLength(activeFlags) < 2) {
             flag1 = true;
-            flag2 = !getValue(Boolean.TRUE, activeFlags);
+            flag2 = !getValueOrDefault(Boolean.TRUE, activeFlags);
             flag3 = false;
         } else {
             flag1 = getValue(0, activeFlags).orElse(false);
@@ -80,7 +80,7 @@ public class PimUtil {
         }
     }
 
-    public static boolean getValue(boolean defaultValue, boolean... booleanVarArg) {
+    public static boolean getValueOrDefault(boolean defaultValue, boolean... booleanVarArg) {
         return getValue(booleanVarArg).orElse(defaultValue);
         /*if(booleanVarArg == null || booleanVarArg.length == 0) {
             return defaultValue;

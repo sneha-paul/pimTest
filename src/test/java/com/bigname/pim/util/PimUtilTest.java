@@ -4,6 +4,7 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.StringUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.Website;
+import com.sun.xml.internal.bind.v2.TODO;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -22,9 +23,9 @@ import static org.junit.Assert.*;
 public class PimUtilTest {
     @Test
     public void getActiveOptions() throws Exception {
-        assertTrue(PimUtil.getValue(Boolean.TRUE, null));
+        assertTrue(PimUtil.getValueOrDefault(Boolean.TRUE, null));
         assertTrue(PimUtil.getValue(new boolean[] {true}).orElse(false));
-        assertTrue(PimUtil.getValue(Boolean.TRUE, new boolean[0]));
+        assertTrue(PimUtil.getValueOrDefault(Boolean.TRUE, new boolean[0]));
         assertFalse(PimUtil.getValue(new boolean[0]).orElse(false));
 
         assertTrue(PimUtil.getValue(0, new boolean[] {true}).orElse(false));
@@ -120,6 +121,15 @@ public class PimUtilTest {
         Assert.assertEquals(PimUtil.getValue("").toString(), Optional.of("").toString());
         Assert.assertEquals(PimUtil.getValue(0,false).toString(), Optional.of(false).toString());
         Assert.assertEquals(PimUtil.getValue(1,false).toString(), Optional.empty().toString());
+        Assert.assertEquals(PimUtil.getValue(1,false).toString(), Optional.empty().toString());
+        Assert.assertEquals(PimUtil.getValue(true).toString(), Optional.of(true).toString());
+    }
+
+    @Test
+    public void getValueOrDefault() throws Exception {
+        Assert.assertEquals(PimUtil.getValue(false,false).toString(), Optional.of(false).toString());
+        Assert.assertEquals(PimUtil.getValue(false,true).toString(), Optional.of(false).toString());
+        Assert.assertEquals(PimUtil.getValue(true,false).toString(), Optional.of(true).toString());
     }
 
     @Test
@@ -186,6 +196,7 @@ public class PimUtilTest {
         Criteria criteria = new Criteria();
 
        Assert.assertEquals(PimUtil.buildCriteria(map), null);*/
+        //TODO
     }
 
     @Test

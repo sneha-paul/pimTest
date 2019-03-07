@@ -14,7 +14,7 @@ public class ConvertUtil {
 
     public static boolean toBoolean(String value, boolean... defaultValue) {
         if(value == null) {
-            return PimUtil.getValue(BOOLEAN_DEFAULT, defaultValue);
+            return PimUtil.getValueOrDefault(BOOLEAN_DEFAULT, defaultValue);
         }
         return TRUE.equalsIgnoreCase(value) || YES.equalsIgnoreCase(value) || Y.equalsIgnoreCase(value);
     }
