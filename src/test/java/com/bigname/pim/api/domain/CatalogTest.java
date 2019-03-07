@@ -79,13 +79,60 @@ public class CatalogTest {
 
     @Test
     public void merge() throws Exception {
-    }
+        //Create Catalog Original
+        Catalog original = new Catalog();
+        original.setCatalogName("One");
+        original.setCatalogId("ONE");
+        original.setExternalId("ONE");
+        original.setDescription("ONE");
+
+        //Add Details
+        Catalog modified = new Catalog();
+        modified.setGroup("DETAILS");
+        modified.setCatalogName("One-A");
+        modified.setCatalogId("ONE-A");
+        modified.setExternalId("ONE-A");
+        modified.setDescription("ONE-A");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getCatalogName(), "One-A");
+        Assert.assertEquals(original.getCatalogId(), "ONE-A");
+        Assert.assertEquals(original.getExternalId(), "ONE-A");
+        Assert.assertEquals(original.getDescription(), "ONE-A");
+
+        //Without Details
+        Catalog modified1 = new Catalog();
+        modified1.setCatalogName("One");
+        modified1.setCatalogId("ONE");
+        modified1.setExternalId("ONE");
+        modified1.setDescription("ONE");
+
+        original = original.merge(modified1);
+        Assert.assertEquals(original.getCatalogName(), "One-A");
+        Assert.assertEquals(original.getCatalogId(), "ONE-A");
+        Assert.assertEquals(original.getExternalId(), "ONE-A");
+        Assert.assertEquals(original.getDescription(), "ONE-A");    }
 
     @Test
     public void cloneInstance() throws Exception {
     }
     @Test
     public void toMap() throws Exception {
+        //create new instance
+        Catalog catalogDTO = new Catalog();
+        catalogDTO.setCatalogName("test");
+        catalogDTO.setCatalogId("test");
+
+        //Testing equals with id
+        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getCatalogId()));
+
+        Assert.assertEquals(catalogDTO.getCatalogId(), "TEST");
+        Assert.assertEquals(catalogDTO.getCatalogName(), "test");
+        Assert.assertEquals(catalogDTO.getActive(), "N");
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getCatalogId()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getCatalogName()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getActive()));
     }
 
     @Test
