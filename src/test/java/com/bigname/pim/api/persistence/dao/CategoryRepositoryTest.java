@@ -2,6 +2,7 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Category;
@@ -90,7 +91,6 @@ public class CategoryRepositoryTest {
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "Y"));
-
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
@@ -100,35 +100,28 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
+        Category category = categoryDAO.findByExternalId(categoriesData.get(0).get("externalId").toString()).orElse(null);
+
         Category categoryDetails = categoryDAO.findByExternalId(categoriesData.get(0).get("externalId").toString()).orElse(null);
         Assert.assertTrue(categoryDetails != null);
         categoryDetails.setDescription("Test1 catalog description");
         categoryDetails.setGroup("DETAILS");
         categoryDAO.save(categoryDetails);
 
-        Optional<Category> category = categoryDAO.findByExternalId(categoryDetails.getCategoryId());
-        Assert.assertTrue(category.isPresent());
-        category = categoryDAO.findById(categoryDetails.getCategoryId(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(category.isPresent());
-        category = categoryDAO.findById(categoryDetails.getId(), FindBy.INTERNAL_ID);
-        Assert.assertTrue(category.isPresent());
+        Category updatedCategory = categoryDAO.findByExternalId(categoryDetails.getCategoryId()).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategory));
+        Map<String, Object> diff = category.diff(updatedCategory);
+        Assert.assertEquals(diff.size(), 1);
+        Assert.assertEquals(diff.get("description"), "Test1 catalog description");
 
-        categoryDetails = categoryDAO.findByExternalId(categoriesData.get(1).get("externalId").toString()).orElse(null);
-        categoryDetails.setCategoryName("Test1Name");
-        categoryDetails.setMetaTitle("New Meta title");
-        categoryDetails.setMetaDescription("Meta description");
-        categoryDetails.setActive("N");
-        categoryDetails.setGroup("DETAILS", "SEO");
-        categoryDAO.save(categoryDetails);
+        Category categoryDetails1 = categoryDAO.findByExternalId(categoriesData.get(1).get("externalId").toString()).orElse(null);
+        categoryDetails1.setMetaTitle("New Meta title");
+        categoryDetails1.setGroup("SEO");
+        categoryDAO.save(categoryDetails1);
 
-        category = categoryDAO.findByExternalId(categoryDetails.getCategoryId());
-        Assert.assertTrue(category.isPresent());
-        category = categoryDAO.findById(categoryDetails.getCategoryId(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(category.isPresent());
-        category = categoryDAO.findById(categoryDetails.getId(), FindBy.INTERNAL_ID);
-        Assert.assertTrue(category.isPresent());
+        Category updatedCategory1 = categoryDAO.findByExternalId(categoryDetails1.getCategoryId()).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategory1));
 
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
     }
 
 
