@@ -2,6 +2,7 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Catalog;
@@ -88,10 +89,9 @@ public class CatalogRepositoryTest {
 
     @Test
     public void updateCatalogTest() {
+
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "Y"));
-        catalogsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "active", "Y"));
-
         catalogsData.forEach(catalogData -> {
             Catalog catalogDTO = new Catalog();
             catalogDTO.setCatalogName((String)catalogData.get("name"));
@@ -99,22 +99,19 @@ public class CatalogRepositoryTest {
             catalogDTO.setActive((String)catalogData.get("active"));
             catalogDTO.setDescription((String)catalogData.get("description"));
             catalogDAO.insert(catalogDTO);
+
+            Catalog catalogDetails = catalogDAO.findByExternalId(catalogsData.get(0).get("externalId").toString()).orElse(null);
+            Assert.assertTrue(catalogDetails != null);
+            catalogDetails.setDescription("Test1 catalog description");
+            catalogDetails.setGroup("DETAILS");
+            catalogDAO.save(catalogDetails);
+
+            Catalog catalog = catalogDAO.findByExternalId(catalogDetails.getCatalogId()).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(catalog));
+            Map<String, Object> diff = catalogDTO.diff(catalog);
+            Assert.assertEquals(diff.size(), 1);
+            Assert.assertEquals(diff.get("description"), "Test1 catalog description");
         });
-
-        Catalog catalogDetails = catalogDAO.findByExternalId(catalogsData.get(0).get("externalId").toString()).orElse(null);
-        Assert.assertTrue(catalogDetails != null);
-        catalogDetails.setDescription("Test1 catalog description");
-        catalogDetails.setGroup("DETAILS");
-        catalogDAO.save(catalogDetails);
-
-        Optional<Catalog> catalog = catalogDAO.findByExternalId(catalogDetails.getCatalogId());
-        Assert.assertTrue(catalog.isPresent());
-        catalog = catalogDAO.findById(catalogDetails.getCatalogId(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(catalog.isPresent());
-        catalog = catalogDAO.findById(catalogDetails.getId(), FindBy.INTERNAL_ID);
-        Assert.assertTrue(catalog.isPresent());
-
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
     }
 
     @Test
