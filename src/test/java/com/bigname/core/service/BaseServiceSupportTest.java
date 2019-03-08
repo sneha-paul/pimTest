@@ -1,6 +1,7 @@
 package com.bigname.core.service;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.Entity;
 import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
@@ -67,11 +68,9 @@ public class BaseServiceSupportTest {
             websiteService.create(websiteDTO);
 
             Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
             Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
         });
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -87,23 +86,19 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
 
-        websitesData.forEach(websiteData -> {
+        List<Website> websiteDTOs = websitesData.stream().map(websiteData -> {
             Website websiteDTO = new Website();
             websiteDTO.setWebsiteName((String)websiteData.get("name"));
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
             websiteDTO.setActive((String)websiteData.get("active"));
             websiteDTO.setUrl((String)websiteData.get("url"));
+            return websiteDTO;
+        }).collect(Collectors.toList());
 
-            websiteService.create(websiteDTO);
+        websiteService.create(websiteDTOs);
 
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
-            Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
-        });
+        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), websitesData.size());
 
-        Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false).getTotalElements(), websitesData.size());
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -121,16 +116,14 @@ public class BaseServiceSupportTest {
         });
 
         Website websiteDetails = websiteService.get(websitesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(websiteDetails != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDetails));
         websiteService.toggle(websiteDetails.getWebsiteId(), EXTERNAL_ID, Toggle.get(websiteDetails.getActive()));
 
         Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(updatedWebsite != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedWebsite));
         Map<String, Object> diff = websiteDetails.diff(updatedWebsite);
         Assert.assertEquals(diff.size(), 1);
         Assert.assertEquals(diff.get("active"), "N");
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -148,12 +141,10 @@ public class BaseServiceSupportTest {
             websiteDAO.insert(websiteDTO);
 
             Website websiteDetails = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(websiteDetails != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDetails));
             Map<String, Object> diff = websiteDTO.diff(websiteDetails);
             Assert.assertEquals(diff.size(), 0);
         });
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -180,8 +171,6 @@ public class BaseServiceSupportTest {
 
         Page<Website> paginatedResult = websiteService.getAll(0, 10, null,false);
         Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -213,6 +202,8 @@ public class BaseServiceSupportTest {
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
+        // sorting : Descending
+
         websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -237,8 +228,6 @@ public class BaseServiceSupportTest {
         actual = result.stream().map(website -> website.getWebsiteName()).collect(Collectors.toList()).toArray(new String[0]);
         expected = websitesData.stream().map(websiteData -> (String)websiteData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
         Assert.assertNotEquals(expected, actual);
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -268,8 +257,6 @@ public class BaseServiceSupportTest {
         Page<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
         Map<String, Website> websitesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -299,8 +286,6 @@ public class BaseServiceSupportTest {
         List<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, null, false);
         Map<String, Website> websitesMap = paginatedResult.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -330,8 +315,6 @@ public class BaseServiceSupportTest {
         Page<Website> paginatedResult = websiteService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
         Map<String, Website> websitesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -361,8 +344,6 @@ public class BaseServiceSupportTest {
         List<Website> paginatedResult = websiteService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
         Map<String, Website> websitesMap = paginatedResult.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -389,8 +370,6 @@ public class BaseServiceSupportTest {
 
         Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websitesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), 9);
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -417,8 +396,6 @@ public class BaseServiceSupportTest {
 
         Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websitesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), 9);
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -435,20 +412,19 @@ public class BaseServiceSupportTest {
             websiteDAO.insert(websiteDTO);
 
             Website websiteDetails = websiteService.get(websitesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(websiteDetails != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDetails));
             websiteDetails.setUrl("https://www.test11.com");
             websiteDetails.setGroup("DETAILS");
 
             websiteService.update(websiteDetails.getWebsiteId(), EXTERNAL_ID, websiteDetails);
 
             Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(updatedWebsite != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(updatedWebsite));
             Map<String, Object> diff = websiteDTO.diff(updatedWebsite);
             Assert.assertEquals(diff.size(), 1);
             Assert.assertEquals(diff.get("url"), "https://www.test11.com");
         });
 
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -490,9 +466,6 @@ public class BaseServiceSupportTest {
         websitesMap = result.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
         Assert.assertFalse(websitesMap.size() == websitesData.size() && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-
     }
 
     @Test
@@ -509,14 +482,12 @@ public class BaseServiceSupportTest {
                     websiteDAO.insert(websiteDTO);
 
             Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newWebsite != null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
             Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
 
             Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
             Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
         });
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -543,8 +514,6 @@ public class BaseServiceSupportTest {
 
         List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"));
         Assert.assertTrue(result.size() == 2);
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -572,8 +541,6 @@ public class BaseServiceSupportTest {
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Website> result = websiteService.findAll(criteria);
         Assert.assertTrue(result.size() == 2);
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -600,8 +567,6 @@ public class BaseServiceSupportTest {
 
         Optional<Website> result = websiteService.findOne(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
@@ -629,8 +594,6 @@ public class BaseServiceSupportTest {
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
         Optional<Website> result = websiteService.findOne(criteria);
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
     }
 
     @Test
