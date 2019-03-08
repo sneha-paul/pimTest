@@ -66,6 +66,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAllWebsiteCatalogsTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -79,6 +80,7 @@ public class WebsiteServiceImplTest {
 
         Website website = websiteService.get(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
@@ -89,6 +91,7 @@ public class WebsiteServiceImplTest {
             catalogDTO.setActive((String)catalogData.get("active"));
             catalogService.create(catalogDTO);
 
+            //creating websiteCatalog
             Catalog catalog = catalogService.get((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID,false).orElse(null);
 
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
@@ -100,12 +103,14 @@ public class WebsiteServiceImplTest {
             websiteCatalogDAO.insert(websiteCatalog);
         });
 
+        //Getting websiteCatalogs
         Page<Map<String, Object>> websiteCatalog =  websiteService.findAllWebsiteCatalogs(website.getWebsiteId(), FindBy.EXTERNAL_ID, "catalogName","test", PageRequest.of(0, catalogsData.size(), null),false);
         Assert.assertEquals(websiteCatalog.getSize(),catalogsData.size());
     }
 
     @Test
     public void getAllWebsiteCatalogsTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -119,6 +124,7 @@ public class WebsiteServiceImplTest {
 
         Website website = websiteService.get(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
@@ -131,6 +137,7 @@ public class WebsiteServiceImplTest {
             catalogDTO.setActive((String)catalogData.get("active"));
             catalogService.create(catalogDTO);
 
+            //creating websiteCatalogs
             Catalog catalog = catalogService.get((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID,false).orElse(null);
 
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
@@ -142,12 +149,14 @@ public class WebsiteServiceImplTest {
             websiteCatalogDAO.insert(websiteCatalog);
         });
 
+        //Getting websiteCatalogs
         List<WebsiteCatalog> websiteCatalogList = websiteService.getAllWebsiteCatalogs(website.getId());
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteCatalogList));
     }
 
     @Test
     public void findAvailableCatalogsForWebsiteTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -161,6 +170,7 @@ public class WebsiteServiceImplTest {
 
         Website website = websiteService.get(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
@@ -174,24 +184,11 @@ public class WebsiteServiceImplTest {
             catalogService.create(catalogDTO);
         });
 
+        //Getting available catalogs
         Page<Catalog> catalogPage = websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size()),false);
         Assert.assertEquals(catalogPage.getContent().size(), 4);
 
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
-
-        catalogsData = new ArrayList<>();
-        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
-        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
-        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 3.com", "externalId", "TEST_CATALOG_3", "active", "Y"));
-        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 4.com", "externalId", "TEST_CATALOG_4", "active", "Y"));
-        catalogsData.forEach(catalogData -> {
-            Catalog catalogDTO = new Catalog();
-            catalogDTO.setCatalogName((String)catalogData.get("name"));
-            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
-            catalogDTO.setActive((String)catalogData.get("active"));
-            catalogService.create(catalogDTO);
-        });
-
+        //creating websiteCatalogs
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
         WebsiteCatalog websiteCatalog = new WebsiteCatalog();
         websiteCatalog.setWebsiteId(website.getId());
@@ -201,8 +198,9 @@ public class WebsiteServiceImplTest {
         websiteCatalog.setSubSequenceNum(0);
         websiteCatalogDAO.insert(websiteCatalog);
 
+        //Getting available catalogs
         Page<Catalog> availableCatalogPage = websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false);
-        Assert.assertEquals(availableCatalogPage.getContent().size(), 3);
+        Assert.assertEquals(availableCatalogPage.getContent().size(), 3); //TODO pagination
        /* Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false).getTotalElements(), 3);
         Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false).getContent().size(), 3);
         Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(1, 1),false).getContent().size(), 1);
@@ -213,6 +211,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAvailableCatalogsForWebsiteTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -226,6 +225,7 @@ public class WebsiteServiceImplTest {
 
         Website website = websiteService.get(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
@@ -237,22 +237,11 @@ public class WebsiteServiceImplTest {
             catalogService.create(catalogDTO);
         });
 
+        //Getting available catalogs
         Page<Catalog> catalogPage = websiteService.getAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, catalogsData.size(), null, false);
         Assert.assertEquals(catalogPage.getContent().size(), 2);
 
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
-
-        catalogsData = new ArrayList<>();
-        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
-        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
-        catalogsData.forEach(catalogData -> {
-            Catalog catalogDTO = new Catalog();
-            catalogDTO.setCatalogName((String)catalogData.get("name"));
-            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
-            catalogDTO.setActive((String)catalogData.get("active"));
-            catalogService.create(catalogDTO);
-        });
-
+        //creating websiteCatalogs
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
         WebsiteCatalog websiteCatalog = new WebsiteCatalog();
         websiteCatalog.setWebsiteId(website.getId());
@@ -262,6 +251,7 @@ public class WebsiteServiceImplTest {
         websiteCatalog.setSubSequenceNum(0);
         websiteCatalogDAO.insert(websiteCatalog);
 
+        //Getting available catalogs
         Page<Catalog> availableCatalogPage = websiteService.getAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, catalogsData.size(), null, false);
         Assert.assertEquals(availableCatalogPage.getContent().size(), 1);
 
@@ -269,6 +259,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getWebsiteCatalogsTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -282,6 +273,7 @@ public class WebsiteServiceImplTest {
 
         Website website = websiteService.get(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
@@ -294,6 +286,7 @@ public class WebsiteServiceImplTest {
             catalogDTO.setActive((String)catalogData.get("active"));
             catalogService.create(catalogDTO);
 
+            //creating websiteCatalogs
             Catalog catalog = catalogService.get((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID,false).orElse(null);
 
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
@@ -305,12 +298,14 @@ public class WebsiteServiceImplTest {
             websiteCatalogDAO.insert(websiteCatalog);
         });
 
+        //Getting websiteCatalogs
         Page<Map<String, Object>> websiteCatalogMap =  websiteService.getWebsiteCatalogs(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, PageRequest.of(0, catalogsData.size(), null), false);// TODO pagination check
         Assert.assertEquals(websiteCatalogMap.getSize(), catalogsData.size());
     }
 
     @Test
     public void addCatalogTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -322,6 +317,7 @@ public class WebsiteServiceImplTest {
             websiteService.create(websiteDTO);
         });
 
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 2.com", "externalId", "TEST_CATALOG_2", "active", "Y"));
@@ -335,6 +331,7 @@ public class WebsiteServiceImplTest {
             catalogService.create(catalogDTO);
         });
 
+        //Adding websiteCatalogs
         WebsiteCatalog websiteCatalog = websiteService.addCatalog(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID);
         WebsiteCatalog websiteCatalog1 =  websiteCatalogDAO.findById(websiteCatalog.getId()).orElse(null);
         Assert.assertEquals(websiteCatalog.getCatalogId(), websiteCatalog1.getCatalogId());
@@ -342,6 +339,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getWebsiteByNameTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -353,6 +351,7 @@ public class WebsiteServiceImplTest {
             websiteService.create(websiteDTO);
         });
 
+        //Getting website by name
         Optional<Website> website = websiteService.getWebsiteByName(websitesData.get(0).get("name").toString());
         Assert.assertTrue(website.isPresent());
         Website website1 = websiteService.getWebsiteByName(websitesData.get(0).get("name").toString()).orElse(null);
@@ -362,6 +361,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getWebsiteByUrlTest() throws Exception {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -373,6 +373,7 @@ public class WebsiteServiceImplTest {
             websiteService.create(websiteDTO);
         });
 
+        //Getting website by url
         Optional<Website> website = websiteService.getWebsiteByUrl(websitesData.get(0).get("url").toString());
         Assert.assertTrue(website.isPresent());
         Website website1 = websiteService.getWebsiteByUrl(websitesData.get(0).get("url").toString()).orElse(null);
