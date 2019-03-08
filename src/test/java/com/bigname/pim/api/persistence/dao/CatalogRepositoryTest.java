@@ -6,6 +6,8 @@ import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Catalog;
+import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.RootCategory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,9 +39,17 @@ public class CatalogRepositoryTest {
     @Autowired
     CatalogDAO catalogDAO;
 
+    @Autowired
+    CategoryDAO categoryDAO;
+
+    @Autowired
+    RootCategoryDAO rootCategoryDAO;
+
     @Before
     public void setUp() {
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        rootCategoryDAO.deleteAll();
     }
 
     @Test
@@ -229,8 +240,186 @@ public class CatalogRepositoryTest {
         Assert.assertEquals(catalogDAO.findAll(PageRequest.of(0, catalogsData.size()), false, false, true).getTotalElements(), 0);
     }
 
+    @Test
+    public void getRootCategoriesTest() throws Exception {
+
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
+        });
+
+        Catalog catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
+
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+
+            Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+
+            RootCategory rootCategory = new RootCategory();
+            rootCategory.setCatalogId(catalog.getId());
+            rootCategory.setRootCategoryId(category.getId());
+            rootCategory.setSequenceNum(0);
+            rootCategory.setSubSequenceNum(0);
+            rootCategory.setActive(category.getActive());
+            rootCategoryDAO.insert(rootCategory);
+        });
+
+        Page<Map<String, Object>> rootCategoriesMap = catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(0, categoriesData.size(), null));
+        Assert.assertEquals(rootCategoriesMap.getSize(), categoriesData.size()); //TODO pagination
+    }
+
+    @Test
+    public void findAllRootCategoriesTest() throws Exception {
+
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
+        });
+
+        Catalog catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
+
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+
+            Category category = categoryDAO.findById((String)categoryData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+
+            RootCategory rootCategory = new RootCategory();
+            rootCategory.setCatalogId(catalog.getId());
+            rootCategory.setRootCategoryId(category.getId());
+            rootCategory.setSequenceNum(0);
+            rootCategory.setSubSequenceNum(0);
+            rootCategory.setActive(category.getActive());
+            rootCategoryDAO.insert(rootCategory);
+        });
+
+        boolean[] activeRequired = {false};
+
+        Page<Map<String, Object>> rootCategories =  catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size(),null), activeRequired);
+        Assert.assertEquals(rootCategories.getSize(),categoriesData.size());//TODO pagination
+    }
+
+    @Test
+    public void getAllRootCategoriesTest() throws Exception {
+
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
+        });
+
+        Catalog catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "N"));
+
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+
+            Category category = categoryDAO.findById((String)categoryData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+
+            RootCategory rootCategory = new RootCategory();
+            rootCategory.setCatalogId(catalog.getId());
+            rootCategory.setRootCategoryId(category.getId());
+            rootCategory.setSequenceNum(0);
+            rootCategory.setSubSequenceNum(0);
+            rootCategory.setActive(category.getActive());
+            rootCategoryDAO.insert(rootCategory);
+        });
+
+        List<RootCategory> rootCategoryList = catalogDAO.getAllRootCategories(catalog.getId());
+        Assert.assertTrue(ValidationUtil.isNotEmpty(rootCategoryList));
+
+    }
+
+    @Test
+    public void findAvailableRootCategoriesForCatalogTest() throws Exception {
+
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
+        });
+
+        Catalog catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
+
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        RootCategory rootCategory = new RootCategory();
+        rootCategory.setCatalogId(catalog.getId());
+        rootCategory.setRootCategoryId(category.getId());
+        rootCategory.setSequenceNum(0);
+        rootCategory.setSubSequenceNum(0);
+        rootCategory.setActive(category.getActive());
+        rootCategoryDAO.insert(rootCategory);
+
+        Page<Category> availableCategoriesPage = catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(0, categoriesData.size() - 1), false);
+        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1); //TODO pagination
+    }
+
     @After
     public void tearDown() {
         catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        rootCategoryDAO.deleteAll();
     }
 }
