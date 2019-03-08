@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -137,7 +139,7 @@ public class CategoryControllerTest {
     @Test
     public void detailsTest() throws Exception {
 
-        /*//Create mode
+        //Create mode
         mockMvc.perform(
                 get("/pim/categories/create"))
                 .andExpect(status().isOk())
@@ -152,19 +154,9 @@ public class CategoryControllerTest {
         List<Category> createdCategoryInstances = addCategoryInstances();
         Assert.assertFalse(createdCategoryInstances.isEmpty());
 
+        //Details mode with valid categoryID
         String categoryId = createdCategoryInstances.get(0).getCategoryId();
-
-        mockMvc.perform(
-                get("/pim/categories/" + categoryId))
-                .andExpect(status().isOk())
-                .andExpect(view().name("category/category"))
-                .andExpect(forwardedUrl("/category/category.jsp"))
-                .andExpect(model().attribute("mode", is("DETAILS")))
-                .andExpect(model().attribute("active", is("CATEGORIES")))
-                .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId))));
-        //Details mode with reload true
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.put("reload", ConversionUtil.toList("true"));
 
         mockMvc.perform(
                 get("/pim/categories/" + categoryId).params(params))
@@ -173,7 +165,41 @@ public class CategoryControllerTest {
                 .andExpect(forwardedUrl("/category/category.jsp"))
                 .andExpect(model().attribute("mode", is("DETAILS")))
                 .andExpect(model().attribute("active", is("CATEGORIES")))
-                .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId))));*/
+                .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId))));
+
+        //Adding subCategory
+        categoryService.addSubCategory(createdCategoryInstances.get(0).getCategoryId(), FindBy.EXTERNAL_ID, createdCategoryInstances.get(1).getCategoryId(), FindBy.EXTERNAL_ID);
+        Category category = categoryService.get(createdCategoryInstances.get(0).getCategoryId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        //Details mode with valid categoryID and parentID
+        String categoryId1 = createdCategoryInstances.get(1).getCategoryId();
+        String parentCategoryId = category.getCategoryId();
+        params = new LinkedMultiValueMap<>();
+        params.put("parentId", ConversionUtil.toList(parentCategoryId));
+
+        mockMvc.perform(
+                get("/pim/categories/" + categoryId1).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/category"))
+                .andExpect(forwardedUrl("/category/category.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("CATEGORIES")))
+                .andExpect(model().attribute("parentId", is(parentCategoryId)))
+                .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId1))));
+
+
+        //Details mode with reload true
+        params = new LinkedMultiValueMap<>();
+        params.put("reload", ConversionUtil.toList("true"));
+
+        mockMvc.perform(
+                get("/pim/categories/" + categoryId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("category/category_body"))
+                .andExpect(forwardedUrl("/category/category_body.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("CATEGORIES")))
+                .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId))));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -244,8 +270,10 @@ public class CategoryControllerTest {
         result1.andExpect(jsonPath("$.recordsTotal").value(9));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsHierarchyTest() throws Exception {
+
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -301,10 +329,11 @@ public class CategoryControllerTest {
     public void setProductsSequenceTest() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void availableCategoriesTest() throws Exception {
 
-       /* //Add a website instance
+        //Add a website instance
         List<Category> createdCategoryInstances = addCategoryInstances();
         Assert.assertFalse(createdCategoryInstances.isEmpty());
 
@@ -314,7 +343,7 @@ public class CategoryControllerTest {
                 get("/pim/categories/" + categoryId + "/subCategories/available"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("category/availableSubCategories"))
-                .andExpect(forwardedUrl("/category/availableSubCategories.jsp"));*/
+                .andExpect(forwardedUrl("/category/availableSubCategories.jsp"));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -473,5 +502,4 @@ public class CategoryControllerTest {
         });
         return createdCategoryInstances;
     }
-
 }
