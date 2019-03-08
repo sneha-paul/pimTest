@@ -44,6 +44,7 @@ public class CatalogTest {
     }
     @Test
     public void accessorsTest(){
+        //Create new instance
         Catalog catalogDTO = new Catalog();
         catalogDTO.setCatalogName("test");
         catalogDTO.setCatalogId("test");
@@ -51,11 +52,13 @@ public class CatalogTest {
 
         catalogDTO.orchestrate();
 
+        //Testing equals with id
         Assert.assertEquals(catalogDTO.getCatalogId(), "TEST");
         Assert.assertEquals(catalogDTO.getCatalogName(), "test");
         Assert.assertEquals(catalogDTO.getDescription(), "test");
         Assert.assertEquals(catalogDTO.getActive(), "N");
 
+        //create
         catalogService.create(catalogDTO);
         Catalog newCatalog = catalogService.get(catalogDTO.getCatalogId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newCatalog));
@@ -75,6 +78,14 @@ public class CatalogTest {
 
     @Test
     public void orchestrate() throws Exception {
+        //Create id
+        Catalog catalogDTO = new Catalog();
+        catalogDTO.setExternalId("test");
+        catalogDTO.orchestrate();
+
+        //Check CatalogId
+        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getCatalogId()));
+        Assert.assertEquals(catalogDTO.getCatalogId(), "TEST");
     }
 
     @Test
@@ -115,6 +126,29 @@ public class CatalogTest {
 
     @Test
     public void cloneInstance() throws Exception {
+        //Create
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test", "externalId", "TEST_1", "discontinued", "Y", "description", "Test2","active", "Y"));
+
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String) catalogData.get("name"));
+            catalogDTO.setCatalogId((String) catalogData.get("externalId"));
+            catalogDTO.setActive((String) catalogData.get("active"));
+            catalogDTO.setDiscontinued((String) catalogData.get("discontinued"));
+            catalogDTO.setDescription((String) catalogData.get("description"));
+            catalogDAO.insert(catalogDTO);
+
+            //Clone catalog
+            Catalog newCatalog = catalogService.get(catalogDTO.getCatalogId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(newCatalog != null);
+            Assert.assertTrue(newCatalog.diff(catalogDTO).isEmpty());
+
+            Catalog catalogClone = catalogService.cloneInstance(newCatalog.getCatalogId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Assert.assertTrue(catalogClone.getCatalogId() .equals(newCatalog.getCatalogId() + "_COPY") && catalogClone.getCatalogName().equals(newCatalog.getCatalogName() + "_COPY") && catalogClone.getActive() != newCatalog.getActive());
+        });
+
+        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
     }
     @Test
     public void toMap() throws Exception {
@@ -141,6 +175,22 @@ public class CatalogTest {
 
     @Test
     public void diff() throws Exception {
+        //Create first instance
+        Catalog catalog1 = new Catalog();
+        catalog1.setCatalogName("test");
+        catalog1.setCatalogId("test_1");
+        catalog1.setDescription("test");
+
+        //Create second instance
+        Catalog catalog2 = new Catalog();
+        catalog2.setCatalogName("test.com");
+        catalog2.setCatalogId("test_1");
+        catalog2.setDescription("test");
+
+        //Checking first instance and second instance
+        Map<String, Object> diff = catalog1.diff(catalog2);
+        Assert.assertEquals(diff.size(), 2);
+        Assert.assertEquals(diff.get("catalogName"), "test.com");
     }
     @After
     public void tearDown() throws Exception {
