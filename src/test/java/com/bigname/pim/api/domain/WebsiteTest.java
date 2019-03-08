@@ -60,7 +60,7 @@ public class WebsiteTest {
         Assert.assertEquals(websiteDTO.getExternalId(), "TEST");
         Assert.assertEquals(websiteDTO.getActive(), "N");
 
-        //Update
+        //create
         websiteService.create(websiteDTO);
         Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
@@ -154,6 +154,7 @@ public class WebsiteTest {
         Assert.assertEquals(websiteDTO.getUrl(), "www.test.com");
         Assert.assertEquals(websiteDTO.getActive(), "N");
 
+        //Get websiteDTO
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteName()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getExternalId()));
@@ -166,11 +167,36 @@ public class WebsiteTest {
 
     @Test
     public void orchestrate() throws Exception {
+        //Create id
+        Website websiteDTO = new Website();
+        websiteDTO.setExternalId("test");
+        websiteDTO.orchestrate();
 
-    }
+        //Check websiteId
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
+        Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
+}
 
     @Test
     public void diff() throws Exception {
+        //Create first instance
+        Website website1 = new Website();
+        website1.setWebsiteId("test");
+        website1.setWebsiteName("test.com");
+        website1.setUrl("www.test");
+        website1.setActive("N");
+
+        //Create Second instance
+        Website website2 = new Website();
+        website2.setWebsiteId("test");
+        website2.setWebsiteName("test.com2");
+        website2.setUrl("www.test");
+        website2.setActive("N");
+
+        //Checking First instance and Second instance
+        Map<String, Object> diff = website1.diff(website2);
+        Assert.assertEquals(diff.size(), 2);
+        Assert.assertEquals(diff.get("websiteName"), "test.com2");
     }
     @After
     public void tearDown() throws Exception {
