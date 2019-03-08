@@ -31,11 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -80,13 +77,19 @@ public class FamilyControllerTest {
         Assert.assertNotNull(familyController);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
-    public void all() throws Exception {
+    public void allTest() throws Exception {
+        mockMvc.perform(
+                get("/pim/families"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/families"))
+                .andExpect(forwardedUrl("/settings/families.jsp"));
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void all1() throws Exception {
+    public void all1Test() throws Exception {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test 1", "externalId", "TEST_1", "active", "Y"));
         familiesData.add(CollectionsUtil.toMap("name", "Test 2", "externalId", "TEST_2", "active", "Y"));
@@ -139,12 +142,12 @@ public class FamilyControllerTest {
     }
 
     @Test
-    public void details() throws Exception {
+    public void detailsTest() throws Exception {
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void create() throws Exception {
+    public void createTest() throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("familyName", ConversionUtil.toList("TestFamily"));
@@ -164,7 +167,7 @@ public class FamilyControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void update() throws Exception {
+    public void updateTest() throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("familyName", ConversionUtil.toList("TestFamily"));
