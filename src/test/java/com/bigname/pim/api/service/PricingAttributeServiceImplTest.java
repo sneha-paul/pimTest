@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
-public class PricingAttributeServiceTest {
+public class PricingAttributeServiceImplTest {
     @Autowired
     PricingAttributeService pricingAttributeService;
 
