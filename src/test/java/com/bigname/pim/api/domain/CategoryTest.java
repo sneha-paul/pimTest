@@ -44,6 +44,7 @@ public class CategoryTest {
     }
     @Test
     public void accessorsTest(){
+        //Create New Instance
         Category categoryDTO = new Category();
         categoryDTO.setCategoryName("test");
         categoryDTO.setDescription("test");
@@ -54,6 +55,7 @@ public class CategoryTest {
 
         categoryDTO.orchestrate();
 
+        //Testing equals unique id
         Assert.assertEquals(categoryDTO.getCategoryId(), "TEST");
         Assert.assertEquals(categoryDTO.getCategoryName(), "test");
         Assert.assertEquals(categoryDTO.getDescription(), "test");
@@ -62,6 +64,7 @@ public class CategoryTest {
         Assert.assertEquals(categoryDTO.getMetaDescription(), "test");
         Assert.assertEquals(categoryDTO.getActive(), "N");
 
+        //Create
         categoryService.create(categoryDTO);
         Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
@@ -85,16 +88,43 @@ public class CategoryTest {
 
     @Test
     public void orchestrate() throws Exception {
+        //Create new instance
+        Category categoryDTO = new Category();
+        categoryDTO.setExternalId("test");
+        categoryDTO.orchestrate();
+
+        //Check CategoryId
+        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDTO.getCategoryId()));
+        Assert.assertEquals(categoryDTO.getCategoryId(), "TEST");
     }
 
     @Test
     public void cloneInstance() throws Exception {
+        //Adding website
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "tes.com", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String) categoryData.get("name"));
+            categoryDTO.setCategoryId((String) categoryData.get("externalId"));
+            categoryDTO.setActive((String) categoryData.get("active"));
+            categoryDTO.setDescription((String) categoryData.get("test.com"));
+            categoryDAO.insert(categoryDTO);
 
+            //Clone Category
+            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(newCategory != null);
+         //   Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
+
+            Category categoryClone = categoryService.cloneInstance(newCategory.getCategoryId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Assert.assertTrue(categoryClone.getCategoryId() .equals(newCategory.getCategoryId() + "_COPY") && categoryClone.getCategoryName().equals(newCategory.getCategoryName() + "_COPY") && categoryClone.getDescription().equals(newCategory.getDescription() + "_COPY") && categoryClone.getActive() != newCategory.getActive());
+        });
     }
+
 
     @Test
     public void merge() throws Exception {
-        //Create Website Original
+        //Create Category Original instance
         Category original = new Category();
         original.setCategoryId("One");
         original.setCategoryName("ONE");
@@ -102,7 +132,7 @@ public class CategoryTest {
         original.setDescription("ONE");
         original.setLongDescription("ONE");
 
-        //Add Details
+        //Add Details or modified instance
         Category modified = new Category();
         modified.setGroup("DETAILS");
         modified.setCategoryName("One-A");
@@ -111,6 +141,7 @@ public class CategoryTest {
         modified.setDescription("ONE-A");
         modified.setLongDescription("ONE-A");
 
+        //Merge
         original = original.merge(modified);
         Assert.assertEquals(original.getCategoryName(), "One-A");
         Assert.assertEquals(original.getCategoryId(), "ONE-A");
@@ -174,6 +205,22 @@ public class CategoryTest {
 
     @Test
     public void diff() throws Exception {
+        //Create first instance
+        Category category1 = new Category();
+        category1.setExternalId("test");
+        category1.setCategoryName("test");
+        category1.setDescription("test");
+
+        //Create second instance
+        Category category2 = new Category();
+        category2.setExternalId("test");
+        category2.setCategoryName("test.com");
+        category2.setDescription("test");
+
+        //Checking first instance and second instance
+        Map<String, Object> diff = category1.diff(category2);
+        Assert.assertEquals(diff.size(), 2);
+        Assert.assertEquals(diff.get("categoryName"), "test.com");
     }
     @After
     public void tearDown() throws Exception {
