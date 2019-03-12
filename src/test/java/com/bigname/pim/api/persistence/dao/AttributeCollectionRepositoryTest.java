@@ -2,6 +2,7 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
@@ -395,9 +396,9 @@ public class AttributeCollectionRepositoryTest {
         });
 
         AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
-        Assert.assertTrue(attributeCollection.getAttributes() != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection.getAttributes()));
         attributeCollection = attributeCollectionDAO.findById(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        Assert.assertTrue(attributeCollection.getAttributes() != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection.getAttributes()));
     }
 
     @Test
@@ -444,9 +445,9 @@ public class AttributeCollectionRepositoryTest {
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
 
-            AttributeCollection attributeCollectionUpdate = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+           /* AttributeCollection attributeCollectionUpdate = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
-               /* List<Map<String, Object>> attributesOptionsUpdateData = new ArrayList<>();
+                List<Map<String, Object>> attributesOptionsUpdateData = new ArrayList<>();
                 attributesOptionsUpdateData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsUpdateData.add(CollectionsUtil.toMap("value", "OPEN_END1", "active", "Y"));
                 attributesOptionsUpdateData.add(CollectionsUtil.toMap("value", "PAPERS", "active", "Y"));
@@ -459,15 +460,16 @@ public class AttributeCollectionRepositoryTest {
                     attributeOption.orchestrate();
                     //attribute.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
                     attributeCollectionUpdate.addAttributeOption(attributeOption);
-                });*/
+                });
 
-            attributeCollectionDAO.save(attributeCollectionUpdate);
+            attributeCollectionDAO.save(attributeCollectionUpdate);*/
         });
     }
 
     @Test
     public void retrieveAttributeOptionTest() {
         List<Map<String, Object>> collectionsData = new ArrayList<>();
+        List<Map<String, Object>> attributesData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection", "externalId", "ENVELOPE", "active", "Y", "discontinued", "N"));
         collectionsData.forEach(collectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -479,7 +481,6 @@ public class AttributeCollectionRepositoryTest {
 
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
-            List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
             attributesData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
@@ -509,8 +510,10 @@ public class AttributeCollectionRepositoryTest {
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
         });
-        //AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
-
+        AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
+        Attribute attribute = attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().get(ValidatableEntity.toId(attributesData.get(0).get("id").toString()));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attribute));
+        Assert.assertEquals(attribute.getOptions().get("FOLDERS").getValue(), "FOLDERS");
     }
 
     @After
