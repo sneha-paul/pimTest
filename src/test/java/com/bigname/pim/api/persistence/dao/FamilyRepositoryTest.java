@@ -1,6 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
@@ -35,6 +36,7 @@ public class FamilyRepositoryTest {
     @Before
     public void setUp() {
         familyDAO.getMongoTemplate().dropCollection(Family.class);
+        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
     }
 
     @Test
@@ -80,7 +82,6 @@ public class FamilyRepositoryTest {
 
     @Test
     public void updateFamilyTest() {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
         attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
         attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
@@ -148,6 +149,16 @@ public class FamilyRepositoryTest {
 
             family.get().addAttribute(familyAttributeDTO);
 
+            FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+            familyAttributeOption.setActive("Y");
+            familyAttributeOption.setValue(attributeOption.getValue());
+            familyAttributeOption.setId(attributeOption.getId());
+            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
+            familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+            //familyDAO.save(family.get());
+
+           // family.get().addAttributeOption(familyAttributeOption, attributeOption);
+
             //create variantGroup
             family.get().setGroup("VARIANT_GROUPS");
             VariantGroup variantGroup = new VariantGroup();
@@ -156,28 +167,17 @@ public class FamilyRepositoryTest {
             variantGroup.setLevel(1);
             variantGroup.setActive("N");
             family.get().addVariantGroup(variantGroup);
+            family.get().getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
 
             familyDAO.save(family.get());
 
-            //TODO : can't set FamilyAttributeOption : set
-            /*Family family1 = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
-            Optional<FamilyAttribute> familyAttributeDetails = family1.getAttribute(attribute.getFullId()); // null pointer exception occurs
-
-            FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
-            familyAttributeOption.setActive("Y");
-            familyAttributeOption.setValue(attributeOption.getValue());
-            familyAttributeOption.setId(attributeOption.getId());
-            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
-            familyAttributeDetails.get().getOptions().put(attributeOption.getId(), familyAttributeOption);
-            familyDAO.save(family.get());*/
-
         });
 
-        Optional<Family> familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString());
+        Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(familyDetails));
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+
 
     }
 
@@ -233,5 +233,6 @@ public class FamilyRepositoryTest {
     @After
     public void tearDown() {
         familyDAO.getMongoTemplate().dropCollection(Family.class);
+        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
     }
 }
