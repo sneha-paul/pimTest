@@ -37,9 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.bigname.core.util.FindBy.EXTERNAL_ID;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.*;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -329,8 +331,60 @@ public class CatalogControllerTest {
         result1.andExpect(jsonPath("$.recordsTotal").value(2));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setRootCategoriesSequenceTest() throws Exception {
+
+        //creating catalog
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogService.create(catalogDTO);
+        });
+
+        //creating category
+        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
+
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryService.create(categoryDTO);
+
+            Category category = categoryService.get((String)categoryData.get("externalId"), FindBy.EXTERNAL_ID,false).orElse(null);
+
+            RootCategory rootCategory = new RootCategory();
+            rootCategory.setCatalogId(catalog.getId());
+            rootCategory.setRootCategoryId(category.getId());
+            rootCategory.setSequenceNum(0);
+            rootCategory.setSubSequenceNum(0);
+            rootCategory.setActive(category.getActive());
+            rootCategoryDAO.insert(rootCategory);
+        });
+
+        //getting sequencing
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("sourceId", ConversionUtil.toList(categoriesData.get(0).get("externalId").toString()));
+        params.put("destinationId", ConversionUtil.toList(categoriesData.get(1).get("externalId").toString()));
+
+        ResultActions result = mockMvc.perform(
+                put("/pim/catalogs/TEST_CATALOG_MAIN/rootCategories/data")
+                        .params(params)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(jsonPath("$.success").value(true));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -497,8 +551,58 @@ public class CatalogControllerTest {
         result1.andExpect(jsonPath("$.success").value(true));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoriesHierarchyTest() throws Exception {
+        List<Map<String, Object>> catalogsData = new ArrayList<>();
+        catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
+        catalogsData.forEach(catalogData -> {
+            Catalog catalogDTO = new Catalog();
+            catalogDTO.setCatalogName((String)catalogData.get("name"));
+            catalogDTO.setCatalogId((String)catalogData.get("externalId"));
+            catalogDTO.setActive((String)catalogData.get("active"));
+            catalogDTO.setDescription((String)catalogData.get("description"));
+            catalogService.create(catalogDTO);
+        });
+
+        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y", "parent", "0", "isParent", true, "level", "0", "parentChain", ""));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", false,"level", "1", "parentChain", "TEST_CATEGORY_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 3", "externalId", "TEST_CATEGORY_3", "description", "Test description 3", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", false,"level", "1", "parentChain", "TEST_CATEGORY_1"));
+
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryService.create(categoryDTO);
+        });
+
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+
+        catalogService.addRootCategory(catalog.getExternalId(), FindBy.EXTERNAL_ID, category.getExternalId(), FindBy.EXTERNAL_ID);
+
+
+        String[] ids = {category.getCategoryId()};
+
+        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+
+        categories.forEach(relatedCategory -> categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID));
+
+        MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
+        detailsParams.put("start", ConversionUtil.toList("0"));
+        detailsParams.put("length", ConversionUtil.toList("4"));
+        detailsParams.put("draw", ConversionUtil.toList("1"));
+        ResultActions result = mockMvc.perform(
+                get("/pim/catalogs/TEST_CATALOG_MAIN/hierarchy")
+                        .params(detailsParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
 
     }
 
