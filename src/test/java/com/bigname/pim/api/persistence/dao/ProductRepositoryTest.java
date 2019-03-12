@@ -2,6 +2,8 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
@@ -31,28 +33,145 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class ProductRepositoryTest {
+
     @Autowired
-    ProductDAO productDAO;
+    private ProductDAO productDAO;
+
     @Autowired
-    AttributeCollectionDAO attributeCollectionDAO;
+    private AttributeCollectionDAO attributeCollectionDAO;
+
     @Autowired
-    FamilyDAO familyDAO;
+    private FamilyDAO familyDAO;
 
     @Before
     public void setUp() {
         productDAO.getMongoTemplate().dropCollection(Product.class);
+
+        familyDAO.getMongoTemplate().dropCollection(Family.class);
+
+        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
     }
 
     @Test
     public void createProductTest() {
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionDAO.insert(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollectionDetails.addAttribute(attribute);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
+        AttributeOption attributeOption = new AttributeOption();
+        attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+        attributeOption.setValue("TestOption");
+        attributeOption.setAttributeId(attribute.getFullId());
+        attributeOption.setActive("Y");
+        attributeOption.orchestrate();
+        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyDAO.insert(familyDTO);
+
+            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
+            Assert.assertTrue(family.isPresent());
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attribute.getName(), null);
+            familyAttributeDTO.setActive("Y");
+            familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+            familyAttributeDTO.setUiType(attribute.getUiType());
+            familyAttributeDTO.setScopable("Y");
+            familyAttributeDTO.setAttributeId(attribute.getFullId());
+            familyAttributeDTO.getScope().put("ECOMMERCE", FamilyAttribute.Scope.OPTIONAL);
+            familyAttributeDTO.setAttributeGroup(familyAttributeGroup); //TODO : check whether right or wrong
+            familyAttributeDTO.setAttribute(attribute);
+
+            family.get().addAttribute(familyAttributeDTO);
+
+            FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+            familyAttributeOption.setActive("Y");
+            familyAttributeOption.setValue(attributeOption.getValue());
+            familyAttributeOption.setId(attributeOption.getId());
+            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
+            familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+
+
+            //set parentAttribute //TODO
+
+            //create variantGroup
+            family.get().setGroup("VARIANT_GROUPS");
+            VariantGroup variantGroup = new VariantGroup();
+            variantGroup.setName("Test Variant1");
+            variantGroup.setId("TEST_VARIANT_1");
+            variantGroup.setLevel(1);
+            variantGroup.setActive("N");
+            family.get().addVariantGroup(variantGroup);
+            family.get().getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
+
+            familyDAO.save(family.get());
+
+        });
+
+        Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
+
+
+        //create Product instance
         Product productDTO = new Product();
         productDTO.setProductName("Test1");
         productDTO.setProductId("TEST1");
-        productDTO.setProductFamilyId("7abf9064-aba5-4573-9557-e1d83547e771");
         productDTO.setChannelId("AMAZON");
+        productDTO.setProductFamilyId(familyDetails.getId());
+       // productDTO.setProductFamily();
         productDTO.setActive("Y");
         Product product = productDAO.insert(productDTO);
         Assert.assertTrue(product.diff(productDTO).isEmpty());
+
+        /*List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 4", "externalId", "PRODUCT_TEST_4", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productDAO.insert(productDTO);
+        });*/
 
     }
 
@@ -76,72 +195,114 @@ public class ProductRepositoryTest {
     @Test
     public void updateProductTest() {
 
-         /*AttributeCollection attributeCollection1 = new AttributeCollection();
-        attributeCollection1.setGroup("ATTRIBUTES");
-        attributeCollection1.addAttribute(attributeDetailsMap);*/
-
-        /*Map<String , Attribute> attributeMap = null;
-
-        attributeMap.put("STYLE", attributeDetailsMap);
-
-        AttributeGroup attributeGroup = new AttributeGroup();
-        attributeGroup.setAttributes(attributeMap);
-
-        Map<String, AttributeGroup> attributesMap = null;
-        attributesMap.put("DEFAULT_GROUP", attributeGroup);*/
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
-
-        /*Attribute attributeDetails1 = new Attribute();
-        attributeDetails1.setName("Style");
-        attributeDetails1.setLabel("Style");
-        attributeDetails1.setDataType("string");
-
-        Map<String, Attribute> attributeMap = new HashMap<>();
-        attributeMap.put("Attributes", attributeDetails1);
-
-        AttributeGroup attributeGroup = new AttributeGroup();
-        attributeGroup.setAttributes(attributeMap);
-
-        Map<String, AttributeGroup> attributeGroupHashMap = new HashMap<>();
-        attributeGroupHashMap.put("DEFAULT_GROUP", attributeGroup);
-
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
-        attributeCollectionDTO.setCollectionName("Envelopes Attributes Collection");
-        attributeCollectionDTO.setCollectionId("ENVELOPES");
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
         attributeCollectionDTO.setActive("Y");
         attributeCollectionDTO.setDiscontinued("N");
-        //attributeCollectionDTO.setAttributes(attributesMap);
         attributeCollectionDAO.insert(attributeCollectionDTO);
-        AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
-        Assert.assertTrue(attributeCollection != null);
-        attributeCollection.setGroup("ATTRIBUTES");
-        //attributeCollection.addAttribute(attributeDetailsMap);
-        attributeCollection.setAttributes(attributeGroupHashMap);
-        attributeCollectionDAO.save(attributeCollection);*/
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
-        Family familyDTO = new Family();
-        familyDTO.setFamilyId("PAPER");
-        familyDTO.setFamilyName("PAPER");
-        familyDTO.setActive("Y");
-        familyDTO.setDiscontinued("N");
-        familyDAO.insert(familyDTO);
-        Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
-        Assert.assertTrue(family != null);
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollectionDetails.addAttribute(attribute);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
+        AttributeOption attributeOption = new AttributeOption();
+        attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+        attributeOption.setValue("TestOption");
+        attributeOption.setAttributeId(attribute.getFullId());
+        attributeOption.setActive("Y");
+        attributeOption.orchestrate();
+        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyDAO.insert(familyDTO);
+
+            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
+            Assert.assertTrue(family.isPresent());
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attribute.getName(), null);
+            familyAttributeDTO.setActive("Y");
+            familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+            familyAttributeDTO.setUiType(attribute.getUiType());
+            familyAttributeDTO.setScopable("Y");
+            familyAttributeDTO.setAttributeId(attribute.getFullId());
+            familyAttributeDTO.getScope().put("ECOMMERCE", FamilyAttribute.Scope.OPTIONAL);
+            familyAttributeDTO.setAttributeGroup(familyAttributeGroup); //TODO : check whether right or wrong
+            familyAttributeDTO.setAttribute(attribute);
+
+            family.get().addAttribute(familyAttributeDTO);
+
+            FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+            familyAttributeOption.setActive("Y");
+            familyAttributeOption.setValue(attributeOption.getValue());
+            familyAttributeOption.setId(attributeOption.getId());
+            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
+            familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
 
 
+            //set parentAttribute //TODO
+
+            //create variantGroup
+            family.get().setGroup("VARIANT_GROUPS");
+            VariantGroup variantGroup = new VariantGroup();
+            variantGroup.setName("Test Variant1");
+            variantGroup.setId("TEST_VARIANT_1");
+            variantGroup.setLevel(1);
+            variantGroup.setActive("N");
+            family.get().addVariantGroup(variantGroup);
+            family.get().getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
+
+            familyDAO.save(family.get());
+
+        });
+
+        Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
+
+
+        //create Product instance
         Product productDTO = new Product();
         productDTO.setProductName("Test1");
         productDTO.setProductId("TEST1");
-        productDTO.setProductFamilyId(family.getFamilyId());
         productDTO.setChannelId("AMAZON");
+        productDTO.setProductFamilyId(familyDetails.getId());
+        // productDTO.setProductFamily();
         productDTO.setActive("Y");
-        productDAO.insert(productDTO);
+        Product product = productDAO.insert(productDTO);
+        Assert.assertTrue(product.diff(productDTO).isEmpty());
+
 
         Product productDetails = productDAO.findByExternalId(productDTO.getProductId()).orElse(null);
-        Assert.assertTrue(productDetails != null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(productDetails));
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("PLAIN_LEAD_TIME", "5");
@@ -160,12 +321,12 @@ public class ProductRepositoryTest {
         productDetails.setGroup("DETAILS");
         productDAO.save(productDetails);
 
-        Optional<Product> product = productDAO.findByExternalId(productDetails.getProductId());
-        Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDetails.getProductId(), FindBy.EXTERNAL_ID);
-        Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDetails.getId(), FindBy.INTERNAL_ID);
-        Assert.assertTrue(product.isPresent());
+        Optional<Product> product1 = productDAO.findByExternalId(productDetails.getProductId());
+        Assert.assertTrue(product1.isPresent());
+        product1 = productDAO.findById(productDetails.getProductId(), FindBy.EXTERNAL_ID);
+        Assert.assertTrue(product1.isPresent());
+        product1 = productDAO.findById(productDetails.getId(), FindBy.INTERNAL_ID);
+        Assert.assertTrue(product1.isPresent());
 
     }
 
@@ -299,6 +460,10 @@ public class ProductRepositoryTest {
     @After
     public void tearDown() {
         productDAO.getMongoTemplate().dropCollection(Product.class);
+
+        familyDAO.getMongoTemplate().dropCollection(Family.class);
+
+        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
     }
 
 }
