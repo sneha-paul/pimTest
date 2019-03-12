@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
@@ -38,7 +39,7 @@ public class AttributeCollectionTest {
     }
     @Test
     public void accessorsTest() {
-        //Create New Instance
+        //Create New Instance attributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
         attributeCollectionDTO.setCollectionId("test");
         attributeCollectionDTO.setCollectionName("test");
@@ -57,6 +58,22 @@ public class AttributeCollectionTest {
         Assert.assertEquals(newAttributeCollection.getCollectionId(), attributeCollectionDTO.getCollectionId());
         Assert.assertEquals(newAttributeCollection.getCollectionName(), attributeCollectionDTO.getCollectionName());
         Assert.assertEquals(newAttributeCollection.getActive(), attributeCollectionDTO.getActive());
+
+        //Create new instance attribute
+        Attribute attributeDTO = new Attribute();
+        attributeDTO.setActive("Y");
+        attributeDTO.setName("test.com");
+
+        Assert.assertEquals(attributeDTO.getActive(), "Y");
+        Assert.assertEquals(attributeDTO.getName(), "test.com");
+
+        newAttributeCollection.addAttribute(attributeDTO);
+        attributeCollectionDAO.save(newAttributeCollection);
+
+        AttributeCollection newAttributeCollection2 = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(newAttributeCollection2));
+        Assert.assertEquals(newAttributeCollection2.getAllAttributes().get(0).getName(), attributeDTO.getName());
+        Assert.assertEquals(newAttributeCollection2.getAllAttributes().get(0).getActive(), attributeDTO.getActive());
     }
 
     @Test
@@ -134,13 +151,25 @@ public class AttributeCollectionTest {
         modified1.setCollectionName("test");
         modified1.setActive("N");
 
-        original=original.merge(modified1);
+        original = original.merge(modified1);
         Assert.assertEquals(original.getCollectionName(), "TEST");
         Assert.assertEquals(original.getCollectionId(), "TEST");
         Assert.assertEquals(original.getExternalId(), "TEST");
         Assert.assertEquals(original.getActive(), "N");
 
         //Add ATTRIBUTES
+        Attribute original1 = new Attribute();
+        original1.setName("test11");
+        original1.setActive("Y");
+
+        Attribute modified2 = new Attribute();
+        modified2.setGroup("ATTRIBUTES");
+        modified2.setName("TEST11");
+        modified2.setActive("Y");
+
+        original1 = original1.merge(modified2);
+        Assert.assertEquals(original1.getName(), "TEST11");
+        Assert.assertEquals(original1.getActive(), "Y");
     }
 
     @Test
@@ -173,7 +202,6 @@ public class AttributeCollectionTest {
         AttributeCollection attributeCollection1 = new AttributeCollection();
         attributeCollection1.setCollectionId("test");
         attributeCollection1.setCollectionName("test");
-        //setAttributes
 
         //Create Second Instance
         AttributeCollection attributeCollection2 = new AttributeCollection();
@@ -184,7 +212,22 @@ public class AttributeCollectionTest {
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("collectionName"), "test.com");
 
+        //Create Attribute first instance
+        Attribute attribute1 = new Attribute();
+        attribute1.setName("test");
+        attribute1.setActive("Y");
 
+        //Create Attribute second instance
+        Attribute attribute2 = new Attribute();
+        attribute2.setName("test22");
+        attribute2.setActive("Y");
+
+        attributeCollection1.addAttribute(attribute1);
+        attributeCollection2.addAttribute(attribute2);
+
+        Map<String, Object> diff1 = attributeCollection1.diff(attributeCollection2);
+        Assert.assertEquals(diff1.size(), 2);
+       // Assert.assertEquals(diff1.get("name"), "test22");
     }
 
     @Test
