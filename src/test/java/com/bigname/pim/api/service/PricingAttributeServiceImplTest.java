@@ -2,10 +2,14 @@ package com.bigname.pim.api.service;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.Entity;
+import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.util.FindBy;
 import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
+import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,14 +17,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
@@ -128,6 +133,400 @@ public class PricingAttributeServiceImplTest {
             Assert.assertEquals(diff.size(), 0);
         });
     }
+
+    @Test
+    public void getAllAsPageTest() {
+        List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+        pricingAttributesData.forEach(pricingAttributeData -> {
+            PricingAttribute pricingAttributeDTO= new PricingAttribute();
+            pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+            pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+            pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+            pricingAttributeService.create(pricingAttributeDTO);
+        });
+
+        Page<PricingAttribute> paginatedResult = pricingAttributeService.getAll(0, 10, null,false);
+        Assert.assertEquals(paginatedResult.getContent().size(), pricingAttributesData.size());
+    }
+
+   @Test
+    public void getAllAsListTest() {
+       List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+       pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+       pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_2", "active", "Y"));
+       pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_3", "active", "Y"));
+
+       pricingAttributesData.forEach(pricingAttributeData -> {
+           PricingAttribute pricingAttributeDTO= new PricingAttribute();
+           pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+           pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+           pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+           pricingAttributeService.create(pricingAttributeDTO);
+       });
+
+        List<PricingAttribute> result = pricingAttributeService.getAll(Sort.by("pricingAttributeName").ascending(), false);
+        String[] actual = result.stream().map(pricingAttribute -> pricingAttribute.getPricingAttributeName()).collect(Collectors.toList()).toArray(new String[0]);
+        String[] expected = pricingAttributesData.stream().map(pricingAttributeData -> (String)pricingAttributeData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
+        Assert.assertArrayEquals(expected, actual);
+
+        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+
+        // sorting : Descending
+
+       pricingAttributesData = new ArrayList<>();
+       pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+       pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+       pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+       pricingAttributesData.forEach(pricingAttributeData -> {
+           PricingAttribute pricingAttributeDTO= new PricingAttribute();
+           pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+           pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+           pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+           pricingAttributeService.create(pricingAttributeDTO);
+       });
+
+        result = pricingAttributeService.getAll(Sort.by("pricingAttributeName").descending(), false);
+        actual = result.stream().map(pricingAttribute -> pricingAttribute.getPricingAttributeName()).collect(Collectors.toList()).toArray(new String[0]);
+        expected = pricingAttributesData.stream().map(pricingAttributeData -> (String)pricingAttributeData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
+        Assert.assertNotEquals(expected, actual);
+    }
+
+     @Test
+    public void getAllWithIdsAsPageTest() {
+         List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+         pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+         pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+         pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+         pricingAttributesData.forEach(pricingAttributeData -> {
+             PricingAttribute pricingAttributeDTO= new PricingAttribute();
+             pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+             pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+             pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+             pricingAttributeService.create(pricingAttributeDTO);
+         });
+
+        String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
+
+        Page<PricingAttribute> paginatedResult = pricingAttributeService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
+        Map<String, PricingAttribute> pricingAttributesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
+        Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
+    }
+
+    @Test
+    public void getAllWithIdsAsListTest() {
+        List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+        pricingAttributesData.forEach(pricingAttributeData -> {
+            PricingAttribute pricingAttributeDTO= new PricingAttribute();
+            pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+            pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+            pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+            pricingAttributeService.create(pricingAttributeDTO);
+        });
+
+        String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
+
+        List<PricingAttribute> listedResult = pricingAttributeService.getAll(ids, EXTERNAL_ID, null, false);
+        Map<String, PricingAttribute> pricingAttributesMap = listedResult.stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
+        Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
+    }
+
+ @Test
+    public void getAllWithExclusionsAsPageTest() {
+     List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+     pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+     pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+     pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+     pricingAttributesData.forEach(pricingAttributeData -> {
+         PricingAttribute pricingAttributeDTO= new PricingAttribute();
+         pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+         pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+         pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+         pricingAttributeService.create(pricingAttributeDTO);
+     });
+
+     String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
+
+        Page<PricingAttribute> paginatedResult = pricingAttributeService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
+        Map<String, PricingAttribute> pricingAttributesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
+        Assert.assertTrue(pricingAttributesMap.size() == (pricingAttributesData.size() - ids.length) && !pricingAttributesMap.containsKey(ids[0]) && !pricingAttributesMap.containsKey(ids[1]) && !pricingAttributesMap.containsKey(ids[2]));
+    }
+
+       @Test
+    public void getAllWithExclusionsAsListTest() {
+           List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+           pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+           pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+           pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+           pricingAttributesData.forEach(pricingAttributeData -> {
+               PricingAttribute pricingAttributeDTO= new PricingAttribute();
+               pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+               pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+               pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+               pricingAttributeService.create(pricingAttributeDTO);
+           });
+
+           String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
+
+        List<PricingAttribute> listedResult = pricingAttributeService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        Map<String, PricingAttribute> pricingAttributesMap = listedResult.stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
+        Assert.assertTrue(pricingAttributesMap.size() == (pricingAttributesData.size() - ids.length) && !pricingAttributesMap.containsKey(ids[0]) && !pricingAttributesMap.containsKey(ids[1]) && !pricingAttributesMap.containsKey(ids[2]));
+    }
+
+    @Test
+    public void findAllAtSearchTest() {
+        List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+        pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+        pricingAttributesData.forEach(pricingAttributeData -> {
+            PricingAttribute pricingAttributeDTO= new PricingAttribute();
+            pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+            pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+            pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+            pricingAttributeService.create(pricingAttributeDTO);
+        });
+
+        Page<PricingAttribute> paginatedResult = pricingAttributeService.findAll("name", "Test", PageRequest.of(0, pricingAttributesData.size()), false);
+        Assert.assertEquals(paginatedResult.getContent().size(), 3);
+    }
+
+ @Test
+    public void findAllTest() {
+     List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+     pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+     pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+     pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+     pricingAttributesData.forEach(pricingAttributeData -> {
+         PricingAttribute pricingAttributeDTO= new PricingAttribute();
+         pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+         pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+         pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+         pricingAttributeService.create(pricingAttributeDTO);
+     });
+
+        Page<PricingAttribute> paginatedResult = pricingAttributeService.findAll(PageRequest.of(0, pricingAttributesData.size()), false);
+        Assert.assertEquals(paginatedResult.getContent().size(), 3);
+    }
+
+   @Test
+    public void updateEntityTest() {
+       List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+       pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+
+       pricingAttributesData.forEach(pricingAttributeData -> {
+           PricingAttribute pricingAttributeDTO= new PricingAttribute();
+           pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+           pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+           pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+           pricingAttributeDAO.insert(pricingAttributeDTO);
+       });
+
+            PricingAttribute pricingAttributeDetails = pricingAttributeService.get(pricingAttributesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDetails));
+            pricingAttributeDetails.setPricingAttributeName("Test");
+            pricingAttributeDetails.setGroup("DETAILS");
+
+            pricingAttributeService.update(pricingAttributeDetails.getPricingAttributeId(), EXTERNAL_ID, pricingAttributeDetails);
+            PricingAttribute updatedPricingAttribute = pricingAttributeService.get(pricingAttributeDetails.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(updatedPricingAttribute));
+            Assert.assertEquals(updatedPricingAttribute.getPricingAttributeName(), "Test");
+    }
+
+       @Test
+    public void updateEntitiesTest(){
+           List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+           pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+           pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+           pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "Y"));
+
+           pricingAttributesData.forEach(pricingAttributeData -> {
+               PricingAttribute pricingAttributeDTO= new PricingAttribute();
+               pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+               pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+               pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+               pricingAttributeDAO.insert(pricingAttributeDTO);
+           });
+
+           String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
+
+        List<PricingAttribute> result = pricingAttributeService.getAll(ids, EXTERNAL_ID, null, false);
+        Map<String, PricingAttribute> pricingAttributesMap = result.stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
+        Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
+
+        List<PricingAttribute> pricingAttributes = result.stream().map(result1 -> {
+            result1.setActive("N");
+            return result1;
+        }).collect(Collectors.toList());
+
+        pricingAttributeService.update(pricingAttributes);
+
+        result = pricingAttributeService.getAll(Sort.by("websiteName").descending(), true);
+        pricingAttributesMap = result.stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
+        Assert.assertTrue(pricingAttributesMap.size() == (pricingAttributesData.size() - ids.length) && !pricingAttributesMap.containsKey(ids[0]) && !pricingAttributesMap.containsKey(ids[1]) && !pricingAttributesMap.containsKey(ids[2]));
+        Assert.assertFalse(pricingAttributesMap.size() == pricingAttributesData.size() && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
+    }
+
+     @Test
+    public void cloneInstance() {
+         List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+         pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+
+         pricingAttributesData.forEach(pricingAttributeData -> {
+             PricingAttribute pricingAttributeDTO= new PricingAttribute();
+             pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+             pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+             pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+             pricingAttributeDAO.insert(pricingAttributeDTO);
+
+            PricingAttribute newPricingAttribute = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newPricingAttribute));
+            Assert.assertTrue(newPricingAttribute.diff(pricingAttributeDTO).isEmpty());
+
+            PricingAttribute pricingAttributeClone = pricingAttributeService.cloneInstance(newPricingAttribute.getPricingAttributeId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Assert.assertTrue(pricingAttributeClone.getPricingAttributeId() .equals(newPricingAttribute.getPricingAttributeId() + "_COPY") && pricingAttributeClone.getPricingAttributeName().equals(newPricingAttribute.getPricingAttributeName() + "_COPY") && pricingAttributeClone.getActive() != newPricingAttribute.getActive());
+        });
+    }
+
+  @Test
+    public void findAll() {
+      List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
+
+      pricingAttributesData.forEach(pricingAttributeData -> {
+          PricingAttribute pricingAttributeDTO= new PricingAttribute();
+          pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+          pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+          pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+          pricingAttributeDAO.insert(pricingAttributeDTO);
+        });
+
+        List<PricingAttribute> result = pricingAttributeService.findAll(CollectionsUtil.toMap("active", "N"));
+        Assert.assertTrue(result.size() == 1);
+    }
+
+  @Test
+    public void findAll1() {
+        List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
+
+      pricingAttributesData.forEach(pricingAttributeData -> {
+          PricingAttribute pricingAttributeDTO= new PricingAttribute();
+          pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+          pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+          pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+          pricingAttributeDAO.insert(pricingAttributeDTO);
+        });
+
+        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        List<PricingAttribute> result = pricingAttributeService.findAll(criteria);
+        Assert.assertTrue(result.size() == 1);
+    }
+
+     @Test
+    public void findOne() {
+         List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+         pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+         pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+         pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
+
+         pricingAttributesData.forEach(pricingAttributeData -> {
+             PricingAttribute pricingAttributeDTO= new PricingAttribute();
+             pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+             pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+             pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+             pricingAttributeDAO.insert(pricingAttributeDTO);
+         });
+
+        Optional<PricingAttribute> result = pricingAttributeService.findOne(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name")));
+        Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.get().getPricingAttributeName());
+    }
+
+   @Test
+    public void findOne1() {
+       List<Map<String, Object>> pricingAttributesData = new ArrayList<>();
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
+      pricingAttributesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
+
+      pricingAttributesData.forEach(pricingAttributeData -> {
+          PricingAttribute pricingAttributeDTO= new PricingAttribute();
+          pricingAttributeDTO.setPricingAttributeName((String)pricingAttributeData.get("name"));
+          pricingAttributeDTO.setPricingAttributeId((String)pricingAttributeData.get("externalId"));
+          pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
+          pricingAttributeDAO.insert(pricingAttributeDTO);
+        });
+        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name")));
+        Optional<PricingAttribute> result = pricingAttributeService.findOne(criteria);
+        Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.get().getPricingAttributeName());
+    }
+
+    @Test
+    public void validate1() throws Exception {
+        /* Create a valid new instance with id TEST */
+        PricingAttribute pricingAttributeDTO = new PricingAttribute();
+        pricingAttributeDTO.setPricingAttributeName("test");
+        pricingAttributeDTO.setPricingAttributeId("TEST");
+        pricingAttributeDTO.setActive("Y");
+
+        Map<String, Object> context = new HashMap<>();
+
+        Class groups = ValidatableEntity.CreateGroup.class;
+//        validate
+        Assert.assertTrue(pricingAttributeService.validate(pricingAttributeDTO, context, groups).isEmpty());
+//        insert the valid instance
+        pricingAttributeDAO.insert(pricingAttributeDTO);
+
+        /*Create a second instance with the same id TEST to check the unique constraint violation of pricingAttributeId*/
+
+        PricingAttribute pricingAttributeDTO1 = new PricingAttribute();
+        pricingAttributeDTO1.setPricingAttributeName("Envelope");
+        pricingAttributeDTO1.setPricingAttributeId("TEST");
+        pricingAttributeDTO1.setActive("Y");
+
+        Assert.assertEquals(pricingAttributeService.validate(pricingAttributeDTO1, context, groups).size(), 1);
+
+        /*Testing forceUniqueId*/
+        context.put("forceUniqueId", true);
+        Assert.assertTrue(pricingAttributeService.validate(pricingAttributeDTO1, context, groups).isEmpty());
+        Assert.assertEquals(pricingAttributeDTO1.getExternalId(), "TEST_1");
+        pricingAttributeDAO.insert(pricingAttributeDTO1);
+
+        context.clear();
+
+        /*Testing uniqueConstraint violation of pricingAttributeId with update operation*/
+        PricingAttribute pricingAttribute = pricingAttributeDAO.findById(pricingAttributeDTO.getPricingAttributeId(), FindBy.EXTERNAL_ID).orElse(null);
+        pricingAttribute.setPricingAttributeId("TEST_1");
+        pricingAttribute.setGroup("DETAILS");
+        pricingAttribute.setActive("Y");
+        context.put("id", pricingAttributeDTO.getExternalId());
+
+        groups = ValidatableEntity.DetailsGroup.class;
+        Assert.assertEquals(pricingAttributeService.validate(pricingAttribute, context, groups).size(), 1);
+
+        /*Testing forceUniqueId with update operation*/
+        context.put("forceUniqueId", true);
+        Assert.assertTrue(pricingAttributeService.validate(pricingAttribute, context, groups).isEmpty());
+        Assert.assertEquals(pricingAttribute.getExternalId(), "TEST_1_1");
+    }
+
 
     @After
     public void tearDown() throws Exception {
