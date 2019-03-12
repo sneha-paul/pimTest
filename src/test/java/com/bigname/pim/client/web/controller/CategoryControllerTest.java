@@ -2,12 +2,16 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.User;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
+import com.bigname.pim.api.service.FamilyService;
+import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.api.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
@@ -32,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -62,6 +67,15 @@ public class CategoryControllerTest {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private RelatedCategoryDAO relatedCategoryDAO;
+    @Autowired
+    private FamilyService familyService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private FamilyDAO familyDAO;
+
     @Before
     public void setUp() throws Exception {
         if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
@@ -73,6 +87,8 @@ public class CategoryControllerTest {
             userService.create(user);
         }
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        relatedCategoryDAO.deleteAll();
+        familyDAO.getMongoTemplate().dropCollection(Family.class);
     }
 
     @Test
@@ -273,6 +289,48 @@ public class CategoryControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsHierarchyTest() throws Exception {
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y", "parent", "0", "isParent", "true", "level", "0", "parentChain", ""));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Test Category4", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Test Category5", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
+
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+
+            categoryService.create(categoryDTO);
+
+            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
+            Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
+        });
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        String[] ids = {category.getCategoryId()};
+
+        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+
+        categories.forEach(relatedCategory -> {
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
+        });
+
+        MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
+        detailsParams.put("start", ConversionUtil.toList("0"));
+        detailsParams.put("length", ConversionUtil.toList("4"));
+        detailsParams.put("draw", ConversionUtil.toList("1"));
+        ResultActions result = mockMvc.perform(
+                get("/pim/categories/hierarchy")
+                        .params(detailsParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
 
     }
 
@@ -317,8 +375,40 @@ public class CategoryControllerTest {
         result1.andExpect(jsonPath("$.recordsTotal").value(1));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setSubCategoriesSequenceTest() throws Exception {
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryService.create(categoryDTO);
+        });
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        String[] ids = {category.getCategoryId()};
+
+        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+
+        categories.forEach(relatedCategory -> categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID));
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("sourceId", ConversionUtil.toList(categoriesData.get(1).get("externalId").toString()));
+        params.put("destinationId", ConversionUtil.toList(categoriesData.get(2).get("externalId").toString()));
+
+        ResultActions result = mockMvc.perform(
+                put("/pim/categories/TEST_1/subCategories/data")
+                        .params(params)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(jsonPath("$.success").value(true));
     }
 
     @Test
@@ -465,11 +555,12 @@ public class CategoryControllerTest {
 
     @Test
     public void availableProductsTest() throws Exception {
-
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableProductsTest() throws Exception {
+
     }
 
     @Test
@@ -483,6 +574,9 @@ public class CategoryControllerTest {
     @After
     public void tearDown() throws Exception {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        relatedCategoryDAO.deleteAll();
+        familyDAO.getMongoTemplate().dropCollection(Family.class);
+
     }
 
     private List<Category> addCategoryInstances() {
