@@ -7,6 +7,8 @@ import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.service.AssetCollectionService;
+import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -43,6 +45,12 @@ public class ProductRepositoryTest {
     @Autowired
     private FamilyDAO familyDAO;
 
+    @Autowired
+    private ChannelDAO channelDAO;
+
+    @Autowired
+    private AttributeCollectionService attributeCollectionService;
+
     @Before
     public void setUp() {
         productDAO.getMongoTemplate().dropCollection(Product.class);
@@ -50,10 +58,26 @@ public class ProductRepositoryTest {
         familyDAO.getMongoTemplate().dropCollection(Family.class);
 
         attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+
+        channelDAO.getMongoTemplate().dropCollection(Channel.class);
     }
 
     @Test
     public void createProductTest() {
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelDAO.insert(channel);
+        });
+
+        Channel channel = channelDAO.findById(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
         attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
         attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
@@ -62,34 +86,58 @@ public class ProductRepositoryTest {
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
         AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
 
-        Attribute attribute = new Attribute();
-        attribute.setActive("Y");
-        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
-        attribute.setUiType(Attribute.UIType.DROPDOWN);
-        attribute.setName("Test_Attribute");
-        attribute.setId("TEST_ATTRIBUTE");
-        attributeCollectionDetails.addAttribute(attribute);
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-        Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
-        AttributeOption attributeOption = new AttributeOption();
-        attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
-        attributeOption.setValue("TestOption");
-        attributeOption.setAttributeId(attribute.getFullId());
-        attributeOption.setActive("Y");
-        attributeOption.orchestrate();
-        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
-        familiesData.forEach(familyData -> {
+        familiesData.forEach((Map<String, Object> familyData) -> {
             AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
@@ -98,8 +146,7 @@ public class ProductRepositoryTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
-            Assert.assertTrue(family.isPresent());
+            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -109,52 +156,58 @@ public class ProductRepositoryTest {
             familyAttributeGroup.setId(familyAttributeGroup.getFullId());
 
             //Create the new familyAttribute instance
-            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attribute.getName(), null);
+            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeDetails.getName(), null);
             familyAttributeDTO.setActive("Y");
             familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
-            familyAttributeDTO.setUiType(attribute.getUiType());
+            familyAttributeDTO.setUiType(attributeDetails.getUiType());
             familyAttributeDTO.setScopable("Y");
-            familyAttributeDTO.setAttributeId(attribute.getFullId());
-            familyAttributeDTO.getScope().put("ECOMMERCE", FamilyAttribute.Scope.OPTIONAL);
-            familyAttributeDTO.setAttributeGroup(familyAttributeGroup); //TODO : check whether right or wrong
-            familyAttributeDTO.setAttribute(attribute);
+            familyAttributeDTO.setAttributeId(attributeDetails.getFullId());
+            familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+            familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+            familyAttributeDTO.setAttribute(attributeDetails);
 
-            family.get().addAttribute(familyAttributeDTO);
+            family.addAttribute(familyAttributeDTO);
 
-            FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
-            familyAttributeOption.setActive("Y");
-            familyAttributeOption.setValue(attributeOption.getValue());
-            familyAttributeOption.setId(attributeOption.getId());
-            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
-            familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+            FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeDetails.getId());
 
+            List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
+            attributeOptionList.forEach(attributeOption -> {
+                FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                familyAttributeOption.setActive("Y");
+                familyAttributeOption.setValue(attributeOption.getValue());
+                familyAttributeOption.setId(attributeOption.getId());
+                familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                family.addAttributeOption(familyAttributeOption, attributeOption);
+            });
 
             //set parentAttribute //TODO
 
             //create variantGroup
-            family.get().setGroup("VARIANT_GROUPS");
+            family.setGroup("VARIANT_GROUPS");
             VariantGroup variantGroup = new VariantGroup();
-            variantGroup.setName("Test Variant1");
-            variantGroup.setId("TEST_VARIANT_1");
+            variantGroup.setName(attributeDetails.getName());
+            variantGroup.setId(attributeDetails.getId());
+            variantGroup.setActive("Y");
             variantGroup.setLevel(1);
-            variantGroup.setActive("N");
-            family.get().addVariantGroup(variantGroup);
-            family.get().getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
+            variantGroup.setFamilyId(family.getFamilyId());
+            variantGroup.getVariantAxis().put(1, Arrays.asList(attributeDetails.getName()));
+            variantGroup.getVariantAttributes().put(1, Arrays.asList(attributes.get(2).getName(), attributes.get(9).getName()));
+            family.addVariantGroup(variantGroup);
+            family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
 
-            familyDAO.save(family.get());
+            familyDAO.save(family);
 
         });
 
         Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
 
-
         //create Product instance
         Product productDTO = new Product();
         productDTO.setProductName("Test1");
         productDTO.setProductId("TEST1");
-        productDTO.setChannelId("AMAZON");
+        productDTO.setChannelId(channel.getChannelId());
         productDTO.setProductFamilyId(familyDetails.getId());
-       // productDTO.setProductFamily();
         productDTO.setActive("Y");
         Product product = productDAO.insert(productDTO);
         Assert.assertTrue(product.diff(productDTO).isEmpty());
@@ -464,6 +517,8 @@ public class ProductRepositoryTest {
         familyDAO.getMongoTemplate().dropCollection(Family.class);
 
         attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+
+        channelDAO.getMongoTemplate().dropCollection(Channel.class);
     }
 
 }
