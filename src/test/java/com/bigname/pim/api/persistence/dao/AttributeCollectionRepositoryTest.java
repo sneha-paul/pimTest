@@ -469,7 +469,6 @@ public class AttributeCollectionRepositoryTest {
     @Test
     public void retrieveAttributeOptionTest() {
         List<Map<String, Object>> collectionsData = new ArrayList<>();
-        List<Map<String, Object>> attributesData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection", "externalId", "ENVELOPE", "active", "Y", "discontinued", "N"));
         collectionsData.forEach(collectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -480,7 +479,7 @@ public class AttributeCollectionRepositoryTest {
             attributeCollectionDAO.insert(attributeCollectionDTO);
 
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
-
+            List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
             attributesData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
@@ -511,7 +510,7 @@ public class AttributeCollectionRepositoryTest {
             attributeCollectionDAO.save(attributeCollectionDetails);
         });
         AttributeCollection attributeCollection = attributeCollectionDAO.findByExternalId(collectionsData.get(0).get("externalId").toString()).orElse(null);
-        Attribute attribute = attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().get(ValidatableEntity.toId(attributesData.get(0).get("id").toString()));
+        Attribute attribute = attributeCollection.getAttributes().get(AttributeGroup.DEFAULT_GROUP_ID).getAttributes().get(ValidatableEntity.toId("style"));
         Assert.assertTrue(ValidationUtil.isNotEmpty(attribute));
         Assert.assertEquals(attribute.getOptions().get("FOLDERS").getValue(), "FOLDERS");
     }
