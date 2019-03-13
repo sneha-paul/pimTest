@@ -385,6 +385,10 @@ public class CatalogControllerTest {
                         .accept(MediaType.APPLICATION_JSON_UTF8));
 
         result.andExpect(jsonPath("$.success").value(true));
+
+        List<RootCategory> rootCategoryList = catalogService.getAllRootCategories(catalog.getId());
+        Assert.assertEquals(rootCategoryList.get(0).getSubSequenceNum(), 1);
+        Assert.assertEquals(rootCategoryList.get(1).getSubSequenceNum(), 0);
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -603,6 +607,14 @@ public class CatalogControllerTest {
                         .accept(MediaType.APPLICATION_JSON_UTF8));
 
         result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$[0].parent").value(0));
+        result.andExpect(jsonPath("$[0].isParent").value(true));
+        result.andExpect(jsonPath("$[0].level").value(0));
+        result.andExpect(jsonPath("$[0].parentChain").value(""));
+        result.andExpect(jsonPath("$[1].parent").value("TEST_CATEGORY_1"));
+        result.andExpect(jsonPath("$[1].isParent").value(false));
+        result.andExpect(jsonPath("$[1].level").value(1));
+        result.andExpect(jsonPath("$[1].parentChain").value("TEST_CATEGORY_1"));
 
     }
 
