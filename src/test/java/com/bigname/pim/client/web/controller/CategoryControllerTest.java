@@ -8,6 +8,7 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -75,6 +77,8 @@ public class CategoryControllerTest {
     private ProductService productService;
     @Autowired
     private FamilyDAO familyDAO;
+    @Autowired
+    ProductDAO productDAO;
 
     @Before
     public void setUp() throws Exception {
@@ -88,7 +92,9 @@ public class CategoryControllerTest {
         }
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
+        productDAO.getMongoTemplate().dropCollection(Product.class);
         familyDAO.getMongoTemplate().dropCollection(Family.class);
+
     }
 
     @Test
@@ -331,7 +337,14 @@ public class CategoryControllerTest {
                         .accept(MediaType.APPLICATION_JSON_UTF8));
 
         result.andExpect(status().isOk());
-
+        result.andExpect(jsonPath("$[0].parent").value(0));
+        result.andExpect(jsonPath("$[0].isParent").value(true));
+        result.andExpect(jsonPath("$[0].level").value(0));
+        result.andExpect(jsonPath("$[0].parentChain").value(""));
+        result.andExpect(jsonPath("$[1].parent").value("TEST_1"));
+        result.andExpect(jsonPath("$[1].isParent").value(false));
+        result.andExpect(jsonPath("$[1].level").value(1));
+        result.andExpect(jsonPath("$[1].parentChain").value("TEST_1"));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -378,6 +391,7 @@ public class CategoryControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void setSubCategoriesSequenceTest() throws Exception {
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -390,6 +404,8 @@ public class CategoryControllerTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryService.create(categoryDTO);
         });
+
+        //adding subCategories
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
         String[] ids = {category.getCategoryId()};
@@ -402,6 +418,7 @@ public class CategoryControllerTest {
         params.put("sourceId", ConversionUtil.toList(categoriesData.get(1).get("externalId").toString()));
         params.put("destinationId", ConversionUtil.toList(categoriesData.get(2).get("externalId").toString()));
 
+        //sequencing
         ResultActions result = mockMvc.perform(
                 put("/pim/categories/TEST_1/subCategories/data")
                         .params(params)
@@ -409,14 +426,78 @@ public class CategoryControllerTest {
                         .accept(MediaType.APPLICATION_JSON_UTF8));
 
         result.andExpect(jsonPath("$.success").value(true));
+
+        Page<Map<String, Object>> subCategories = categoryService.getSubCategories(category.getCategoryId(), FindBy.EXTERNAL_ID, PageRequest.of(0, categoriesData.size(), null), false);
+        List<Map<String, Object>> subCategoriesList = subCategories.getContent();
+        Assert.assertEquals(subCategoriesList.get(0).get("subSequenceNum"), 1);
+        Assert.assertEquals(subCategoriesList.get(1).get("subSequenceNum"), 0);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoryProductsTest() throws Exception {
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+        });
+
+        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryService.create(categoryDTO);
+        });
+
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+
+            Product product = productService.get(productData.get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
+        });
+
+        MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
+        detailParams.put("start", ConversionUtil.toList("0"));
+        detailParams.put("length", ConversionUtil.toList("3"));
+        detailParams.put("draw", ConversionUtil.toList("1"));
+        ResultActions result1 = mockMvc.perform(
+                get("/pim/categories/TEST_1/products/data")
+                        .params(detailParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result1.andExpect(status().isOk());
+        result1.andExpect(jsonPath("$.data.size()").value(3));
+        result1.andExpect(jsonPath("$.draw").value(1));
+        result1.andExpect(jsonPath("$.recordsFiltered").value(3));
+        result1.andExpect(jsonPath("$.recordsTotal").value(3));
     }
 
     @Test
     public void setProductsSequenceTest() throws Exception {
+
+
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -553,22 +634,203 @@ public class CategoryControllerTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void availableProductsTest() throws Exception {
+        //Add  categories instance
+        List<Category> createdCategoryInstances = addCategoryInstances();
+        Assert.assertFalse(createdCategoryInstances.isEmpty());
+
+        //Details mode with valid categoryID
+        String categoryId = createdCategoryInstances.get(0).getCategoryId();
+        mockMvc.perform(
+                get("/pim/categories/" + categoryId + "/products/available"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("product/availableProducts"))
+                .andExpect(forwardedUrl("/product/availableProducts.jsp"));
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableProductsTest() throws Exception {
 
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryService.create(categoryDTO);
+        });
+
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+        });
+
+        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
+
+        MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
+        detailParams.put("start", ConversionUtil.toList("0"));
+        detailParams.put("length", ConversionUtil.toList("4"));
+        detailParams.put("draw", ConversionUtil.toList("1"));
+        ResultActions result = mockMvc.perform(
+                get("/pim/categories/TEST_1/products/available/list")
+                        .params(detailParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.data.size()").value(2));
+        result.andExpect(jsonPath("$.draw").value(1));
+        result.andExpect(jsonPath("$.recordsFiltered").value(2));
+        result.andExpect(jsonPath("$.recordsTotal").value(2));
+
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addProductTest() throws Exception {
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryService.create(categoryDTO);
+        });
+
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+        });
+
+        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        Page<Product> categoryProducts = categoryService.getAvailableProductsForCategory(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 1, null, false);
+
+        MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
+        detailParams.put("id", ConversionUtil.toList("TEST_1"));
+        detailParams.put("productId", ConversionUtil.toList("TEST_PRODUCT_1"));
+        ResultActions result1 = mockMvc.perform(
+                post("/pim/categories/TEST_1/products/TEST_PRODUCT_1")
+                        .params(detailParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+
+        result1.andExpect(status().isOk());
+        result1.andExpect(jsonPath("$.size()").value(1));
+        result1.andExpect(jsonPath("$.success").value(true));
+
+        Page<Product> categoryProducts1 = categoryService.getAvailableProductsForCategory(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 1, null, false);
+        Assert.assertEquals(categoryProducts1.getTotalElements(), categoryProducts.getTotalElements()-1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleProductTest() throws Exception {
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+        });
+
+        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryService.create(categoryDTO);
+        });
+
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+
+            Product product = productService.get(productData.get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
+        });
+
+        MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
+        detailParams.put("id", ConversionUtil.toList("TEST_CATALOG_MAIN"));
+        detailParams.put("rootCategoryId", ConversionUtil.toList("TEST_CATEGORY_1"));
+        detailParams.put("active", ConversionUtil.toList("Y"));
+        ResultActions result = mockMvc.perform(
+                put("/pim/categories/TEST_1/products/TEST_PRODUCT_1/active/Y")
+                        .params(detailParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.size()").value(1));
+        result.andExpect(jsonPath("$.success").value(true));
     }
 
     @After
@@ -576,6 +838,7 @@ public class CategoryControllerTest {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
         familyDAO.getMongoTemplate().dropCollection(Family.class);
+        productDAO.getMongoTemplate().dropCollection(Product.class);
 
     }
 
