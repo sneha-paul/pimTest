@@ -9,7 +9,6 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.api.service.FamilyService;
 import org.javatuples.Pair;
 import org.junit.After;
 import org.junit.Assert;
@@ -159,7 +158,7 @@ public class AttributeCollectionServiceImplTest {
             });
             attributeCollectionDAO.save(attributeCollectionDetails);
 
-            List<Pair<String, String>> result = attributeCollectionService.getAttributeGroupsIdNamePair(attributeCollectionDTO.getCollectionId(),EXTERNAL_ID,null);
+            List<Pair<String, String>> result = attributeCollectionService.getAttributeGroupsIdNamePair(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, null);
             Assert.assertEquals(result.get(0).getValue0(),"DEFAULT_GROUP");
         });
     }
@@ -230,7 +229,7 @@ public class AttributeCollectionServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        Optional<Attribute> result = attributeCollectionService.findAttribute(attributeCollectionDTO.getCollectionId(),FindBy.EXTERNAL_ID, attributeCollectionDTO.getAttributeFullId(attributeOption));
+        Optional<Attribute> result = attributeCollectionService.findAttribute(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attributeCollectionDTO.getAttributeFullId(attributeOption));
         Assert.assertEquals(result.get().getName(), "Test_Attribute");
     }
 
