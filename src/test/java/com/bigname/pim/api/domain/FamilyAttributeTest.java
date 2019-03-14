@@ -96,9 +96,8 @@ public class FamilyAttributeTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
-            Assert.assertTrue(family.isPresent());
-            Assert.assertTrue(family != null);
+            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             //Create Attribute Group
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -119,25 +118,27 @@ public class FamilyAttributeTest {
             familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
             familyAttributeDTO.setAttribute(attribute);
 
-           family.get().addAttribute(familyAttributeDTO);
-           // familyDAO.save(family.get());
+            family.addAttribute(familyAttributeDTO);
+
+            familyDAO.save(family);
+
+            FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
 
             Assert.assertEquals(familyAttributeDTO.getActive(), "Y");
             Assert.assertEquals(familyAttributeDTO.getScopable(), "Y");
             Assert.assertEquals(familyAttributeDTO.getName(), "test");
             Assert.assertEquals(familyAttributeDTO.getCollectionId(), "TEST");
 
-           // Family newFamilyAttribute = familyService.get(familyDTO.getId(), EXTERNAL_ID, false).orElse(null);
-
-          // Assert.assertTrue(ValidationUtil.isNotEmpty(familyAttributeDTO));
-
-            Assert.assertEquals(familyAttributeDTO.getFullId(), familyAttributeDTO.getFullId());
-            Assert.assertEquals(familyAttributeDTO.getCollectionId(), familyAttributeDTO.getCollectionId());
-            Assert.assertEquals(familyAttributeDTO.getAttributeGroup(), familyAttributeDTO.getAttributeGroup());
-            Assert.assertEquals(familyAttributeDTO.getAttribute(), familyAttributeDTO.getAttribute());
-            Assert.assertEquals(familyAttributeDTO.getScope(), familyAttributeDTO.getScope());
-            Assert.assertEquals(familyAttributeDTO.getAttributeId(), familyAttributeDTO.getAttributeId());
-            Assert.assertEquals(familyAttributeDTO.getUiType(), familyAttributeDTO.getUiType());
+            //Equals Checking Family Attribute
+            Assert.assertTrue(ValidationUtil.isNotEmpty(familyAttribute));
+            Assert.assertEquals(familyAttribute.getCollectionId(), familyAttributeDTO.getCollectionId());
+            Assert.assertEquals(familyAttribute.getAttribute(), familyAttributeDTO.getAttribute());
+            Assert.assertEquals(familyAttribute.getScope(), familyAttributeDTO.getScope());
+            Assert.assertEquals(familyAttribute.getAttributeId(), familyAttributeDTO.getAttributeId());
+            Assert.assertEquals(familyAttribute.getUiType(), familyAttributeDTO.getUiType());
+            Assert.assertEquals(familyAttribute.getName(), familyAttributeDTO.getName());
+            Assert.assertEquals(familyAttribute.getActive(), familyAttributeDTO.getActive());
+            Assert.assertEquals(familyAttribute.getScopable(), familyAttributeDTO.getScopable());
 
         });
     }
