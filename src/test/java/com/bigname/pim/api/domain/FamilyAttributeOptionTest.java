@@ -1,7 +1,9 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.ValidatableEntity;
+import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -67,6 +70,7 @@ public class FamilyAttributeOptionTest {
         attributeCollectionDAO.save(attributeCollectionDetails);
 
         attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
         //Create Attribute Option
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -78,7 +82,6 @@ public class FamilyAttributeOptionTest {
         attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
 
         attributeCollectionDAO.save(attributeCollectionDetails);
-
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
@@ -94,9 +97,8 @@ public class FamilyAttributeOptionTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
-            Assert.assertTrue(family.isPresent());
-            Assert.assertTrue(family != null);
+            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             //Create Attribute Group
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -117,13 +119,36 @@ public class FamilyAttributeOptionTest {
             familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
             familyAttributeDTO.setAttribute(attribute);
 
-            family.get().addAttribute(familyAttributeDTO);
-            // familyDAO.save(family.get());
+            family.addAttribute(familyAttributeDTO);
+            FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
 
+            //Create Family Attribute Option
+            List<AttributeOption> attributeOptionList = new ArrayList(attribute.getOptions().values());
+            attributeOptionList.forEach(attributeOption1 -> {
+                FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                familyAttributeOption.setActive("Y");
+                familyAttributeOption.setValue(attributeOption.getValue());
+                familyAttributeOption.setId(attributeOption.getId());
+                familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                family.addAttributeOption(familyAttributeOption, attributeOption);
 
+                familyDAO.save(family);
 
-        });
-    }
+                //Getting Attribute using family service Option and equals checking
+
+               // Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
+                FamilyAttribute result = family.getAllAttributesMap(false).get(attribute.getId());
+                Assert.assertEquals(familyAttributeOption.getActive(), "Y");
+
+                Assert.assertTrue(ValidationUtil.isNotEmpty(result));
+                Assert.assertEquals(result.getId(), familyAttributeOption.getId());
+                Assert.assertEquals(result.getActive(), familyAttributeOption.getActive());
+               /* Assert.assertEquals(result.getContent().get(0).getActive(), familyAttributeOption.getActive());
+                Assert.assertEquals(result.getContent().get(0).getId(), familyAttributeOption.getId());
+                Assert.assertEquals(result.getContent().get(0).getId(), familyAttributeOption.getValue());*/
+            });
+        });}
     @Test
     public void getId() throws Exception {
     }
