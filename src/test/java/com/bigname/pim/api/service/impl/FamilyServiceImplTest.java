@@ -26,10 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -499,17 +496,21 @@ public class FamilyServiceImplTest {
 
             family.addAttribute(familyAttributeDTO);
 
+            FamilyAttribute familyAttribute1 = family.getAllAttributesMap(false).get(attribute.getId());
+
             FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
             familyAttributeOption.setActive("Y");
             familyAttributeOption.setValue(attributeOption.getValue());
             familyAttributeOption.setId(attributeOption.getId());
-            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
+            familyAttributeOption.setFamilyAttributeId(familyAttribute1.getId());
             familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+            family.addAttributeOption(familyAttributeOption, attributeOption);
 
             familyDAO.save(family);
             FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
-            Page<FamilyAttributeOption> result=familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
-           // Assert.assertEquals(result.getSize(), 2);
+            Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
+            Assert.assertEquals(result.getContent().size(), 1);
+            Assert.assertEquals(result.getContent().get(0).getValue(), "TestOption");
         });
     }
 
@@ -581,33 +582,42 @@ public class FamilyServiceImplTest {
 
             family.addAttribute(familyAttributeDTO);
 
+            FamilyAttribute familyAttribute1 = family.getAllAttributesMap(false).get(attribute.getId());
+
             FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
             familyAttributeOption.setActive("Y");
             familyAttributeOption.setValue(attributeOption.getValue());
             familyAttributeOption.setId(attributeOption.getId());
-            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
+            familyAttributeOption.setFamilyAttributeId(familyAttribute1.getId());
             familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+            family.addAttributeOption(familyAttributeOption, attributeOption);
 
             //create variantGroup
             family.setGroup("VARIANT_GROUPS");
             VariantGroup variantGroup = new VariantGroup();
-            variantGroup.setName("Test Variant1");
-            variantGroup.setId("TEST_VARIANT_1");
+            variantGroup.setName(attribute.getName());
+            variantGroup.setId(attribute.getId());
             variantGroup.setLevel(1);
-            variantGroup.setActive("N");
+            variantGroup.setActive("Y");
+            variantGroup.setFamilyId(family.getFamilyId());
+            variantGroup.getVariantAxis().put(1, Arrays.asList(attribute.getId()));
+            variantGroup.getVariantAttributes().put(1, Arrays.asList(attribute.getName()));
+
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
 
             familyDAO.save(family);
-            List<FamilyAttribute> result=familyService.getVariantAxisAttributes(family.getFamilyId(),"TEST_VARIANT_1", FindBy.EXTERNAL_ID, null);
-          //  Assert.assertTrue(ValidationUtil.isNotEmpty(result));
-        //    Assert.assertEquals(result.size(),null);
+         //   FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
+            List<FamilyAttribute> result=familyService.getVariantAxisAttributes(family.getFamilyId(),variantGroup.getId(), FindBy.EXTERNAL_ID, null);
+             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
+             Assert.assertEquals(result.get(0).getName(),attribute.getName());
         });
     }
 
     @Test
     public void getAvailableVariantAxisAttributes() throws Exception {
-        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        //TODO
+    /*    AttributeCollection attributeCollectionDTO = new AttributeCollection();
         attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
         attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
         attributeCollectionDTO.setActive("Y");
@@ -624,6 +634,14 @@ public class FamilyServiceImplTest {
         attribute.setId("TEST_ATTRIBUTE");
         attributeCollectionDetails.addAttribute(attribute);
 
+        Attribute attribute1 = new Attribute();
+        attribute1.setActive("Y");
+        attribute1.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute1.setUiType(Attribute.UIType.DROPDOWN);
+        attribute1.setName("Test_Attribute_1");
+        attribute1.setId("TEST_ATTRIBUTE_1");
+        attributeCollectionDetails.addAttribute(attribute1);
+
         attributeCollectionDAO.save(attributeCollectionDetails);
 
         attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
@@ -636,6 +654,16 @@ public class FamilyServiceImplTest {
         attributeOption.setActive("Y");
         attributeOption.orchestrate();
         attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+
+        Optional<Attribute> attributeDetails1 = attributeCollectionDetails.getAttribute(attribute1.getFullId());
+        AttributeOption attributeOption1 = new AttributeOption();
+        attributeOption1.setCollectionId(attributeCollectionDTO.getCollectionId());
+        attributeOption1.setValue("TestOption1");
+        attributeOption1.setAttributeId(attribute1.getFullId());
+        attributeOption1.setActive("Y");
+        attributeOption1.orchestrate();
+        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption1"), attributeOption1);
+
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
@@ -673,29 +701,35 @@ public class FamilyServiceImplTest {
 
             family.addAttribute(familyAttributeDTO);
 
+            FamilyAttribute familyAttribute1 = family.getAllAttributesMap(false).get(attribute.getId());
+
             FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
             familyAttributeOption.setActive("Y");
             familyAttributeOption.setValue(attributeOption.getValue());
             familyAttributeOption.setId(attributeOption.getId());
-            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
+            familyAttributeOption.setFamilyAttributeId(familyAttribute1.getId());
             familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+            family.addAttributeOption(familyAttributeOption, attributeOption);
 
             //create variantGroup
             family.setGroup("VARIANT_GROUPS");
             VariantGroup variantGroup = new VariantGroup();
-            variantGroup.setName("Test Variant1");
-            variantGroup.setId("TEST_VARIANT_1");
+            variantGroup.setName(attribute.getName());
+            variantGroup.setId(attribute.getId());
             variantGroup.setLevel(1);
-            variantGroup.setActive("N");
+            variantGroup.setActive("Y");
+            variantGroup.setFamilyId(family.getFamilyId());
+            variantGroup.getVariantAxis().put(1, Arrays.asList(attribute.getId()));
+           // variantGroup.getVariantAttributes().put(1, Arrays.asList(attribute.getName()));
+
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
 
             familyDAO.save(family);
-
-            List<FamilyAttribute> result=familyService.getAvailableVariantAxisAttributes(family.getFamilyId(), "TEST_VARIANT_1", FindBy.EXTERNAL_ID, null);
-            //  Assert.assertTrue(ValidationUtil.isNotEmpty(result));
-          //  Assert.assertEquals(result.size(),null);
-        });
+              FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
+            List<FamilyAttribute> result=familyService.getAvailableVariantAxisAttributes(family.getFamilyId(), variantGroup.getId(), FindBy.EXTERNAL_ID, null);
+           Assert.assertEquals(result.size(),0);
+        });*/
     }
 
     @Test

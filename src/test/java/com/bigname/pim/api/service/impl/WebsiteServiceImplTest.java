@@ -379,8 +379,10 @@ public class WebsiteServiceImplTest {
         Website website1 = websiteService.getWebsiteByUrl(websitesData.get(0).get("url").toString()).orElse(null);
         Assert.assertEquals(website1.getUrl(), websitesData.get(0).get("url").toString());
     }
+
     @Test
     public void createEntityTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -395,6 +397,7 @@ public class WebsiteServiceImplTest {
 
             websiteService.create(websiteDTO);
 
+            //Getting website by websiteId
             Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
             Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
@@ -403,6 +406,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void createEntitiesTest(){
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -424,13 +428,14 @@ public class WebsiteServiceImplTest {
         }).collect(Collectors.toList());
 
         websiteService.create(websiteDTOs);
-
+        //Getting websites
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websiteDTOs.size()), false).getTotalElements(), websitesData.size());
 
     }
 
     @Test
     public void toggleTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
@@ -443,10 +448,12 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        //Getting website
         Website websiteDetails = websiteService.get(websitesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(websiteDetails != null);
-        websiteService.toggle(websiteDetails.getWebsiteId(), EXTERNAL_ID, Toggle.get(websiteDetails.getActive()));
 
+        //toggle
+        websiteService.toggle(websiteDetails.getWebsiteId(), EXTERNAL_ID, Toggle.get(websiteDetails.getActive()));
         Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(updatedWebsite != null);
         Map<String, Object> diff = websiteDetails.diff(updatedWebsite);
@@ -456,6 +463,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test1.com", "active", "Y"));
@@ -468,6 +476,7 @@ public class WebsiteServiceImplTest {
             websiteDTO.setUrl((String) websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
 
+            //Getting website
             Website websiteDetails = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(websiteDetails != null);
             Map<String, Object> diff = websiteDTO.diff(websiteDetails);
@@ -477,6 +486,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllAsPageTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -497,12 +507,14 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        //Getting websites as Page
         Page<Website> paginatedResult = websiteService.getAll(0, 10, null,false);
         Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
     }
 
     @Test
     public void getAllAsListTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -523,6 +535,7 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        // sorting : ascending
         List<Website> result = websiteService.getAll(Sort.by("websiteName").ascending(), false);
         String[] actual = result.stream().map(website -> website.getWebsiteName()).collect(Collectors.toList()).toArray(new String[0]);
         String[] expected = websitesData.stream().map(websiteData -> (String)websiteData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
@@ -530,8 +543,8 @@ public class WebsiteServiceImplTest {
 
         websiteDAO.getMongoTemplate().dropCollection(Website.class);
 
-        // sorting : Descending
 
+        //creating website
         websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -552,6 +565,7 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        // sorting : Descending
         result = websiteService.getAll(Sort.by("websiteName").descending(), false);
         actual = result.stream().map(website -> website.getWebsiteName()).collect(Collectors.toList()).toArray(new String[0]);
         expected = websitesData.stream().map(websiteData -> (String)websiteData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
@@ -560,6 +574,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithIdsAsPageTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -581,7 +596,7 @@ public class WebsiteServiceImplTest {
         });
 
         String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
-
+        //Getting websites by ids
         Page<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
         Map<String, Website> websitesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
@@ -589,6 +604,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithIdsAsListTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -610,7 +626,7 @@ public class WebsiteServiceImplTest {
         });
 
         String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
-
+        //Getting websites by ids
         List<Website> paginatedResult = websiteService.getAll(ids, EXTERNAL_ID, null, false);
         Map<String, Website> websitesMap = paginatedResult.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
@@ -618,6 +634,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsPageTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -639,7 +656,7 @@ public class WebsiteServiceImplTest {
         });
 
         String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
-
+        //Getting websites with exclude Ids
         Page<Website> paginatedResult = websiteService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
         Map<String, Website> websitesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
@@ -647,6 +664,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsListTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -668,7 +686,7 @@ public class WebsiteServiceImplTest {
         });
 
         String[] ids = {websitesData.get(0).get("externalId").toString(), websitesData.get(1).get("externalId").toString(), websitesData.get(2).get("externalId").toString()};
-
+        //Getting websites with exclude Ids
         List<Website> paginatedResult = websiteService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
         Map<String, Website> websitesMap = paginatedResult.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
@@ -676,6 +694,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAllAtSearchTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -695,13 +714,14 @@ public class WebsiteServiceImplTest {
             websiteDTO.setUrl((String) websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
         });
-
+        //Getting websites by searchField
         Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websitesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), 9);
     }
 
     @Test
     public void findAllTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -722,12 +742,14 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        //Getting websites
         Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websitesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), 9);
     }
 
     @Test
     public void updateEntityTest() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
@@ -741,11 +763,13 @@ public class WebsiteServiceImplTest {
 
             Website websiteDetails = websiteService.get(websitesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDetails));
+
+           //updating website
             websiteDetails.setUrl("https://www.test11.com");
             websiteDetails.setGroup("DETAILS");
 
             websiteService.update(websiteDetails.getWebsiteId(), EXTERNAL_ID, websiteDetails);
-
+            //Getting updated website
             Website updatedWebsite = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(updatedWebsite));
             Map<String, Object> diff = websiteDTO.diff(updatedWebsite);
@@ -757,6 +781,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void updateEntitiesTest(){
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -783,13 +808,14 @@ public class WebsiteServiceImplTest {
         Map<String, Website> websitesMap = result.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
 
+        //updating websites
         List<Website> websites = result.stream().map(result1 -> {
             result1.setActive("N");
             return result1;
         }).collect(Collectors.toList());
-
         websiteService.update(websites);
 
+        //Getting updated websites
         result = websiteService.getAll(Sort.by("websiteName").descending(), true);
         websitesMap = result.stream().collect(Collectors.toMap(website -> website.getWebsiteId(), website -> website));
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
@@ -798,6 +824,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void cloneInstance() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
@@ -809,10 +836,11 @@ public class WebsiteServiceImplTest {
             websiteDTO.setUrl((String) websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
 
+            //Getting website
             Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
             Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
-
+            //cloning website instance
             Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
             Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
         });
@@ -820,6 +848,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAll() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -839,13 +868,14 @@ public class WebsiteServiceImplTest {
             websiteDTO.setUrl((String) websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
         });
-
+        //Getting websites
         List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"));
         Assert.assertTrue(result.size() == 2);
     }
 
     @Test
     public void findAll1() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -865,7 +895,7 @@ public class WebsiteServiceImplTest {
             websiteDTO.setUrl((String) websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
         });
-
+        //Getting websites
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Website> result = websiteService.findAll(criteria);
         Assert.assertTrue(result.size() == 2);
@@ -873,6 +903,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findOne() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -892,13 +923,14 @@ public class WebsiteServiceImplTest {
             websiteDTO.setUrl((String) websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
         });
-
+        //Getting website
         Optional<Website> result = websiteService.findOne(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }
 
     @Test
     public void findOne1() {
+        //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -919,6 +951,7 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        //Getting website
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
         Optional<Website> result = websiteService.findOne(criteria);
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
