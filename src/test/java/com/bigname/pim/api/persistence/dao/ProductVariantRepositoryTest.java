@@ -8,6 +8,7 @@ import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.AttributeCollectionService;
+import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.util.PimUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -16,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -52,6 +54,9 @@ public class ProductVariantRepositoryTest {
 
     @Autowired
     private AttributeCollectionService attributeCollectionService;
+
+    @Autowired
+    private FamilyService familyService;
 
     @Before
     public void setUp() {
@@ -93,7 +98,7 @@ public class ProductVariantRepositoryTest {
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
 
         List<Map<String, Object>> attributesData = new ArrayList<>();
-        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "COLOR", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
         attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
         attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
         attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
@@ -219,14 +224,40 @@ public class ProductVariantRepositoryTest {
         //create productVariantInstance
         Product newProduct = productDAO.findById(product.getProductId(), FindBy.EXTERNAL_ID).orElse(null);
 
-        ProductVariant productVariantDTO = new ProductVariant();
+        Page<FamilyAttributeOption> familyAttributeOptions = familyService.getFamilyAttributeOptions(familyDetails.getFamilyId(),FindBy.EXTERNAL_ID, attributeDetails.getId(), 0, 2, null);
+
+        List<FamilyAttribute> variantAxisAttributes = familyService.getVariantAxisAttributes(familyDetails.getFamilyId(),attributeDetails.getId().toUpperCase(), FindBy.EXTERNAL_ID, null);
+        Map<String, String> axisAttributes = variantAxisAttributes.get(0).getOptions().values().iterator().next().toMap();
+        ProductVariant productVariant = new ProductVariant(newProduct);
+        productVariant.setProductVariantId(familyAttributeOptions.getContent().get(0).getId());
+        productVariant.setChannelId(channel.getChannelId());
+        productVariant.setActive("Y");
+        productVariant.setAxisAttributes(axisAttributes);
+        productVariant.setLevel(1);
+        productVariant.setProductVariantName(newProduct.getProductName() + " - " + familyAttributeOptions.getContent().get(0).getId().toString());
+        ProductVariant productVariantDTO = productVariantDAO.insert(productVariant);
+        Assert.assertTrue(productVariantDTO.diff(productVariant).isEmpty());
+
+
+        /*ProductVariant productVariantDTO = new ProductVariant();
         productVariantDTO.setProductVariantName("Test1");
         productVariantDTO.setProductVariantId("TEST1");
         productVariantDTO.setProductId(newProduct.getId());
         productVariantDTO.setActive("Y");
         productVariantDTO.setChannelId(channel.getChannelId());
         ProductVariant productVariant = productVariantDAO.insert(productVariantDTO);
-        Assert.assertTrue(productVariant.diff(productVariantDTO).isEmpty());
+        Assert.assertTrue(productVariant.diff(productVariantDTO).isEmpty());*/
+
+        /*productVariant = new ProductVariant(product);
+        productVariant.setProductVariantId(variantId);
+        productVariant.setChannelId(channelId);
+        productVariant.setActive("Y");
+        productVariant.setAxisAttributes(axisAttributes);
+        newProductVariants.put(variantId, productVariant);
+
+                    productVariant.setLevel(1); //TODO - change for multi level variants support
+                    productVariant.setProductVariantName(product.getProductName() + " - " + tempName.toString());
+    setVariantAttributeValues(product, productVariant, variantAttributesMap);*/
 
     }
 
