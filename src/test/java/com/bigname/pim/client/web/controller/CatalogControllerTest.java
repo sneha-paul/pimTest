@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -353,6 +352,11 @@ public class CatalogControllerTest {
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 3", "externalId", "TEST_CATEGORY_3", "description", "Test description 3", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 4", "externalId", "TEST_CATEGORY_4", "description", "Test description 4", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 5", "externalId", "TEST_CATEGORY_5", "description", "Test description 5", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 6", "externalId", "TEST_CATEGORY_6", "description", "Test description 6", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 7", "externalId", "TEST_CATEGORY_7", "description", "Test description 7", "active", "Y"));
 
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
@@ -361,22 +365,26 @@ public class CatalogControllerTest {
             categoryDTO.setActive((String)categoryData.get("active"));
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryService.create(categoryDTO);
+        });
 
-            Category category = categoryService.get((String)categoryData.get("externalId"), FindBy.EXTERNAL_ID,false).orElse(null);
 
+        List<Category> categoryList = categoryService.getAll(null, false);
+        int count[] = {1};
+        categoryList.forEach(rootCategoryData -> {
             RootCategory rootCategory = new RootCategory();
             rootCategory.setCatalogId(catalog.getId());
-            rootCategory.setRootCategoryId(category.getId());
-            rootCategory.setSequenceNum(0);
+            rootCategory.setRootCategoryId(rootCategoryData.getId());
+            rootCategory.setSequenceNum(count[0]);
             rootCategory.setSubSequenceNum(0);
-            rootCategory.setActive(category.getActive());
+            rootCategory.setActive(rootCategoryData.getActive());
             rootCategoryDAO.insert(rootCategory);
+            count[0] ++;
         });
 
         //getting sequencing
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.put("sourceId", ConversionUtil.toList(categoriesData.get(0).get("externalId").toString()));
-        params.put("destinationId", ConversionUtil.toList(categoriesData.get(1).get("externalId").toString()));
+        params.put("sourceId", ConversionUtil.toList(categoriesData.get(1).get("externalId").toString()));
+        params.put("destinationId", ConversionUtil.toList(categoriesData.get(0).get("externalId").toString()));
 
         ResultActions result = mockMvc.perform(
                 put("/pim/catalogs/TEST_CATALOG_MAIN/rootCategories/data")
@@ -387,8 +395,12 @@ public class CatalogControllerTest {
         result.andExpect(jsonPath("$.success").value(true));
 
         List<RootCategory> rootCategoryList = catalogService.getAllRootCategories(catalog.getId());
-        Assert.assertEquals(rootCategoryList.get(0).getSubSequenceNum(), 1);
-        Assert.assertEquals(rootCategoryList.get(1).getSubSequenceNum(), 0);
+        Assert.assertEquals(rootCategoryList.get(0).getSequenceNum(), 1);
+        Assert.assertEquals(rootCategoryList.get(0).getSubSequenceNum(), 0);
+
+        Assert.assertEquals(rootCategoryList.get(1).getSequenceNum(), 1);
+        Assert.assertEquals(rootCategoryList.get(1).getSubSequenceNum(), 1);
+
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -572,9 +584,12 @@ public class CatalogControllerTest {
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
-        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y", "parent", "0", "isParent", true, "level", "0", "parentChain", ""));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", false,"level", "1", "parentChain", "TEST_CATEGORY_1"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 3", "externalId", "TEST_CATEGORY_3", "description", "Test description 3", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", false,"level", "1", "parentChain", "TEST_CATEGORY_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y", "parent", "0", "isParent", "true", "level", "0", "parentChain", ""));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", "true", "level", "1", "parentChain", "TEST_CATEGORY_1"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 3", "externalId", "TEST_CATEGORY_3", "description", "Test description 3", "active", "Y", "parent", "TEST_CATEGORY_2", "isParent", "true", "level", "2", "parentChain", "TEST_CATEGORY_1|TEST_CATEGORY_2"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 4", "externalId", "TEST_CATEGORY_4", "description", "Test description 4", "active", "Y", "parent", "TEST_CATEGORY_3", "isParent", "true", "level", "3", "parentChain", "TEST_CATEGORY_1|TEST_CATEGORY_2|TEST_CATEGORY_3"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 5", "externalId", "TEST_CATEGORY_5", "description", "Test description 5", "active", "Y", "parent", "TEST_CATEGORY_4", "isParent", "false", "level", "4", "parentChain", "TEST_CATEGORY_1|TEST_CATEGORY_2|TEST_CATEGORY_3|TEST_CATEGORY_4"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 6", "externalId", "TEST_CATEGORY_6", "description", "Test description 6", "active", "Y", "parent", "TEST_CATEGORY_3", "isParent", "false", "level", "3", "parentChain", "TEST_CATEGORY_1|TEST_CATEGORY_2|TEST_CATEGORY_3"));
 
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
@@ -589,16 +604,15 @@ public class CatalogControllerTest {
 
         catalogService.addRootCategory(catalog.getExternalId(), FindBy.EXTERNAL_ID, category.getExternalId(), FindBy.EXTERNAL_ID);
 
-
-        String[] ids = {category.getCategoryId()};
-
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
-
-        categories.forEach(relatedCategory -> categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID));
+        categoryService.addSubCategory(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        categoryService.addSubCategory(categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        categoryService.addSubCategory(categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        categoryService.addSubCategory(categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(5).get("externalId").toString(), FindBy.EXTERNAL_ID);
 
         MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
         detailsParams.put("start", ConversionUtil.toList("0"));
-        detailsParams.put("length", ConversionUtil.toList("4"));
+        detailsParams.put("length", ConversionUtil.toList("6"));
         detailsParams.put("draw", ConversionUtil.toList("1"));
         ResultActions result = mockMvc.perform(
                 get("/pim/catalogs/TEST_CATALOG_MAIN/hierarchy")
@@ -608,13 +622,34 @@ public class CatalogControllerTest {
 
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$[0].parent").value(0));
-        result.andExpect(jsonPath("$[0].isParent").value(true));
+        result.andExpect(jsonPath("$[0].isParent").value("true"));
         result.andExpect(jsonPath("$[0].level").value(0));
         result.andExpect(jsonPath("$[0].parentChain").value(""));
+
         result.andExpect(jsonPath("$[1].parent").value("TEST_CATEGORY_1"));
-        result.andExpect(jsonPath("$[1].isParent").value(false));
+        result.andExpect(jsonPath("$[1].isParent").value("true"));
         result.andExpect(jsonPath("$[1].level").value(1));
         result.andExpect(jsonPath("$[1].parentChain").value("TEST_CATEGORY_1"));
+
+        result.andExpect(jsonPath("$[2].parent").value("TEST_CATEGORY_2"));
+        result.andExpect(jsonPath("$[2].isParent").value("true"));
+        result.andExpect(jsonPath("$[2].level").value(2));
+        result.andExpect(jsonPath("$[2].parentChain").value("TEST_CATEGORY_1|TEST_CATEGORY_2"));
+
+        result.andExpect(jsonPath("$[3].parent").value("TEST_CATEGORY_3"));
+        result.andExpect(jsonPath("$[3].isParent").value("false"));
+        result.andExpect(jsonPath("$[3].level").value(3));
+        result.andExpect(jsonPath("$[3].parentChain").value("TEST_CATEGORY_1|TEST_CATEGORY_2|TEST_CATEGORY_3"));
+
+        result.andExpect(jsonPath("$[4].parent").value("TEST_CATEGORY_3"));
+        result.andExpect(jsonPath("$[4].isParent").value("true"));
+        result.andExpect(jsonPath("$[4].level").value(3));
+        result.andExpect(jsonPath("$[4].parentChain").value("TEST_CATEGORY_1|TEST_CATEGORY_2|TEST_CATEGORY_3"));
+
+        result.andExpect(jsonPath("$[5].parent").value("TEST_CATEGORY_4"));
+        result.andExpect(jsonPath("$[5].isParent").value("false"));
+        result.andExpect(jsonPath("$[5].level").value(4));
+        result.andExpect(jsonPath("$[5].parentChain").value("TEST_CATEGORY_1|TEST_CATEGORY_2|TEST_CATEGORY_3|TEST_CATEGORY_4"));
 
     }
 
