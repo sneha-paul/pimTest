@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.common.util.CollectionsUtil;
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
@@ -45,18 +46,18 @@ public class FamilyAttributeGroupTest {
     }
     @Test
     public void accessorsTest(){
-    //Create Attribute collection
-    AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        //Create Attribute collection
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
         attributeCollectionDTO.setCollectionName("Test");
         attributeCollectionDTO.setCollectionId("TEST");
         attributeCollectionDTO.setActive("Y");
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-    AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
-    //Create attribute
-    Attribute attribute = new Attribute();
+        //Create attribute
+        Attribute attribute = new Attribute();
         attribute.setActive("Y");
         attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
         attribute.setUiType(Attribute.UIType.DROPDOWN);
@@ -66,11 +67,11 @@ public class FamilyAttributeGroupTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-    attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
-    //Create Attribute Option
-   /* Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
-    AttributeOption attributeOption = new AttributeOption();
+        //Create Attribute Option
+        Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
+        AttributeOption attributeOption = new AttributeOption();
         attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
         attributeOption.setValue("TestOption");
         attributeOption.setAttributeId(attribute.getFullId());
@@ -78,9 +79,9 @@ public class FamilyAttributeGroupTest {
         attributeOption.orchestrate();
         attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
 
-        attributeCollectionDAO.save(attributeCollectionDetails);*/
+        attributeCollectionDAO.save(attributeCollectionDetails);
 
-    List<Map<String, Object>> familiesData = new ArrayList<>();
+        List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
@@ -94,9 +95,17 @@ public class FamilyAttributeGroupTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
-            Assert.assertTrue(family.isPresent());
-            Assert.assertTrue(family != null);
+            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            //Create Attribute Group
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setFullId("DEFAULT_GROUP");
+           // familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
 
             //Create the new familyAttribute instance
             FamilyAttribute familyAttributeDTO = new FamilyAttribute(attribute.getName(), null);
@@ -107,25 +116,20 @@ public class FamilyAttributeGroupTest {
             familyAttributeDTO.setScopable("Y");
             familyAttributeDTO.setAttributeId(attribute.getFullId());
             familyAttributeDTO.getScope().put("ECOMMERCE", FamilyAttribute.Scope.OPTIONAL);
-           // familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+            familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
             familyAttributeDTO.setAttribute(attribute);
 
-           // family.get().addAttribute(familyAttributeDTO);
-            // familyDAO.save(family.get());
+            family.addAttribute(familyAttributeDTO);
+            familyDAO.save(family);
 
-            //Create Attribute Group
-            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
-            familyAttributeGroup.setActive("Y");
-            familyAttributeGroup.setMasterGroup("Y");
-            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
-            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+            //Getting Attribute group and equals checking
+            FamilyAttributeGroup familyAttributeGroup1 = family.getAllAttributesMap(false).get(attribute.getId()).getAttributeGroup();
 
             Assert.assertEquals(familyAttributeGroup.getActive(), "Y");
             Assert.assertEquals(familyAttributeGroup.getMasterGroup(), "Y");
 
-            Assert.assertEquals(familyAttributeGroup.getFullId(), familyAttributeGroup.getFullId());
-            Assert.assertEquals(familyAttributeGroup.getName(), familyAttributeGroup.getName());
-
+            Assert.assertTrue(ValidationUtil.isNotEmpty(familyAttributeGroup1));
+            Assert.assertEquals(familyAttributeGroup1.getFullId(), familyAttributeGroup.getFullId());
 
         });
         }
