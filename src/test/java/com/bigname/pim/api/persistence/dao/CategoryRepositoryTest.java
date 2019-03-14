@@ -5,7 +5,7 @@ import com.bigname.common.util.ConversionUtil;
 import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.Category;
+import com.bigname.pim.api.domain.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,11 +35,24 @@ import java.util.Optional;
 @ContextConfiguration(classes={PimApplication.class})
 public class CategoryRepositoryTest {
     @Autowired
-    CategoryDAO categoryDAO;
+    private  CategoryDAO categoryDAO;
+    @Autowired
+    private RelatedCategoryDAO relatedCategoryDAO;
+    @Autowired
+    private FamilyDAO familyDAO;
+    @Autowired
+    private ProductDAO productDAO;
+    @Autowired
+    private CategoryProductDAO categoryProductDAO;
+
 
     @Before
     public void setUp() {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        relatedCategoryDAO.deleteAll();
+        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        productDAO.getMongoTemplate().dropCollection(Product.class);
+        categoryProductDAO.deleteAll();
     }
 
     @Test
@@ -247,8 +261,357 @@ public class CategoryRepositoryTest {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
     }
 
+    @Test
+    public void getSubCategoriesTest() throws Exception {
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Category4", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Category5", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        categoriesData.stream().skip(1).forEach(categoryData -> {
+            Category category1 = categoryDAO.findById(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            RelatedCategory relatedCategory = new RelatedCategory();
+            relatedCategory.setCategoryId(category.getId());
+            relatedCategory.setSubCategoryId(category1.getId());
+            relatedCategory.setActive("Y");
+            relatedCategoryDAO.insert(relatedCategory);
+        });
+
+        Page<Map<String, Object>> subCategoriesMap = categoryDAO.getSubCategories(category.getId(), PageRequest.of(0, categoriesData.size(), null));
+        Assert.assertEquals(subCategoriesMap.getTotalElements(), categoriesData.size() - 1); //TODO pagination
+    }
+
+    @Test
+    public void getAllSubCategoriesTest() throws Exception {
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Category4", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Category5", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        categoriesData.stream().skip(1).forEach(categoryData -> {
+            Category category1 = categoryDAO.findById(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            RelatedCategory relatedCategory = new RelatedCategory();
+            relatedCategory.setCategoryId(category.getId());
+            relatedCategory.setSubCategoryId(category1.getId());
+            relatedCategory.setActive("Y");
+            relatedCategoryDAO.insert(relatedCategory);
+        });
+
+        boolean[] activeRequired = {false};
+
+        List<RelatedCategory> subCategoryList = categoryDAO.getAllSubCategories(category.getId(), activeRequired);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(subCategoryList));
+    }
+
+    @Test
+    public void findAvailableSubCategoriesForCategory() throws Exception {
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category1 = categoryDAO.findById(categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        RelatedCategory relatedCategory = new RelatedCategory();
+        relatedCategory.setCategoryId(category.getId());
+        relatedCategory.setSubCategoryId(category1.getId());
+        relatedCategory.setActive("Y");
+        relatedCategoryDAO.insert(relatedCategory);
+
+        Page<Category> availableCategoriesPage = categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), "categoryName", "Test", PageRequest.of(0, categoriesData.size() - 2), false);
+        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1); //TODO pagination
+    }
+
+    @Test
+    public void findAllSubCategoriesTest() throws Exception {
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Test Category4", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Test Category5", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        categoriesData.stream().skip(1).forEach(categoryData -> {
+            Category category1 = categoryDAO.findById(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            RelatedCategory relatedCategory = new RelatedCategory();
+            relatedCategory.setCategoryId(category.getId());
+            relatedCategory.setSubCategoryId(category1.getId());
+            relatedCategory.setActive("Y");
+            relatedCategoryDAO.insert(relatedCategory);
+        });
+
+        boolean[] activeRequired = {false};
+
+        Page<Map<String, Object>> relatedCategories =  categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size() - 1,null), activeRequired);
+        Assert.assertEquals(relatedCategories.getSize(), categoriesData.size() - 1);//TODO pagination
+    }
+
+    @Test
+    public void getProductsTest() throws Exception {
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDAO.insert(familyDTO);
+        });
+
+        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productDAO.insert(productDTO);
+
+            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+            CategoryProduct categoryProduct = new CategoryProduct();
+            categoryProduct.setCategoryId(category.getId());
+            categoryProduct.setProductId(product.getId());
+            categoryProduct.setSequenceNum(0);
+            categoryProduct.setSubSequenceNum(0);
+            categoryProduct.setActive(product.getActive());
+            categoryProductDAO.insert(categoryProduct);
+        });
+        Page<Map<String, Object>> categoryProductMap = categoryDAO.getProducts(category.getId(), PageRequest.of(0, productsData.size(), null));
+        Assert.assertEquals(categoryProductMap.getSize(), productsData.size()); //TODO pagination
+    }
+
+    @Test
+    public void findAllCategoryProductsTest() throws Exception {
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDAO.insert(familyDTO);
+        });
+
+        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productDAO.insert(productDTO);
+
+            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+            CategoryProduct categoryProduct = new CategoryProduct();
+            categoryProduct.setCategoryId(category.getId());
+            categoryProduct.setProductId(product.getId());
+            categoryProduct.setSequenceNum(0);
+            categoryProduct.setSubSequenceNum(0);
+            categoryProduct.setActive(product.getActive());
+            categoryProductDAO.insert(categoryProduct);
+        });
+        boolean[] activeRequired = {false};
+
+        Page<Map<String, Object>> categoryProductMap = categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size(),null), activeRequired);
+        Assert.assertEquals(categoryProductMap.getSize(), productsData.size()); //TODO pagination
+    }
+
+    @Test
+    public void getAllCategoryProductsTest() throws Exception {
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDAO.insert(familyDTO);
+        });
+
+        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productDAO.insert(productDTO);
+
+            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+            CategoryProduct categoryProduct = new CategoryProduct();
+            categoryProduct.setCategoryId(category.getId());
+            categoryProduct.setProductId(product.getId());
+            categoryProduct.setSequenceNum(0);
+            categoryProduct.setSubSequenceNum(0);
+            categoryProduct.setActive(product.getActive());
+            categoryProductDAO.insert(categoryProduct);
+        });
+
+        List<CategoryProduct> categoryProductsList = categoryDAO.getAllCategoryProducts(category.getId());
+        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryProductsList));
+    }
+
+    @Test
+    public void findAvailableProductsForCategoryTest() throws Exception {
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDAO.insert(familyDTO);
+        });
+
+        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> categoriesData = new ArrayList<>();
+        categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
+        categoriesData.forEach(categoryData -> {
+            Category categoryDTO = new Category();
+            categoryDTO.setCategoryName((String)categoryData.get("name"));
+            categoryDTO.setCategoryId((String)categoryData.get("externalId"));
+            categoryDTO.setActive((String)categoryData.get("active"));
+            categoryDTO.setDescription((String)categoryData.get("description"));
+            categoryDAO.insert(categoryDTO);
+        });
+
+        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Test Product 3", "externalId", "TEST_PRODUCT_3", "productFamilyId", family1.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productDAO.insert(productDTO);
+        });
+
+        Product product = productDAO.findById(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+
+        CategoryProduct categoryProduct = new CategoryProduct();
+        categoryProduct.setCategoryId(category.getId());
+        categoryProduct.setProductId(product.getId());
+        categoryProduct.setSequenceNum(0);
+        categoryProduct.setSubSequenceNum(0);
+        categoryProduct.setActive(product.getActive());
+        categoryProductDAO.insert(categoryProduct);
+
+        Page<Product> availableProducts = categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(0, productsData.size() - 1), false);
+        Assert.assertEquals(availableProducts.getContent().size(), 2); //TODO pagination
+    }
+
     @After
     public void tearDown() {
         categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        relatedCategoryDAO.deleteAll();
+        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        productDAO.getMongoTemplate().dropCollection(Product.class);
+        categoryProductDAO.deleteAll();
     }
 }
