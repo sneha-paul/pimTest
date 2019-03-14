@@ -277,7 +277,13 @@ public class WebsiteRepositoryTest {
 
         //Getting websiteCatalogs
         Page<Map<String, Object>> websiteCatalogMap = websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size(), null));
-        Assert.assertEquals(websiteCatalogMap.getSize(), catalogsData.size()); //TODO pagination
+        Assert.assertEquals(websiteCatalogMap.getSize(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size(), null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(1, 1, null)).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -322,7 +328,13 @@ public class WebsiteRepositoryTest {
 
         //Getting websiteCatalogs with search elements
         Page<Map<String, Object>> websiteCatalog =  websiteDAO.findAllWebsiteCatalogs(website.getId(), "catalogName", "test", PageRequest.of(0, catalogsData.size(), null),false);
-        Assert.assertEquals(websiteCatalog.getSize(),catalogsData.size()); //TODO pagination
+        Assert.assertEquals(websiteCatalog.getSize(),catalogsData.size());
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size(), null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1, null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(), "catalogName", "test", PageRequest.of(1, 1, null)).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -404,7 +416,14 @@ public class WebsiteRepositoryTest {
         });
 
         Page<Catalog> catalogPage = websiteDAO.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(),"catalogName","Test", PageRequest.of(0, catalogsData.size()),false);
-        Assert.assertEquals(catalogPage.getContent().size(), 4); //TODO pagination
+        Assert.assertEquals(catalogPage.getContent().size(), 4);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()), false).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getContent().size(), catalogsData.size()-1 );
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(), "catalogName", "test", PageRequest.of(1, 1), false).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1), false).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 2);
+
 
         //Creating websiteCatalogs
         Catalog catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
@@ -418,7 +437,13 @@ public class WebsiteRepositoryTest {
 
         //Getting available catalogs
         Page<Catalog> availableCatalogPage = websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false);
-        Assert.assertEquals(availableCatalogPage.getContent().size(), 3); //TODO pagination
+        Assert.assertEquals(availableCatalogPage.getContent().size(), 3);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()), false).getTotalElements(), catalogsData.size()-1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getTotalElements(), catalogsData.size()-1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getContent().size(), catalogsData.size() - 1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(), "catalogName", "test", PageRequest.of(1, 1), false).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1), false).getContent().size(), 0);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 1);
 
     }
 

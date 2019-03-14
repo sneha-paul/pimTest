@@ -268,7 +268,7 @@ public class CatalogRepositoryTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryDAO.insert(categoryDTO);
 
-            Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Category category = categoryDAO.findById(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
 
 
             RootCategory rootCategory = new RootCategory();
@@ -281,7 +281,13 @@ public class CatalogRepositoryTest {
         });
 
         Page<Map<String, Object>> rootCategoriesMap = catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(0, categoriesData.size(), null));
-        Assert.assertEquals(rootCategoriesMap.getSize(), categoriesData.size()); //TODO pagination
+        Assert.assertEquals(rootCategoriesMap.getSize(), categoriesData.size());
+        Assert.assertEquals(catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(0, categoriesData.size(), null)).getTotalElements(), categoriesData.size());
+        Assert.assertEquals(catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(0, categoriesData.size()-1, null)).getTotalElements(), categoriesData.size());
+        Assert.assertEquals(catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(0, categoriesData.size()-1, null)).getContent().size(), categoriesData.size() - 1);
+        Assert.assertEquals(catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(1, 1, null)).getContent().size(), 1);
+        Assert.assertEquals(catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(1, categoriesData.size()-1, null)).getContent().size(), 1);
+        Assert.assertEquals(catalogDAO.getRootCategories(catalog.getId(), PageRequest.of(0, categoriesData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -326,7 +332,13 @@ public class CatalogRepositoryTest {
         boolean[] activeRequired = {false};
 
         Page<Map<String, Object>> rootCategories =  catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size(),null), activeRequired);
-        Assert.assertEquals(rootCategories.getSize(),categoriesData.size());//TODO pagination
+        Assert.assertEquals(rootCategories.getSize(),categoriesData.size());
+        Assert.assertEquals(catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size(),null), activeRequired).getTotalElements(), categoriesData.size());
+        Assert.assertEquals(catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-1,null), activeRequired).getTotalElements(), categoriesData.size());
+        Assert.assertEquals(catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-1,null), activeRequired).getContent().size(), categoriesData.size() - 1);
+        Assert.assertEquals(catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(1, 1, null), activeRequired).getContent().size(), 1);
+        Assert.assertEquals(catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(1,categoriesData.size()-1,null), activeRequired).getContent().size(), 1);
+        Assert.assertEquals(catalogDAO.findAllRootCategories(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-1,null), activeRequired).getTotalPages(), 2);
     }
 
     @Test
@@ -413,7 +425,13 @@ public class CatalogRepositoryTest {
         rootCategoryDAO.insert(rootCategory);
 
         Page<Category> availableCategoriesPage = catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(0, categoriesData.size() - 1), false);
-        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1); //TODO pagination
+        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1);
+        Assert.assertEquals(catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-1), false).getTotalElements(), categoriesData.size()-1);
+        Assert.assertEquals(catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-1), false).getTotalElements(), categoriesData.size()-1);
+        Assert.assertEquals(catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-1), false).getContent().size(), categoriesData.size() - 1);
+        Assert.assertEquals(catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(1, 1), false).getContent().size(), 0);
+        Assert.assertEquals(catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(1,categoriesData.size()-1), false).getContent().size(), 0);
+        Assert.assertEquals(catalogDAO.findAvailableRootCategoriesForCatalog(catalog.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-1), false).getTotalPages(), 1);
     }
 
     @After
