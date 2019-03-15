@@ -9,7 +9,10 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
+import com.bigname.pim.data.loader.ProductLoader1;
 import com.bigname.pim.util.PimUtil;
+import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -237,33 +240,25 @@ public class ProductVariantRepositoryTest {
             axisAttributes.put(variantAxisAttributes.get(0).getId(), k);
             productVariant.setAxisAttributes(axisAttributes);
             productVariant.setLevel(1);
-            productVariant.setProductVariantName(newProduct.getProductName() + " - " + familyAttributeOptions.getContent().get(0).getId().toString());
+            productVariant.setProductVariantName(newProduct.getProductName() + " - " + k);
+
+            Page<VariantGroup> variantGroups = familyService.getVariantGroups(familyDetails.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+
+            Map<Integer, List<String>> variantAttributesMap = variantGroups.getContent().get(0).getVariantAttributes();
+            //String variantGroupId = newProduct.getProductFamily().getChannelVariantGroups().get(channel.getChannelId());
+           // VariantGroup variantGroup = newProduct.getProductFamily().getVariantGroups().get();
+            List<String> variantAttributeIds = variantGroups.getContent().get(0).getVariantAttributes().get(productVariant.getLevel());
+            variantAttributeIds.forEach(attributeId -> {
+                if(variantAttributesMap.containsKey(attributeId)) {
+                    productVariant.getVariantAttributes().put(attributeId, variantAttributesMap.get(attributeId));
+                }
+            });
             ProductVariant productVariantDTO = productVariantDAO.insert(productVariant);
         });
-
 
        // Assert.assertTrue(productVariantDTO.diff(productVariant).isEmpty());
 
 
-        /*ProductVariant productVariantDTO = new ProductVariant();
-        productVariantDTO.setProductVariantName("Test1");
-        productVariantDTO.setProductVariantId("TEST1");
-        productVariantDTO.setProductId(newProduct.getId());
-        productVariantDTO.setActive("Y");
-        productVariantDTO.setChannelId(channel.getChannelId());
-        ProductVariant productVariant = productVariantDAO.insert(productVariantDTO);
-        Assert.assertTrue(productVariant.diff(productVariantDTO).isEmpty());*/
-
-        /*productVariant = new ProductVariant(product);
-        productVariant.setProductVariantId(variantId);
-        productVariant.setChannelId(channelId);
-        productVariant.setActive("Y");
-        productVariant.setAxisAttributes(axisAttributes);
-        newProductVariants.put(variantId, productVariant);
-
-                    productVariant.setLevel(1); //TODO - change for multi level variants support
-                    productVariant.setProductVariantName(product.getProductName() + " - " + tempName.toString());
-    setVariantAttributeValues(product, productVariant, variantAttributesMap);*/
 
     }
 
