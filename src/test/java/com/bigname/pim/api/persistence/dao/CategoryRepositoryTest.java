@@ -71,8 +71,6 @@ public class CategoryRepositoryTest {
             Category category = categoryDAO.insert(categoryDTO);
             Assert.assertTrue(category.diff(categoryDTO).isEmpty());
         });
-
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);//move
     }
 
     @Test
@@ -96,8 +94,6 @@ public class CategoryRepositoryTest {
             category = categoryDAO.findById(categoryDTO.getId(), FindBy.INTERNAL_ID);
             Assert.assertTrue(category.isPresent());
         });
-
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);//move
     }
 
     @Test
@@ -256,8 +252,6 @@ public class CategoryRepositoryTest {
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), false, true, true).getTotalElements(), inactiveCount1[0] + discontinued1[0]);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), false, false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), false, false, true).getTotalElements(), discontinued1[0]);
-
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);//move
     }
 
     @Test
@@ -267,8 +261,8 @@ public class CategoryRepositoryTest {
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Category4", "active", "Y"));
-        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Category5", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Test Category4", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Test Category5", "active", "Y"));
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
@@ -290,7 +284,13 @@ public class CategoryRepositoryTest {
         });
 
         Page<Map<String, Object>> subCategoriesMap = categoryDAO.getSubCategories(category.getId(), PageRequest.of(0, categoriesData.size(), null));
-        Assert.assertEquals(subCategoriesMap.getTotalElements(), categoriesData.size() - 1); //TODO pagination
+        Assert.assertEquals(subCategoriesMap.getTotalElements(), categoriesData.size() - 1);
+        Assert.assertEquals(categoryDAO.getSubCategories(category.getId(), PageRequest.of(0, categoriesData.size() - 1, null)).getTotalElements(), categoriesData.size() - 1);
+        Assert.assertEquals(categoryDAO.getSubCategories(category.getId(), PageRequest.of(0, categoriesData.size()-2, null)).getTotalElements(), categoriesData.size() - 1);
+        Assert.assertEquals(categoryDAO.getSubCategories(category.getId(), PageRequest.of(0, categoriesData.size()-2, null)).getContent().size(), categoriesData.size() - 2);
+        Assert.assertEquals(categoryDAO.getSubCategories(category.getId(), PageRequest.of(1, 1, null)).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.getSubCategories(category.getId(), PageRequest.of(1, categoriesData.size()-2, null)).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.getSubCategories(category.getId(), PageRequest.of(0, categoriesData.size()-2, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -333,6 +333,8 @@ public class CategoryRepositoryTest {
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "description", "Test Category3", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "description", "Test Category4", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "description", "Test Category5", "active", "Y"));
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
             categoryDTO.setCategoryName((String)categoryData.get("name"));
@@ -352,7 +354,13 @@ public class CategoryRepositoryTest {
         relatedCategoryDAO.insert(relatedCategory);
 
         Page<Category> availableCategoriesPage = categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), "categoryName", "Test", PageRequest.of(0, categoriesData.size() - 2), false);
-        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1); //TODO pagination
+        Assert.assertEquals(availableCategoriesPage.getContent().size(), 3);
+        Assert.assertEquals(categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-2), false).getTotalElements(), categoriesData.size()-1);
+        Assert.assertEquals(categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-2), false).getContent().size(), categoriesData.size() - 2);
+        Assert.assertEquals(categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), "categoryName", "Test", PageRequest.of(1, 1), false).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), "categoryName", "Test", PageRequest.of(1,categoriesData.size()-2), false).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-2), false).getTotalPages(), 2);
+
     }
 
     @Test
@@ -386,7 +394,13 @@ public class CategoryRepositoryTest {
         boolean[] activeRequired = {false};
 
         Page<Map<String, Object>> relatedCategories =  categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size() - 1,null), activeRequired);
-        Assert.assertEquals(relatedCategories.getSize(), categoriesData.size() - 1);//TODO pagination
+        Assert.assertEquals(relatedCategories.getSize(), categoriesData.size() - 1);
+        Assert.assertEquals(categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size() - 1,null), activeRequired).getTotalElements(), categoriesData.size() - 1);
+        Assert.assertEquals(categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-2,null), activeRequired).getTotalElements(), categoriesData.size()-1);
+        Assert.assertEquals(categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-2,null), activeRequired).getContent().size(), categoriesData.size() - 2);
+        Assert.assertEquals(categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(1, 1, null), activeRequired).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(1,categoriesData.size()-2,null), activeRequired).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAllSubCategories(category.getId(), "categoryName", "Test", PageRequest.of(0,categoriesData.size()-2,null), activeRequired).getTotalPages(), 2);
     }
 
     @Test
@@ -439,7 +453,13 @@ public class CategoryRepositoryTest {
             categoryProductDAO.insert(categoryProduct);
         });
         Page<Map<String, Object>> categoryProductMap = categoryDAO.getProducts(category.getId(), PageRequest.of(0, productsData.size(), null));
-        Assert.assertEquals(categoryProductMap.getSize(), productsData.size()); //TODO pagination
+        Assert.assertEquals(categoryProductMap.getSize(), productsData.size());
+        Assert.assertEquals(categoryDAO.getProducts(category.getId(), PageRequest.of(0, productsData.size(), null)).getTotalElements(), productsData.size());
+        Assert.assertEquals(categoryDAO.getProducts(category.getId(), PageRequest.of(0, productsData.size()-1, null)).getTotalElements(), productsData.size());
+        Assert.assertEquals(categoryDAO.getProducts(category.getId(), PageRequest.of(0, productsData.size()-1, null)).getContent().size(), productsData.size() - 1);
+        Assert.assertEquals(categoryDAO.getProducts(category.getId(), PageRequest.of(1, 1, null)).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.getProducts(category.getId(), PageRequest.of(1, productsData.size()-1, null)).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.getProducts(category.getId(), PageRequest.of(0, productsData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -494,7 +514,13 @@ public class CategoryRepositoryTest {
         boolean[] activeRequired = {false};
 
         Page<Map<String, Object>> categoryProductMap = categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size(),null), activeRequired);
-        Assert.assertEquals(categoryProductMap.getSize(), productsData.size()); //TODO pagination
+        Assert.assertEquals(categoryProductMap.getSize(), productsData.size());
+        Assert.assertEquals(categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size(),null), activeRequired).getTotalElements(), productsData.size());
+        Assert.assertEquals(categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size()-1,null), activeRequired).getTotalElements(), productsData.size());
+        Assert.assertEquals(categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size()-1,null), activeRequired).getContent().size(), productsData.size() - 1);
+        Assert.assertEquals(categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(1, 1, null), activeRequired).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(1,productsData.size()-1,null), activeRequired).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAllCategoryProducts(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size()-1,null), activeRequired).getTotalPages(), 2);
     }
 
     @Test
@@ -602,7 +628,13 @@ public class CategoryRepositoryTest {
         categoryProductDAO.insert(categoryProduct);
 
         Page<Product> availableProducts = categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(0, productsData.size() - 1), false);
-        Assert.assertEquals(availableProducts.getContent().size(), 2); //TODO pagination
+        Assert.assertEquals(availableProducts.getContent().size(), productsData.size() - 1);
+        Assert.assertEquals(categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size()-1), false).getTotalElements(), productsData.size()-1);
+        Assert.assertEquals(categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size()-1), false).getTotalElements(), productsData.size()-1);
+        Assert.assertEquals(categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size()-1), false).getContent().size(), productsData.size() - 1);
+        Assert.assertEquals(categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(1, 1), false).getContent().size(), 1);
+        Assert.assertEquals(categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(1,productsData.size()-1), false).getContent().size(), 0);
+        Assert.assertEquals(categoryDAO.findAvailableProductsForCategory(category.getId(), "productName", "Test", PageRequest.of(0,productsData.size()-1), false).getTotalPages(), 1);
     }
 
     @After
