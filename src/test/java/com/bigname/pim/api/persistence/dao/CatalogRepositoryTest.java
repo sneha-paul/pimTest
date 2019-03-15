@@ -68,9 +68,6 @@ public class CatalogRepositoryTest {
             Catalog catalog = catalogDAO.insert(catalogDTO);
             Assert.assertTrue(catalog.diff(catalogDTO).isEmpty());
         });
-
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);//move
-
     }
 
     @Test
@@ -94,8 +91,6 @@ public class CatalogRepositoryTest {
             catalog = catalogDAO.findById(catalogDTO.getId(), FindBy.INTERNAL_ID);
             Assert.assertTrue(catalog.isPresent());
         });
-
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);//move
     }
 
     @Test
