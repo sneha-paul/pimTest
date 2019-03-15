@@ -151,7 +151,8 @@ public class WebsiteServiceImplTest {
 
         //Getting websiteCatalogs
         List<WebsiteCatalog> websiteCatalogList = websiteService.getAllWebsiteCatalogs(website.getId());
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteCatalogList)); //TODO check size also
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteCatalogList));
+        Assert.assertEquals(catalogsData.size(), websiteCatalogList.size());
     }
 
     @Test
@@ -186,7 +187,7 @@ public class WebsiteServiceImplTest {
 
         //Getting available catalogs
         Page<Catalog> catalogPage = websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size()),false);
-        Assert.assertEquals(catalogPage.getContent().size(), 4);
+        Assert.assertEquals(catalogPage.getContent().size(), catalogsData.size());
 
         //creating websiteCatalogs
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
@@ -200,13 +201,7 @@ public class WebsiteServiceImplTest {
 
         //Getting available catalogs
         Page<Catalog> availableCatalogPage = websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false);
-        Assert.assertEquals(availableCatalogPage.getContent().size(), 3); //TODO pagination
-       /* Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false).getTotalElements(), 3);
-        Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false).getContent().size(), 3);
-        Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(1, 1),false).getContent().size(), 1);
-        Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(1, catalogsData.size() - 1),false).getContent().size(), 1);
-        Assert.assertEquals(websiteService.findAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,"catalogName","Test", PageRequest.of(0, catalogsData.size() - 1),false).getTotalPages(), 2);*/
-
+        Assert.assertEquals(availableCatalogPage.getContent().size(), catalogsData.size() - 1);
     }
 
     @Test
@@ -239,7 +234,7 @@ public class WebsiteServiceImplTest {
 
         //Getting available catalogs
         Page<Catalog> catalogPage = websiteService.getAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, catalogsData.size(), null, false);
-        Assert.assertEquals(catalogPage.getContent().size(), 2);
+        Assert.assertEquals(catalogPage.getContent().size(), catalogsData.size());
 
         //creating websiteCatalogs
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
@@ -253,8 +248,7 @@ public class WebsiteServiceImplTest {
 
         //Getting available catalogs
         Page<Catalog> availableCatalogPage = websiteService.getAvailableCatalogsForWebsite(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, catalogsData.size(), null, false);
-        Assert.assertEquals(availableCatalogPage.getContent().size(), 1);
-
+        Assert.assertEquals(availableCatalogPage.getContent().size(), catalogsData.size() - 1);
     }
 
     @Test
@@ -703,8 +697,8 @@ public class WebsiteServiceImplTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "N"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "N"));
 
         websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
@@ -715,8 +709,9 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
         //Getting websites by searchField
-        Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websitesData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 9);//size hardCoded - change it
+        long size = websitesData.stream().filter(x -> x.get("active").equals("Y")).count();
+        Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websitesData.size()), true);
+        Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
     @Test
@@ -730,8 +725,8 @@ public class WebsiteServiceImplTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "Y"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "N"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "N"));
 
         websitesData.forEach( websiteData -> {
             Website websiteDTO = new Website();
@@ -743,8 +738,9 @@ public class WebsiteServiceImplTest {
         });
 
         //Getting websites
-        Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websitesData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 9);//size
+        long size = websitesData.stream().filter(x -> x.get("active").equals("Y")).count();
+        Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websitesData.size()), true);
+        Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
     @Test
@@ -869,8 +865,9 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
         //Getting websites
+        long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
         List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"));
-        Assert.assertTrue(result.size() == 2);
+        Assert.assertTrue(result.size() == size);
     }
 
     @Test
@@ -896,9 +893,10 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
         //Getting websites
+        long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Website> result = websiteService.findAll(criteria);
-        Assert.assertTrue(result.size() == 2);
+        Assert.assertTrue(result.size() == size);
     }
 
     @Test
