@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -120,8 +121,6 @@ public class CategoryTest {
             Assert.assertTrue(categoryClone.getCategoryId() .equals(newCategory.getCategoryId() + "_COPY") && categoryClone.getCategoryName().equals(newCategory.getCategoryName() + "_COPY") && categoryClone.getDescription().equals(newCategory.getDescription() + "_COPY") && categoryClone.getActive() != newCategory.getActive());
         });
     }
-
-
     @Test
     public void merge() throws Exception {
         //Create Category Original instance
@@ -170,29 +169,47 @@ public class CategoryTest {
         modified2.setMetaTitle("One-A");
         modified2.setMetaDescription("ONE-A");
         modified2.setMetaKeywords("ONE-A");
+        modified2.setCategoryName("One-A");
 
         original = original.merge(modified2);
         Assert.assertEquals(original.getMetaTitle(), "One-A");
         Assert.assertEquals(original.getMetaDescription(), "ONE-A");
         Assert.assertEquals(original.getMetaKeywords(), "ONE-A");
+        Assert.assertEquals(original.getCategoryName(), "One-A");
 
+        //Add Details or modified instance for update
+        Category modified3 = new Category();
+        modified.setGroup("DETAILS");
+        modified.setCategoryName("Test-A");
+        modified.setCategoryId("TEST-A");
+        modified.setExternalId("TEST-A");
+        modified.setDescription("TEST-A");
+        modified.setLongDescription("TEST-A");
+
+        //Merge for update
+        original = original.merge(modified3);
+        Assert.assertEquals(original.getCategoryName(), "One-A");
+        Assert.assertEquals(original.getCategoryId(), "ONE-A");
+        Assert.assertEquals(original.getExternalId(), "ONE-A");
+        Assert.assertEquals(original.getDescription(), "ONE-A");
+        Assert.assertEquals(original.getLongDescription(), "ONE-A");
     }
-
     @Test
     public void toMap() throws Exception {
         //Create new Instance
         Category categoryDTO = new Category();
-        categoryDTO.setCategoryName("test");
-        categoryDTO.setCategoryId("test");
+        categoryDTO.setCategoryName("Test");
+        categoryDTO.setExternalId("TEST");
 
-        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDTO.getCategoryId()));
+        //Create map for checking
+        Map<String, String> map = new HashMap<>();
+        map.put("categoryName", "Test");
+        map.put("externalId", "TEST");
 
-        //Testing equals with id
-        Assert.assertEquals(categoryDTO.getCategoryId(), "TEST");
-        Assert.assertEquals(categoryDTO.getCategoryName(), "test");
-
-        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDTO.getCategoryId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDTO.getCategoryName()));
+        //checking map1 and map2
+        Map<String, String> map1 = categoryDTO.toMap();
+        Assert.assertEquals(map1.get("categoryName"), map.get("categoryName"));
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
     }
 
     @Test
@@ -221,6 +238,23 @@ public class CategoryTest {
         Map<String, Object> diff = category1.diff(category2);
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("categoryName"), "test.com");
+
+        //Create first instance for ignore internal id
+        Category category3 = new Category();
+        category3.setExternalId("test");
+        category3.setCategoryName("test");
+        category3.setDescription("test");
+
+        //Create second instance
+        Category category4 = new Category();
+        category4.setExternalId("test");
+        category4.setCategoryName("test.com");
+        category4.setDescription("test");
+
+        //Checking first instance and second instance
+        Map<String, Object> diff1 = category1.diff(category2, true);
+        Assert.assertEquals(diff1.size(), 1);
+        Assert.assertEquals(diff1.get("categoryName"), "test.com");
     }
     @After
     public void tearDown() throws Exception {
