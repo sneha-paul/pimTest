@@ -369,7 +369,7 @@ public class BaseServiceSupportTest {
         });
 
         Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websitesData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 9);
+        Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
     }
 
     @Test
@@ -395,7 +395,7 @@ public class BaseServiceSupportTest {
         });
 
         Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websitesData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 9);
+        Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
     }
 
     @Test
@@ -512,8 +512,10 @@ public class BaseServiceSupportTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
+
         List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"));
-        Assert.assertTrue(result.size() == 2);
+        Assert.assertTrue(result.size() == size);
     }
 
     @Test
@@ -525,7 +527,7 @@ public class BaseServiceSupportTest {
         websitesData.add(CollectionsUtil.toMap("name", "Test4.com", "externalId", "TEST_4", "url", "www.test4.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test5.com", "externalId", "TEST_5", "url", "www.test5.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test6.com", "externalId", "TEST_6", "url", "www.test6.com", "active", "Y"));
-        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "Y"));
+        websitesData.add(CollectionsUtil.toMap("name", "Test7.com", "externalId", "TEST_7", "url", "www.test7.com", "active", "N"));
         websitesData.add(CollectionsUtil.toMap("name", "Test8.com", "externalId", "TEST_8", "url", "www.test8.com", "active", "N"));
         websitesData.add(CollectionsUtil.toMap("name", "Test9.com", "externalId", "TEST_9", "url", "www.test9.com", "active", "N"));
 
@@ -538,9 +540,11 @@ public class BaseServiceSupportTest {
             websiteDAO.insert(websiteDTO);
         });
 
+        long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
+
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Website> result = websiteService.findAll(criteria);
-        Assert.assertTrue(result.size() == 2);
+        Assert.assertTrue(result.size() == size);
     }
 
     @Test
