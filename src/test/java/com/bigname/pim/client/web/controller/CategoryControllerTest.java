@@ -68,14 +68,19 @@ public class CategoryControllerTest {
 
     @Autowired
     private RelatedCategoryDAO relatedCategoryDAO;
+
     @Autowired
     private FamilyService familyService;
+
     @Autowired
     private ProductService productService;
+
     @Autowired
     private FamilyDAO familyDAO;
+
     @Autowired
     private ProductDAO productDAO;
+
     @Autowired
     private CategoryProductDAO categoryProductDAO;
 
@@ -93,7 +98,6 @@ public class CategoryControllerTest {
         relatedCategoryDAO.deleteAll();
         productDAO.getMongoTemplate().dropCollection(Product.class);
         familyDAO.getMongoTemplate().dropCollection(Family.class);
-
     }
 
     @Test
@@ -745,6 +749,10 @@ public class CategoryControllerTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.size()").value(1));
 
+        Page<Map<String, Object>> relatedCategories = categoryService.getSubCategories(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, PageRequest.of(0, categoriesData.size(), null), false);
+        List<Map<String, Object>> relatedCategoriesList = relatedCategories.getContent();
+        Assert.assertEquals(relatedCategoriesList.get(0).get("active"), "N");
+
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -884,7 +892,7 @@ public class CategoryControllerTest {
         result1.andExpect(jsonPath("$.success").value(true));
 
         Page<Product> categoryProducts1 = categoryService.getAvailableProductsForCategory(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 1, null, false);
-        Assert.assertEquals(categoryProducts1.getTotalElements(), categoryProducts.getTotalElements()-1);
+        Assert.assertEquals(categoryProducts1.getTotalElements(), categoryProducts.getTotalElements() - 1);
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -944,6 +952,11 @@ public class CategoryControllerTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.size()").value(1));
         result.andExpect(jsonPath("$.success").value(true));
+
+        Page<Map<String, Object>> categoryProduct = categoryService.getCategoryProducts(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, PageRequest.of(0, productsData.size(), null), false);
+        List<Map<String, Object>> categoryProductList = categoryProduct.getContent();
+
+        Assert.assertEquals(categoryProductList.get(2).get("active"), "N");
     }
 
     @After
