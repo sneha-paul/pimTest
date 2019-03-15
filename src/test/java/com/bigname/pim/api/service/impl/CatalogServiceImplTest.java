@@ -113,7 +113,7 @@ public class CatalogServiceImplTest {
         });
         //Getting rootCategories
         Page<Map<String, Object>> rootCategories =  catalogService.findAllRootCategories(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, "categoryName", "Test", PageRequest.of(0,categoriesData.size(),null), false);
-        Assert.assertEquals(rootCategories.getSize(),categoriesData.size());//TODO pagination
+        Assert.assertEquals(rootCategories.getSize(),categoriesData.size());
     }
 
     @Test
@@ -201,7 +201,7 @@ public class CatalogServiceImplTest {
         rootCategoryDAO.insert(rootCategory);
         //Getting available categories
         Page<Category> availableCategoriesPage = catalogService.findAvailableRootCategoriesForCatalog(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, "categoryName", "Test", PageRequest.of(0, categoriesData.size() - 1), false);
-        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1); //TODO pagination
+        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1);
     }
 
     @Test
@@ -244,7 +244,7 @@ public class CatalogServiceImplTest {
         rootCategoryDAO.insert(rootCategory);
         //Getting available categories
         Page<Category> availableRootCategories = catalogService.getAvailableRootCategoriesForCatalog(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,0,categoriesData.size() - 1, null, false);
-        Assert.assertEquals(availableRootCategories.getContent().size(), 1); //TODO pagination
+        Assert.assertEquals(availableRootCategories.getContent().size(), 1);
     }
 
     @Test
@@ -335,7 +335,7 @@ public class CatalogServiceImplTest {
         });
         //Getting rootCategories
         Page<Map<String, Object>> rootCategoriesMap = catalogService.getRootCategories(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, PageRequest.of(0, categoriesData.size(), null), false);
-        Assert.assertEquals(rootCategoriesMap.getSize(), categoriesData.size()); //TODO pagination
+        Assert.assertEquals(rootCategoriesMap.getSize(), categoriesData.size());
     }
 
     @Test

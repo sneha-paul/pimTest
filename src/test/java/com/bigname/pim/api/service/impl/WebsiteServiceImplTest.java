@@ -151,7 +151,7 @@ public class WebsiteServiceImplTest {
 
         //Getting websiteCatalogs
         List<WebsiteCatalog> websiteCatalogList = websiteService.getAllWebsiteCatalogs(website.getId());
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteCatalogList));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteCatalogList)); //TODO check size also
     }
 
     @Test
@@ -716,7 +716,7 @@ public class WebsiteServiceImplTest {
         });
         //Getting websites by searchField
         Page<Website> paginatedResult = websiteService.findAll("name", "Test", PageRequest.of(0, websitesData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 9);
+        Assert.assertEquals(paginatedResult.getContent().size(), 9);//size hardCoded - change it
     }
 
     @Test
@@ -744,7 +744,7 @@ public class WebsiteServiceImplTest {
 
         //Getting websites
         Page<Website> paginatedResult = websiteService.findAll(PageRequest.of(0, websitesData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 9);
+        Assert.assertEquals(paginatedResult.getContent().size(), 9);//size
     }
 
     @Test

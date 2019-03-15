@@ -72,7 +72,7 @@ public class CategoryRepositoryTest {
             Assert.assertTrue(category.diff(categoryDTO).isEmpty());
         });
 
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);//move
     }
 
     @Test
@@ -97,7 +97,7 @@ public class CategoryRepositoryTest {
             Assert.assertTrue(category.isPresent());
         });
 
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);//move
     }
 
     @Test
@@ -255,10 +255,9 @@ public class CategoryRepositoryTest {
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), true, false, true).getTotalElements(), activeCount1[0] + discontinued1[0]);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), false, true, true).getTotalElements(), inactiveCount1[0] + discontinued1[0]);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), false, false).getTotalElements(), activeCount1[0] + inactiveCount1[0]);
-        /*Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false).getTotalElements(), activeCount1[0] + inactiveCount1[0] + discontinued1[0]);*/
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), false, false, true).getTotalElements(), discontinued1[0]);
 
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        categoryDAO.getMongoTemplate().dropCollection(Category.class);//move
     }
 
     @Test

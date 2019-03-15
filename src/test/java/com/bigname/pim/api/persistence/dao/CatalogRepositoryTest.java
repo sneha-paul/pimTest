@@ -69,7 +69,7 @@ public class CatalogRepositoryTest {
             Assert.assertTrue(catalog.diff(catalogDTO).isEmpty());
         });
 
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);//move
 
     }
 
@@ -95,7 +95,7 @@ public class CatalogRepositoryTest {
             Assert.assertTrue(catalog.isPresent());
         });
 
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);//move
     }
 
     @Test
@@ -208,7 +208,7 @@ public class CatalogRepositoryTest {
         catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "activeFrom", yesterday, "activeTo", todayEOD));
         catalogsData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "description", "TEST_2description", "activeFrom", null, "activeTo", todayEOD));
-        catalogsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "description", "TEST_3description", "activeFrom", tomorrowEOD));
+        catalogsData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "description", "TEST_3description", "activeFrom", tomorrow));
         catalogsData.add(CollectionsUtil.toMap("name", "Test4", "externalId", "TEST_4", "description", "TEST_4description", "active", "N", "activeFrom", null, "activeTo", null));
         catalogsData.add(CollectionsUtil.toMap("name", "Test6", "externalId", "TEST_6", "description", "TEST_5description", "activeFrom", yesterday, "activeTo", tomorrowEOD));
         catalogsData.add(CollectionsUtil.toMap("name", "Test7", "externalId", "TEST_7", "description", "TEST_6description", "activeFrom", yesterday, "activeTo", null));

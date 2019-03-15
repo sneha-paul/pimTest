@@ -148,7 +148,7 @@ public class CatalogTest {
             Assert.assertTrue(catalogClone.getCatalogId() .equals(newCatalog.getCatalogId() + "_COPY") && catalogClone.getCatalogName().equals(newCatalog.getCatalogName() + "_COPY") && catalogClone.getActive() != newCatalog.getActive());
         });
 
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);//move
     }
     @Test
     public void toMap() throws Exception {

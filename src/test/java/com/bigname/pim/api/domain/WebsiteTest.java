@@ -94,7 +94,7 @@ public class WebsiteTest {
             Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
         });
 
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        websiteDAO.getMongoTemplate().dropCollection(Website.class); //move this to setUp/TearDown
     }
 
     @Test
@@ -129,7 +129,7 @@ public class WebsiteTest {
 
         original = original.merge(modified1);
         Assert.assertEquals(original.getWebsiteName(), "One-A");
-       Assert.assertEquals(original.getWebsiteId(), "ONE-A");
+        Assert.assertEquals(original.getWebsiteId(), "ONE-A");
         Assert.assertEquals(original.getExternalId(), "ONE-A");
         Assert.assertEquals(original.getUrl(), "www.one.com");
 
@@ -159,7 +159,8 @@ public class WebsiteTest {
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteName()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getExternalId()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getUrl()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getActive()));    }
+        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getActive()));
+    }
 
     @Test
     public void equals() throws Exception {

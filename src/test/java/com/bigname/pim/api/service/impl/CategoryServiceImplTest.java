@@ -736,7 +736,7 @@ public class CategoryServiceImplTest {
         });
         //Getting categories
         Page<Category> paginatedResult = categoryService.findAll(PageRequest.of(0, categoriesData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 5);
+        Assert.assertEquals(paginatedResult.getContent().size(), 5);//size
     }
 
     @Test

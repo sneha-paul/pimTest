@@ -227,16 +227,22 @@ public class ProductVariantRepositoryTest {
         Page<FamilyAttributeOption> familyAttributeOptions = familyService.getFamilyAttributeOptions(familyDetails.getFamilyId(),FindBy.EXTERNAL_ID, attributeDetails.getId(), 0, 2, null);
 
         List<FamilyAttribute> variantAxisAttributes = familyService.getVariantAxisAttributes(familyDetails.getFamilyId(),attributeDetails.getId().toUpperCase(), FindBy.EXTERNAL_ID, null);
-        Map<String, String> axisAttributes = variantAxisAttributes.get(0).getOptions().values().iterator().next().toMap();
-        ProductVariant productVariant = new ProductVariant(newProduct);
-        productVariant.setProductVariantId(familyAttributeOptions.getContent().get(0).getId());
-        productVariant.setChannelId(channel.getChannelId());
-        productVariant.setActive("Y");
-        productVariant.setAxisAttributes(axisAttributes);
-        productVariant.setLevel(1);
-        productVariant.setProductVariantName(newProduct.getProductName() + " - " + familyAttributeOptions.getContent().get(0).getId().toString());
-        ProductVariant productVariantDTO = productVariantDAO.insert(productVariant);
-        Assert.assertTrue(productVariantDTO.diff(productVariant).isEmpty());
+
+        variantAxisAttributes.get(0).getOptions().forEach((k, v) -> {
+            ProductVariant productVariant = new ProductVariant(newProduct);
+            productVariant.setProductVariantId(familyAttributeOptions.getContent().get(0).getId());
+            productVariant.setChannelId(channel.getChannelId());
+            productVariant.setActive("Y");
+            Map<String, String> axisAttributes = new HashMap<>();
+            axisAttributes.put(variantAxisAttributes.get(0).getId(), k);
+            productVariant.setAxisAttributes(axisAttributes);
+            productVariant.setLevel(1);
+            productVariant.setProductVariantName(newProduct.getProductName() + " - " + familyAttributeOptions.getContent().get(0).getId().toString());
+            ProductVariant productVariantDTO = productVariantDAO.insert(productVariant);
+        });
+
+
+       // Assert.assertTrue(productVariantDTO.diff(productVariant).isEmpty());
 
 
         /*ProductVariant productVariantDTO = new ProductVariant();
