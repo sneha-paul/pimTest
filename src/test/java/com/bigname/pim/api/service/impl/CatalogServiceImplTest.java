@@ -201,7 +201,7 @@ public class CatalogServiceImplTest {
         rootCategoryDAO.insert(rootCategory);
         //Getting available categories
         Page<Category> availableCategoriesPage = catalogService.findAvailableRootCategoriesForCatalog(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, "categoryName", "Test", PageRequest.of(0, categoriesData.size() - 1), false);
-        Assert.assertEquals(availableCategoriesPage.getContent().size(), 1);
+        Assert.assertEquals(availableCategoriesPage.getContent().size(), categoriesData.size() - 1);
     }
 
     @Test
@@ -233,8 +233,10 @@ public class CatalogServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Page<Category> availableRootCategories1 = catalogService.getAvailableRootCategoriesForCatalog(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,0,categoriesData.size(), null, false);
+        Assert.assertEquals(availableRootCategories1.getContent().size(), categoriesData.size());
 
+        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
         RootCategory rootCategory = new RootCategory();
         rootCategory.setCatalogId(catalog.getId());
         rootCategory.setRootCategoryId(category.getId());
@@ -244,7 +246,7 @@ public class CatalogServiceImplTest {
         rootCategoryDAO.insert(rootCategory);
         //Getting available categories
         Page<Category> availableRootCategories = catalogService.getAvailableRootCategoriesForCatalog(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,0,categoriesData.size() - 1, null, false);
-        Assert.assertEquals(availableRootCategories.getContent().size(), 1);
+        Assert.assertEquals(availableRootCategories.getContent().size(), categoriesData.size() - 1);
     }
 
     @Test
@@ -293,6 +295,11 @@ public class CatalogServiceImplTest {
         RootCategory updatedRootCategory = rootCategoryDAO.findById(rootCategory.getId()).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedRootCategory));
         Assert.assertEquals(updatedRootCategory.getActive(), "N");
+
+        catalogService.toggleRootCategory(rootCategory1.getCatalogId(), FindBy.INTERNAL_ID, rootCategory1.getRootCategoryId(), FindBy.INTERNAL_ID, Toggle.get(updatedRootCategory.getActive()));
+        RootCategory updatedRootCategory1 = rootCategoryDAO.findById(rootCategory.getId()).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedRootCategory));
+        Assert.assertEquals(updatedRootCategory1.getActive(), "Y");
     }
 
     @Test
@@ -416,6 +423,11 @@ public class CatalogServiceImplTest {
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 3", "externalId", "TEST_CATEGORY_3", "description", "Test description 3", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 4", "externalId", "TEST_CATEGORY_4", "description", "Test description 4", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 5", "externalId", "TEST_CATEGORY_5", "description", "Test description 5", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 6", "externalId", "TEST_CATEGORY_6", "description", "Test description 6", "active", "Y"));
+        categoriesData.add(CollectionsUtil.toMap("name", "Test Category 7", "externalId", "TEST_CATEGORY_7", "description", "Test description 7", "active", "Y"));
 
         categoriesData.forEach(categoryData -> {
             Category categoryDTO = new Category();
@@ -425,19 +437,31 @@ public class CatalogServiceImplTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryService.create(categoryDTO);
 
-            Category category = categoryService.get((String)categoryData.get("externalId"), FindBy.EXTERNAL_ID,false).orElse(null);
+        });
 
+        //Adding rootCategory
+        List<Category> categoryList = categoryService.getAll(null, false);
+        int count[] = {1};
+        categoryList.forEach(rootCategoryData -> {
             RootCategory rootCategory = new RootCategory();
             rootCategory.setCatalogId(catalog.getId());
-            rootCategory.setRootCategoryId(category.getId());
-            rootCategory.setSequenceNum(0);
+            rootCategory.setRootCategoryId(rootCategoryData.getId());
+            rootCategory.setSequenceNum(count[0]);
             rootCategory.setSubSequenceNum(0);
-            rootCategory.setActive(category.getActive());
+            rootCategory.setActive(rootCategoryData.getActive());
             rootCategoryDAO.insert(rootCategory);
+            count[0] ++;
         });
+
         //Setting rootCategorySequence
-        boolean success = catalogService.setRootCategorySequence(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        boolean success = catalogService.setRootCategorySequence(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID);
         Assert.assertTrue(success);
+        List<RootCategory> rootCategoryList = catalogService.getAllRootCategories(catalog.getId());
+        Assert.assertEquals(rootCategoryList.get(0).getSequenceNum(), 1);
+        Assert.assertEquals(rootCategoryList.get(0).getSubSequenceNum(), 0);
+
+        Assert.assertEquals(rootCategoryList.get(1).getSequenceNum(), 1);
+        Assert.assertEquals(rootCategoryList.get(1).getSubSequenceNum(), 1);
     }
 
     @Test
@@ -545,6 +569,11 @@ public class CatalogServiceImplTest {
         Catalog updatedCatalog = catalogService.get(catalogDetails.getCatalogId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCatalog));
         Assert.assertEquals(updatedCatalog.getActive(), "N");
+
+        catalogService.toggle(catalogDetails.getCatalogId(), EXTERNAL_ID, Toggle.get(updatedCatalog.getActive()));
+        Catalog updatedCatalog1 = catalogService.get(catalogDetails.getCatalogId(), EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCatalog));
+        Assert.assertEquals(updatedCatalog1.getActive(), "Y");
     }
 
     @Test
@@ -780,8 +809,9 @@ public class CatalogServiceImplTest {
             catalogDAO.insert(catalogDTO);
         });
         //Getting catalogs by searchField
-        Page<Catalog> paginatedResult = catalogService.findAll("name", "Test", PageRequest.of(0, catalogsData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 7);
+        long size = catalogsData.stream().filter(x -> x.get("active").equals("Y")).count();
+        Page<Catalog> paginatedResult = catalogService.findAll("name", "Test", PageRequest.of(0, catalogsData.size()), true);
+        Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
     @Test
@@ -805,8 +835,9 @@ public class CatalogServiceImplTest {
             catalogDAO.insert(catalogDTO);
         });
         //Getting catalogs
-        Page<Catalog> paginatedResult = catalogService.findAll(PageRequest.of(0, catalogsData.size()), false);
-        Assert.assertEquals(paginatedResult.getContent().size(), 7);
+        long size = catalogsData.stream().filter(x -> x.get("active").equals("Y")).count();
+        Page<Catalog> paginatedResult = catalogService.findAll(PageRequest.of(0, catalogsData.size()), true);
+        Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
     @Test
@@ -924,8 +955,9 @@ public class CatalogServiceImplTest {
             catalogDAO.insert(catalogDTO);
         });
         //Getting catalogs
+        long size = catalogsData.stream().filter(x -> x.get("active").equals("N")).count();
         List<Catalog> result = catalogService.findAll(CollectionsUtil.toMap("active", "N"));
-        Assert.assertTrue(result.size() == 2);
+        Assert.assertTrue(result.size() == size);
     }
 
     @Test
@@ -949,9 +981,10 @@ public class CatalogServiceImplTest {
             catalogDAO.insert(catalogDTO);
         });
         //Getting catalogs
+        long size = catalogsData.stream().filter(x -> x.get("active").equals("N")).count();
         Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Catalog> result = catalogService.findAll(criteria);
-        Assert.assertTrue(result.size() == 2);
+        Assert.assertTrue(result.size() == size);
     }
 
     @Test
