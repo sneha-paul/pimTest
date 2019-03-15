@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,8 +94,6 @@ public class WebsiteTest {
             Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
             Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
         });
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class); //move this to setUp/TearDown
     }
 
     @Test
@@ -132,8 +131,6 @@ public class WebsiteTest {
         Assert.assertEquals(original.getWebsiteId(), "ONE-A");
         Assert.assertEquals(original.getExternalId(), "ONE-A");
         Assert.assertEquals(original.getUrl(), "www.one.com");
-
-
     }
 
     @Test
@@ -141,25 +138,18 @@ public class WebsiteTest {
         //Create new Instance
         Website websiteDTO = new Website();
         websiteDTO.setWebsiteName("Test.com");
-        websiteDTO.setWebsiteId("test");
         websiteDTO.setUrl("www.test.com");
-        websiteDTO.setExternalId("test");
+        websiteDTO.setExternalId("TEST");
 
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
+        Map<String, String> map = new HashMap<>();
+        map.put("websiteName", "Test.com");
+        map.put("externalId", "TEST");
+        map.put("url", "www.test.com");
 
-        //Testing equals with id
-        Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
-        Assert.assertEquals(websiteDTO.getWebsiteName(), "Test.com");
-        Assert.assertEquals(websiteDTO.getExternalId(), "TEST");
-        Assert.assertEquals(websiteDTO.getUrl(), "www.test.com");
-        Assert.assertEquals(websiteDTO.getActive(), "N");
-
-        //Get websiteDTO
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteName()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getExternalId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getUrl()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getActive()));
+        Map<String, String> map1 = websiteDTO.toMap();
+        Assert.assertEquals(map1.get("websiteName"), map.get("websiteName"));
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
+        Assert.assertEquals(map1.get("url"), map.get("url"));
     }
 
     @Test
@@ -176,8 +166,7 @@ public class WebsiteTest {
         //Check websiteId
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
         Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
-}
-
+    }
     @Test
     public void diff() throws Exception {
         //Create first instance
@@ -198,6 +187,25 @@ public class WebsiteTest {
         Map<String, Object> diff = website1.diff(website2);
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("websiteName"), "test.com2");
+
+        //Create first instance for ignore internal id
+        Website website3 = new Website();
+        website3.setWebsiteId("test");
+        website3.setWebsiteName("test.com");
+        website3.setUrl("www.test");
+        website3.setActive("N");
+
+        //Create Second instance
+        Website website4 = new Website();
+        website4.setWebsiteId("test");
+        website4.setWebsiteName("test.com2");
+        website4.setUrl("www.test");
+        website4.setActive("N");
+
+        //Checking First instance and Second instance
+        Map<String, Object> diff1 = website1.diff(website2,true);
+        Assert.assertEquals(diff1.size(), 1);
+        Assert.assertEquals(diff1.get("websiteName"), "test.com2");
     }
     @After
     public void tearDown() throws Exception {
