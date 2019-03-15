@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -148,25 +149,23 @@ public class CatalogTest {
             Assert.assertTrue(catalogClone.getCatalogId() .equals(newCatalog.getCatalogId() + "_COPY") && catalogClone.getCatalogName().equals(newCatalog.getCatalogName() + "_COPY") && catalogClone.getActive() != newCatalog.getActive());
         });
 
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);//move
     }
     @Test
     public void toMap() throws Exception {
-        //create new instance
+        //Create new Instance
         Catalog catalogDTO = new Catalog();
-        catalogDTO.setCatalogName("test");
-        catalogDTO.setCatalogId("test");
+        catalogDTO.setCatalogName("Test");
+        catalogDTO.setExternalId("TEST");
 
-        //Testing equals with id
-        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getCatalogId()));
+        //Create map for checking
+        Map<String, String> map = new HashMap<>();
+        map.put("catalogName", "Test");
+        map.put("externalId", "TEST");
 
-        Assert.assertEquals(catalogDTO.getCatalogId(), "TEST");
-        Assert.assertEquals(catalogDTO.getCatalogName(), "test");
-        Assert.assertEquals(catalogDTO.getActive(), "N");
-
-        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getCatalogId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getCatalogName()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(catalogDTO.getActive()));
+        //checking map1 and map2
+        Map<String, String> map1 = catalogDTO.toMap();
+        Assert.assertEquals(map1.get("catalogName"), map.get("catalogName"));
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
     }
 
     @Test
@@ -191,6 +190,23 @@ public class CatalogTest {
         Map<String, Object> diff = catalog1.diff(catalog2);
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("catalogName"), "test.com");
+
+        //Create first instance ignore internal id
+        Catalog catalog3 = new Catalog();
+        catalog3.setCatalogName("test");
+        catalog3.setCatalogId("test_1");
+        catalog3.setDescription("test");
+
+        //Create second instance
+        Catalog catalog4 = new Catalog();
+        catalog4.setCatalogName("test.com");
+        catalog4.setCatalogId("test_1");
+        catalog4.setDescription("test");
+
+        //Checking first instance and second instance
+        Map<String, Object> diff1 = catalog1.diff(catalog2, true);
+        Assert.assertEquals(diff1.size(), 1);
+        Assert.assertEquals(diff1.get("catalogName"), "test.com");
     }
     @After
     public void tearDown() throws Exception {
