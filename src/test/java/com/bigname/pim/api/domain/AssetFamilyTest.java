@@ -15,6 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 import static org.junit.Assert.*;
 
@@ -38,6 +41,7 @@ public class AssetFamilyTest {
     }
     @Test
     public void accessorsTest(){
+        //Create New Instance
         AssetFamily assetFamilyDTO = new AssetFamily();
         assetFamilyDTO.setAssetFamilyId("test");
         assetFamilyDTO.setAssetFamilyName("test");
@@ -45,6 +49,7 @@ public class AssetFamilyTest {
 
         assetFamilyDTO.orchestrate();
 
+        //Equals Checking with Id
         Assert.assertEquals(assetFamilyDTO.getAssetFamilyId(), "TEST");
         Assert.assertEquals(assetFamilyDTO.getAssetFamilyName(), "test");
         Assert.assertEquals(assetFamilyDTO.getDescription(), "test");
@@ -61,14 +66,57 @@ public class AssetFamilyTest {
 
     @Test
     public void merge() throws Exception {
-    }
+        //Create New Instance For Original
+        AssetFamily original = new AssetFamily();
+        original.setExternalId("test");
+        original.setAssetFamilyName("Test");
+        original.setDescription("test");
 
+        //Create Modified Instance
+        AssetFamily modified = new AssetFamily();
+        modified.setGroup("DETAILS");
+        modified.setExternalId("TEST-A");
+        modified.setAssetFamilyName("Test-A");
+        modified.setDescription("test-A");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getExternalId(), "TEST-A");
+        Assert.assertEquals(original.getAssetFamilyName(), "Test-A");
+        Assert.assertEquals(original.getDescription(), "test-A");
+
+        //Create New Instance for Without Details
+        AssetFamily modified1 = new AssetFamily();
+        modified1.setExternalId("TEST");
+        modified1.setAssetFamilyName("Test");
+        modified1.setDescription("test");
+
+        original = original.merge(modified1);
+        Assert.assertEquals(original.getExternalId(), "TEST-A");
+        Assert.assertEquals(original.getAssetFamilyName(), "Test-A");
+        Assert.assertEquals(original.getDescription(), "test-A");
+    }
     @Test
     public void toMap() throws Exception {
+        //Create New Instance
+        AssetFamily assetFamilyDTO = new AssetFamily();
+        assetFamilyDTO.setExternalId("test");
+        assetFamilyDTO.setAssetFamilyName("Test");
+        assetFamilyDTO.setDescription("test");
+
+        //Create New Instance For Checking map
+        Map<String, String> map = new HashMap<>();
+        map.put("externalId","TEST");
+        map.put("assetFamilyName","Test");
+        map.put("description","test");
+
+        //Equals Checking For Getting Map
+        Map<String, String> map1 = assetFamilyDTO.toMap();
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
+        Assert.assertEquals(map1.get("assetFamilyName"), map.get("assetFamilyName"));
+        Assert.assertEquals(map1.get("description"), map.get("description"));
     }
     @After
     public void tearDown() throws Exception {
         assetFamilyDAO.getMongoTemplate().dropCollection(AssetFamily.class);
     }
-
 }
