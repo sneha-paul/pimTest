@@ -245,19 +245,56 @@ public class VariantGroupTest {
 
     @Test
     public void orchestrate() throws Exception {
+        //Create id
+        VariantGroup variantGroupDTO = new VariantGroup();
+        variantGroupDTO.setName("test");
+        variantGroupDTO.orchestrate();
+
+        //Check Variant Group Id
+        Assert.assertTrue(ValidationUtil.isNotEmpty(variantGroupDTO.getId()));
+        Assert.assertEquals(variantGroupDTO.getId(), "TEST");
     }
 
     @Test
     public void toMap() throws Exception {
+
     }
 
     @Test
     public void merge() throws Exception {
+        //Create Original Instance
+        VariantGroup original = new VariantGroup();
+        original.setName("Test");
+        original.setId("test");
+        original.setActive("Y");
+
+        //Create Modified Instance
+        VariantGroup modified = new VariantGroup();
+        modified.setGroup("DETAILS");
+        modified.setName("Test-A");
+        modified.setId("test");
+        modified.setActive("Y");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getName(), "Test-A");
+        Assert.assertEquals(original.getId(), "test");
+        Assert.assertEquals(original.getActive(), "Y");
+
+        // Without DETAILS
+        VariantGroup modified1 = new VariantGroup();
+        modified1.setName("Test");
+        modified1.setId("test");
+        modified1.setActive("Y");
+
+        original = original.merge(modified1);
+        Assert.assertEquals(original.getName(), "Test-A");
+        Assert.assertEquals(original.getId(), "test");
+        Assert.assertEquals(original.getActive(), "Y");
+
     }
     @After
     public void tearDown() throws Exception {
         familyDAO.getMongoTemplate().dropCollection(Family.class);
         attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
     }
-
 }
