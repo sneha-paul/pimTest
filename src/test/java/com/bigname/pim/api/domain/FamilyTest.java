@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -127,6 +128,19 @@ public class FamilyTest {
         Assert.assertEquals(original1.getName(), "TEST-A");
         Assert.assertEquals(original1.getActive(), "Y");
 
+        //Add VariantGroups
+        VariantGroup original2 = new VariantGroup();
+        original2.setName("Tests");
+        original2.setActive("N");
+
+        VariantGroup modified3 = new VariantGroup();
+        modified3.setGroup("VARIANT_GROUPS");
+        modified3.setName("Tests");
+        modified3.setActive("N");
+
+        original2 = original2.merge(modified3);
+        Assert.assertEquals(original2.getName(), "Tests");
+        Assert.assertEquals(original2.getActive(), "N");
 
     }
 
@@ -143,7 +157,6 @@ public class FamilyTest {
             familyDTO.setActive((String) familyData.get("active"));
             familyDAO.insert(familyDTO);
 
-
             //Clone Family
             Family newFamily = familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(newFamily != null);
@@ -153,31 +166,24 @@ public class FamilyTest {
             Assert.assertTrue(familyClone.getFamilyId() .equals(newFamily.getFamilyId() + "_COPY") && familyClone.getFamilyName().equals(newFamily.getFamilyName() + "_COPY") && familyClone.getActive() != newFamily.getActive());
         });
     }
-
-
     @Test
     public void toMap() throws Exception {
         //Create new instance
         Family familyDTO = new Family();
-        familyDTO.setFamilyId("test");
         familyDTO.setFamilyName("test");
         familyDTO.setExternalId("test");
-        familyDTO.setActive("N");
+        familyDTO.setActive("Y");
 
-        Assert.assertTrue(ValidationUtil.isNotEmpty(familyDTO.getFamilyId()));
+        //Create New Instance For Checking Map
+        Map<String, String> map = new HashMap<>();
+        map.put("familyName", "test");
+        map.put("externalId", "TEST");
+        map.put("active", "Y");
 
-        //Testing equals with id
-        Assert.assertEquals(familyDTO.getFamilyId(), "TEST");
-        Assert.assertEquals(familyDTO.getFamilyName(), "test");
-        Assert.assertEquals(familyDTO.getExternalId(), "TEST");
-        Assert.assertEquals(familyDTO.getActive(), "N");
-
-        //Get websiteDTO
-        Assert.assertTrue(ValidationUtil.isNotEmpty(familyDTO.getFamilyId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(familyDTO.getFamilyName()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(familyDTO.getExternalId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(familyDTO.getActive()));
-
+        Map<String, String> map1 = familyDTO.toMap();
+        Assert.assertEquals(map1.get("familyName"), map.get("familyName"));
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
+        Assert.assertEquals(map1.get("active"), map.get("active"));
     }
     @Test
     public void getAddonMasterGroups() throws Exception {
@@ -233,6 +239,12 @@ public class FamilyTest {
         Map<String, Object> diff = family1.diff(family2);
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("familyName"), "test.com");
+
+        //Checking For First Instance and second Instance Using Ignore Internal Id
+        Map<String, Object> diff1 = family1.diff(family2, true);
+        Assert.assertEquals(diff1.size(), 1);
+        Assert.assertEquals(diff1.get("familyName"), "test.com");
+
     }
     @After
     public void tearDown() throws Exception {
