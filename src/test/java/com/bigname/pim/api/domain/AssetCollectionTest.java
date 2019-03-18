@@ -15,6 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 import static org.junit.Assert.*;
 
@@ -38,6 +41,7 @@ public class AssetCollectionTest {
     }
     @Test
     public void accessorsTest(){
+        //Create New Instance
         AssetCollection assetCollectionDTO = new AssetCollection();
         assetCollectionDTO.setCollectionId("test");
         assetCollectionDTO.setCollectionName("test");
@@ -45,6 +49,7 @@ public class AssetCollectionTest {
 
         assetCollectionDTO.orchestrate();
 
+        //Equals Checking With Id
         Assert.assertEquals(assetCollectionDTO.getCollectionId(), "TEST");
         Assert.assertEquals(assetCollectionDTO.getCollectionName(), "test");
         Assert.assertEquals(assetCollectionDTO.getRootId(), "test");
@@ -60,18 +65,115 @@ public class AssetCollectionTest {
 
     @Test
     public void merge() throws Exception {
+        //Create New Original Instance
+        AssetCollection original = new AssetCollection();
+        original.setExternalId("test");
+        original.setCollectionName("Test");
+        original.setActive("Y");
+
+        //Create New Modified Instance
+        AssetCollection modified = new AssetCollection();
+        modified.setGroup("DETAILS");
+        modified.setExternalId("TEST-A");
+        modified.setCollectionName("Test-A");
+        modified.setActive("N");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getExternalId(), "TEST-A");
+        Assert.assertEquals(original.getCollectionName(), "Test-A");
+        Assert.assertEquals(original.getActive(), "N");
+
+        //Create New Modified Instance Without Details
+        AssetCollection modified1 = new AssetCollection();
+        modified1.setExternalId("TEST");
+        modified1.setCollectionName("Test");
+        modified1.setActive("Y");
+
+        original = original.merge(modified1);
+        Assert.assertEquals(original.getExternalId(), "TEST-A");
+        Assert.assertEquals(original.getCollectionName(), "Test-A");
+        Assert.assertEquals(original.getActive(), "N");
+
     }
 
     @Test
     public void toMap() throws Exception {
+        //Create New Instance
+        AssetCollection assetCollectionDTO = new AssetCollection();
+        assetCollectionDTO.setExternalId("test");
+        assetCollectionDTO.setCollectionName("Test");
+        assetCollectionDTO.setRootId("test");
+        assetCollectionDTO.setActive("Y");
+
+        //Create New Map For Equals Checking
+        Map<String, String> map = new HashMap<>();
+        map.put("externalId", "TEST");
+        map.put("collectionName", "Test");
+        map.put("rootId", "test");
+        map.put("active", "Y");
+
+        Map<String, String> map1 = assetCollectionDTO.toMap();
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
+        Assert.assertEquals(map1.get("collectionName"), map.get("collectionName"));
+        Assert.assertEquals(map1.get("rootId"), map.get("rootId"));
+        Assert.assertEquals(map1.get("active"), map.get("active"));
+
     }
 
     @Test
     public void toMap1() throws Exception {
+        //create New Instance
+        AssetCollection assetCollectionDTO = new AssetCollection();
+        assetCollectionDTO.setExternalId("test");
+        assetCollectionDTO.setCollectionName("Test");
+        assetCollectionDTO.setRootId("test");
+        assetCollectionDTO.setActive("Y");
+
+        //Create New Map For Equals Checking
+        Map<String, String> map = new HashMap<>();
+        map.put("externalId", "TEST");
+        map.put("collectionName", "Test");
+        map.put("rootId", "test");
+        map.put("active", "Y");
+
+        Map<String, String> map1 = assetCollectionDTO.toMap();
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
+        Assert.assertEquals(map1.get("collectionName"), map.get("collectionName"));
+        Assert.assertEquals(map1.get("rootId"), map.get("rootId"));
+        Assert.assertEquals(map1.get("active"), map.get("active"));
     }
 
     @Test
     public void diff() throws Exception {
+        //Create First New Instance
+        AssetCollection assetCollection1 = new AssetCollection();
+        assetCollection1.setCollectionName("Test");
+        assetCollection1.setRootId("test");
+
+        //Create Second New Instance
+        AssetCollection assetCollection2 = new AssetCollection();
+        assetCollection2.setCollectionName("Test.com");
+        assetCollection2.setRootId("test");
+
+        //Checking First instance and Second instance
+        Map<String, Object> diff = assetCollection1.diff(assetCollection2);
+        Assert.assertEquals(diff.size(), 2);
+        Assert.assertEquals(diff.get("collectionName"), "Test.com");
+
+        //Create First New Instance For Ignore internal Id
+        AssetCollection assetCollection3 = new AssetCollection();
+        assetCollection3.setCollectionName("Test");
+        assetCollection3.setRootId("test");
+
+        //Create Second New Instance For Ignore internal Id
+        AssetCollection assetCollection4 = new AssetCollection();
+        assetCollection4.setCollectionName("Test.com");
+        assetCollection4.setRootId("test");
+
+        //Checking First instance and Second instance
+        Map<String, Object> diff1 = assetCollection3.diff(assetCollection4, true);
+        Assert.assertEquals(diff1.size(), 1);
+        Assert.assertEquals(diff1.get("collectionName"), "Test.com");
     }
     @After
     public void tearDown() throws Exception {
