@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
@@ -176,24 +177,20 @@ public class AttributeCollectionTest {
     public void toMap() throws Exception {
         //Create new instance
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
-        attributeCollectionDTO.setCollectionId("test");
         attributeCollectionDTO.setCollectionName("test");
         attributeCollectionDTO.setExternalId("test");
-        attributeCollectionDTO.setActive("N");
+        attributeCollectionDTO.setActive("Y");
 
-        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDTO.getCollectionId()));
+        //Checking for Map
+        Map<String, String> map = new HashMap<>();
+        map.put("collectionName", "test");
+        map.put("externalId", "TEST");
+        map.put("active", "Y");
 
-        //Testing equals with id
-        Assert.assertEquals(attributeCollectionDTO.getCollectionId(), "TEST");
-        Assert.assertEquals(attributeCollectionDTO.getCollectionName(), "test");
-        Assert.assertEquals(attributeCollectionDTO.getExternalId(), "TEST");
-        Assert.assertEquals(attributeCollectionDTO.getActive(), "N");
-
-        //Get attributeCollectionDTO
-        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDTO.getCollectionId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDTO.getCollectionName()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDTO.getExternalId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDTO.getActive()));
+        Map<String, String> map1 = attributeCollectionDTO.toMap();
+        Assert.assertEquals(map1.get("collectionName"), map.get("collectionName"));
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
+        Assert.assertEquals(map1.get("active"), map.get("active"));
     }
 
     @Test
@@ -212,22 +209,10 @@ public class AttributeCollectionTest {
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("collectionName"), "test.com");
 
-        //Create Attribute first instance
-        Attribute attribute1 = new Attribute();
-        attribute1.setName("test");
-        attribute1.setActive("Y");
-
-        //Create Attribute second instance
-        Attribute attribute2 = new Attribute();
-        attribute2.setName("test22");
-        attribute2.setActive("Y");
-
-        attributeCollection1.addAttribute(attribute1);
-        attributeCollection2.addAttribute(attribute2);
-
-        Map<String, Object> diff1 = attributeCollection1.diff(attributeCollection2);
-        Assert.assertEquals(diff1.size(), 2);
-       // Assert.assertEquals(diff1.get("name"), "test22");
+        //Checking Ignore internal id
+        Map<String, Object> diff1 = attributeCollection1.diff(attributeCollection2, true);
+        Assert.assertEquals(diff1.size(), 1);
+        Assert.assertEquals(diff1.get("collectionName"), "test.com");
     }
 
     @Test
