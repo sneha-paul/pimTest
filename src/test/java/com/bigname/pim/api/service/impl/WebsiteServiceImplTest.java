@@ -453,6 +453,11 @@ public class WebsiteServiceImplTest {
         Map<String, Object> diff = websiteDetails.diff(updatedWebsite);
         Assert.assertEquals(diff.size(), 1);
         Assert.assertEquals(diff.get("active"), "N");
+
+        websiteService.toggle(websiteDetails.getWebsiteId(), EXTERNAL_ID, Toggle.get(updatedWebsite.getActive()));
+        Website updatedWebsite1 = websiteService.get(websiteDetails.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedWebsite1));
+        Assert.assertEquals(updatedWebsite1.getActive(), "Y");
     }
 
     @Test

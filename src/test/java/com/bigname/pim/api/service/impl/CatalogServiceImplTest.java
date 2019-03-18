@@ -572,7 +572,7 @@ public class CatalogServiceImplTest {
 
         catalogService.toggle(catalogDetails.getCatalogId(), EXTERNAL_ID, Toggle.get(updatedCatalog.getActive()));
         Catalog updatedCatalog1 = catalogService.get(catalogDetails.getCatalogId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCatalog));
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCatalog1));
         Assert.assertEquals(updatedCatalog1.getActive(), "Y");
     }
 
