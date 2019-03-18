@@ -11,6 +11,7 @@ import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
+import com.bigname.pim.util.PimUtil;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.junit.After;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -1078,6 +1080,122 @@ public class FamilyServiceImplTest {
             boolean result=familyService.toggleVariantGroup(family.getId(), FindBy.INTERNAL_ID,"TEST_VARIANT_1", FindBy.EXTERNAL_ID, Toggle.get("active"));
             Assert.assertTrue(result);
         });
+    }
+
+    @Test
+    public void findOneTest() {
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionDAO.insert(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollectionDetails.addAttribute(attribute);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
+        AttributeOption attributeOption = new AttributeOption();
+        attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+        attributeOption.setValue("TestOption");
+        attributeOption.setAttributeId(attribute.getFullId());
+        attributeOption.setActive("Y");
+        attributeOption.orchestrate();
+        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyDAO.insert(familyDTO);
+
+            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Assert.assertTrue(family != null);
+
+            familyDAO.save(family);
+
+        });
+
+        Optional<Family> result = familyService.findOne(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
+        Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());
+
+    }
+
+    @Test
+    public void findOne1Test() {
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionDAO.insert(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollectionDetails.addAttribute(attribute);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
+        AttributeOption attributeOption = new AttributeOption();
+        attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+        attributeOption.setValue("TestOption");
+        attributeOption.setAttributeId(attribute.getFullId());
+        attributeOption.setActive("Y");
+        attributeOption.orchestrate();
+        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyDAO.insert(familyDTO);
+
+            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Assert.assertTrue(family != null);
+
+            familyDAO.save(family);
+
+        });
+        //Getting category
+        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
+        Optional<Family> result = familyService.findOne(criteria);
+        Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());
     }
 
     @After
