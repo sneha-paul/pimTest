@@ -34,6 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.bigname.common.util.ValidationUtil.isEmpty;
 
@@ -49,6 +52,8 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
     private Set<BaseService> services = new HashSet<>();
     protected BaseExporter exporter;
     protected Logger LOGGER = LoggerFactory.getLogger((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+    protected Sort defaultSort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+    protected Predicate<Request> associationSortPredicate = dataTableRequest -> dataTableRequest.getPagination().hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum");
 
     @Value("${app.export.feed.location:/usr/local/pim/uploads/data/export/}")
     protected String exportFileStorageLocation;
@@ -68,28 +73,21 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         this.services.add(service);
     }
 
-    @RequestMapping(value =  {"/list", "/data"})
-    @ResponseBody
     @SuppressWarnings("unchecked")
-    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-        }
-        Page<T> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? service.findAll(PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), dataTableRequest.getStatusOptions())
-                : service.findAll("productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
+    public Result<Map<String, String>> all(HttpServletRequest request, String searchField) {
+        return new Result<Map<String, String>>().buildResult(new Request(request),
+                dataTableRequest -> {
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return service.findAll(dataTableRequest.getPageRequest(defaultSort), dataTableRequest.getStatusOptions());
+                    } else {
+                        return service.findAll(searchField, dataTableRequest.getSearch(), dataTableRequest.getPageRequest(defaultSort), false);
+                    }
+                },
+                paginatedResult -> {
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+                    return dataObjects;
+                });
     }
 
     @RequestMapping(value = "/{id}/active/{active}", method = RequestMethod.PUT)
@@ -157,38 +155,22 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
         return new ModelAndView((String)model.remove("view"), model);
     }
 
-    protected Result<Map<String, Object>> getAssociationGridData(Page<Map<String, Object>> paginatedResult, Class<? extends EntityAssociation<T, ?>> associationClass, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, Object>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort = null;
-        if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        List<Map<String, Object>> dataObjects = new ArrayList<>();
-        int seq[] = {1};
-        EntityAssociation<T, ?> association = ReflectionUtil.newInstance(associationClass);
-        paginatedResult.getContent().forEach(e -> {
-            e.put("sequenceNum", Integer.toString(seq[0] ++));
-            dataObjects.add(association != null ? association.toMap(e) : e);
-        });
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
+    protected Result<Map<String, Object>> getAssociationGridData(HttpServletRequest request,
+                                                                 Class<? extends EntityAssociation<T, ?>> associationClass,
+                                                                 Function<Request, Page<Map<String, Object>>> resultMapper) {
+        return new Result<Map<String, Object>>().buildResult(new Request(request),
+                resultMapper,
+                paginatedResult -> {
+                    List<Map<String, Object>> dataObjects = new ArrayList<>();
+                    int seq[] = {1};
+                    EntityAssociation<T, ?> association = ReflectionUtil.newInstance(associationClass);
+                    paginatedResult.getContent().forEach(e -> {
+                        e.put("sequenceNum", Integer.toString(seq[0] ++));
+                        dataObjects.add(association != null ? association.toMap(e) : e);
+                    });
+                    return dataObjects;
+                });
     }
-
-    protected Pageable getPaginationRequest(HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Sort sort = null;
-        if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        }
-        return PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort);
-    }
-
 
     private Breadcrumbs buildBreadcrumbs(String id, HttpServletRequest request, Map<String, Object> parameterMap) {
         return new BreadcrumbsBuilder(id, entityClass, request, parameterMap, new ArrayList<>(services).toArray(new BaseService[0])).build();

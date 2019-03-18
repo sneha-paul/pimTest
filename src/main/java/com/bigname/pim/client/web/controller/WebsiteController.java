@@ -1,29 +1,20 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Pagination;
 import com.bigname.common.datatable.model.Request;
 import com.bigname.common.datatable.model.Result;
-import com.bigname.common.datatable.model.SortOrder;
 import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.EntityAssociation;
 import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.web.controller.BaseController;
-import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.service.WebsiteService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +121,13 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         return all(model);
     }
 
+    @RequestMapping(value = "/data")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> all(HttpServletRequest request) {
+        return super.all(request, "websiteName");
+    }
+
 
     /**
      * Handler method to load a list of all the catalogs associated with the given websiteId.
@@ -142,30 +140,15 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     @RequestMapping("/{id}/catalogs/data")
     @ResponseBody
     public Result<Map<String, Object>> getWebsiteCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        if(ValidationUtil.isEmpty(dataTableRequest.getSearch())) {
-            return getAssociationGridData(websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), WebsiteCatalog.class, request);
-        } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, Object>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort = null;
-            if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            }
-            List<Map<String, Object>> dataObjects = new ArrayList<>();
-            int seq[] = {1};
-            Page<Map<String, Object>> paginatedResult = websiteService.findAllWebsiteCatalogs(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            EntityAssociation<Website, Catalog> association = new WebsiteCatalog();
-            paginatedResult.getContent().forEach(e -> {
-                e.put("sequenceNum", Integer.toString(seq[0] ++));
-                dataObjects.add(association.toMap(e));
-            });
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
-            return result;
-        }
+        return getAssociationGridData(request,
+                WebsiteCatalog.class,
+                dataTableRequest -> {
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    } else {
+                        return websiteService.findAllWebsiteCatalogs(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    }
+                });
     }
 
     /**
@@ -185,31 +168,25 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
      *
      * @param id
      * @param request
-     * @param response
-     * @param model
      * @return
      */
     @RequestMapping("/{id}/catalogs/available/list")
     @ResponseBody
-    public Result<Map<String, String>> getAvailableCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Catalog> paginatedResult = ValidationUtil.isEmpty(dataTableRequest.getSearch()) ? websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
-                : websiteService.findAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
+    public Result<Map<String, String>> getAvailableCatalogs(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return new Result<Map<String, String>>().buildResult(new Request(request),
+                dataTableRequest -> {
+                    PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                    } else {
+                        return websiteService.findAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), pageRequest, false);
+                    }
+                },
+                paginatedResult -> {
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+                    return dataObjects;
+                });
     }
 
     /**

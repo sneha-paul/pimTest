@@ -3,12 +3,15 @@ package com.bigname.common.datatable.model;
 import com.bigname.common.util.StringUtil;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.PimUtil;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -338,5 +341,33 @@ public class Request {
         pagination.setFilterBy(filterBy);
 
         return pagination;
+    }
+
+    public PageRequest getPageRequest(Sort defaultSort) {
+        return getPageRequest(null, defaultSort);
+    }
+
+    public PageRequest getPageRequest(Predicate<Request> predicate) {
+        return getPageRequest(predicate, null);
+    }
+
+    public PageRequest getPageRequest(Predicate<Request> predicate, Sort defaultSort) {
+        Sort sort = getSort(predicate);
+        if(sort == null && defaultSort != null) {
+            sort = defaultSort;
+        }
+        Pagination pagination = getPagination();
+        return PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort);
+    }
+
+    public Sort getSort() {
+        return getSort(null);
+    }
+
+    public Sort getSort(Predicate<Request> predicate) {
+        if(isNotEmpty(this.getOrder()) && (predicate == null || predicate.test(this))) {
+            return Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(getOrder().getSortDir()).name()), getOrder().getName()));
+        }
+        return null;
     }
 }

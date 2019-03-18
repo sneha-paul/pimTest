@@ -63,28 +63,8 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     @RequestMapping(value =  {"/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        if(isEmpty(dataTableRequest.getSearch())) {
-            return super.all(request, response, model);
-        } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, String>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort;
-            if(pagination.hasSorts()) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            } else {
-                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-            }
-            List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<Family> paginatedResult = familyService.findAll("familyName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
-        }
+    public Result<Map<String, String>> all(HttpServletRequest request) {
+        return all(request, "familyName");
     }
 
     @RequestMapping(value = {"/{id}", "/create"})

@@ -1,8 +1,12 @@
 package com.bigname.common.datatable.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * The datatable result model
@@ -94,6 +98,22 @@ public class Result<T> {
      */
     public void setDataObjects(List<T> dataObjects) {
         this.dataObjects = dataObjects;
+    }
+
+    /*public Result<T> buildResult(Request request, Page<T> paginatedResult, Predicate<Request> predicate, Function<Page<T>, List<T>> mapper) {
+
+    }*/
+
+    public <R> Result<T> buildResult(Request request,
+                                     Function<Request, Page<R>> resultMapper,
+                                     Function<Page<R>, List<T>> dataMapper) {
+        Result<T> result = new Result<>();
+        result.setDraw(request.getDraw());
+        Page<R> paginatedResult = resultMapper.apply(request);
+        result.setDataObjects(dataMapper.apply(paginatedResult));
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
     }
 
 }

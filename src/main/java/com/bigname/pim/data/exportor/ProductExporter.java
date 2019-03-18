@@ -381,8 +381,8 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
     public boolean exportProductsData(String filePath){
         List<Product> products =  productService.getAll(null, false);
         List<List<Object>> data = new ArrayList<>();
-        data.add(Arrays.asList(new String[]{"PARENT PRODUCT NAME", "PARENT PRODUCT ID"}));
-        products.forEach(product -> data.add(Arrays.asList(product.getProductName(), product.getExternalId())));
+        data.add(Arrays.asList(new String[]{"PARENT PRODUCT ID", "PARENT PRODUCT NAME", "CATEGORY_ID", "SEQUENCE_NUM"}));
+        products.forEach(product -> data.add(Arrays.asList(product.getExternalId(), product.getProductName())));
         POIUtil.writeData(filePath, "Parent Products", data);
         return true;
     }

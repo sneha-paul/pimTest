@@ -100,31 +100,9 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
-    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        if (isEmpty(dataTableRequest.getSearch())) {
-            return super.all(request, response, model);
-        } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, String>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort;
-            if (pagination.hasSorts()) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            } else {
-                sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-            }
-            List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<Category> paginatedResult = categoryService.findAll("categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
-        }
-
+    public Result<Map<String, String>> all(HttpServletRequest request) {
+        return all(request, "categoryName");
     }
-
 
     @RequestMapping("/hierarchy")
     @ResponseBody
@@ -136,30 +114,15 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping("/{id}/subCategories/data")
     @ResponseBody
     public Result<Map<String, Object>> getSubCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        if(isEmpty(dataTableRequest.getSearch())) {
-            return getAssociationGridData(categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), RelatedCategory.class, request);
-        } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, Object>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort = null;
-            if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            }
-            List<Map<String, Object>> dataObjects = new ArrayList<>();
-            int seq[] = {1};
-            Page<Map<String, Object>> paginatedResult = categoryService.findAllSubCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            EntityAssociation<Category, Category> association = new RelatedCategory();
-            paginatedResult.getContent().forEach(e -> {
-                e.put("sequenceNum", Integer.toString(seq[0] ++));
-                dataObjects.add(association.toMap(e));
-            });
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
-        }
+        return getAssociationGridData(request,
+                RelatedCategory.class,
+                dataTableRequest -> {
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    } else {
+                        return categoryService.findAllSubCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    }
+                });
     }
 
     @RequestMapping(value = "/{id}/subCategories/data", method = RequestMethod.PUT)
@@ -174,31 +137,15 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping("/{id}/products/data")
     @ResponseBody
     public Result<Map<String, Object>> getCategoryProducts(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        if(isEmpty(dataTableRequest.getSearch())) {
-            return getAssociationGridData(categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), CategoryProduct.class, request);
-        } else {
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, Object>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort = null;
-            if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            }
-            List<Map<String, Object>> dataObjects = new ArrayList<>();
-            int seq[] = {1};
-            Page<Map<String, Object>> paginatedResult = categoryService.findAllCategoryProducts(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            EntityAssociation<Category, Product> association = new CategoryProduct();
-            paginatedResult.getContent().forEach(e -> {
-                e.put("sequenceNum", Integer.toString(seq[0] ++));
-                dataObjects.add(association.toMap(e));
-            });
-
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-            return result;
-        }
+        return getAssociationGridData(request,
+                CategoryProduct.class,
+                dataTableRequest -> {
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    } else {
+                        return categoryService.findAllCategoryProducts(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    }
+                });
     }
 
     @RequestMapping(value = "/{id}/products/data", method = RequestMethod.PUT)
@@ -218,25 +165,21 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @RequestMapping("/{id}/subCategories/available/list")
     @ResponseBody
-    public Result<Map<String, String>> getAvailableSubCategories(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Category> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
-                : categoryService.findAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
+    public Result<Map<String, String>> getAvailableSubCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return new Result<Map<String, String>>().buildResult(new Request(request),
+                dataTableRequest -> {
+                    PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                    } else {
+                        return categoryService.findAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), pageRequest, false);
+                    }
+                },
+                paginatedResult -> {
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+                    return dataObjects;
+                });
     }
 
     @ResponseBody
@@ -267,25 +210,21 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @RequestMapping("/{id}/products/available/list")
     @ResponseBody
-    public Result<Map<String, String>> getAvailableProducts(@PathVariable(value = "id") String id, HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Product> paginatedResult = ValidationUtil.isEmpty(dataTableRequest.getSearch()) ? categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
-                : categoryService.findAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
+    public Result<Map<String, String>> getAvailableProducts(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return new Result<Map<String, String>>().buildResult(new Request(request),
+                dataTableRequest -> {
+                    PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                    } else {
+                        return categoryService.findAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), pageRequest, false);
+                    }
+                },
+                paginatedResult -> {
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+                    return dataObjects;
+                });
     }
 
     @ResponseBody

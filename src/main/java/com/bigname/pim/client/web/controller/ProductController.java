@@ -165,63 +165,24 @@ public class ProductController extends BaseController<Product, ProductService> {
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public Result<Map<String, String>> all(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
-        }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Product> paginatedResult = isEmpty(dataTableRequest.getSearch()) ? productService.findAll(PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), dataTableRequest.getStatusOptions())
-                : productService.findAll("productName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-        List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
-        List<ProductVariant> productVariants = productVariantService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, false);
-        Map<String, Map<String, Object>> productsVariantsInfo = ProductUtil.getVariantDetailsForProducts(productIds, productVariants, 4);
-        paginatedResult.forEach(e -> {
-            Map<String, String> map = e.toMap();
-            Map<String, Object> productVariantsInfo = productsVariantsInfo.get(e.getId());
-            map.put("variantCount", Integer.toString((int)productVariantsInfo.get("totalVariants")));
-            map.put("variantImages", StringUtil.concatinate((List<String>)productVariantsInfo.get("variantImages"), "|"));
-            dataObjects.add(map);
-        });
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
+    public Result<Map<String, String>> all(HttpServletRequest request) {
+        return all(request, "productName");
     }
 
     @RequestMapping("/{id}/categories/data")
     @ResponseBody
     public Result<Map<String, Object>> getProductCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        if(ValidationUtil.isEmpty(dataTableRequest.getSearch())) {
-            return getAssociationGridData(productService.getCategories(id, FindBy.EXTERNAL_ID, getPaginationRequest(request), false), ProductCategory.class, request);
-        } else{
-            Pagination pagination = dataTableRequest.getPagination();
-            Result<Map<String, Object>> result = new Result<>();
-            result.setDraw(dataTableRequest.getDraw());
-            Sort sort = null;
-            if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
-                sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-            }
-            List<Map<String, Object>> dataObjects = new ArrayList<>();
-            int seq[] = {1};
-            Page<Map<String, Object>> paginatedResult = productService.findAllProductCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-            EntityAssociation<Product, Category> association = new ProductCategory();
-            paginatedResult.getContent().forEach(e -> {
-                e.put("sequenceNum", Integer.toString(seq[0] ++));
-                dataObjects.add(association.toMap(e));
-            });
-            result.setDataObjects(dataObjects);
-            result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-            result.setRecordsFiltered(Long.toString(paginatedResult.getContent().size()));
-            return result;
-        }
+        return getAssociationGridData(request,
+                ProductCategory.class,
+                dataTableRequest -> {
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return productService.getCategories(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    } else {
+                        return productService.findAllProductCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    }
+                });
+
+
     }
 
     @RequestMapping(value = "/{id}/categories/available")
@@ -233,25 +194,21 @@ public class ProductController extends BaseController<Product, ProductService> {
     @RequestMapping("/{id}/categories/available/list")
     @ResponseBody
     public Result<Map<String, String>> getAvailableCategories(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        Request dataTableRequest = new Request(request);
-        Pagination pagination = dataTableRequest.getPagination();
-        Result<Map<String, String>> result = new Result<>();
-        result.setDraw(dataTableRequest.getDraw());
-        Sort sort;
-        if(pagination.hasSorts()) {
-            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
-        } else {
-            sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
+        return new Result<Map<String, String>>().buildResult(new Request(request),
+                dataTableRequest -> {
+                    PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return productService.getAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                    } else {
+                        return productService.findAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), pageRequest, false);
+                    }
+                },
+                paginatedResult -> {
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+                    return dataObjects;
+                });
         }
-        List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Category> paginatedResult = ValidationUtil.isEmpty(dataTableRequest.getSearch()) ? productService.getAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort, false)
-                : productService.findAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
-        paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
-        result.setDataObjects(dataObjects);
-        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
-        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-        return result;
-    }
 
     @ResponseBody
     @RequestMapping(value = "/{id}/categories/{categoryId}", method = RequestMethod.POST)
