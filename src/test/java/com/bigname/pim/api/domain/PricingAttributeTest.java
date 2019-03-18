@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,30 +122,26 @@ public class PricingAttributeTest {
         Assert.assertEquals(original.getPricingAttributeId(), "TEST");
         Assert.assertEquals(original.getExternalId(), "TEST");
         Assert.assertEquals(original.getActive(), "N");
-
     }
 
     @Test
     public void toMap() throws Exception {
-        //Create new instance
+        //Create New Instance
         PricingAttribute pricingAttributeDTO = new PricingAttribute();
-        pricingAttributeDTO.setPricingAttributeId("test");
-        pricingAttributeDTO.setPricingAttributeName("test");
         pricingAttributeDTO.setExternalId("test");
-        pricingAttributeDTO.setActive("N");
+        pricingAttributeDTO.setPricingAttributeName("Test");
+        pricingAttributeDTO.setActive("Y");
 
-        Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDTO.getPricingAttributeId()));
+        //Create New Instance For Checking Map
+        Map<String, String> map = new HashMap<>();
+        map.put("externalId", "TEST");
+        map.put("pricingAttributeName", "Test");
+        map.put("active", "Y");
 
-        //Testing equals with id
-        Assert.assertEquals(pricingAttributeDTO.getPricingAttributeId(), "TEST");
-        Assert.assertEquals(pricingAttributeDTO.getPricingAttributeId(), "TEST");
-        Assert.assertEquals(pricingAttributeDTO.getExternalId(), "TEST");
-        Assert.assertEquals(pricingAttributeDTO.getActive(), "N");
-
-        Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDTO.getPricingAttributeId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDTO.getExternalId()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDTO.getPricingAttributeName()));
-        Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDTO.getActive()));
+        Map<String, String> map1 = pricingAttributeDTO.toMap();
+        Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
+        Assert.assertEquals(map1.get("pricingAttributeName"), map.get("pricingAttributeName"));
+        Assert.assertEquals(map1.get("active"), map.get("active"));
     }
 
     @Test
@@ -162,6 +159,21 @@ public class PricingAttributeTest {
         Map<String, Object> diff = pricingAttribute1.diff(pricingAttribute2);
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("pricingAttributeName"), "test.com");
+
+        //Create Second Instance For Ignore Internal Id
+        //Create first instance
+        PricingAttribute pricingAttribute3 = new PricingAttribute();
+        pricingAttribute3.setExternalId("test");
+        pricingAttribute3.setPricingAttributeName("test");
+
+        //Create second instance
+        PricingAttribute pricingAttribute4 = new PricingAttribute();
+        pricingAttribute4.setExternalId("test");
+        pricingAttribute4.setPricingAttributeName("test.com2");
+
+        Map<String, Object> diff1 = pricingAttribute3.diff(pricingAttribute4, true);
+        Assert.assertEquals(diff1.size(), 1);
+        Assert.assertEquals(diff1.get("pricingAttributeName"), "test.com2");
     }
     @After
     public void tearDown() throws Exception {
