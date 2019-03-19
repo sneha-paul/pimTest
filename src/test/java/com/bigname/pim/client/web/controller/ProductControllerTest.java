@@ -461,8 +461,19 @@ public class ProductControllerTest {
     public void reorderAsset() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void details() throws Exception {
+        //Create mode
+
+        /*mockMvc.perform(
+                get("/pim/products/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("product/product"))
+                .andExpect(forwardedUrl("/product/product.jsp"))
+                .andExpect(model().attribute("mode", is("CREATE")))
+                .andExpect(model().attribute("active", is("PRODUCTS")))
+                .andExpect(model().attribute("productFamilies", is(channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName)))));*/
     }
 
     @WithUserDetails("manu@blacwood.com")
