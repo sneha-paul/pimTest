@@ -20,10 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -231,10 +228,33 @@ public class FamilyAttributeOptionTest {
 
     @Test
     public void orchestrate() throws Exception {
+        FamilyAttributeOption familyAttributeOptionDTO = new FamilyAttributeOption();
+        familyAttributeOptionDTO.setValue("test");
+        familyAttributeOptionDTO.orchestrate();
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(familyAttributeOptionDTO.getId()));
+        Assert.assertEquals(familyAttributeOptionDTO.getId(), "TEST");
     }
 
     @Test
     public void toMap() throws Exception {
+        //Create new Instance
+        FamilyAttributeOption familyAttributeOptionDTO = new FamilyAttributeOption();
+        familyAttributeOptionDTO.setId("test");
+        familyAttributeOptionDTO.setValue("Test");
+        familyAttributeOptionDTO.setActive("Y");
+
+        //Checking for map
+        Map<String, String> map = new HashMap<>();
+        map.put("id", "test");
+        map.put("value", "Test");
+        map.put("active", "Y");
+
+        Map<String, String> map1 = familyAttributeOptionDTO.toMap();
+        Assert.assertEquals(map1.get("id"), map.get("id"));
+        Assert.assertEquals(map1.get("value"), map.get("value"));
+        Assert.assertEquals(map1.get("active"), map.get("active"));
+
     }
     @After
     public void tearDown() throws Exception {
