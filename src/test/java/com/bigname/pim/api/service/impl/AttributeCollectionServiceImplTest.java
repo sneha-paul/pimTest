@@ -882,6 +882,34 @@ public class AttributeCollectionServiceImplTest {
        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCollection));
        Assert.assertEquals(updatedCollection.getActive(), "N");
 
+       Attribute attribute = new Attribute();
+       attribute.setActive("Y");
+       attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+       attribute.setUiType(Attribute.UIType.DROPDOWN);
+       attribute.setName("style");
+       attribute.setId("STYLE");
+       attributeCollection.addAttribute(attribute);
+       List<AttributeCollection> attributeList= new ArrayList<>();
+       attributeList.add(attributeCollection);
+       attributeCollectionService.update(attributeList);
+
+       AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+       Attribute attribute1 = new Attribute();
+       attribute1.setActive("Y");
+       attribute1.setAttributeGroup(AttributeGroup.getDefaultGroup());
+       attribute1.setUiType(Attribute.UIType.DROPDOWN);
+       attribute1.setName("styleNew");
+       attribute1.setId("STYLE");
+       attributeCollectionUpdate.updateAttribute(attribute1);
+
+
+       attributeList= new ArrayList<>();
+       attributeList.add(attributeCollectionUpdate);
+       attributeCollectionService.update(attributeList);
+       Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+       Assert.assertEquals(result.getContent().get(0).getName(),attribute1.getName());
+
    }
 
      @Test
@@ -898,6 +926,42 @@ public class AttributeCollectionServiceImplTest {
              attributeCollectionDTO.setActive((String)collectionData.get("active"));
              attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
              attributeCollectionService.create(attributeCollectionDTO);
+
+             AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+             List<Map<String, Object>> attributesData = new ArrayList<>();
+             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE"));
+             attributesData.forEach(attributeData -> {
+                 Attribute attribute = new Attribute();
+                 attribute.setActive((String) attributeData.get("active"));
+                 attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                 attribute.setName((String) attributeData.get("name"));
+                 attribute.setId((String)attributeData.get("id"));
+                 attributeCollection.addAttribute(attribute);
+             });
+             List<AttributeCollection> attributeList= new ArrayList<>();
+             attributeList.add(attributeCollection);
+             attributeCollectionService.update(attributeList);
+
+             AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+
+             List<Map<String, Object>> attributesUpdateData = new ArrayList<>();
+             attributesUpdateData.add(CollectionsUtil.toMap("name", "styleNew", "active", "Y", "id", "STYLE"));
+             attributesUpdateData.forEach(attributeData -> {
+                 Attribute attribute = new Attribute();
+                 attribute.setActive((String) attributeData.get("active"));
+                 attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                 attribute.setName((String) attributeData.get("name"));
+                 attribute.setId((String)attributeData.get("id"));
+                 attributeCollectionUpdate.updateAttribute(attribute);
+             });
+
+             attributeList= new ArrayList<>();
+             attributeList.add(attributeCollectionUpdate);
+             attributeCollectionService.update(attributeList);
+             Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+             Assert.assertEquals(result.getContent().get(0).getName(),attributesUpdateData.get(0).get("name"));
          });
 
          String[] ids = {collectionsData.get(0).get("externalId").toString(), collectionsData.get(1).get("externalId").toString(), collectionsData.get(2).get("externalId").toString()};
@@ -906,38 +970,16 @@ public class AttributeCollectionServiceImplTest {
         Map<String, AttributeCollection> collectionsMap = result.stream().collect(Collectors.toMap(collection -> collection.getCollectionId(), collection -> collection));
         Assert.assertTrue(collectionsMap.size() == ids.length && collectionsMap.containsKey(ids[0]) && collectionsMap.containsKey(ids[1]) && collectionsMap.containsKey(ids[2]));
 
-        List<AttributeCollection> categories = result.stream().map(result1 -> {
+        List<AttributeCollection> collections = result.stream().map(result1 -> {
             result1.setActive("N");
             return result1;
         }).collect(Collectors.toList());
 
-        attributeCollectionService.update(categories);
+        attributeCollectionService.update(collections);
         result = attributeCollectionService.getAll(Sort.by("collectionName").descending(), true);
         collectionsMap = result.stream().collect(Collectors.toMap(collection -> collection.getCollectionId(), collection -> collection));
         Assert.assertTrue(collectionsMap.size() == (collectionsData.size() - ids.length) && !collectionsMap.containsKey(ids[0]) && !collectionsMap.containsKey(ids[1]) && !collectionsMap.containsKey(ids[2]));
         Assert.assertFalse(collectionsMap.size() == collectionsData.size() && collectionsMap.containsKey(ids[0]) && collectionsMap.containsKey(ids[1]) && collectionsMap.containsKey(ids[2]));
-    }
-
-    @Test
-    public void cloneInstanceTest() {
-       /* List<Map<String, Object>> collectionsData = new ArrayList<>();
-        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
-
-        collectionsData.forEach(collectionData -> {
-            AttributeCollection attributeCollectionDTO = new AttributeCollection();
-            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
-            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
-            attributeCollectionDTO.setActive((String)collectionData.get("active"));
-            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
-            attributeCollectionDAO.insert(attributeCollectionDTO);
-
-            AttributeCollection newAttributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(ValidationUtil.isNotEmpty(newAttributeCollection));
-            Assert.assertTrue(newAttributeCollection.diff(attributeCollectionDTO).isEmpty());
-
-           AttributeCollection collectionClone = attributeCollectionService.cloneInstance(newAttributeCollection.getCollectionId(), FindBy.EXTERNAL_ID, Entity.CloneType.LIGHT);
-         //   Assert.assertTrue(collectionClone.getCollectionId() .equals(newAttributeCollection.getCollectionId() + "_COPY") && collectionClone.getCollectionName().equals(collectionClone.getCollectionName() + "_COPY")  && collectionClone.getActive() != collectionClone.getActive());
-        });*/
     }
 
    @Test
@@ -1107,7 +1149,7 @@ public class AttributeCollectionServiceImplTest {
 //        insert the valid instance
         attributeCollectionService.create(attributeCollectionDTO);
 
-        /*Create a second instance with the same id TEST_ATTRIBUTECOLLECTION to check the unique constraint violation of collectionId*/
+        /*Create a second instance with the same id TEST_ATTRIBUTECOLLECTION to check the unique constraint violation of collectionName*/
 
         AttributeCollection attributeCollectionDTO1 = new AttributeCollection();
         attributeCollectionDTO1.setCollectionName("Test_AttributeCollection1");
