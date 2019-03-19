@@ -85,7 +85,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
                 },
                 paginatedResult -> {
                     List<Map<String, String>> dataObjects = new ArrayList<>();
-                    paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
+                    paginatedResult.forEach(e -> dataObjects.add(e.toMap()));
                     return dataObjects;
                 });
     }
@@ -164,7 +164,7 @@ public class BaseController<T extends Entity, Service extends BaseService<T, ?>>
                     List<Map<String, Object>> dataObjects = new ArrayList<>();
                     int seq[] = {1};
                     EntityAssociation<T, ?> association = ReflectionUtil.newInstance(associationClass);
-                    paginatedResult.getContent().forEach(e -> {
+                    paginatedResult.forEach(e -> {
                         e.put("sequenceNum", Integer.toString(seq[0] ++));
                         dataObjects.add(association != null ? association.toMap(e) : e);
                     });
