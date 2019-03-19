@@ -380,4 +380,18 @@ public class Attribute extends ValidatableEntity<Attribute> {
                 ", attributeGroup=" + attributeGroup +
                 '}';
     }
+    public Map<String, Object> diff(Attribute attribute, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(attribute.getId())) {
+            diff.put("internalId", attribute.getId());
+        }
+        if (!this.getName().equals(attribute.getName())) {
+            diff.put("name", attribute.getName());
+        }
+        if (!this.getActive().equals(attribute.getActive())) {
+            diff.put("active", attribute.getActive());
+        }
+        return diff;
+    }
 }
