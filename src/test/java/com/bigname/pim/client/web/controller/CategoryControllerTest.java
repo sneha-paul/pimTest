@@ -175,7 +175,7 @@ public class CategoryControllerTest {
 
         //Details mode, with non=existing categoryID - TODO
 
-        //Add a website instance
+        //Add a category instance
         List<Category> createdCategoryInstances = addCategoryInstances();
         Assert.assertFalse(createdCategoryInstances.isEmpty());
 
@@ -621,7 +621,7 @@ public class CategoryControllerTest {
     @Test
     public void availableCategoriesTest() throws Exception {
 
-        //Add a website instance
+        //Add a category instance
         List<Category> createdCategoryInstances = addCategoryInstances();
         Assert.assertFalse(createdCategoryInstances.isEmpty());
 

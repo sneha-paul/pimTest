@@ -227,7 +227,7 @@ public class WebsiteControllerTest {
             websiteDTO.setWebsiteId((String)websiteData.get("externalId"));
             websiteDTO.setActive((String)websiteData.get("active"));
             websiteDTO.setUrl((String)websiteData.get("url"));
-            websiteDAO.insert(websiteDTO);
+            websiteService.create(websiteDTO);
         });
 
         //Getting entries as page
