@@ -109,7 +109,7 @@ public class FamilyServiceImplTest {
             return familyDTO;
         }).collect(Collectors.toList());
 
-        List<Family> saveAllData=familyService.saveAll(familyDTOs);
+        familyService.saveAll(familyDTOs);
         Assert.assertEquals(familyDAO.findAll(PageRequest.of(0, familyDTOs.size()), false).getTotalElements(), familiesData.size());
     }
 
@@ -2167,7 +2167,7 @@ public class FamilyServiceImplTest {
         Family updatedFamily = familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily));
         Assert.assertEquals(updatedFamily.getActive(), "N");
-
+        //TODO Update  familyAttribute and familyOption is pending
     }
 
     @Test
@@ -2202,6 +2202,7 @@ public class FamilyServiceImplTest {
         familiesMap = result.stream().collect(Collectors.toMap(collection -> collection.getFamilyId(), collection -> collection));
         Assert.assertTrue(familiesMap.size() == (familiesData.size() - ids.length) && !familiesMap.containsKey(ids[0]) && !familiesMap.containsKey(ids[1]) && !familiesMap.containsKey(ids[2]));
         Assert.assertFalse(familiesMap.size() == familiesData.size() && familiesMap.containsKey(ids[0]) && familiesMap.containsKey(ids[1]) && familiesMap.containsKey(ids[2]));
+        //TODO Update  familyAttribute and familyOption is pending
     }
 
     @Test
