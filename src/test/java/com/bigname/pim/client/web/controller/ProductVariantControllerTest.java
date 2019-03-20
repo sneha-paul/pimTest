@@ -310,7 +310,6 @@ public class ProductVariantControllerTest {
 
         AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
-        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
         List<Map<String, Object>> attributesData = new ArrayList<>();
         attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
@@ -333,8 +332,7 @@ public class ProductVariantControllerTest {
             attribute.setActive((String) attributeData.get("active"));
             attributeCollectionDetails.addAttribute(attribute);
         });
-        attributeCollectionList.add(attributeCollectionDetails);
-        attributeCollectionService.update(attributeCollectionList);
+        attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
 
         AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
@@ -356,7 +354,7 @@ public class ProductVariantControllerTest {
             attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
         });
 
-        attributeCollectionService.update(attributeCollectionList);
+        attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
@@ -420,9 +418,7 @@ public class ProductVariantControllerTest {
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
 
-            List<Family> familyList = new ArrayList<>();
-            familyList.add(family);
-            familyService.update(familyList);
+            familyService.update(ConversionUtil.toList(family));
 
         });
 
@@ -435,7 +431,12 @@ public class ProductVariantControllerTest {
         productDTO.setProductFamilyId(familyDetails.getFamilyId());
         productDTO.setActive("Y");
         Product product = productService.create(productDTO);
-        Assert.assertTrue(product.diff(productDTO).isEmpty());
+        Product product1 = productService.get(product.getProductId(), FindBy.EXTERNAL_ID).orElse(null);
+        product1.setScopedFamilyAttributes(channel.getChannelId(), CollectionsUtil.toMap("TestAttribute2", "TestValue2", "TestAttribute4", "TestValue4", "TestAttribute5", "TestValue5", "TestAttribute6", "TestValue6", "TestAttribute7", "TestValue7", "TestAttribute8", "TestValue8", "TestAttribute9", "TestValue9"));
+        //update product
+
+        productService.update(ConversionUtil.toList(product1));
+        //Assert.assertTrue(product.diff(productDTO).isEmpty());
 
         //create productVariantInstance
         Product newProduct = productService.get(product.getProductId(), FindBy.EXTERNAL_ID).orElse(null);
@@ -455,6 +456,7 @@ public class ProductVariantControllerTest {
         //Update
         params.put("group", ConversionUtil.toList("DETAILS"));
         params.put("productVariantName", ConversionUtil.toList("New Test Site"));
+        params.put("TestAttribute3", ConversionUtil.toList("Test3Value"));
         ResultActions result1 = mockMvc.perform(
                 put("/pim/products/TEST1/channels/ECOMMERCE/variants/TEST1_BLUE")
                         .params(params)
@@ -689,7 +691,7 @@ public class ProductVariantControllerTest {
 
     @After
     public void tearDown() throws Exception {
-        //productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
+        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
         channelDAO.getMongoTemplate().dropCollection(Channel.class);
         attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
         familyDAO.getMongoTemplate().dropCollection(Family.class);
