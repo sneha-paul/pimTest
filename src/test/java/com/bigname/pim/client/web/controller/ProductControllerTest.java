@@ -369,31 +369,33 @@ public class ProductControllerTest {
             familyAttributeGroup.setId(familyAttributeGroup.getFullId());
 
             //Create the new familyAttribute instance
-            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeDetails.getName(), null);
-            familyAttributeDTO.setActive("Y");
-            familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
-            familyAttributeDTO.setUiType(attributeDetails.getUiType());
-            familyAttributeDTO.setScopable("Y");
-            familyAttributeDTO.setAttributeId(attributeDetails.getFullId());
-            familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
-            familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
-            familyAttributeDTO.setAttribute(attributeDetails);
+            attributes.forEach(attributeData -> {
+                        FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                        familyAttributeDTO.setActive("Y");
+                        familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                        familyAttributeDTO.setUiType(attributeData.getUiType());
+                        familyAttributeDTO.setScopable("Y");
+                        familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                        familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                        familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                        familyAttributeDTO.setAttribute(attributeData);
+                        family.addAttribute(familyAttributeDTO);
 
-            family.addAttribute(familyAttributeDTO);
+            FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeData.getId());
 
-            FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeDetails.getId());
-
-            List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
-            attributeOptionList.forEach(attributeOption -> {
-                FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
-                familyAttributeOption.setActive("Y");
-                familyAttributeOption.setValue(attributeOption.getValue());
-                familyAttributeOption.setId(attributeOption.getId());
-                familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
-                familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
-                family.addAttributeOption(familyAttributeOption, attributeOption);
-            });
-
+            if(attributeData.getName() == "Color") {
+                List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
+                attributeOptionList.forEach(attributeOption -> {
+                    FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                    familyAttributeOption.setActive("Y");
+                    familyAttributeOption.setValue(attributeOption.getValue());
+                    familyAttributeOption.setId(attributeOption.getId());
+                    familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                    familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                    family.addAttributeOption(familyAttributeOption, attributeOption);
+                });
+            }
+          });
             //set parentAttribute //TODO
 
             //create variantGroup
@@ -433,6 +435,13 @@ public class ProductControllerTest {
 
         params.put("group", ConversionUtil.toList("DETAILS"));
         params.put("productName", ConversionUtil.toList("New Test1"));
+        params.put("TESTATTRIBUTE2", ConversionUtil.toList("Test2Value"));
+        params.put("TESTATTRIBUTE4", ConversionUtil.toList("Test4Value"));
+        params.put("TESTATTRIBUTE5", ConversionUtil.toList("Test5Value"));
+        params.put("TESTATTRIBUTE6", ConversionUtil.toList("Test6Value"));
+        params.put("TESTATTRIBUTE7", ConversionUtil.toList("Test7Value"));
+        params.put("TESTATTRIBUTE8", ConversionUtil.toList("Test8Value"));
+        params.put("TESTATTRIBUTE9", ConversionUtil.toList("Test9Value"));
         ResultActions result1 = mockMvc.perform(
                 put("/pim/products/TEST1/channels/ECOMMERCE")
                         .params(params)
