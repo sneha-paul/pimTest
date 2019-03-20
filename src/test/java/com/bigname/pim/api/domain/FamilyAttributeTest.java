@@ -18,10 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 import static org.junit.Assert.*;
@@ -240,14 +237,36 @@ public class FamilyAttributeTest {
 
     @Test
     public void orchestrate() throws Exception {
+        //Create New Instance
+        FamilyAttribute familyAttributeDTO = new FamilyAttribute();
+        familyAttributeDTO.setId("test");
+        familyAttributeDTO.setName("Test");
+        familyAttributeDTO.orchestrate();
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(familyAttributeDTO.getId()));
+        Assert.assertEquals(familyAttributeDTO.getId(), "test");
     }
 
     @Test
     public void merge() throws Exception {
+        //Create Original Instance
+        FamilyAttribute original = new FamilyAttribute();
+        original.setName("Test");
+        original.setLabel("test");
+
+        //create Modified Instance
+        FamilyAttribute modified = new FamilyAttribute();
+        modified.setName("Test-A");
+        modified.setLabel("test-A");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getName(), "Test-A");
+        Assert.assertEquals(original.getLabel(), "test-A");
     }
 
     @Test
     public void toMap() throws Exception {
+
     }
 
     @Test
