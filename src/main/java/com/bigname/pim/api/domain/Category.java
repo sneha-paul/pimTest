@@ -23,11 +23,9 @@ public class Category extends Entity<Category> {
 
     @Transient
     @NotEmpty(message = "Category Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    // @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "category.categoryId.invalid")
     private String categoryId;
 
     @NotEmpty(message = "Category Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    // @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "category.categoryName.invalid")
     private String categoryName;
 
     private String description;

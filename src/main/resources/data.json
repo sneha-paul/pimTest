@@ -5,8 +5,8 @@
   {"id":"6459a5e8-7a58-4702-8eb0-7480e5042b19","websiteName":"Envelopes.com","url":"https://www.envelopes.com","externalId":"ENVELOPES","active":"Y","_class":"com.bigname.pim.api.domain.Website"},
   {"id":"055ccdc9-2ee3-4234-adf9-310db9418476","websiteName":"Folders.com","url":"https://www.folders.com","externalId":"FOLDERS","active":"Y","_class":"com.bigname.pim.api.domain.Website"},
 
-  {"id":"1aa28e5e-55b6-4a1b-88b0-5e5b4230f291","catalogName":"Envelopes Catalog","description":"Default envelopes.com catalog","externalId":"DEFAULT_ENVELOPES","active":"Y","discontinued":"N","_class":"com.bigname.pim.api.domain.Catalog"},
-  {"id":"d9a22899-28cc-4b22-a068-fcb5c12f5f16","catalogName":"Folders Catalog","description":"Default folders.com catalog","externalId":"DEFAULT_FOLDERS","active":"Y","discontinued":"N","_class":"com.bigname.pim.api.domain.Catalog"},
+  {"id":"1aa28e5e-55b6-4a1b-88b0-5e5b4230f291","catalogName":"Envelopes Catalog","description":"Default envelopes.com catalog","externalId":"ENVELOPES","active":"Y","discontinued":"N","_class":"com.bigname.pim.api.domain.Catalog"},
+  {"id":"d9a22899-28cc-4b22-a068-fcb5c12f5f16","catalogName":"Folders Catalog","description":"Default folders.com catalog","externalId":"FOLDERS","active":"Y","discontinued":"N","_class":"com.bigname.pim.api.domain.Catalog"},
 
   {"id":"6e5d91d6-3103-410f-aa62-6c547708bb7a","websiteId":"6459a5e8-7a58-4702-8eb0-7480e5042b19","catalogId":"1aa28e5e-55b6-4a1b-88b0-5e5b4230f291","sequenceNum":"0","subSequenceNum":0,"active":"Y","_class":"com.bigname.pim.api.domain.WebsiteCatalog"},
   {"id":"5b421ec1-7323-418d-8d76-638ffe4bd9a5","websiteId":"055ccdc9-2ee3-4234-adf9-310db9418476","catalogId":"d9a22899-28cc-4b22-a068-fcb5c12f5f16","sequenceNum":"0","subSequenceNum":1,"active":"Y","_class":"com.bigname.pim.api.domain.WebsiteCatalog"},

@@ -195,6 +195,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         node.put("name", category.getCategoryName());
         node.put("isParent", false);
         node.put("active", category.getActive());
+        node.put("discontinued", category.getDiscontinued());
         return node;
     }
 

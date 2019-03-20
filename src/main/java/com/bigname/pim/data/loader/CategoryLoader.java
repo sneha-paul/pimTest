@@ -1,9 +1,14 @@
 package com.bigname.pim.data.loader;
 
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
+import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
+import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
+import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.POIUtil;
 import org.slf4j.Logger;
@@ -27,15 +32,22 @@ public class CategoryLoader {
     private CategoryService categoryService;
 
     @Autowired
+    private CatalogService catalogService;
+
+    @Autowired
     private CategoryDAO categoryDAO;
 
     @Autowired
     private RelatedCategoryDAO relatedCategoryDAO;
 
+    @Autowired
+    private RootCategoryDAO rootCategoryDAO;
+
     public boolean load(String filePath) {
 
         Set<Category> savableCategories = new LinkedHashSet<>();
         Set<RelatedCategory> savableRelatedCategories = new LinkedHashSet<>();
+        Set<RootCategory> savableRootCategories = new LinkedHashSet<>();
 
         Map<String, Integer> sequenceMap = new HashMap<>();
 
@@ -43,6 +55,7 @@ public class CategoryLoader {
 
         List<List<String>> data = POIUtil.readData(filePath);
 
+        Map<String, Catalog> catalogsLookupMap = catalogService.getAll(null, false).stream().collect(Collectors.toMap(Catalog::getCatalogId, e -> e));
         Map<String, Category> categoriesLookupMap = categoryService.getAll(null, false).stream().collect(Collectors.toMap(Category::getCategoryId, e -> e));
         Map<String, RelatedCategory> relatedCategoriesLookupMap = relatedCategoryDAO.findAll().stream().collect(Collectors.toMap( e -> e.getCategoryId() + "|" + e.getSubCategoryId(), e -> e));
 
@@ -51,18 +64,34 @@ public class CategoryLoader {
 
         List<String> attributeNamesMetadata = data.remove(0);
         // Sort categories data by PARENT_ID and NAME
-        data.sort((c1, c2) ->
-                c1.get(attributeNamesMetadata.indexOf("PARENT_ID")).equals(c2.get(attributeNamesMetadata.indexOf("PARENT_ID"))) ?
-                    c1.get(attributeNamesMetadata.indexOf("NAME")).compareTo(c2.get(attributeNamesMetadata.indexOf("NAME"))) : c1.get(attributeNamesMetadata.indexOf("PARENT_ID")).compareTo(c2.get(attributeNamesMetadata.indexOf("PARENT_ID"))));
+        data.sort((c1, c2) -> {
+            String pc1 = c1.get(attributeNamesMetadata.indexOf("PARENT_CATEGORY_ID"));
+            String pc2 = c2.get(attributeNamesMetadata.indexOf("PARENT_CATEGORY_ID"));
+            int l1 = ValidationUtil.isNotEmpty(pc1) ? pc1.split("\\|").length : 0;
+            int l2 = ValidationUtil.isNotEmpty(pc2) ? pc2.split("\\|").length : 0;
+
+            return c1.get(attributeNamesMetadata.indexOf("PARENT_CATEGORY_ID")).equals(c2.get(attributeNamesMetadata.indexOf("PARENT_CATEGORY_ID"))) ?
+                    c1.get(attributeNamesMetadata.indexOf("CATEGORY_NAME")).compareTo(c2.get(attributeNamesMetadata.indexOf("CATEGORY_NAME"))) : l1 == l2 ?
+                    c1.get(attributeNamesMetadata.indexOf("PARENT_CATEGORY_ID")).compareTo(c2.get(attributeNamesMetadata.indexOf("PARENT_CATEGORY_ID"))) : l1 - l2;
+        });
 
         //Skip the header row and process each category row.
         for(int i = 0; i < data.size(); i ++) {
             String categoryId = data.get(i).get(attributeNamesMetadata.indexOf("CATEGORY_ID")).toUpperCase();
-            String name = data.get(i).get(attributeNamesMetadata.indexOf("NAME"));
-            String parentId = data.get(i).get(attributeNamesMetadata.indexOf("PARENT_ID")).toUpperCase();
+            String name = data.get(i).get(attributeNamesMetadata.indexOf("CATEGORY_NAME"));
+            String parentId = data.get(i).get(attributeNamesMetadata.indexOf("PARENT_CATEGORY_ID")).toUpperCase();
+            if(ValidationUtil.isNotEmpty(parentId)) {
+                parentId = parentId.contains("|") ? parentId.substring(parentId.lastIndexOf("|") + 1) : parentId;
+            }
             String description = data.get(i).get(attributeNamesMetadata.indexOf("DESCRIPTION"));
+            String discontinued = data.get(i).get(attributeNamesMetadata.indexOf("DISCONTINUED"));
+            String longDescription = data.get(i).get(attributeNamesMetadata.indexOf("LONG_DESCRIPTION"));
+            String metaTitle = data.get(i).get(attributeNamesMetadata.indexOf("META_TITLE"));
+            String metaDescription = data.get(i).get(attributeNamesMetadata.indexOf("META_DESCRIPTION"));
+            String metaKeywords = data.get(i).get(attributeNamesMetadata.indexOf("META_KEYWORD"));
+            String catalogIds = data.get(i).get(attributeNamesMetadata.indexOf("CATALOG_IDS"));
             boolean skip = false;
-            //Create the category is another one with the same CATEGORY_ID won't exists
+            //Create the category if another one with the same CATEGORY_ID won't exists
             if(categoriesLookupMap.containsKey(categoryId)) {
                 //SKIP without updating
                 skip = true;
@@ -71,8 +100,17 @@ public class CategoryLoader {
                 category.setCategoryId(categoryId);
                 category.setCategoryName(name);
                 category.setDescription(description);
-                category.setActive("Y");
-                category.setDiscontinued("N");
+                category.setLongDescription(longDescription);
+                category.setMetaTitle(metaTitle);
+                category.setMetaDescription(metaDescription);
+                category.setMetaKeywords(metaKeywords);
+                if("Y".equals(discontinued)) {
+                    category.setActive("N");
+                    category.setDiscontinued("Y");
+                } else {
+                    category.setActive("Y");
+                    category.setDiscontinued("N");
+                }
                 //Add this for batch saving
                 savableCategories.add(category);
 
@@ -91,7 +129,11 @@ public class CategoryLoader {
                         } else {
                             int sequenceNum = sequenceMap.get(parentId);
                             RelatedCategory subCategory = new RelatedCategory(parentCategory.getId(), category.getId(), "", sequenceNum, 0);
-                            subCategory.setActive("Y");
+                            if("Y".equals(parentCategory.getActive()) && "Y".equals(category.getActive())) {
+                                subCategory.setActive("Y");
+                            } else {
+                                subCategory.setActive("N");
+                            }
                             //Add this for batch saving
                             savableRelatedCategories.add(subCategory);
 
@@ -103,6 +145,20 @@ public class CategoryLoader {
                         //Parent ID invalid, skip the subCategory mapping
                         skip = true;
                     }
+                } else {
+                    if(ValidationUtil.isNotEmpty(catalogIds)) {
+                        for(String catalogId : catalogIds.split("\\|")) {
+                            if(catalogsLookupMap.containsKey(catalogId)) {
+                                if(!sequenceMap.containsKey("ROOT")) {
+                                    sequenceMap.put("ROOT", 0);
+                                }
+                                RootCategory rootCategory = new RootCategory(catalogsLookupMap.get(catalogId).getId(), category.getId(), sequenceMap.get("ROOT"));
+                                rootCategory.setActive("Y");
+                                savableRootCategories.add(rootCategory);
+                                sequenceMap.put("ROOT", sequenceMap.get("ROOT") + 1);
+                            }
+                        }
+                    }
                 }
             }
             if(skip) {
@@ -111,6 +167,7 @@ public class CategoryLoader {
         }
         categoryDAO.saveAll(savableCategories);
         relatedCategoryDAO.saveAll(savableRelatedCategories);
+        rootCategoryDAO.saveAll(savableRootCategories);
         LOGGER.info("skipped ---------->" + skippedItems.size());
         return true;
     }

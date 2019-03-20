@@ -1,5 +1,6 @@
 package com.bigname.pim.api.domain;
 
+import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.domain.EntityAssociation;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -32,7 +33,11 @@ public class RelatedCategory extends EntityAssociation<Category, Category> {
         super();
         this.categoryId = categoryId;
         this.subCategoryId = subCategoryId;
-        this.fullSubCategoryId = fullSubCategoryId + "|" + subCategoryId;
+        if(ValidationUtil.isEmpty(fullSubCategoryId)) {
+            this.fullSubCategoryId = subCategoryId;
+        } else {
+            this.fullSubCategoryId = fullSubCategoryId + "|" + subCategoryId;
+        }
         setSequenceNum(sequenceNum);
         setSubSequenceNum(subSequenceNum);
         setActive("Y");

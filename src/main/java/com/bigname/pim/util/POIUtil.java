@@ -20,7 +20,7 @@ public class POIUtil {
             FileInputStream excelFile = new FileInputStream(new File(filePath));
             Workbook workbook = new XSSFWorkbook(excelFile);
 
-            for(int i = 0; i < workbook.getNumberOfSheets(); i ++) {
+            for(int i = 0; i < workbook.getNumberOfSheets() && i < 1; i ++) {
                 Sheet datatypeSheet = workbook.getSheetAt(i);
                 Iterator<Row> rows = datatypeSheet.iterator();
 

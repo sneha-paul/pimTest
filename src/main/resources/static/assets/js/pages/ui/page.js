@@ -100,7 +100,7 @@
                     { data: 'parentChain', visible: false},
                     { data: 'active', title: 'Status',
                         render: function(data, type, row, meta) {
-                            return 'Y' === data ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
+                            return 'Y' === row.discontinued ? '<span class="badge badge-warning">Discontinued</span>' : 'Y' === data ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
                         }
                     },
                     {
