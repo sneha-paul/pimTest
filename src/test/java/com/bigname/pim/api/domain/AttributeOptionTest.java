@@ -18,6 +18,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
@@ -186,14 +188,51 @@ public class AttributeOptionTest {
 
     @Test
     public void merge() throws Exception {
-    }
+        //Create Original Instance
+        AttributeOption original = new AttributeOption();
+        original.setValue("test");
+        original.setParentOptionFullId("test");
+
+        //Create Modified Instance
+        AttributeOption modified = new AttributeOption();
+        modified.setValue("TEST-A");
+        modified.setParentOptionFullId("TEST-A");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getValue(), "TEST-A");
+        Assert.assertEquals(original.getParentOptionFullId(), "TEST-A");    }
 
     @Test
     public void orchestrate() throws Exception {
+        //Create New Instance
+        AttributeOption attributeOptionDTO = new AttributeOption();
+        attributeOptionDTO.setActive("Y");
+        attributeOptionDTO.setIndependent("test");
+        attributeOptionDTO.setId("test");
+        attributeOptionDTO.orchestrate();
+
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeOptionDTO.getId()));
+        Assert.assertEquals(attributeOptionDTO.getId(), "TEST");
     }
 
     @Test
     public void toMap() throws Exception {
+        //Create New Instance
+        AttributeOption attributeOptionDTO = new AttributeOption();
+        attributeOptionDTO.setId("test");
+        attributeOptionDTO.setValue("Test");
+        attributeOptionDTO.setActive("Y");
+
+        //Checking For Map
+        Map<String, String> map = new HashMap<>();
+        map.put("id", "TEST");
+        map.put("value", "Test");
+        map.put("active", "Y");
+
+        Map<String, String> map1 = attributeOptionDTO.toMap();
+        Assert.assertEquals(map1.get("id"), map.get("id"));
+        Assert.assertEquals(map1.get("value"), map.get("value"));
+        Assert.assertEquals(map1.get("active"), map.get("active"));
     }
     @After
     public void tearDown() throws Exception {
