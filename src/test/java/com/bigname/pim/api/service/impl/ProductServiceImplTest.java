@@ -9,6 +9,7 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.*;
 import com.bigname.pim.api.service.*;
+import org.javatuples.Triplet;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,14 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -2834,6 +2836,499 @@ public class ProductServiceImplTest {
     @Test
     public void setAsDefaultAssetTest() throws Exception {
         //TODO
+    }
+    @Test
+    public void createEntityTest() {
+       //creating channel
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+        //creating AttributeCollection
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
+        Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        //creating Attribute
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollection.addAttribute(attribute);
+        List<AttributeCollection> attributeList= new ArrayList<>();
+        attributeList.add(attributeCollection);
+
+        attributeCollectionService.update(attributeList);
+
+        Page<Attribute> attribute1= attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, 0, 1, null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attribute1));
+        Assert.assertEquals(attribute1.getContent().get(0).getName(),attribute.getName());
+
+        //creating AttributeOption
+        Optional<Attribute> attributeDetails = attributeCollection.getAttribute(attribute.getFullId());
+        AttributeOption attributeOption = new AttributeOption();
+        attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+        attributeOption.setValue("TestOption");
+        attributeOption.setAttributeId(attribute.getFullId());
+        attributeOption.setActive("Y");
+        attributeOption.orchestrate();
+        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+        attributeCollectionService.update(attributeList);
+
+        Page<AttributeOption> attributeOption1= attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attribute.getFullId(), 0, 1, null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeOption1));
+        Assert.assertEquals(attributeOption1.getContent().get(0).getValue(),attributeOption.getValue());
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+        familyAttributeGroup.setActive("Y");
+        familyAttributeGroup.setMasterGroup("Y");
+        familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+        familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+        //Create the new familyAttribute instance
+        FamilyAttribute familyAttributeDTO = new FamilyAttribute(attribute.getName(), null);
+        familyAttributeDTO.setActive("Y");
+        familyAttributeDTO.setCollectionId(attributeCollection.getCollectionId());
+        familyAttributeDTO.setUiType(attribute.getUiType());
+        familyAttributeDTO.setScopable("Y");
+        familyAttributeDTO.setAttributeId(attribute.getFullId());
+        familyAttributeDTO.getScope().put("ECOMMERCE", FamilyAttribute.Scope.OPTIONAL);
+        familyAttributeDTO.setAttributeGroup(familyAttributeGroup); //TODO : check whether right or wrong
+        familyAttributeDTO.setAttribute(attribute);
+
+        family.addAttribute(familyAttributeDTO);
+        List<Family> familyList= new ArrayList<>();
+        familyList.add(family);
+        familyService.update(familyList);
+        Page<FamilyAttribute> familyAttributes= familyService.getFamilyAttributes(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+        Assert.assertEquals(familyAttributes.getContent().get(0).getName(),familyAttributeDTO.getName());
+
+        FamilyAttribute familyAttribute1 = family.getAllAttributesMap(false).get(attribute.getId());
+
+        FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+        familyAttributeOption.setActive("Y");
+        familyAttributeOption.setValue(attributeOption.getValue());
+        familyAttributeOption.setId(attributeOption.getId());
+        familyAttributeOption.setFamilyAttributeId(familyAttribute1.getId());
+        familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+        family.addAttributeOption(familyAttributeOption, attributeOption);
+
+        //create variantGroup
+        family.setGroup("VARIANT_GROUPS");
+        VariantGroup variantGroup = new VariantGroup();
+        variantGroup.setName("Test Variant1");
+        variantGroup.setId("TEST_VARIANT_1");
+        variantGroup.setLevel(1);
+        variantGroup.setActive("N");
+        family.addVariantGroup(variantGroup);
+        family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
+        familyDAO.save(family);
+        FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
+        Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
+        Assert.assertEquals(result.getContent().size(), 1);
+        Assert.assertEquals(result.getContent().get(0).getValue(), "TestOption");
+
+
+        List<Triplet<String, String, String>> variantGroups=familyService.getFamilyVariantGroups();
+        Assert.assertEquals(variantGroups.size(),1);
+        Assert.assertEquals(variantGroups.get(0).getValue0(), "TEST_1");
+        //creating Products
+            Product productDTO = new Product();
+            productDTO.setProductName("Product Test 1");
+            productDTO.setProductId("PRODUCT_TEST_1");
+            productDTO.setProductFamilyId(family.getFamilyId());
+            productDTO.setActive("Y");
+            productService.create(productDTO);
+
+        Product product = productService.get(productDTO.getProductId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(product.getProductName(),productDTO.getProductName());
+    }
+
+    @Test
+    public void createEntitiesTest(){
+        //creating channel
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+        //creating AttributeCollection
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionDAO.insert(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        //creating Attribute
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollectionDetails.addAttribute(attribute);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+        //creating AttributeOptions
+        Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
+        AttributeOption attributeOption = new AttributeOption();
+        attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+        attributeOption.setValue("TestOption");
+        attributeOption.setAttributeId(attribute.getFullId());
+        attributeOption.setActive("Y");
+        attributeOption.orchestrate();
+        attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
+
+        attributeCollectionDAO.save(attributeCollectionDetails);
+
+        //creating Families
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyDAO.insert(familyDTO);
+
+            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Assert.assertTrue(family != null);
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attribute.getName(), null);
+            familyAttributeDTO.setActive("Y");
+            familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+            familyAttributeDTO.setUiType(attribute.getUiType());
+            familyAttributeDTO.setScopable("Y");
+            familyAttributeDTO.setAttributeId(attribute.getFullId());
+            familyAttributeDTO.getScope().put("ECOMMERCE", FamilyAttribute.Scope.OPTIONAL);
+            familyAttributeDTO.setAttributeGroup(familyAttributeGroup); //TODO : check whether right or wrong
+            familyAttributeDTO.setAttribute(attribute);
+
+            family.addAttribute(familyAttributeDTO);
+            familyDAO.save(family);
+
+        });
+
+        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(product.getProductName(), productsData.get(0).get("name"));
+    }
+    @Test
+    public void toggleTest() {
+        //creating channel
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+        //creating AttributeCollection
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
+        Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        //creating Attribute
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollection.addAttribute(attribute);
+        List<AttributeCollection> attributeList= new ArrayList<>();
+        attributeList.add(attributeCollection);
+        attributeCollectionService.update(attributeList);
+
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+
+        //creating Products
+        Product productDTO = new Product();
+        productDTO.setProductName("Product Test 1");
+        productDTO.setProductId("PRODUCT_TEST_1");
+        productDTO.setProductFamilyId(family.getFamilyId());
+        productDTO.setActive("Y");
+        productService.create(productDTO);
+        Product product = productService.get(productDTO.getProductId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        //toggle
+        productService.toggle(product.getProductId(), EXTERNAL_ID, Toggle.get(product.getActive()));
+        Product updatedProduct = productService.get(productDTO.getProductId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedProduct));
+        Assert.assertEquals(updatedProduct.getActive(), "N");
+
+        productService.toggle(updatedProduct.getProductId(), EXTERNAL_ID, Toggle.get(updatedProduct.getActive()));
+        Product updatedProduct1 = productService.get(productDTO.getProductId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedProduct1));
+        Assert.assertEquals(updatedProduct1.getActive(), "Y");
+    }
+    @Test
+    public void getTest() {
+    //creating channel
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+        //creating AttributeCollection
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
+        Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        //creating Attribute
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollection.addAttribute(attribute);
+        List<AttributeCollection> attributeList= new ArrayList<>();
+        attributeList.add(attributeCollection);
+        attributeCollectionService.update(attributeList);
+
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+
+        //creating Products
+        Product productDTO = new Product();
+        productDTO.setProductName("Product Test 1");
+        productDTO.setProductId("PRODUCT_TEST_1");
+        productDTO.setProductFamilyId(family.getFamilyId());
+        productDTO.setActive("Y");
+        productService.create(productDTO);
+        //Getting product
+        Product product = productService.get(productDTO.getProductId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(product.getProductName(),productDTO.getProductName());
+    }
+
+    @Test
+    public void getAllAsPageTest() {
+        //creating channel
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+        //creating AttributeCollection
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
+        Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        //creating Attribute
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("Test_Attribute");
+        attribute.setId("TEST_ATTRIBUTE");
+        attributeCollection.addAttribute(attribute);
+        List<AttributeCollection> attributeList= new ArrayList<>();
+        attributeList.add(attributeCollection);
+        attributeCollectionService.update(attributeList);
+
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        //Getting products
+        Page<Product> paginatedResult = productService.getAll(0, 10, null,false);
+        Assert.assertEquals(paginatedResult.getContent().size(), productsData.size());
+    }
+
+    @Test
+    public void getAllAsListTest() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        List<Product> result = productService.getAll(Sort.by("productName").ascending(), false);
+        String[] actual = result.stream().map(product -> product.getProductName()).collect(Collectors.toList()).toArray(new String[0]);
+        String[] expected = productsData.stream().map(productData -> (String)productData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
+        Assert.assertArrayEquals(expected, actual);
+
+        productDAO.getMongoTemplate().dropCollection(Product.class);
+
+        // sorting : Descending
+
+        productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        result = productService.getAll(Sort.by("productName").descending(), false);
+        actual = result.stream().map(product -> product.getProductName()).collect(Collectors.toList()).toArray(new String[0]);
+        expected = productsData.stream().map(productData -> (String)productData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
+        Assert.assertNotEquals(expected, actual);
     }
 
     @After
