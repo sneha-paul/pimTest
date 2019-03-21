@@ -824,7 +824,7 @@ public class WebsiteServiceImplTest {
     }
 
     @Test
-    public void cloneInstance() {
+    public void cloneInstanceTest() {
         //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
@@ -848,7 +848,7 @@ public class WebsiteServiceImplTest {
     }
 
     @Test
-    public void findAll() {
+    public void findAll2Test() {
         //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
@@ -876,7 +876,7 @@ public class WebsiteServiceImplTest {
     }
 
     @Test
-    public void findAll1() {
+    public void findAll1Test() {
         //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
@@ -905,7 +905,7 @@ public class WebsiteServiceImplTest {
     }
 
     @Test
-    public void findOne() {
+    public void findOneTest() {
         //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
@@ -932,7 +932,7 @@ public class WebsiteServiceImplTest {
     }
 
     @Test
-    public void findOne1() {
+    public void findOne1Test() {
         //creating website
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
@@ -962,7 +962,7 @@ public class WebsiteServiceImplTest {
 
 
     @Test
-    public void validate() throws Exception {
+    public void validateTest() throws Exception {
         /* Create a valid new instance with id TEST */
         Website websiteDTO = new Website();
         websiteDTO.setWebsiteName("test");

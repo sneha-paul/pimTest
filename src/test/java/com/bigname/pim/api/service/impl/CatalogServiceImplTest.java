@@ -815,7 +815,7 @@ public class CatalogServiceImplTest {
     }
 
     @Test
-    public void findAllTest() {
+    public void findAll1Test() {
         //creating catalog
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
@@ -912,7 +912,7 @@ public class CatalogServiceImplTest {
     }
 
     @Test
-    public void cloneInstance() {
+    public void cloneInstanceTest() {
         //creating catalog
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
@@ -935,7 +935,7 @@ public class CatalogServiceImplTest {
     }
 
     @Test
-    public void findAll() {
+    public void findAllTest() {
         //creating catalog
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
@@ -961,7 +961,7 @@ public class CatalogServiceImplTest {
     }
 
     @Test
-    public void findAll1() {
+    public void findAll2Test() {
         //creating catalog
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
@@ -988,7 +988,7 @@ public class CatalogServiceImplTest {
     }
 
     @Test
-    public void findOne() {
+    public void findOneTest() {
         //creating catalog
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
@@ -1013,7 +1013,7 @@ public class CatalogServiceImplTest {
     }
 
     @Test
-    public void findOne1() {
+    public void findOne1Test() {
         //creating catalog
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
@@ -1039,7 +1039,7 @@ public class CatalogServiceImplTest {
     }
 
     @Test
-    public void validate1() throws Exception {
+    public void validate1Test() throws Exception {
         /* Create a valid new instance with id CATALOG_TEST */
         Catalog catalogDTO = new Catalog();
         catalogDTO.setCatalogName("Catalog Test");

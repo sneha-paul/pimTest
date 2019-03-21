@@ -22,10 +22,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
-
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -86,7 +86,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void findAllProductCategories() throws Exception {
+    public void findAllProductCategoriesTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -264,7 +264,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void findAvailableCategoriesForProduct() throws Exception {
+    public void findAvailableCategoriesForProductTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -441,7 +441,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getProductVariants() throws Exception {
+    public void getProductVariantsTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -634,7 +634,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getProductVariants1() throws Exception {
+    public void getProductVariants1Test() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -811,7 +811,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getProductVariant() throws Exception {
+    public void getProductVariantTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -983,7 +983,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void create() throws Exception {
+    public void createTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -1144,7 +1144,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void get() throws Exception {
+    public void getTestTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -1305,7 +1305,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getAll() throws Exception {
+    public void getAllTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -1401,74 +1401,74 @@ public class ProductServiceImplTest {
             familyAttributeGroup.setId(familyAttributeGroup.getFullId());
 
             //Create the new familyAttribute instance
-                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeDetails.getName(), null);
-                familyAttributeDTO.setActive("Y");
-                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
-                familyAttributeDTO.setUiType(attributeDetails.getUiType());
-                familyAttributeDTO.setScopable("Y");
-                familyAttributeDTO.setAttributeId(attributeDetails.getFullId());
-                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
-                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
-                familyAttributeDTO.setAttribute(attributeDetails);
+            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeDetails.getName(), null);
+            familyAttributeDTO.setActive("Y");
+            familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+            familyAttributeDTO.setUiType(attributeDetails.getUiType());
+            familyAttributeDTO.setScopable("Y");
+            familyAttributeDTO.setAttributeId(attributeDetails.getFullId());
+            familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+            familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+            familyAttributeDTO.setAttribute(attributeDetails);
 
-                family.addAttribute(familyAttributeDTO);
+            family.addAttribute(familyAttributeDTO);
 
-                FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeDetails.getId());
+            FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeDetails.getId());
 
-                List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
-                attributeOptionList.forEach(attributeOption -> {
-                    FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
-                    familyAttributeOption.setActive("Y");
-                    familyAttributeOption.setValue(attributeOption.getValue());
-                    familyAttributeOption.setId(attributeOption.getId());
-                    familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
-                    familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
-                    family.addAttributeOption(familyAttributeOption, attributeOption);
-                });
-
-                //set parentAttribute //TODO
-
-                //create variantGroup
-                family.setGroup("VARIANT_GROUPS");
-                VariantGroup variantGroup = new VariantGroup();
-                variantGroup.setName(attributeDetails.getName());
-                variantGroup.setId(attributeDetails.getId());
-                variantGroup.setActive("Y");
-                variantGroup.setLevel(1);
-                variantGroup.setFamilyId(family.getFamilyId());
-                variantGroup.getVariantAxis().put(1, Arrays.asList(attributeDetails.getName()));
-                variantGroup.getVariantAttributes().put(1, Arrays.asList(attributes.get(2).getName(), attributes.get(9).getName()));
-                family.addVariantGroup(variantGroup);
-                family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
-
-                List<Family> familyList = new ArrayList<>();
-                familyList.add(family);
-                familyService.update(familyList);
-
+            List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
+            attributeOptionList.forEach(attributeOption -> {
+                FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                familyAttributeOption.setActive("Y");
+                familyAttributeOption.setValue(attributeOption.getValue());
+                familyAttributeOption.setId(attributeOption.getId());
+                familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                family.addAttributeOption(familyAttributeOption, attributeOption);
             });
 
-            Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            //set parentAttribute //TODO
 
-            //Creating products
-            List<Map<String, Object>> productsData = new ArrayList<>();
-            productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-            productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+            //create variantGroup
+            family.setGroup("VARIANT_GROUPS");
+            VariantGroup variantGroup = new VariantGroup();
+            variantGroup.setName(attributeDetails.getName());
+            variantGroup.setId(attributeDetails.getId());
+            variantGroup.setActive("Y");
+            variantGroup.setLevel(1);
+            variantGroup.setFamilyId(family.getFamilyId());
+            variantGroup.getVariantAxis().put(1, Arrays.asList(attributeDetails.getName()));
+            variantGroup.getVariantAttributes().put(1, Arrays.asList(attributes.get(2).getName(), attributes.get(9).getName()));
+            family.addVariantGroup(variantGroup);
+            family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
+
+            List<Family> familyList = new ArrayList<>();
+            familyList.add(family);
+            familyService.update(familyList);
+
+        });
+
+        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        //Creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
 
         productsData.forEach(productData -> {
-                Product productDTO = new Product();
-                productDTO.setProductName((String)productData.get("name"));
-                productDTO.setProductId((String)productData.get("externalId"));
-                productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
-                productDTO.setActive((String)productData.get("active"));
-                productService.create(productDTO);
-            });
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
         //Getting products
         Page<Product> products = productService.getAll(0, productsData.size(), null, false);
-            Assert.assertEquals(products.getContent().size(),productsData.size());
+        Assert.assertEquals(products.getContent().size(),productsData.size());
     }
 
     @Test
-    public void findAll() throws Exception {
+    public void findAllTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -1612,7 +1612,7 @@ public class ProductServiceImplTest {
 
         Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-       //Creating products
+        //Creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -1632,7 +1632,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void findAll1() throws Exception {
+    public void findAll1Test() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -1776,7 +1776,7 @@ public class ProductServiceImplTest {
 
         Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-       //creating products
+        //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -1796,7 +1796,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getAll1() throws Exception {
+    public void getAll1Test() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -1960,8 +1960,8 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getAvailableVariants() throws Exception {
-   /*     List<Map<String, Object>> channelsData = new ArrayList<>();
+    public void getAvailableVariantsTest() throws Exception {
+        List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
         channelsData.forEach(channelData -> {
@@ -2126,15 +2126,17 @@ public class ProductServiceImplTest {
             productVariantDTO.setChannelId(channel.getChannelId());
             productVariantDAO.insert(productVariantDTO);
         });
-        productService.getAvailableVariants(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), 0, 1, null);*/
+        //   productService.getAvailableVariants(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), 0, 1, null);
+        //TODO MANU
     }
 
     @Test
-    public void validate() throws Exception {
+    public void validateTest() throws Exception {
+        //TODO MANU
     }
 
     @Test
-    public void getProductCategories() throws Exception {
+    public void getProductCategoriesTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -2314,7 +2316,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getAvailableCategoriesForProduct() throws Exception {
+    public void getAvailableCategoriesForProductTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -2494,7 +2496,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void addCategory() throws Exception {
+    public void addCategoryTest() throws Exception {
         //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
@@ -2653,14 +2655,14 @@ public class ProductServiceImplTest {
         Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
         //Creating ProductCategories
-            Category categoryDTO = new Category();
-            categoryDTO.setCategoryName("Test1");
-            categoryDTO.setCategoryId("CATEGORY_TEST_1");
-            categoryDTO.setActive("Y");
-            categoryDTO.setDescription("Test Category 1");
-            categoryService.create(categoryDTO);
+        Category categoryDTO = new Category();
+        categoryDTO.setCategoryName("Test1");
+        categoryDTO.setCategoryId("CATEGORY_TEST_1");
+        categoryDTO.setActive("Y");
+        categoryDTO.setDescription("Test Category 1");
+        categoryService.create(categoryDTO);
 
-            //Adding category
+        //Adding category
         productService.addCategory(product.getProductId(), FindBy.EXTERNAL_ID, categoryDTO.getCategoryId(), FindBy.EXTERNAL_ID);
         Page<Map<String,Object>> category=  productService.getCategories(product.getProductId(), FindBy.EXTERNAL_ID, PageRequest.of(0, 1, null), false);
         Assert.assertEquals(category.getContent().size(), 1);
@@ -2668,7 +2670,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void toggleProductCategory() throws Exception {
+    public void toggleProductCategoryTest() throws Exception {
         //Creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
         attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
@@ -2734,7 +2736,7 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void getCategories() throws Exception {
+    public void getCategoriesTest() throws Exception {
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
         attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
@@ -2779,7 +2781,7 @@ public class ProductServiceImplTest {
 
         Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-       //creating products
+        //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
@@ -2815,22 +2817,22 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    public void addAssets() throws Exception {
+    public void addAssetsTest() throws Exception {
         //TODO
     }
 
     @Test
-    public void deleteAsset() throws Exception {
+    public void deleteAssetTest() throws Exception {
         //TODO
     }
 
     @Test
-    public void reorderAssets() throws Exception {
+    public void reorderAssetsTest() throws Exception {
         //TODO
     }
 
     @Test
-    public void setAsDefaultAsset() throws Exception {
+    public void setAsDefaultAssetTest() throws Exception {
         //TODO
     }
 
