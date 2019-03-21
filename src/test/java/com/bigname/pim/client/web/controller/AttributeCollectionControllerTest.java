@@ -2,12 +2,10 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.Attribute;
-import com.bigname.pim.api.domain.AttributeCollection;
-import com.bigname.pim.api.domain.AttributeGroup;
-import com.bigname.pim.api.domain.User;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.UserService;
@@ -298,14 +296,15 @@ public class AttributeCollectionControllerTest {
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
             List<Map<String, Object>> attributesData = new ArrayList<>();
-            attributesData.add(CollectionsUtil.toMap("id", "STYLE", "name", "style", "uiType", "DROPDOWN", "active", "Y"));
-            attributesData.add(CollectionsUtil.toMap("id", "COLOR", "name", "color", "uiType", "DROPDOWN", "active", "Y"));
-            attributesData.add(CollectionsUtil.toMap("id", "SIZE", "name", "size", "uiType", "DROPDOWN", "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("id", "STYLE", "name", "style", "uiType", Attribute.UIType.DROPDOWN, "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("id", "COLOR", "name", "color", "uiType", Attribute.UIType.DROPDOWN, "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("id", "SIZE", "name", "size", "uiType", Attribute.UIType.DROPDOWN, "active", "Y"));
             attributesData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
                 attribute.setActive((String) attributeData.get("active"));
                 attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
                 attribute.setName((String) attributeData.get("name"));
+                attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
                 attributeCollectionDetails.addAttribute(attribute);
             });
             attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
@@ -314,11 +313,9 @@ public class AttributeCollectionControllerTest {
         //updating attribute
         List<Attribute> attributes = attributeCollectionService.getAttributes(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, 3, null).getContent();
 
-
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("name", ConversionUtil.toList("New Style"));
-        params.put("fullId", ConversionUtil.toList(attributes.get(0).getFullId()));
-        params.put("uiType", ConversionUtil.toList("DROPDOWN"));
+        params.put("fullId", ConversionUtil.toList(attributes.get(2).getFullId()));
         params.put("group", ConversionUtil.toList("ATTRIBUTES"));
         ResultActions result = mockMvc.perform(
                 put("/pim/attributeCollections/TEST_COLLECTION_1/attributes/STYLE")
@@ -351,9 +348,9 @@ public class AttributeCollectionControllerTest {
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
             List<Map<String, Object>> attributesData = new ArrayList<>();
-            attributesData.add(CollectionsUtil.toMap("id", "STYLE", "name", "style", "uiType", "DROPDOWN", "active", "Y"));
-            attributesData.add(CollectionsUtil.toMap("id", "COLOR", "name", "color", "uiType", "DROPDOWN", "active", "Y"));
-            attributesData.add(CollectionsUtil.toMap("id", "SIZE", "name", "size", "uiType", "DROPDOWN", "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("id", "STYLE", "name", "style", "uiType", Attribute.UIType.DROPDOWN, "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("id", "COLOR", "name", "color", "uiType", Attribute.UIType.DROPDOWN, "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("id", "SIZE", "name", "size", "uiType", Attribute.UIType.DROPDOWN, "active", "Y"));
             attributesData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
                 attribute.setActive((String) attributeData.get("active"));
@@ -385,7 +382,7 @@ public class AttributeCollectionControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeOptionsTest() throws Exception {
-        /*List<Map<String, Object>> collectionsData = new ArrayList<>();
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Test Collection 1", "externalId", "TEST_COLLECTION_1", "active", "Y", "discontinued", "N"));
         collectionsData.forEach(collectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -398,14 +395,14 @@ public class AttributeCollectionControllerTest {
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
             List<Map<String, Object>> attributesData = new ArrayList<>();
-            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
+            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", Attribute.UIType.DROPDOWN));
             attributesData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
                 attribute.setActive((String)attributeData.get("active"));
                 attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
                 attribute.setName((String)attributeData.get("name"));
                 attribute.setId((String)attributeData.get("id"));
-                attribute.setUiType(Attribute.UIType.DROPDOWN);
+                attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
                 attributeCollectionDetails.addAttribute(attribute);
 
                 Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
@@ -432,7 +429,7 @@ public class AttributeCollectionControllerTest {
         detailsParams.put("length", ConversionUtil.toList("3"));
         detailsParams.put("draw", ConversionUtil.toList("1"));
         ResultActions result = mockMvc.perform(
-                get("/pim/attributeCollections/TEST_COLLECTION_1/attributes/STYLE/options/data")
+                get("/pim/attributeCollections/TEST_COLLECTION_1/attributes/DEFAULT_GROUP|STYLE/options/data")
                         .params(detailsParams)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept(MediaType.APPLICATION_JSON_UTF8));
@@ -441,7 +438,7 @@ public class AttributeCollectionControllerTest {
         result.andExpect(jsonPath("$.data.size()").value(3));
         result.andExpect(jsonPath("$.draw").value(1));
         result.andExpect(jsonPath("$.recordsFiltered").value(3));
-        result.andExpect(jsonPath("$.recordsTotal").value(3));*/
+        result.andExpect(jsonPath("$.recordsTotal").value(3));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -465,7 +462,7 @@ public class AttributeCollectionControllerTest {
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
             List<Map<String, Object>> attributesData = new ArrayList<>();
-            attributesData.add(CollectionsUtil.toMap("id", "STYLE", "name", "style", "uiType", "DROPDOWN", "active", "Y"));
+            attributesData.add(CollectionsUtil.toMap("id", "STYLE", "name", "style", "uiType", Attribute.UIType.DROPDOWN, "active", "Y"));
             attributesData.forEach(attributeData -> {
                 Attribute attribute = new Attribute();
                 attribute.setActive((String) attributeData.get("active"));
@@ -493,6 +490,49 @@ public class AttributeCollectionControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateAttributeOptionTest() throws Exception {
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Test Collection 1", "externalId", "TEST_COLLECTION_1", "active", "Y", "discontinued", "N"));
+        collectionsData.forEach(collectionData -> {
+            AttributeCollection attributeCollectionDTO = new AttributeCollection();
+            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
+            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
+            attributeCollectionDTO.setActive((String)collectionData.get("active"));
+            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
+            attributeCollectionService.create(attributeCollectionDTO);
+
+            AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+            List<Map<String, Object>> attributesData = new ArrayList<>();
+            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", Attribute.UIType.DROPDOWN));
+            attributesData.forEach(attributeData -> {
+                Attribute attribute = new Attribute();
+                attribute.setActive((String)attributeData.get("active"));
+                attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                attribute.setName((String)attributeData.get("name"));
+                attribute.setId((String)attributeData.get("id"));
+                attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+                attributeCollectionDetails.addAttribute(attribute);
+
+                Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
+
+                List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "PAPER", "active", "Y"));
+                attributesOptionsData.forEach(attributeOptionData ->{
+                    AttributeOption attributeOption = new AttributeOption();
+                    attributeOption.setValue((String)attributeOptionData.get("value"));
+                    attributeOption.setCollectionId(attributeCollectionDetails.getCollectionId());
+                    attributeOption.setActive((String)attributeOptionData.get("active"));
+                    attributeOption.setAttributeId(attribute.getFullId());
+                    attributeOption.orchestrate();
+                    attribute1.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+                });
+            });
+            attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
+        });
+
+
     }
 
     @After
