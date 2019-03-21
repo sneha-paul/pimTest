@@ -2,11 +2,16 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.common.util.CollectionsUtil;
 import com.bigname.common.util.ConversionUtil;
+import com.bigname.common.util.ValidationUtil;
+import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.Family;
-import com.bigname.pim.api.domain.User;
+import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.ChannelDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.service.AttributeCollectionService;
+import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.UserService;
 import org.junit.After;
@@ -30,7 +35,10 @@ import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,6 +67,18 @@ public class FamilyControllerTest {
     @Autowired
     private FamilyService familyService;
 
+    @Autowired
+    ChannelService channelService;
+
+    @Autowired
+    AttributeCollectionService attributeCollectionService;
+
+    @Autowired
+    private AttributeCollectionDAO attributeCollectionDAO;
+
+    @Autowired
+    private ChannelDAO channelDAO;
+
     @Before
     public void setUp() throws Exception {
         if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
@@ -69,6 +89,8 @@ public class FamilyControllerTest {
             user.setActive("Y");
             userService.create(user);
         }
+        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
         familyDAO.getMongoTemplate().dropCollection(Family.class);
     }
 
@@ -141,8 +163,54 @@ public class FamilyControllerTest {
         result1.andExpect(jsonPath("$.recordsTotal").value(9));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void detailsTest() throws Exception {
+        //Create mode
+        mockMvc.perform(
+                get("/pim/families/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/family"))
+                .andExpect(forwardedUrl("/settings/family.jsp"))
+                .andExpect(model().attribute("mode", is("CREATE")))
+                .andExpect(model().attribute("active", is("FAMILIES")));
+
+        //Details mode, with non=existing familyID - TODO
+
+        //Add a family instance
+        List<Family> createdFamilyInstances = addFamilyInstances();
+        Assert.assertFalse(createdFamilyInstances.isEmpty());
+
+        //Details mode with valid familyID
+        String familyId = createdFamilyInstances.get(0).getFamilyId();
+
+        String channel = ConversionUtil.toJSONString(channelService.getAll(0, 100, null).getContent().stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName)));
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("channels", ConversionUtil.toList(channel));
+
+        mockMvc.perform(
+                get("/pim/families/" + familyId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/family"))
+                .andExpect(forwardedUrl("/settings/family.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("FAMILIES")))
+                .andExpect(model().attribute("channels", is(channel)))
+                .andExpect(model().attribute("family", hasProperty("externalId", is(familyId))));
+
+        //Details mode with reload true
+        params = new LinkedMultiValueMap<>();
+        params.put("reload", ConversionUtil.toList("true"));
+
+        mockMvc.perform(
+                get("/pim/families/" + familyId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/family_body"))
+                .andExpect(forwardedUrl("/settings/family_body.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("active", is("FAMILIES")))
+                .andExpect(model().attribute("channels", is(channel)))
+                .andExpect(model().attribute("family", hasProperty("externalId", is(familyId))));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -196,40 +264,922 @@ public class FamilyControllerTest {
         result1.andExpect(jsonPath("$.group.length()").value(1));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void allAttributes() throws Exception {
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach((Map<String, Object> familyData) -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyService.create(familyDTO);
+
+            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            attributes.forEach(attributeData -> {
+                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                familyAttributeDTO.setActive("Y");
+                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                familyAttributeDTO.setUiType(attributeData.getUiType());
+                familyAttributeDTO.setScopable("Y");
+                familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                familyAttributeDTO.setAttribute(attributeData);
+                family.addAttribute(familyAttributeDTO);
+            });
+            familyService.update(ConversionUtil.toList(family));
+        });
+
+        //getting attribute
+        MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
+        detailsParams.put("start", ConversionUtil.toList("0"));
+        detailsParams.put("length", ConversionUtil.toList("10"));
+        detailsParams.put("draw", ConversionUtil.toList("1"));
+        ResultActions result = mockMvc.perform(
+                get("/pim/families/TEST_1/attributes/data")
+                        .params(detailsParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.data.size()").value(10));
+        result.andExpect(jsonPath("$.draw").value(1));
+        result.andExpect(jsonPath("$.recordsFiltered").value(10));
+        result.andExpect(jsonPath("$.recordsTotal").value(10));
     }
 
     @Test
     public void attributeDetails() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createAttribute() throws Exception {
+        /*List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test Attribute Collection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTE_COLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+        });
+
+
+
+        FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+        familyAttributeGroup.setActive("Y");
+        familyAttributeGroup.setMasterGroup("Y");
+        familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+
+        //creating attribute
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("collectionId", ConversionUtil.toList("TEST_ATTRIBUTE_COLLECTION"));
+        params.put("attributeId", ConversionUtil.toList(attributeDetails.getFullId()));
+        params.put("name", ConversionUtil.toList(attributeDetails.getName()));
+        params.put("fullId", ConversionUtil.toList(FamilyAttributeGroup.DEFAULT_GROUP));
+        params.put("defaultGroup", ConversionUtil.toList("N"));
+        params.put("masterGroup", ConversionUtil.toList("N"));
+
+        ResultActions result = mockMvc.perform(
+                post("/pim/families/TEST_1/attributes")
+                        .params(params)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.size()").value(3));
+        result.andExpect(jsonPath("$.success").value(true));
+*/
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateAttribute() throws Exception {
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test Attribute Collection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTE_COLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+
+            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            attributes.forEach(attributeData -> {
+                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                familyAttributeDTO.setActive("Y");
+                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                familyAttributeDTO.setUiType(attributeData.getUiType());
+                familyAttributeDTO.setScopable("Y");
+                familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                familyAttributeDTO.setAttribute(attributeData);
+                family.addAttribute(familyAttributeDTO);
+
+            });
+            familyService.update(ConversionUtil.toList(family));
+        });
+
+
+        List<FamilyAttribute> familyAttributes = familyService.getFamilyAttributes(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, 3, null).getContent();
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("name", ConversionUtil.toList("New Color"));
+        params.put("fullId", ConversionUtil.toList(familyAttributes.get(0).getAttributeGroup().getFullId() +"|"+ familyAttributes.get(0).getId()));
+        params.put("group", ConversionUtil.toList("ATTRIBUTES"));
+        ResultActions result = mockMvc.perform(
+                put("/pim/families/TEST_1/attributes/COLOR")
+                        .params(params)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.size()").value(3));
+        result.andExpect(jsonPath("$.success").value(true));
+        result.andExpect(jsonPath("$.group.length()").value(0));
+
+
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void allAttributeOptions() throws Exception {
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test Attribute Collection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTE_COLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+
+            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            attributes.forEach(attributeData -> {
+                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                familyAttributeDTO.setActive("Y");
+                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                familyAttributeDTO.setUiType(attributeData.getUiType());
+                familyAttributeDTO.setScopable("Y");
+                familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                familyAttributeDTO.setAttribute(attributeData);
+                family.addAttribute(familyAttributeDTO);
+
+                FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeData.getId());
+
+                //TODO add option
+                if(attributeData.getName().equals("Color")) {
+                    List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
+                    attributeOptionList.forEach(attributeOption -> {
+                        FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                        familyAttributeOption.setActive("Y");
+                        familyAttributeOption.setValue(attributeOption.getValue());
+                        familyAttributeOption.setId(attributeOption.getId());
+                        familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                        familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                        family.addAttributeOption(familyAttributeOption, attributeOption);
+                    });
+                }
+            });
+            familyService.update(ConversionUtil.toList(family));
+        });
+
+        MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
+        detailsParams.put("start", ConversionUtil.toList("0"));
+        detailsParams.put("length", ConversionUtil.toList("3"));
+        detailsParams.put("draw", ConversionUtil.toList("1"));
+        ResultActions result = mockMvc.perform(
+                get("/pim/families/TEST_1/attributes/DEFAULT_GROUP|DEFAULT_GROUP|DEFAULT_GROUP|COLOR/options/data")
+                        .params(detailsParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.data.size()").value(3));
+        result.andExpect(jsonPath("$.draw").value(1));
+        result.andExpect(jsonPath("$.recordsFiltered").value(3));
+        result.andExpect(jsonPath("$.recordsTotal").value(3));
+
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void availableAttributeOptions() throws Exception {
+        //Add a product instance
+        List<Family> createdFamilyAttributeInstances = new ArrayList<>();
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach((Map<String, Object> familyData) -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyService.create(familyDTO);
+
+            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            attributes.forEach(attributeData -> {
+                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                familyAttributeDTO.setActive("Y");
+                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                familyAttributeDTO.setUiType(attributeData.getUiType());
+                familyAttributeDTO.setScopable("Y");
+                familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                familyAttributeDTO.setAttribute(attributeData);
+                family.addAttribute(familyAttributeDTO);
+            });
+            familyService.update(ConversionUtil.toList(family));
+        });
+
+        List<FamilyAttribute> familyAttributes = familyService.getFamilyAttributes(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, 3, null).getContent();
+
+        //AvailableCategories with valid productID
+        String attributeId = familyAttributes.get(0).getId();
+        String familyId = familiesData.get(0).get("externalId").toString();
+        mockMvc.perform(
+                get("/pim/families/" + familyId + "/attributes/" + attributeId + "/options/available"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/availableFamilyAttributeOptions"))
+                .andExpect(forwardedUrl("/settings/availableFamilyAttributeOptions.jsp"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void availableAttributeOptions1() throws Exception {
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test Attribute Collection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTE_COLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+
+            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            attributes.forEach(attributeData -> {
+                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                familyAttributeDTO.setActive("Y");
+                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                familyAttributeDTO.setUiType(attributeData.getUiType());
+                familyAttributeDTO.setScopable("Y");
+                familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                familyAttributeDTO.setAttribute(attributeData);
+                family.addAttribute(familyAttributeDTO);
+
+            });
+            familyService.update(ConversionUtil.toList(family));
+        });
+
+
+        MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
+        detailParams.put("start", ConversionUtil.toList("0"));
+        detailParams.put("length", ConversionUtil.toList("3"));
+        detailParams.put("draw", ConversionUtil.toList("1"));
+        ResultActions result1 = mockMvc.perform(
+                get("/pim/families/TEST_1/attributes/COLOR/options/available/data")
+                        .params(detailParams)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result1.andExpect(status().isOk());
+        result1.andExpect(jsonPath("$.data.size()").value(3));
+        result1.andExpect(jsonPath("$.draw").value(1));
+        result1.andExpect(jsonPath("$.recordsFiltered").value(3));
+        result1.andExpect(jsonPath("$.recordsTotal").value(3));
+
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void attributeOptionDetails() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void availableAxisAttributes() throws Exception {
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test Attribute Collection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTE_COLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach(familyData -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyService.create(familyDTO);
+
+            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            attributes.forEach(attributeData -> {
+                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                familyAttributeDTO.setActive("Y");
+                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                familyAttributeDTO.setUiType(attributeData.getUiType());
+                familyAttributeDTO.setScopable("Y");
+                familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                familyAttributeDTO.setAttribute(attributeData);
+                family.addAttribute(familyAttributeDTO);
+
+                FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeData.getId());
+
+                //TODO add option
+                if(attributeData.getName().equals("Color")) {
+                    List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
+                    attributeOptionList.forEach(attributeOption -> {
+                        FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
+                        familyAttributeOption.setActive("Y");
+                        familyAttributeOption.setValue(attributeOption.getValue());
+                        familyAttributeOption.setId(attributeOption.getId());
+                        familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
+                        familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
+                        family.addAttributeOption(familyAttributeOption, attributeOption);
+                    });
+                }
+            });
+
+            //create variantGroup
+            family.setGroup("VARIANT_GROUPS");
+            VariantGroup variantGroup = new VariantGroup();
+            variantGroup.setName("Test Variant1");
+            variantGroup.setId("TEST_VARIANT_1");
+            variantGroup.setLevel(1);
+            variantGroup.setActive("N");
+            /*family.addVariantGroup(variantGroup);
+            family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());*/
+            familyService.update(ConversionUtil.toList(family));
+        });
+
+        mockMvc.perform(
+                get("/pim/families/TEST_1/variantGroups/TEST_VARIANT_1/axisAttributes/available"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/availableVariantAxisAttributes"))
+                .andExpect(forwardedUrl("/settings/availableVariantAxisAttributes.jsp"));
     }
 
     @Test
@@ -283,6 +1233,136 @@ public class FamilyControllerTest {
     @After
     public void tearDown() throws Exception {
         familyDAO.getMongoTemplate().dropCollection(Family.class);
+        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+    }
+
+    private List<Family> addFamilyInstances() {
+        List<Family> createdFamilyInstances = new ArrayList<>();
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach(familyData -> {
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            createdFamilyInstances.add(familyService.create(familyDTO));
+        });
+        return createdFamilyInstances;
+    }
+
+    private List<Family> addFamilyAttributeInstances() {
+        List<Family> createdFamilyAttributeInstances = new ArrayList<>();
+        List<Map<String, Object>> channelsData = new ArrayList<>();
+        channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
+
+        channelsData.forEach(channelData -> {
+            Channel channel = new Channel();
+            channel.setChannelName((String)channelData.get("name"));
+            channel.setChannelId((String)channelData.get("externalId"));
+            channel.setActive((String)channelData.get("active"));
+            channelService.create(channel);
+        });
+
+        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
+
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
+        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
+        List<Map<String, Object>> attributesData = new ArrayList<>();
+        attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute2", "externalId", "TEST_ATTRIBUTE_2", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute3", "externalId", "TEST_ATTRIBUTE_3", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute4", "externalId", "TEST_ATTRIBUTE_4", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute5", "externalId", "TEST_ATTRIBUTE_5", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute6", "externalId", "TEST_ATTRIBUTE_6", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute7", "externalId", "TEST_ATTRIBUTE_7", "active", "Y", "uiType", Attribute.UIType.TEXTAREA));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute8", "externalId", "TEST_ATTRIBUTE_8", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute9", "externalId", "TEST_ATTRIBUTE_9", "active", "Y", "uiType", Attribute.UIType.INPUT_BOX));
+        attributesData.add(CollectionsUtil.toMap("name", "TestAttribute10", "externalId", "TEST_ATTRIBUTE_10", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
+
+        attributesData.forEach(attributeData -> {
+            Attribute attribute = new Attribute();
+            attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+            attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+            attribute.setName((String) attributeData.get("name"));
+            attribute.setId((String) attributeData.get("externalId"));
+            attribute.setActive((String) attributeData.get("active"));
+            attributeCollectionDetails.addAttribute(attribute);
+        });
+        attributeCollectionList.add(attributeCollectionDetails);
+        attributeCollectionService.update(attributeCollectionList);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        List<Attribute> attributes = attributeCollection.getAllAttributes();
+        Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
+
+        List<Map<String, Object>> attributeOptionsData = new ArrayList<>();
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Blue", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Green", "active", "Y"));
+        attributeOptionsData.add(CollectionsUtil.toMap("value", "Red", "active", "Y"));
+
+        attributeOptionsData.forEach(attributeOptionData -> {
+            AttributeOption attributeOption = new AttributeOption();
+            attributeOption.setCollectionId(attributeCollectionDTO.getCollectionId());
+            attributeOption.setValue((String) attributeOptionData.get("value"));
+            attributeOption.setAttributeId(attributeDetails.getFullId());
+            attributeOption.setActive((String) attributeOptionData.get("active"));
+            attributeOption.orchestrate();
+            attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+        });
+
+        attributeCollectionService.update(attributeCollectionList);
+
+        List<Map<String, Object>> familiesData = new ArrayList<>();
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
+        familiesData.forEach((Map<String, Object> familyData) -> {
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family familyDTO = new Family();
+            familyDTO.setFamilyName((String)familyData.get("name"));
+            familyDTO.setFamilyId((String)familyData.get("externalId"));
+            familyDTO.setActive((String)familyData.get("active"));
+            familyDTO.setDiscontinued((String)familyData.get("discontinue"));
+            familyService.create(familyDTO);
+
+            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Assert.assertTrue(ValidationUtil.isNotEmpty(family));
+
+            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
+            familyAttributeGroup.setActive("Y");
+            familyAttributeGroup.setMasterGroup("Y");
+            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
+
+            //Create the new familyAttribute instance
+            attributes.forEach(attributeData -> {
+                FamilyAttribute familyAttributeDTO = new FamilyAttribute(attributeData.getName(), null);
+                familyAttributeDTO.setActive("Y");
+                familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
+                familyAttributeDTO.setUiType(attributeData.getUiType());
+                familyAttributeDTO.setScopable("Y");
+                familyAttributeDTO.setAttributeId(attributeData.getFullId());
+                familyAttributeDTO.getScope().put(channel.getChannelId(), FamilyAttribute.Scope.OPTIONAL);
+                familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
+                familyAttributeDTO.setAttribute(attributeData);
+                family.addAttribute(familyAttributeDTO);
+            });
+            familyService.update(ConversionUtil.toList(family));
+            Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            createdFamilyAttributeInstances.add(family1);
+        });
+        return createdFamilyAttributeInstances;
     }
 
 }
