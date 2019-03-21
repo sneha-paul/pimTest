@@ -17,6 +17,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 import static org.junit.Assert.*;
 
@@ -75,148 +79,26 @@ public class AttributeTest {
         Assert.assertEquals(newAttributeCollection2.getAllAttributes().get(0).getActive(), attributeDTO.getActive());
 
     }
-    @Test
-    public void buildInstance() throws Exception {
-    }
-
-    @Test
-    public void getName() throws Exception {
-    }
-
-    @Test
-    public void setName() throws Exception {
-    }
-
-    @Test
-    public void getLabel() throws Exception {
-    }
-
-    @Test
-    public void setLabel() throws Exception {
-    }
-
-    @Test
-    public void getUiType() throws Exception {
-    }
-
-    @Test
-    public void setUiType() throws Exception {
-    }
-
-    @Test
-    public void getDataType() throws Exception {
-    }
-
-    @Test
-    public void setDataType() throws Exception {
-    }
-
-    @Test
-    public void getId() throws Exception {
-    }
-
-    @Test
-    public void setId() throws Exception {
-    }
-
-    @Test
-    public void getFullId() throws Exception {
-    }
-
-    @Test
-    public void getRegEx() throws Exception {
-    }
-
-    @Test
-    public void setRegEx() throws Exception {
-    }
-
-    @Test
-    public void getSelectable() throws Exception {
-    }
-
-    @Test
-    public void setSelectable() throws Exception {
-    }
-
-    @Test
-    public void getActive() throws Exception {
-    }
-
-    @Test
-    public void setActive() throws Exception {
-    }
-
-    @Test
-    public void getSequenceNum() throws Exception {
-    }
-
-    @Test
-    public void setSequenceNum() throws Exception {
-    }
-
-    @Test
-    public void getSubSequenceNum() throws Exception {
-    }
-
-    @Test
-    public void setSubSequenceNum() throws Exception {
-    }
-
-    @Test
-    public void getAttributeGroup() throws Exception {
-    }
-
-    @Test
-    public void setAttributeGroup() throws Exception {
-    }
-
-    @Test
-    public void getOptions() throws Exception {
-    }
-
-    @Test
-    public void setOptions() throws Exception {
-    }
-
-    @Test
-    public void getParentBasedOptions() throws Exception {
-    }
-
-    @Test
-    public void setParentBasedOptions() throws Exception {
-    }
-
-    @Test
-    public void getReferenceMap() throws Exception {
-    }
-
-    @Test
-    public void setReferenceMap() throws Exception {
-    }
-
-    @Test
-    public void getParentAttributeId() throws Exception {
-    }
-
-    @Test
-    public void setParentAttributeId() throws Exception {
-    }
-
-    @Test
-    public void getTopLevelGroup() throws Exception {
-    }
 
     @Test
     public void orchestrate() throws Exception {
-    }
+        //Create id
+        Attribute attributeDTO = new Attribute();
+        attributeDTO.setId("test");
+        attributeDTO.setName("test");
+        attributeDTO.orchestrate();
 
+        //Check websiteId
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeDTO.getId()));
+        Assert.assertEquals(attributeDTO.getId(), "test");
+    }
     @Test
     public void merge() throws Exception {
     }
 
     @Test
     public void toMap() throws Exception {
+
     }
 
     @Test
