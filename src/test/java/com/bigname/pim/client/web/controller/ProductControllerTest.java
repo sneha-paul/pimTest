@@ -383,8 +383,7 @@ public class ProductControllerTest {
 
             FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attributeData.getId());
 
-            //TODO add option
-            if(attributeData.getName().equals("Color")) {
+            if(attributeData.getName() == "Color") {
                 List<AttributeOption> attributeOptionList = new ArrayList(attributeDetails.getOptions().values());
                 attributeOptionList.forEach(attributeOption -> {
                     FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
@@ -412,7 +411,9 @@ public class ProductControllerTest {
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
 
-            familyService.update(ConversionUtil.toList(family));
+            List<Family> familyList = new ArrayList<>();
+            familyList.add(family);
+            familyService.update(familyList);
 
         });
 
@@ -827,7 +828,9 @@ public class ProductControllerTest {
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
 
-            familyService.update(ConversionUtil.toList());
+            List<Family> familyList = new ArrayList<>();
+            familyList.add(family);
+            familyService.update(familyList);
 
         });
 
