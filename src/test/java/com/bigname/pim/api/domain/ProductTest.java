@@ -39,12 +39,6 @@ public class ProductTest {
     @Autowired
     FamilyService familyService;
     @Autowired
-    ChannelDAO channelDAO;
-    @Autowired
-    AttributeCollectionDAO attributeCollectionDAO;
-    @Autowired
-    AttributeCollectionService attributeCollectionService;
-    @Autowired
     FamilyDAO familyDAO;
 
     @Before
@@ -54,35 +48,7 @@ public class ProductTest {
     }
     @Test
     public void accessorsTest() {
-        /*//Create Family
-        Family familyDTO = new Family();
-        familyDTO.setFamilyId("tes11");
-        familyDTO.setFamilyName("test");
-        familyService.create(familyDTO);
-
-       Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
-
-        //Create new instance
-        Product productDTO = new Product();
-        productDTO.setProductId("test");
-        productDTO.setExternalId("test");
-        productDTO.setProductName("Test.com");
-        productDTO.setProductFamilyId(family.getFamilyId());
-
-        productDTO.orchestrate();
-
-        //Testing equals unique id
-        Assert.assertEquals(productDTO.getProductId(), "TEST");
-        Assert.assertEquals(productDTO.getExternalId(), "TEST");
-        Assert.assertEquals(productDTO.getProductName(), "Test.com");
-
-        //create
-        productService.create(productDTO);
-        Product newProduct = productService.get(productDTO.getProductId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(ValidationUtil.isNotEmpty(newProduct));
-        Assert.assertEquals(newProduct.getProductId(), productDTO.getProductId());
-        Assert.assertEquals(newProduct.getProductName(), productDTO.getProductName());
-        Assert.assertEquals(newProduct.getExternalId(), productDTO.getExternalId());*/
+       //Create Family
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "TEST", "externalId", "TEST", "active", "Y", "discontinue", "N"));
 
@@ -101,9 +67,9 @@ public class ProductTest {
 
         Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-        //creating products
+        //Creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId",familyDetails.getFamilyId(), "productFamilyId", "TEST", "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId","TEST", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -114,20 +80,15 @@ public class ProductTest {
         });
         Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-      /*  //Testing equals unique id
+        //Testing equals unique id
         Assert.assertEquals(product.getProductId(), "TEST");
         Assert.assertEquals(product.getExternalId(), "TEST");
         Assert.assertEquals(product.getProductName(), "Product Test 1");
 
-        //create
-        productService.create(product);
-        Product newProduct = productService.get(product.getProductId(), EXTERNAL_ID, false).orElse(null);
-        Assert.assertTrue(ValidationUtil.isNotEmpty(newProduct));
-        Assert.assertEquals(newProduct.getProductId(), product.getProductId());
-        Assert.assertEquals(newProduct.getProductName(), product.getProductName());
-        Assert.assertEquals(newProduct.getExternalId(), product.getExternalId());*/
+        Assert.assertTrue(ValidationUtil.isNotEmpty(product));
+        Assert.assertEquals(productsData.get(0).get("externalId"),product.getExternalId());
+        Assert.assertEquals(product.getProductFamilyId(), familyDetails.getId());
     }
-
 
     @Test
     public void orchestrate() throws Exception {
@@ -143,30 +104,39 @@ public class ProductTest {
 
     @Test
     public void merge() throws Exception {
+        //create Original instance
+        Product original = new Product();
+        original.setExternalId("test");
+        original.setProductName("Test");
+        original.setActive("Y");
+
+        //Create modified instance
+        Product modified = new Product();
+        modified.setGroup("DETAILS");
+        modified.setExternalId("test-A");
+        modified.setProductName("Test-A");
+        modified.setActive("Y");
+
+        original = original.merge(modified);
+        Assert.assertEquals(original.getProductName(), "Test-A");
+        Assert.assertEquals(original.getExternalId(), "TEST-A");
+        Assert.assertEquals(original.getActive(), "Y");
+
+        //Without Details
+        Product modified1 = new Product();
+        modified1.setExternalId("test");
+        modified1.setProductName("Test");
+        modified1.setActive("Y");
+
+        original = original.merge(modified1);
+        Assert.assertEquals(original.getProductName(), "Test-A");
+        Assert.assertEquals(original.getExternalId(), "TEST-A");
+        Assert.assertEquals(original.getActive(), "Y");
     }
 
     @Test
     public void cloneInstance() throws Exception {
-        /*//Adding website
-        List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "discontinued", "N", "active", "Y"));
 
-        productsData.forEach(productData -> {
-            Product productDTO = new Product();
-            productDTO.setProductName((String) productData.get("name"));
-            productDTO.setProductFamilyId((String) productData.get("externalId"));
-            productDTO.setActive((String) productData.get("active"));
-            productDTO.setDiscontinued((String) productData.get("discontinued"));
-            productDAO.insert(productDTO);
-
-            //Clone website
-            Product newProduct = productService.get(productDTO.getProductFamilyId(), EXTERNAL_ID, false).orElse(null);
-            Assert.assertTrue(newProduct != null);
-            Assert.assertTrue(newProduct.diff(productDTO).isEmpty());
-
-            Product productClone = productService.cloneInstance(newProduct.getProductFamilyId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
-            Assert.assertTrue(productClone.getProductFamilyId() .equals(newProduct.getProductFamilyId() + "_COPY") && productClone.getProductName().equals(newProduct.getProductName() + "_COPY") && productClone.getDiscontinued().equals(newProduct.getDiscontinued() + "_COPY") && productClone.getActive() != newProduct.getActive());
-        });*/
     }
 
     @Test
@@ -183,7 +153,6 @@ public class ProductTest {
         Map<String, String> map1 = productDTO.toMap();
         Assert.assertEquals(map1.get("productName"), map.get("productName"));
         Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
-
     }
 
     @Test
