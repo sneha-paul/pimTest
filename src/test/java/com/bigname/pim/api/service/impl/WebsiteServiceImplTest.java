@@ -66,7 +66,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAllWebsiteCatalogsTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -110,7 +110,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWebsiteCatalogsTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -157,7 +157,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAvailableCatalogsForWebsiteTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -206,7 +206,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAvailableCatalogsForWebsiteTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -253,7 +253,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getWebsiteCatalogsTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -299,7 +299,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void addCatalogTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -333,7 +333,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getWebsiteByNameTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -355,7 +355,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getWebsiteByUrlTest() throws Exception {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test Website 1.com", "externalId", "TEST_WEBSITE_1", "url", "www.testwebsite1.com", "active", "Y"));
         websitesData.forEach(websiteData -> {
@@ -376,7 +376,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void createEntityTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -400,7 +400,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void createEntitiesTest(){
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -429,7 +429,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void toggleTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
@@ -462,7 +462,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test1.com", "active", "Y"));
@@ -485,7 +485,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllAsPageTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -513,7 +513,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllAsListTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -573,7 +573,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithIdsAsPageTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -603,7 +603,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithIdsAsListTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -633,7 +633,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsPageTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -663,7 +663,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsListTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -693,7 +693,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAllAtSearchTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -721,7 +721,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAllTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -750,7 +750,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void updateEntityTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
@@ -782,7 +782,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void updateEntitiesTest(){
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -825,7 +825,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void cloneInstanceTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
 
@@ -849,7 +849,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAll2Test() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -877,7 +877,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findAll1Test() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -906,7 +906,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findOneTest() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));
@@ -933,7 +933,7 @@ public class WebsiteServiceImplTest {
 
     @Test
     public void findOne1Test() {
-        //creating website
+        //creating websites
         List<Map<String, Object>> websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "Y"));
         websitesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "url", "www.test2.com", "active", "Y"));

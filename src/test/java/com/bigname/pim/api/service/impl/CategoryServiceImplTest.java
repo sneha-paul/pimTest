@@ -77,7 +77,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAllSubCategoriesTest() throws Exception {
-        //Creating category
+        //Creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -121,7 +121,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAvailableSubCategoriesForCategoryTest() throws Exception {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -165,7 +165,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getCategoryHierarchyTest() throws Exception {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y", "parent", "0", "isParent", "true", "level", "0", "parentChain", ""));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y", "parent", "TEST_1", "isParent", "false", "level", "1", "parentChain", "TEST_1"));
@@ -209,7 +209,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAvailableSubCategoriesForCategoryTest() throws Exception {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -253,7 +253,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getSubCategoriesTest() throws Exception {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -291,7 +291,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void setSubCategorySequenceTest() throws Exception {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -331,7 +331,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void addSubCategoryTest() throws Exception {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -366,7 +366,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void toggleSubCategoryTest() throws Exception {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -414,7 +414,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAvailableProductsForCategoryTest() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -426,7 +426,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -440,7 +440,7 @@ public class CategoryServiceImplTest {
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
 
-        //creating product
+        //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -470,7 +470,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void setProductSequenceTest() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -482,7 +482,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -495,7 +495,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -538,7 +538,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void toggleProductTest() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -550,7 +550,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -563,7 +563,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
@@ -602,7 +602,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getCategoryProductsTest() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -614,7 +614,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -627,7 +627,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
@@ -657,7 +657,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getCategoryProducts1Test() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -669,7 +669,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -682,7 +682,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
@@ -713,7 +713,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAvailableProductsForCategoryTest() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -725,7 +725,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -738,7 +738,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -769,7 +769,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void addProductTest() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -781,7 +781,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -794,7 +794,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -817,7 +817,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAllCategoryProductsTest() throws Exception {
-        //creating Family
+        //creating Families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -829,7 +829,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -842,7 +842,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.add(CollectionsUtil.toMap("name", "Test Product 2", "externalId", "TEST_PRODUCT_2", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -875,7 +875,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAllCategoryProductsTest() throws Exception {
-        //creating family
+        //creating families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
         familiesData.forEach(familyData -> {
@@ -887,7 +887,7 @@ public class CategoryServiceImplTest {
         });
 
         Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -900,7 +900,7 @@ public class CategoryServiceImplTest {
         });
 
         Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        //creating Product
+        //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
@@ -929,7 +929,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void createEntityTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -951,7 +951,7 @@ public class CategoryServiceImplTest {
     }
     @Test
     public void createEntitiesTest(){
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -973,7 +973,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void toggleTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.forEach(categoryData -> {
@@ -1002,7 +1002,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1025,7 +1025,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAllAsPageTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1048,7 +1048,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAllAsListTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1071,7 +1071,7 @@ public class CategoryServiceImplTest {
         Assert.assertArrayEquals(expected, actual);
 
 
-        //creating category
+        //creating categories
         categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1096,7 +1096,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAllWithIdsAsPageTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1123,7 +1123,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAllWithIdsAsListTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1149,7 +1149,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsPageTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1175,7 +1175,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsListTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1201,7 +1201,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAllAtSearchTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1224,7 +1224,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAllTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1247,7 +1247,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void updateEntityTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
 
@@ -1277,7 +1277,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void updateEntitiesTest(){
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1315,7 +1315,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void cloneInstanceTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
 
@@ -1338,7 +1338,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAll1Test() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1363,7 +1363,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findAll2Test() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1388,7 +1388,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findOneTest() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));
@@ -1411,7 +1411,7 @@ public class CategoryServiceImplTest {
 
     @Test
     public void findOne1Test() {
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "description", "Test Category2", "active", "Y"));

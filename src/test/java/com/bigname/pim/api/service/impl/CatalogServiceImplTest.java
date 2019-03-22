@@ -75,7 +75,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findAllRootCategoriesTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -88,7 +88,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
@@ -118,7 +118,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAllRootCategoriesTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -131,7 +131,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "N"));
@@ -163,7 +163,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findAvailableRootCategoriesForCatalogTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -176,7 +176,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
@@ -206,7 +206,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAvailableRootCategoriesForCatalogTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -219,7 +219,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
@@ -251,7 +251,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void toggleRootCategoryTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -264,7 +264,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
@@ -304,7 +304,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getRootCategoriesTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -317,7 +317,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
@@ -347,7 +347,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getCategoryHierarchyTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -360,7 +360,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y", "parent", "0", "isParent", true, "level", "0", "parentChain", ""));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y", "parent", "TEST_CATEGORY_1", "isParent", false,"level", "1", "parentChain", "TEST_CATEGORY_1"));
@@ -406,7 +406,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void setRootCategorySequenceTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -419,7 +419,7 @@ public class CatalogServiceImplTest {
         });
 
         Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
@@ -466,7 +466,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void addRootCategoryTest() throws Exception {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog Main", "externalId", "TEST_CATALOG_MAIN", "description", "Test Catalog Main description", "active", "Y"));
         catalogsData.forEach(catalogData -> {
@@ -477,7 +477,7 @@ public class CatalogServiceImplTest {
             catalogDTO.setDescription((String)catalogData.get("description"));
             catalogService.create(catalogDTO);
         });
-        //creating category
+        //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 2", "externalId", "TEST_CATEGORY_2", "description", "Test description 2", "active", "Y"));
@@ -499,7 +499,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void createEntityTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -521,7 +521,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void createEntitiesTest(){
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -548,7 +548,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void toggleTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG", "description", "Catalog1 description", "active", "Y"));
 
@@ -578,7 +578,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -601,7 +601,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAllAsPageTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -626,7 +626,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAllAsListTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -678,7 +678,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAllWithIdsAsPageTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -706,7 +706,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAllWithIdsAsListTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -734,7 +734,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsPageTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -762,7 +762,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsListTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -790,7 +790,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findAllAtSearchTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -816,7 +816,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findAll1Test() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -842,7 +842,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void updateEntityTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
 
@@ -873,7 +873,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void updateEntitiesTest(){
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -913,7 +913,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void cloneInstanceTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
 
@@ -936,7 +936,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findAllTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -962,7 +962,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findAll2Test() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -989,7 +989,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findOneTest() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));
@@ -1014,7 +1014,7 @@ public class CatalogServiceImplTest {
 
     @Test
     public void findOne1Test() {
-        //creating catalog
+        //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog1", "externalId", "TEST_CATALOG_1", "description", "Catalog1 description", "active", "Y"));
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog2", "externalId", "TEST_CATALOG_2", "description", "Catalog2 description", "active", "Y"));

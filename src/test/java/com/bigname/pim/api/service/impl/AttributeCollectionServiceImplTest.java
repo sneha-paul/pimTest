@@ -58,7 +58,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAllTest() throws Exception {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> attributesCollectionData = new ArrayList<>();
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
@@ -79,7 +79,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void get1Test() throws Exception {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> attributesCollectionData = new ArrayList<>();
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
@@ -102,7 +102,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAttributesTest() throws Exception {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> attributesCollectionData = new ArrayList<>();
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
@@ -117,7 +117,7 @@ public class AttributeCollectionServiceImplTest {
 
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
-            //Creating Attribute
+            //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y"));
             attributesData.add(CollectionsUtil.toMap("name", "color", "active", "Y"));
@@ -141,7 +141,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAttributeGroupsIdNamePairTest() throws Exception {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> attributesCollectionData = new ArrayList<>();
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "active", "Y"));
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test2.com", "externalId", "TEST_2", "active", "Y"));
@@ -156,7 +156,7 @@ public class AttributeCollectionServiceImplTest {
 
             AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
-            //Creating Attribute
+            //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y"));
             attributesData.add(CollectionsUtil.toMap("name", "color", "active", "Y"));
@@ -379,61 +379,22 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void createEntitiesTest(){
-        //Creating AttributeCollection
-        List<Map<String, Object>> collectionsData = new ArrayList<>();
-        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
-        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
-        collectionsData.forEach(collectionData -> {
+        //Creating AttributeCollections
+            List<Map<String, Object>> collectionsData = new ArrayList<>();
+            collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
+            collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
+
+        List<AttributeCollection> attributeCollectionDTOs = collectionsData.stream().map(collectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
-            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
-            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
+            attributeCollectionDTO.setCollectionName(collectionData.get("name").toString());
+            attributeCollectionDTO.setCollectionId(collectionData.get("externalId").toString());
             attributeCollectionDTO.setActive((String)collectionData.get("active"));
-            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
-            attributeCollectionService.create(attributeCollectionDTO);
+            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinue"));
+            return attributeCollectionDTO;
+        }).collect(Collectors.toList());
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
-
-            //Creating Attribute
-          List<Map<String, Object>> attributesData = new ArrayList<>();
-            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
-            attributesData.forEach(attributeData -> {
-                Attribute attribute = new Attribute();
-                attribute.setActive((String)attributeData.get("active"));
-                attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
-                attribute.setName((String)attributeData.get("name"));
-                attribute.setId((String)attributeData.get("id"));
-                attribute.setUiType(Attribute.UIType.DROPDOWN);
-                attributeCollectionDetails.addAttribute(attribute);
-
-                Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
-
-                //Creating AttributeOption
-                List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
-                attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
-                attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
-                attributesOptionsData.add(CollectionsUtil.toMap("value", "PAPER", "active", "Y"));
-                attributesOptionsData.forEach(attributeOptionData ->{
-                    AttributeOption attributeOption = new AttributeOption();
-                    attributeOption.setValue((String)attributeOptionData.get("value"));
-                    attributeOption.setCollectionId(attributeCollectionDetails.getCollectionId());
-                    attributeOption.setActive((String)attributeOptionData.get("active"));
-                    attributeOption.setAttributeId(attribute.getFullId());
-                    attributeOption.orchestrate();
-                    attribute1.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
-                });
-            });
-
-            List<AttributeCollection> attributeList= new ArrayList<>();
-            attributeList.add(attributeCollectionDetails);
-            attributeCollectionService.update(attributeList);
-        });
-        //Getting AttributeCollection
-        List<AttributeCollection>  collection = attributeCollectionService.getAll(null, false);
-        Assert.assertTrue(ValidationUtil.isNotEmpty(collection));
-        Assert.assertEquals(collection.size(),collectionsData.size());
-        List<Attribute> attributes=collection.get(0).getAllAttributes();
-        Assert.assertEquals(attributes.size(),1);
-        Assert.assertEquals(attributes.get(0).getOptions().size(),3);
+            attributeCollectionService.create(attributeCollectionDTOs);
+            Assert.assertEquals(attributeCollectionDAO.findAll(PageRequest.of(0, attributeCollectionDTOs.size()), false).getTotalElements(), collectionsData.size());
     }
 
     @Test
@@ -503,7 +464,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAllAsPageTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -560,7 +521,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAllAsListTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -606,7 +567,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAllWithIdsAsPageTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -666,7 +627,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAllWithIdsAsListTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -725,7 +686,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsPageTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -741,7 +702,7 @@ public class AttributeCollectionServiceImplTest {
 
             AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-            //Creating Attribute
+            //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
             attributesData.forEach(attributeData -> {
@@ -755,7 +716,7 @@ public class AttributeCollectionServiceImplTest {
 
                 Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
 
-                //Creating AttributeOption
+                //Creating AttributeOptions
                 List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
@@ -785,7 +746,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void getAllWithExclusionsAsListTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -801,7 +762,7 @@ public class AttributeCollectionServiceImplTest {
 
             AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-            //Creating Attribute
+            //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
             attributesData.forEach(attributeData -> {
@@ -815,7 +776,7 @@ public class AttributeCollectionServiceImplTest {
 
                 Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
 
-                //Creating AttributeOption
+                //Creating AttributeOptions
                 List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
@@ -844,7 +805,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void findAllAtSearchTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -860,7 +821,7 @@ public class AttributeCollectionServiceImplTest {
 
             AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-            //Creating Attribute
+            //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
             attributesData.forEach(attributeData -> {
@@ -874,7 +835,7 @@ public class AttributeCollectionServiceImplTest {
 
                 Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
 
-                //Creating AttributeOption
+                //Creating AttributeOptions
                 List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
@@ -900,7 +861,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void findAllTest() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -975,7 +936,7 @@ public class AttributeCollectionServiceImplTest {
 
      @Test
     public void updateEntitiesTest(){
-         //Creating AttributeCollection
+         //Creating AttributeCollections
          List<Map<String, Object>> collectionsData = new ArrayList<>();
          collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
          collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -991,7 +952,7 @@ public class AttributeCollectionServiceImplTest {
 
              AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-             //Creating Attribute
+             //Creating Attributes
              List<Map<String, Object>> attributesData = new ArrayList<>();
              attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE"));
              attributesData.forEach(attributeData -> {
@@ -1038,7 +999,7 @@ public class AttributeCollectionServiceImplTest {
             return result1;
         }).collect(Collectors.toList());
 
-         //Updating AttributeCollection
+         //Updating AttributeCollections
         attributeCollectionService.update(collections);
         result = attributeCollectionService.getAll(Sort.by("collectionName").descending(), true);
         collectionsMap = result.stream().collect(Collectors.toMap(collection -> collection.getCollectionId(), collection -> collection));
@@ -1048,7 +1009,7 @@ public class AttributeCollectionServiceImplTest {
 
    @Test
     public void findAll1Test() {
-       //Creating AttributeCollection
+       //Creating AttributeCollections
        List<Map<String, Object>> collectionsData = new ArrayList<>();
        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -1064,7 +1025,7 @@ public class AttributeCollectionServiceImplTest {
 
            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-           //Creating Attribute
+           //Creating Attributes
            List<Map<String, Object>> attributesData = new ArrayList<>();
            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
            attributesData.forEach(attributeData -> {
@@ -1078,7 +1039,7 @@ public class AttributeCollectionServiceImplTest {
 
                Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
 
-               //Creating AttributeOption
+               //Creating AttributeOptions
                List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
@@ -1106,7 +1067,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void findAll2Test() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -1122,7 +1083,7 @@ public class AttributeCollectionServiceImplTest {
 
             AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
-            //Creating Attribute
+            //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
             attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", "DROPDOWN"));
             attributesData.forEach(attributeData -> {
@@ -1136,7 +1097,7 @@ public class AttributeCollectionServiceImplTest {
 
                 Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
 
-                //Creating AttributeOption
+                //Creating AttributeOptions
                 List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
                 attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
@@ -1164,7 +1125,7 @@ public class AttributeCollectionServiceImplTest {
 
    @Test
     public void findOneTest() {
-       //Creating AttributeCollection
+       //Creating AttributeCollections
        List<Map<String, Object>> collectionsData = new ArrayList<>();
        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
        collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));
@@ -1187,7 +1148,7 @@ public class AttributeCollectionServiceImplTest {
 
     @Test
     public void findOne1Test() {
-        //Creating AttributeCollection
+        //Creating AttributeCollections
         List<Map<String, Object>> collectionsData = new ArrayList<>();
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection1", "externalId", "ENVELOPE1", "active", "Y", "discontinued", "N"));
         collectionsData.add(CollectionsUtil.toMap("name", "Envelopes Attributes Collection2", "externalId", "ENVELOPE2", "active", "Y", "discontinued", "N"));

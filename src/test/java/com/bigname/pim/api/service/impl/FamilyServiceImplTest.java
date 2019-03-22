@@ -1267,58 +1267,17 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
-        familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        List<Family> familyDTOs = familiesData.stream().map(familyData -> {
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
-            familyDAO.insert(familyDTO);
+            return familyDTO;
+        }).collect(Collectors.toList());
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
-            Assert.assertTrue(family != null);
-
-            FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
-            familyAttributeGroup.setActive("Y");
-            familyAttributeGroup.setMasterGroup("Y");
-            familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
-            familyAttributeGroup.setId(familyAttributeGroup.getFullId());
-
-            //Create the new familyAttribute instance
-            FamilyAttribute familyAttributeDTO = new FamilyAttribute(attribute.getName(), null);
-            familyAttributeDTO.setActive("Y");
-            familyAttributeDTO.setCollectionId(finalAttributeCollectionDetails.getCollectionId());
-            familyAttributeDTO.setUiType(attribute.getUiType());
-            familyAttributeDTO.setScopable("Y");
-            familyAttributeDTO.setAttributeId(attribute.getFullId());
-            familyAttributeDTO.getScope().put("ECOMMERCE", FamilyAttribute.Scope.OPTIONAL);
-            familyAttributeDTO.setAttributeGroup(familyAttributeGroup); //TODO : check whether right or wrong
-            familyAttributeDTO.setAttribute(attribute);
-
-            family.addAttribute(familyAttributeDTO);
-
-            FamilyAttributeOption familyAttributeOption = new FamilyAttributeOption();
-            familyAttributeOption.setActive("Y");
-            familyAttributeOption.setValue(attributeOption.getValue());
-            familyAttributeOption.setId(attributeOption.getId());
-            familyAttributeOption.setFamilyAttributeId(familyAttributeDTO.getId());
-            familyAttributeDTO.getOptions().put(attributeOption.getId(), familyAttributeOption);
-
-            //create variantGroup
-            family.setGroup("VARIANT_GROUPS");
-            VariantGroup variantGroup = new VariantGroup();
-            variantGroup.setName("Test Variant1");
-            variantGroup.setId("TEST_VARIANT_1");
-            variantGroup.setLevel(1);
-            variantGroup.setActive("N");
-            family.addVariantGroup(variantGroup);
-            family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
-
-            List<Family>  families = familyService.getAll(null, false);
-            Assert.assertTrue(ValidationUtil.isNotEmpty(families));
-            Assert.assertEquals(families.size(),familiesData.size());
-        });
+        familyService.create(familyDTOs);
+        Assert.assertEquals(familyDAO.findAll(PageRequest.of(0, familyDTOs.size()), false).getTotalElements(), familiesData.size());
     }
 
     @Test
@@ -1537,7 +1496,7 @@ public class FamilyServiceImplTest {
 
     @Test
     public void getAllAsListTest() {
-        ////Creating Family
+        //creating Families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
@@ -2066,7 +2025,7 @@ public class FamilyServiceImplTest {
             family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
             familyDAO.save(family);
         });
-        //Getting Family
+        //Getting Families
         Page<Family> paginatedResult = familyService.findAll("active", "Y", PageRequest.of(0, familiesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());
     }
@@ -2162,7 +2121,7 @@ public class FamilyServiceImplTest {
             family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
             familyDAO.save(family);
         });
-        //Getting Family
+        //Getting Families
         Page<Family> paginatedResult = familyService.findAll(PageRequest.of(0, familiesData.size()), false);
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());//size
     }
@@ -2295,7 +2254,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        //Creating Family
+        //creating Families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
@@ -2329,7 +2288,7 @@ public class FamilyServiceImplTest {
 
             family.addAttribute(familyAttributeDTO);
         });
-        //Getting AttributeCollection
+        //Getting AttributeCollections
         List<AttributeCollection> result = attributeCollectionService.findAll(CollectionsUtil.toMap("active", "N"));
         long size = familiesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
@@ -2356,7 +2315,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        //Creating Family
+        //creating Families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
@@ -2434,7 +2393,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        //Creating Family
+        //creating Families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
@@ -2492,7 +2451,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        //Creating AttributeOption
+        //creating Families
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
