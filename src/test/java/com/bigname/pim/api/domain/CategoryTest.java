@@ -239,18 +239,6 @@ public class CategoryTest {
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("categoryName"), "test.com");
 
-        //Create first instance for ignore internal id
-        Category category3 = new Category();
-        category3.setExternalId("test");
-        category3.setCategoryName("test");
-        category3.setDescription("test");
-
-        //Create second instance
-        Category category4 = new Category();
-        category4.setExternalId("test");
-        category4.setCategoryName("test.com");
-        category4.setDescription("test");
-
         //Checking first instance and second instance
         Map<String, Object> diff1 = category1.diff(category2, true);
         Assert.assertEquals(diff1.size(), 1);
