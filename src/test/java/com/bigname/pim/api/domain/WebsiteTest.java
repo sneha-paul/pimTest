@@ -188,20 +188,6 @@ public class WebsiteTest {
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("websiteName"), "test.com2");
 
-        //Create first instance for ignore internal id
-        Website website3 = new Website();
-        website3.setWebsiteId("test");
-        website3.setWebsiteName("test.com");
-        website3.setUrl("www.test");
-        website3.setActive("N");
-
-        //Create Second instance
-        Website website4 = new Website();
-        website4.setWebsiteId("test");
-        website4.setWebsiteName("test.com2");
-        website4.setUrl("www.test");
-        website4.setActive("N");
-
         //Checking First instance and Second instance
         Map<String, Object> diff1 = website1.diff(website2,true);
         Assert.assertEquals(diff1.size(), 1);
