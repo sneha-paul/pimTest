@@ -32,7 +32,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -112,7 +114,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void create() throws Exception {
+    public void createTest() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
@@ -136,7 +138,6 @@ public class ProductControllerTest {
 
         AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
-        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
         List<Map<String, Object>> attributesData = new ArrayList<>();
         attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
@@ -159,8 +160,7 @@ public class ProductControllerTest {
             attribute.setActive((String) attributeData.get("active"));
             attributeCollectionDetails.addAttribute(attribute);
         });
-        attributeCollectionList.add(attributeCollectionDetails);
-        attributeCollectionService.update(attributeCollectionList);
+        attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
 
         AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
@@ -182,7 +182,7 @@ public class ProductControllerTest {
             attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
         });
 
-        attributeCollectionService.update(attributeCollectionList);
+        attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
@@ -246,9 +246,7 @@ public class ProductControllerTest {
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
 
-            List<Family> familyList = new ArrayList<>();
-            familyList.add(family);
-            familyService.update(familyList);
+            familyService.update(ConversionUtil.toList(family));
 
         });
 
@@ -275,7 +273,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void update() throws Exception {
+    public void updateTest() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
@@ -299,7 +297,7 @@ public class ProductControllerTest {
 
         AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
-        List<AttributeCollection> attributeCollectionList = new ArrayList<>();
+
 
         List<Map<String, Object>> attributesData = new ArrayList<>();
         attributesData.add(CollectionsUtil.toMap("name", "Color", "externalId", "COLOR", "active", "Y", "uiType", Attribute.UIType.DROPDOWN));
@@ -322,8 +320,8 @@ public class ProductControllerTest {
             attribute.setActive((String) attributeData.get("active"));
             attributeCollectionDetails.addAttribute(attribute);
         });
-        attributeCollectionList.add(attributeCollectionDetails);
-        attributeCollectionService.update(attributeCollectionList);
+
+        attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
 
         AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
 
@@ -345,7 +343,7 @@ public class ProductControllerTest {
             attributeDetails.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
         });
 
-        attributeCollectionService.update(attributeCollectionList);
+        attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
@@ -411,9 +409,7 @@ public class ProductControllerTest {
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put(channel.getChannelId(), variantGroup.getId());
 
-            List<Family> familyList = new ArrayList<>();
-            familyList.add(family);
-            familyService.update(familyList);
+            familyService.update(ConversionUtil.toList(family));
 
         });
 
@@ -472,22 +468,48 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void details() throws Exception {
+    public void detailsTest() throws Exception {
         //Create mode
+        List<Product> createdProductInstances = addProductInstance();
+        Assert.assertFalse(createdProductInstances.isEmpty());
 
-        /*mockMvc.perform(
-                get("/pim/products/create"))
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        String channel = channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName)).toString();
+        params.put("channelId", ConversionUtil.toList(channel));
+
+        //create mode
+        mockMvc.perform(
+                get("/pim/products/create").params(params))
                 .andExpect(status().isOk())
                 .andExpect(view().name("product/product"))
                 .andExpect(forwardedUrl("/product/product.jsp"))
                 .andExpect(model().attribute("mode", is("CREATE")))
-                .andExpect(model().attribute("active", is("PRODUCTS")))
-                .andExpect(model().attribute("productFamilies", is(channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName)))));*/
+                .andExpect(model().attribute("active", is("PRODUCTS")));
+
+        //Deatils mode
+        String productId = createdProductInstances.get(0).getProductId();
+        mockMvc.perform(
+                get("/pim/products/" + productId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("product/product"))
+                .andExpect(forwardedUrl("/product/product.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")));
+
+        //Details mode with reload true
+        params = new LinkedMultiValueMap<>();
+        params.put("reload", ConversionUtil.toList("true"));
+
+        mockMvc.perform(
+                get("/pim/products/" + productId).params(params))
+                .andExpect(status().isOk())
+                .andExpect(view().name("product/product_body"))
+                .andExpect(forwardedUrl("/product/product_body.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")));
     }
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void all() throws Exception {
+    public void allTest() throws Exception {
         mockMvc.perform(
                 get("/pim/products"))
                 .andExpect(status().isOk())
@@ -497,7 +519,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void all1() throws Exception {
+    public void all1Test() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
@@ -694,7 +716,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void getProductCategories() throws Exception {
+    public void getProductCategoriesTest() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
@@ -883,7 +905,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void availableCategories() throws Exception {
+    public void availableCategoriesTest() throws Exception {
         //Add a product instance
         List<Product> createdProductInstances = addProductInstance();
         Assert.assertFalse(createdProductInstances.isEmpty());
@@ -899,7 +921,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void getAvailableCategories() throws Exception {
+    public void getAvailableCategoriesTest() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
@@ -1091,7 +1113,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void addCategory() throws Exception {
+    public void addCategoryTest() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
@@ -1282,7 +1304,7 @@ public class ProductControllerTest {
 
     @WithUserDetails("manu@blacwood.com")
     @Test
-    public void toggleProductCategory() throws Exception {
+    public void toggleProductCategoryTest() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
