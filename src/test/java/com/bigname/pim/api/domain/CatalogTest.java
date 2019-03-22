@@ -191,18 +191,6 @@ public class CatalogTest {
         Assert.assertEquals(diff.size(), 2);
         Assert.assertEquals(diff.get("catalogName"), "test.com");
 
-        //Create first instance ignore internal id
-        Catalog catalog3 = new Catalog();
-        catalog3.setCatalogName("test");
-        catalog3.setCatalogId("test_1");
-        catalog3.setDescription("test");
-
-        //Create second instance
-        Catalog catalog4 = new Catalog();
-        catalog4.setCatalogName("test.com");
-        catalog4.setCatalogId("test_1");
-        catalog4.setDescription("test");
-
         //Checking first instance and second instance
         Map<String, Object> diff1 = catalog1.diff(catalog2, true);
         Assert.assertEquals(diff1.size(), 1);
