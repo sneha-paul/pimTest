@@ -9,6 +9,7 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.*;
 import com.bigname.pim.api.service.*;
+import com.bigname.pim.util.PimUtil;
 import org.javatuples.Triplet;
 import org.junit.After;
 import org.junit.Assert;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -3329,6 +3331,456 @@ public class ProductServiceImplTest {
         actual = result.stream().map(product -> product.getProductName()).collect(Collectors.toList()).toArray(new String[0]);
         expected = productsData.stream().map(productData -> (String)productData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
         Assert.assertNotEquals(expected, actual);
+    }
+
+    @Test
+    public void getAllWithIdsAsPageTest() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        String[] ids = {productsData.get(0).get("externalId").toString(), productsData.get(1).get("externalId").toString(), productsData.get(2).get("externalId").toString()};
+        //Getting product as page
+        Page<Product> paginatedResult = productService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
+        Map<String, Product> productsMap = paginatedResult.getContent().stream().collect(Collectors.toMap(product -> product.getProductId(), product -> product));
+        Assert.assertTrue(productsMap.size() == ids.length && productsMap.containsKey(ids[0]) && productsMap.containsKey(ids[1]) && productsMap.containsKey(ids[2]));
+    }
+
+    @Test
+    public void getAllWithIdsAsListTest() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        String[] ids = {productsData.get(0).get("externalId").toString(), productsData.get(1).get("externalId").toString(), productsData.get(2).get("externalId").toString()};
+        //Getting product by ids
+        List<Product> paginatedResult = productService.getAll(ids, EXTERNAL_ID, null, false);
+        Map<String, Product> productsMap = paginatedResult.stream().collect(Collectors.toMap(product -> product.getProductId(), product -> product));
+        Assert.assertTrue(productsMap.size() == ids.length && productsMap.containsKey(ids[0]) && productsMap.containsKey(ids[1]) && productsMap.containsKey(ids[2]));
+    }
+
+    @Test
+    public void getAllWithExclusionsAsPageTest() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        String[] ids = {productsData.get(0).get("externalId").toString(), productsData.get(1).get("externalId").toString(), productsData.get(2).get("externalId").toString()};
+
+        //Getting products with exclude Ids
+        Page<Product> paginatedResult = productService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
+        Map<String, Product> productsMap = paginatedResult.getContent().stream().collect(Collectors.toMap(product -> product.getProductId(), product -> product));
+        Assert.assertTrue(productsMap.size() == (productsData.size() - ids.length) && !productsMap.containsKey(ids[0]) && !productsMap.containsKey(ids[1]) && !productsMap.containsKey(ids[2]));
+    }
+
+    @Test
+    public void getAllWithExclusionsAsListTest() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        String[] ids = {productsData.get(0).get("externalId").toString(), productsData.get(1).get("externalId").toString(), productsData.get(2).get("externalId").toString()};
+
+        //Getting products with exclude Ids
+        List<Product> paginatedResult = productService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        Map<String, Product> productsMap = paginatedResult.stream().collect(Collectors.toMap(product -> product.getProductId(), product -> product));
+        Assert.assertTrue(productsMap.size() == (productsData.size() - ids.length) && !productsMap.containsKey(ids[0]) && !productsMap.containsKey(ids[1]) && !productsMap.containsKey(ids[2]));
+    }
+
+    @Test
+    public void findAllAtSearchTest() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+        //Getting product by searchField
+        long size = productsData.stream().filter(x -> x.get("active").equals("Y")).count();
+        Page<Product> paginatedResult = productService.findAll("name", "Test", PageRequest.of(0, productsData.size()), true);
+        Assert.assertEquals(paginatedResult.getContent().size(), size);
+    }
+
+    @Test
+    public void findAll2Test() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+        //Getting products
+        long size = productsData.stream().filter(x -> x.get("active").equals("Y")).count();
+        Page<Product> paginatedResult = productService.findAll(PageRequest.of(0, productsData.size()), true);
+        Assert.assertEquals(paginatedResult.getContent().size(), size);
+    }
+
+    @Test
+    public void updateEntityTest() {
+        //creating AttributeCollection
+        AttributeCollection attributeCollectionDTO = new AttributeCollection();
+        attributeCollectionDTO.setCollectionName("Test_AttributeCollection");
+        attributeCollectionDTO.setCollectionId("TEST_ATTRIBUTECOLLECTION");
+        attributeCollectionDTO.setActive("Y");
+        attributeCollectionDTO.setDiscontinued("N");
+
+        attributeCollectionService.create(attributeCollectionDTO);
+
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
+        Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
+        attributeCollection.setActive("N");
+        attributeCollection.setGroup("DETAILS");
+
+        attributeCollectionService.update(attributeCollection.getCollectionId(), EXTERNAL_ID, attributeCollection);
+        AttributeCollection updatedCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCollection));
+        Assert.assertEquals(updatedCollection.getActive(), "N");
+        //Cteating Attribute
+        Attribute attribute = new Attribute();
+        attribute.setActive("Y");
+        attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute.setUiType(Attribute.UIType.DROPDOWN);
+        attribute.setName("style");
+        attribute.setId("STYLE");
+        attributeCollection.addAttribute(attribute);
+        List<AttributeCollection> attributeList= new ArrayList<>();
+        attributeList.add(attributeCollection);
+        attributeCollectionService.update(attributeList);
+
+        AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+
+        Attribute attribute1 = new Attribute();
+        attribute1.setActive("Y");
+        attribute1.setAttributeGroup(AttributeGroup.getDefaultGroup());
+        attribute1.setUiType(Attribute.UIType.DROPDOWN);
+        attribute1.setName("styleNew");
+        attribute1.setId("STYLE");
+        attributeCollectionUpdate.updateAttribute(attribute1);
+
+        attributeList= new ArrayList<>();
+        attributeList.add(attributeCollectionUpdate);
+        attributeCollectionService.update(attributeList);
+        Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+        Assert.assertEquals(result.getContent().get(0).getName(),attribute1.getName());
+
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("N");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+        //updating family
+        family.setActive("Y");
+        family.setGroup("DETAILS");
+        familyService.update(family.getFamilyId(), EXTERNAL_ID, family);
+        Family updatedFamily = familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily));
+        Assert.assertEquals(updatedFamily.getActive(), "Y");
+
+
+        //creating Product
+        Product productDTO = new Product();
+        productDTO.setProductName("Product Test 1");
+        productDTO.setProductId("PRODUCT_TEST_1");
+        productDTO.setProductFamilyId(family.getFamilyId());
+        productDTO.setActive("Y");
+        productService.create(productDTO);
+
+        Product product = productService.get(productDTO.getProductId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        //updating product
+        product.setActive("N");
+        product.setGroup("DETAILS");
+        productService.update(product.getProductId(), EXTERNAL_ID, product);
+        Product updatedProduct = productService.get(productDTO.getProductId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedProduct));
+        Assert.assertEquals(updatedProduct.getActive(), "N");
+    }
+
+    @Test
+    public void updateEntitiesTest(){
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+
+        String[] ids = {productsData.get(0).get("externalId").toString(), productsData.get(1).get("externalId").toString(), productsData.get(2).get("externalId").toString()};
+
+        List<Product> productResult = productService.getAll(ids, EXTERNAL_ID, null, false);
+        Map<String, Product> productsMap = productResult.stream().collect(Collectors.toMap(product -> product.getProductId(), product -> product));
+        Assert.assertTrue(productsMap.size() == ids.length && productsMap.containsKey(ids[0]) && productsMap.containsKey(ids[1]) && productsMap.containsKey(ids[2]));
+
+        List<Product> products = productResult.stream().map(result1 -> {
+            result1.setActive("N");
+            return result1;
+        }).collect(Collectors.toList());
+
+        //Updating products
+        productService.update(products);
+        productResult = productService.getAll(Sort.by("productName").descending(), true);
+        productsMap = productResult.stream().collect(Collectors.toMap(product -> product.getProductId(), product -> product));
+        Assert.assertTrue(productsMap.size() == (productsData.size() - ids.length) && !productsMap.containsKey(ids[0]) && !productsMap.containsKey(ids[1]) && !productsMap.containsKey(ids[2]));
+        Assert.assertFalse(productsMap.size() == productsData.size() && productsMap.containsKey(ids[0]) && productsMap.containsKey(ids[1]) && productsMap.containsKey(ids[2]));
+    }
+
+    @Test
+    public void findAll3Test() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+        //Getting products
+        long size = productsData.stream().filter(x -> x.get("active").equals("N")).count();
+        List<Product> result = productService.findAll(CollectionsUtil.toMap("active", "N"));
+        Assert.assertTrue(result.size() == size);
+    }
+
+    @Test
+    public void findAll4Test() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+        //Getting products
+        long size = productsData.stream().filter(x -> x.get("active").equals("N")).count();
+        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        List<Product> result = productService.findAll(criteria);
+        Assert.assertTrue(result.size() == size);
+    }
+
+    @Test
+    public void findOneTest() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+        //Getting product
+        Optional<Product> result = productService.findOne(CollectionsUtil.toMap("productName", productsData.get(0).get("name")));
+        Assert.assertEquals(productsData.get(0).get("name"), result.get().getProductName());
+    }
+
+    @Test
+    public void findOne1Test() {
+        //creating family
+        Family familyDTO = new Family();
+        familyDTO.setFamilyName("Test1");
+        familyDTO.setFamilyId("TEST_1");
+        familyDTO.setActive("Y");
+        familyDTO.setDiscontinued("N");
+        familyService.create(familyDTO);
+        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
+
+        //creating products
+        List<Map<String, Object>> productsData = new ArrayList<>();
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.forEach(productData -> {
+            Product productDTO = new Product();
+            productDTO.setProductName((String)productData.get("name"));
+            productDTO.setProductId((String)productData.get("externalId"));
+            productDTO.setProductFamilyId((String)productData.get("productFamilyId"));
+            productDTO.setActive((String)productData.get("active"));
+            productService.create(productDTO);
+        });
+        //Getting product
+        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("productName", productsData.get(0).get("name")));
+        Product result = productService.findOne(criteria).orElse(null);
+        Assert.assertEquals(productsData.get(0).get("name"), result.getProductName());
     }
 
     @After
