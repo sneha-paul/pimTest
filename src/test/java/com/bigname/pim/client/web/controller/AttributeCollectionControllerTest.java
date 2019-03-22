@@ -94,11 +94,11 @@ public class AttributeCollectionControllerTest {
 
         //Details mode, with non=existing collectionID - TODO
 
-        //Add a website instance
+        //Add a attribute collection instance
         List<AttributeCollection> createdAttributeCollectionInstances = addAttributeCollectionInstances();
         Assert.assertFalse(createdAttributeCollectionInstances.isEmpty());
 
-        //Details mode with valid websiteID
+        //Details mode with valid collectionID
         String collectionId = createdAttributeCollectionInstances.get(0).getCollectionId();
         mockMvc.perform(
                 get("/pim/attributeCollections/" + collectionId))
@@ -245,6 +245,31 @@ public class AttributeCollectionControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void attributeDetailsTest() throws Exception {
+        List<AttributeCollection> createdAttributeCollectionInstances = addAttributeCollectionInstances();
+        Assert.assertFalse(createdAttributeCollectionInstances.isEmpty());
+
+        String collectionId = createdAttributeCollectionInstances.get(0).getCollectionId();
+
+        //Create mode
+        mockMvc.perform(
+                get("/pim/attributeCollections/" + collectionId + "/attributes/create"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/attribute"))
+                .andExpect(forwardedUrl("/settings/attribute.jsp"))
+                .andExpect(model().attribute("mode", is("CREATE")));
+
+        //Details mode
+        List<Attribute> attributeList = attributeCollectionService.getAttributes(collectionId, FindBy.EXTERNAL_ID, 0, 10, null).getContent();
+        String attributeId = attributeList.get(0).getId();
+
+        mockMvc.perform(
+                get("/pim/attributeCollections/" + collectionId + "/attributes/" + attributeId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/attribute"))
+                .andExpect(forwardedUrl("/settings/attribute.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("attribute", hasProperty("id", is(attributeId))))
+                .andExpect(model().attribute("uiTypes", is(Attribute.UIType.getAll())));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -444,6 +469,32 @@ public class AttributeCollectionControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void attributeOptionDetailsTest() throws Exception {
+        List<AttributeCollection> createdAttributeInstances = addAttributeCollectionInstances();
+        Assert.assertFalse(createdAttributeInstances.isEmpty());
+
+        String collectionId = createdAttributeInstances.get(0).getCollectionId();
+        List<Attribute> attributeList = attributeCollectionService.getAttributes(collectionId, FindBy.EXTERNAL_ID, 0, 1, null).getContent();
+        String attributeId = attributeList.get(0).getId();
+        String attributeId1 = attributeList.get(0).getFullId();
+
+        mockMvc.perform(
+                get("/pim/attributeCollections/" + collectionId + "/attributes/" + attributeId + "//options/create/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/attributeOption"))
+                .andExpect(forwardedUrl("/settings/attributeOption.jsp"))
+                .andExpect(model().attribute("mode", is("CREATE")));
+
+        List<AttributeOption> attributeOptionsList = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId1, 0, 1, null).getContent();
+        String attributeOptionId = attributeOptionsList.get(0).getId();
+
+        //Details mode
+        mockMvc.perform(
+                get("/pim/attributeCollections/" + collectionId + "/attributes/" + attributeId + "/options/" + attributeOptionId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/attributeOption"))
+                .andExpect(forwardedUrl("/settings/attributeOption.jsp"))
+                .andExpect(model().attribute("mode", is("DETAILS")))
+                .andExpect(model().attribute("attribute", hasProperty("id", is(attributeId))));
     }
 
     @WithUserDetails("manu@blacwood.com")
@@ -531,8 +582,6 @@ public class AttributeCollectionControllerTest {
             });
             attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
         });
-
-
     }
 
     @After
@@ -542,15 +591,48 @@ public class AttributeCollectionControllerTest {
 
     private List<AttributeCollection> addAttributeCollectionInstances() {
         List<AttributeCollection> createdAttributeCollectionInstances = new ArrayList<>();
-        List<Map<String, Object>> attributeCollectionsData = new ArrayList<>();
-        attributeCollectionsData.add(CollectionsUtil.toMap("name", "Test Collection 1", "externalId", "TEST_COLLECTION_1", "active", "Y", "discontinued", "N"));
-        attributeCollectionsData.forEach(attributeCollectionData -> {
+        List<Map<String, Object>> collectionsData = new ArrayList<>();
+        collectionsData.add(CollectionsUtil.toMap("name", "Test Collection 1", "externalId", "TEST_COLLECTION_1", "active", "Y", "discontinued", "N"));
+        collectionsData.forEach(collectionData -> {
             AttributeCollection attributeCollectionDTO = new AttributeCollection();
-            attributeCollectionDTO.setCollectionName((String)attributeCollectionData.get("name"));
-            attributeCollectionDTO.setCollectionId((String)attributeCollectionData.get("externalId"));
-            attributeCollectionDTO.setActive((String)attributeCollectionData.get("active"));
+            attributeCollectionDTO.setCollectionName((String)collectionData.get("name"));
+            attributeCollectionDTO.setCollectionId((String)collectionData.get("externalId"));
+            attributeCollectionDTO.setActive((String)collectionData.get("active"));
+            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
+            attributeCollectionService.create(attributeCollectionDTO);
 
-            createdAttributeCollectionInstances.add(attributeCollectionService.create(attributeCollectionDTO));
+            AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+
+            List<Map<String, Object>> attributesData = new ArrayList<>();
+            attributesData.add(CollectionsUtil.toMap("name", "style", "active", "Y", "id", "STYLE", "uiType", Attribute.UIType.DROPDOWN));
+            attributesData.forEach(attributeData -> {
+                Attribute attribute = new Attribute();
+                attribute.setActive((String)attributeData.get("active"));
+                attribute.setAttributeGroup(AttributeGroup.getDefaultGroup());
+                attribute.setName((String)attributeData.get("name"));
+                attribute.setId((String)attributeData.get("id"));
+                attribute.setUiType((Attribute.UIType) attributeData.get("uiType"));
+                attributeCollectionDetails.addAttribute(attribute);
+
+                Attribute attribute1 = attributeCollectionDetails.getAttribute(attribute.getFullId()).orElse(null);
+
+                List<Map<String, Object>> attributesOptionsData = new ArrayList<>();
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "FOLDERS", "active", "Y"));
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "OPEN_END", "active", "Y"));
+                attributesOptionsData.add(CollectionsUtil.toMap("value", "PAPER", "active", "Y"));
+                attributesOptionsData.forEach(attributeOptionData ->{
+                    AttributeOption attributeOption = new AttributeOption();
+                    attributeOption.setValue((String)attributeOptionData.get("value"));
+                    attributeOption.setCollectionId(attributeCollectionDetails.getCollectionId());
+                    attributeOption.setActive((String)attributeOptionData.get("active"));
+                    attributeOption.setAttributeId(attribute.getFullId());
+                    attributeOption.orchestrate();
+                    attribute1.getOptions().put(ValidatableEntity.toId(attributeOption.getValue()), attributeOption);
+                });
+            });
+            attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
+            AttributeCollection attributeCollection = attributeCollectionService.get(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            createdAttributeCollectionInstances.add(attributeCollection);
         });
         return createdAttributeCollectionInstances;
     }
