@@ -27,15 +27,19 @@ public class ProductFeedCleaner {
         List<Object> header = products.get(0);
 
         int parentCodeIdx = header.indexOf("Parent Code");
-        int oldParentNameIdx = header.indexOf("Old Parent Name");
-        int newParentNameIdx = header.indexOf("Parent Name");
-        int parentNameProcessStatusIdx = header.indexOf("Parent Name Process Status");
-        int oldProductPageNameIdx = header.indexOf("Old Product Page Name");
-        int newProductPageNameIdx = header.indexOf("Product Page Name");
-        int productPageNameProcessStatusIdx = header.indexOf("Product Page Name Process Status");
+        int parentNameIdx = header.indexOf("Old Parent Name");
+        int productPageNameIdx = header.indexOf("Old Product Page Name");
+        int collectionIdx = header.indexOf("Old Collection");
+        int sizeIdx = header.indexOf("Old Size");
+        int sizeCodeIdx = header.indexOf("Old Size Code");
+        int metricSizeIdx = header.indexOf("Old Metric Size");
+        Map<String, Map<String, Object>> collectionData = attributeOptionsMap.get("COLLECTION");
+        Map<String, Map<String, Object>> sizeData = attributeOptionsMap.get("SIZE");
+        Map<String, Map<String, Object>> sizeCodeData = attributeOptionsMap.get("SIZE_CODE");
+        Map<String, Map<String, Object>> metricSizeData = attributeOptionsMap.get("METRIC_SIZE");
         int numOfHeaderRows = 5;
-        for(int i = 5; i < products.size(); i ++) {
-            String oldParentProductName = (String)products.get(i).get(oldParentNameIdx);
+        for(int i = numOfHeaderRows; i < products.size(); i ++) {
+            String oldParentProductName = (String)products.get(i).get(parentNameIdx);
             int status = -1;
             String key = (String)products.get(i).get(parentCodeIdx);
             if(parentProductsMap.containsKey(key)) {
@@ -43,19 +47,101 @@ public class ProductFeedCleaner {
                 Map<String, Object> map = parentProductsMap.get(key);
                 if(map.get("NEW_VALUE").toString().isEmpty()) {
                     status = 0;
-                    products.get(i).set(newParentNameIdx, map.get("VALUE"));
-                    products.get(i).set(newProductPageNameIdx, map.get("VALUE"));
+                    products.get(i).set(parentNameIdx + 1, map.get("VALUE"));
+                    products.get(i).set(productPageNameIdx + 1, map.get("VALUE"));
                 } else {
                     status = 1;
-                    products.get(i).set(newParentNameIdx, map.get("NEW_VALUE"));
-                    products.get(i).set(newProductPageNameIdx, map.get("NEW_VALUE"));
+                    products.get(i).set(parentNameIdx + 1, map.get("NEW_VALUE"));
+                    products.get(i).set(productPageNameIdx + 1, map.get("NEW_VALUE"));
                 }
             } else {
-                products.get(i).set(newParentNameIdx, oldParentProductName);
-                products.get(i).set(newProductPageNameIdx, oldParentProductName);
+                products.get(i).set(parentNameIdx + 1, oldParentProductName);
+                products.get(i).set(productPageNameIdx + 1, oldParentProductName);
             }
-            products.get(i).set(parentNameProcessStatusIdx, status);
-            products.get(i).set(productPageNameProcessStatusIdx, status);
+            products.get(i).set(parentNameIdx + 2, status);
+            products.get(i).set(productPageNameIdx + 2, status);
+
+            //##########################################################################################################
+
+            int idx = collectionIdx;
+            String existingValue = (String)products.get(i).get(idx);
+            status = -1;
+            key = (String)products.get(i).get(idx);
+            if(collectionData.containsKey(key)) {
+                Map<String, Object> map = collectionData.get(key);
+                if(existingValue.equals(map.get("NEW_VALUE").toString())) {
+                    status = 0;
+                } else {
+                    System.out.println(existingValue + "--" + map.get("NEW_VALUE"));
+                    status = 1;
+                }
+                products.get(i).set(idx + 1, map.get("NEW_VALUE"));
+            } else {
+                products.get(i).set(idx + 1, existingValue);
+            }
+            products.get(i).set(idx + 2, status);
+
+            //##########################################################################################################
+
+            idx = sizeIdx;
+            existingValue = (String)products.get(i).get(idx);
+            status = -1;
+            key = (String)products.get(i).get(idx);
+            if(sizeData.containsKey(key)) {
+                Map<String, Object> map = sizeData.get(key);
+                if(existingValue.equals(map.get("NEW_VALUE").toString())) {
+                    status = 0;
+                } else {
+                    System.out.println(existingValue + "--" + map.get("NEW_VALUE"));
+                    status = 1;
+                }
+                products.get(i).set(idx + 1, map.get("NEW_VALUE"));
+            } else {
+                products.get(i).set(idx + 1, existingValue);
+            }
+            products.get(i).set(idx + 2, status);
+
+            //##########################################################################################################
+
+            idx = sizeCodeIdx;
+            existingValue = (String)products.get(i).get(idx);
+            status = -1;
+            key = (String)products.get(i).get(idx);
+            if(sizeCodeData.containsKey(key)) {
+                Map<String, Object> map = sizeCodeData.get(key);
+                if(existingValue.equals(map.get("NEW_VALUE").toString())) {
+                    status = 0;
+                } else {
+                    System.out.println(existingValue + "--" + map.get("NEW_VALUE"));
+                    status = 1;
+                }
+                products.get(i).set(idx + 1, map.get("NEW_VALUE"));
+            } else {
+                products.get(i).set(idx + 1, existingValue);
+            }
+            products.get(i).set(idx + 2, status);
+
+            //##########################################################################################################
+
+            idx = metricSizeIdx;
+            existingValue = (String)products.get(i).get(idx);
+            status = -1;
+            key = (String)products.get(i).get(idx);
+            if(metricSizeData.containsKey(key)) {
+                Map<String, Object> map = metricSizeData.get(key);
+                if(existingValue.equals(map.get("NEW_VALUE").toString())) {
+                    status = 0;
+                } else {
+                    System.out.println(existingValue + "--" + map.get("NEW_VALUE"));
+                    status = 1;
+                }
+                products.get(i).set(idx + 1, map.get("NEW_VALUE"));
+            } else {
+                products.get(i).set(idx + 1, existingValue);
+            }
+            products.get(i).set(idx + 2, status);
+
+
         }
         POIUtil.writeData(updatedProductFeedFilePath, "PRODUCTS", products);
     }
