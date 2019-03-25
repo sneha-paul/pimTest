@@ -1,14 +1,10 @@
 package com.bigname.pim.api.domain;
-
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
-import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.sun.org.apache.xml.internal.resolver.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,8 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 21/03/2019.
