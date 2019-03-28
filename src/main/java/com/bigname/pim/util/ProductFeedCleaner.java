@@ -41,28 +41,30 @@ public class ProductFeedCleaner {
         requiredOutputFieldsmap.put("Parent Code", "PARENT_PRODUCT_ID");
         requiredOutputFieldsmap.put("Parent Name", "PARENT_PRODUCT_NAME");
         requiredOutputFieldsmap.put("Product Page Name", "PRODUCT_PAGE_NAME");
-        requiredOutputFieldsmap.put("Color Group", "COLOR_GROUP");
-        requiredOutputFieldsmap.put("Color", "COLOR");
-        requiredOutputFieldsmap.put("Existing Color Name", "COLOR_NAME");
         requiredOutputFieldsmap.put("Collection", "COLLECTION");
         requiredOutputFieldsmap.put("Size", "SIZE");
         requiredOutputFieldsmap.put("Size Code", "SIZE_CODE");
         requiredOutputFieldsmap.put("Metric Size", "METRIC_SIZE");
-        requiredOutputFieldsmap.put("Paper Weight", "PAPER_WEIGHT");
         requiredOutputFieldsmap.put("Paper Texture", "PAPER_TEXTURE");
         requiredOutputFieldsmap.put("Availability", "AVAILABILITY");
-        requiredOutputFieldsmap.put("Recycled Percent", "RECYCLED_PERCENT");
         requiredOutputFieldsmap.put("Recycled Content", "RECYCLED_CONTENT");
+        requiredOutputFieldsmap.put("Color Group", "COLOR_GROUP");
+        requiredOutputFieldsmap.put("Color", "COLOR");
+        requiredOutputFieldsmap.put("Existing Color Name", "COLOR_NAME");
+        requiredOutputFieldsmap.put("New Color Name", "NEW_COLOR_NAME");
+        requiredOutputFieldsmap.put("Paper Weight", "PAPER_WEIGHT");
+        requiredOutputFieldsmap.put("Recycled Percent", "RECYCLED_PERCENT");
+        requiredOutputFieldsmap.put("Sealing Method", "SEALING_METHOD");
+        requiredOutputFieldsmap.put("Compare To Brand", "COMPARE_TO_BRAND");
         requiredOutputFieldsmap.put("Brand", "BRAND");
         requiredOutputFieldsmap.put("Brand Collection", "BRAND COLLECTION");
+        requiredOutputFieldsmap.put("Old Sealing Method", "OLD_SEALING_METHOD");
+        requiredOutputFieldsmap.put("Sealing Method Type", "SEALING_METHOD_TYPE");
         requiredOutputFieldsmap.put("Old Window Size", "OLD_WINDOW_SIZE");
         requiredOutputFieldsmap.put("Old Window Position", "OLD_WINDOW_POSITION");
         requiredOutputFieldsmap.put("Window Size", "WINDOW_SIZE");
         requiredOutputFieldsmap.put("Window Position", "WINDOW_POSITION");
         requiredOutputFieldsmap.put("Window Location", "WINDOW_LOCATION");
-        requiredOutputFieldsmap.put("Old Sealing Method", "OLD_SEALING_METHOD");
-        requiredOutputFieldsmap.put("Sealing Method", "SEALING_METHOD");
-        requiredOutputFieldsmap.put("Sealing Method Type", "SEALING_METHOD_TYPE");
         requiredOutputFieldsmap.put("Base Quantity Price", "BASE_QUANTITY_PRICE");
         requiredOutputFieldsmap.put("Each Weight", "EACH_WEIGHT");
         requiredOutputFieldsmap.put("Recycled", "RECYCLED");
@@ -104,7 +106,7 @@ public class ProductFeedCleaner {
         int availabilityIdx = header.indexOf("Old Availability");
         int recycledPercentIdx = header.indexOf("Old Recycled Percent");
         int recycledContentIdx = header.indexOf("Old Recycled Content");
-        int brandIdx = header.indexOf("Old Brand");
+        int compareToBrandIdx = header.indexOf("Old Compare To Brand");
         int brandCollectionIdx = header.indexOf("Old Brand Collection");
         int sealingMethodIdx = header.indexOf("Old Sealing Method");
         int sealingMethodTypeIdx = header.indexOf("Old Sealing Method Type");
@@ -123,7 +125,7 @@ public class ProductFeedCleaner {
         Map<String, Map<String, Object>> availabilityData = attributeOptionsMap.get("AVAILABILITY");
         Map<String, Map<String, Object>> recycledPercentData = attributeOptionsMap.get("RECYCLED_PERCENT");
         Map<String, Map<String, Object>> recycledContentData = attributeOptionsMap.get("RECYCLED_CONTENT");
-        Map<String, Map<String, Object>> brandData = attributeOptionsMap.get("BRAND");
+        Map<String, Map<String, Object>> compareToBrandData = attributeOptionsMap.get("BRAND");
         Map<String, Map<String, Object>> brandCollectionData = attributeOptionsMap.get("BRAND_COLLECTION");
         Map<String, Map<String, Object>> sealingMethodData = attributeOptionsMap.get("SEALING_METHOD");
         Map<String, Map<String, Object>> sealingMethodTypeData = attributeOptionsMap.get("SEALING_METHOD_TYPE");
@@ -390,13 +392,13 @@ public class ProductFeedCleaner {
 
             //##########################################################################################################
 
-            idx = brandIdx; // TODO - 1
+            idx = compareToBrandIdx; // TODO - 1
             existingValue = (String)products.get(i).get(idx);
             if(!existingValue.isEmpty()) {
                 int status = -1;
                 String key = (String) products.get(i).get(idx);
-                if (brandData.containsKey(key)) { // TODO - 2
-                    Map<String, Object> map = brandData.get(key); // TODO - 3
+                if (compareToBrandData.containsKey(key)) { // TODO - 2
+                    Map<String, Object> map = compareToBrandData.get(key); // TODO - 3
                     if (existingValue.equals(map.get("NEW_VALUE").toString())) {
                         status = 0;
                     } else {
@@ -413,7 +415,7 @@ public class ProductFeedCleaner {
 
             //##########################################################################################################
 
-            idx = brandCollectionIdx; // TODO - 1
+            /*idx = brandCollectionIdx; // TODO - 1
             existingValue = (String)products.get(i).get(idx);
             if(!existingValue.isEmpty()) {
                 int status = -1;
@@ -432,7 +434,7 @@ public class ProductFeedCleaner {
                     missingAttributesMap.get("BRAND_COLLECTION").add(Arrays.asList(ValidatableEntity.toId(existingValue), existingValue)); // TODO - 4
                 }
                 products.get(i).set(idx + 2, status);
-            }
+            }*/
             //##########################################################################################################
 
             idx = sealingMethodIdx; // TODO - 1
@@ -618,8 +620,33 @@ public class ProductFeedCleaner {
                 }
                 products.get(i).set(idx + 2, status);
             }
+
+            //##########################################################################################################
+
+            if("Y".equalsIgnoreCase((String)products.get(i).get(header.indexOf("Recycled")))) {
+                products.get(i).set(header.indexOf("Recycled"), "Y");
+            } else {
+                products.get(i).set(header.indexOf("Recycled"), "N");
+            }
+
+            //##########################################################################################################
+
+            if("Y".equalsIgnoreCase((String)products.get(i).get(header.indexOf("Laser")))) {
+                products.get(i).set(header.indexOf("Laser"), "Y");
+            } else {
+                products.get(i).set(header.indexOf("Laser"), "N");
+            }
+
+            //##########################################################################################################
+
+            if("Y".equalsIgnoreCase((String)products.get(i).get(header.indexOf("Inkjet")))) {
+                products.get(i).set(header.indexOf("Inkjet"), "Y");
+            } else {
+                products.get(i).set(header.indexOf("Inkjet"), "N");
+            }
         }
         Map<String, List<List<Object>>> groupedProducts = new LinkedHashMap<>();
+        List<Object> headerRow = requiredOutputFieldsmap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
         for(int i = numOfHeaderRows; i < products.size(); i ++) {
             String category = (String)products.get(i).get(header.indexOf("Category"));
             if(category.isEmpty()) {
@@ -627,7 +654,7 @@ public class ProductFeedCleaner {
             }
             if(!groupedProducts.containsKey(category)) {
                 groupedProducts.put(category, new ArrayList<>());
-                groupedProducts.get(category).add(requiredOutputFieldsmap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+                groupedProducts.get(category).add(headerRow);
             }
             List<Object> filteredProduct = new ArrayList<>();
             int _i = i;
