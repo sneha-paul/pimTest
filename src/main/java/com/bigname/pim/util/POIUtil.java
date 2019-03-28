@@ -151,7 +151,18 @@ public class POIUtil {
     public static boolean writeData(String filePath, Map<String, List<List<Object>>> datas) {
         // Blank workbook
         XSSFWorkbook workbook = new XSSFWorkbook();
-
+        CellStyle style = workbook.createCellStyle();
+        //Background color
+        style.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        Font font = workbook.createFont();
+        //Font color
+        font.setColor(IndexedColors.WHITE.getIndex());
+        //Bold
+        font.setBold(true);
+        //Italic
+//        font.setItalic(true);
+        style.setFont(font);
         datas.forEach((sheetName, data) -> {
             // Create a blank sheet
             XSSFSheet sheet = workbook.createSheet(sheetName);
@@ -166,14 +177,18 @@ public class POIUtil {
                 for (Object obj : objArr) {
                     // this line creates a cell in the next column of that row
                     Cell cell = row.createCell(cellnum++);
+                    if(rownum == 1) {
+                        cell.setCellStyle(style);
+                    }
                     if (obj instanceof String)
                         cell.setCellValue((String)obj);
                     else if (obj instanceof Integer)
                         cell.setCellValue((Integer)obj);
                 }
             }
-            for(int i = 0; i < data.size(); i ++) {
-                sheet.setColumnWidth(i, 15000);
+            for(int i = 0; i < data.get(0).size(); i ++) {
+//                sheet.setColumnWidth(i, 15000);
+                sheet.autoSizeColumn(i);
             }
         });
 
