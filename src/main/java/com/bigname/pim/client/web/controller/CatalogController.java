@@ -8,6 +8,7 @@ import com.bigname.core.util.Toggle;
 import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.RootCategory;
+import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.data.exportor.CatalogExporter;
@@ -59,6 +60,13 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String catalogId, Catalog catalog) {
+        //updating websiteCatalog
+        Catalog catalog1 = catalogService.get(catalogId, FindBy.EXTERNAL_ID, false).orElse(null);
+        List<WebsiteCatalog> websiteCatalogs = catalogService.getAllWebsiteCatalogsWithCatalogId(catalog1.getId());
+        websiteCatalogs.forEach(websiteCatalog -> {
+            websiteCatalog.setActive(catalog.getActive());
+            catalogService.updateWebsiteCatalog(websiteCatalog);
+        });
         return update(catalogId, catalog, "/pim/catalogs/", catalog.getGroup().length == 1 && catalog.getGroup()[0].equals("DETAILS") ? Catalog.DetailsGroup.class : null);
     }
 

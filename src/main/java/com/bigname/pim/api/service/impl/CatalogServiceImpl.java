@@ -286,6 +286,11 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     }
 
     @Override
+    public List<WebsiteCatalog> getAllWebsiteCatalogsWithCatalogId(String catalogInternalId) {
+        return websiteCatalogDAO.findByCatalogId(catalogInternalId);
+    }
+
+    @Override
     public boolean toggleCatalog(String catalogId, FindBy findBy, Toggle toggle) {
 
         return get(catalogId, findBy, false)
@@ -302,5 +307,10 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                     });
                     return true;
                 }).orElseThrow(() -> new EntityNotFoundException("unable to find"));
+    }
+
+    @Override
+    public void updateWebsiteCatalog(WebsiteCatalog websiteCatalog) {
+        websiteCatalogDAO.save(websiteCatalog);
     }
 }

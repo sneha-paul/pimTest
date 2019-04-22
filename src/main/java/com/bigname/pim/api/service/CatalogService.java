@@ -6,6 +6,7 @@ import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
+import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,5 +76,9 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
 
     List<RootCategory> getAllRootCategories(String catalogInternalId);
 
+    List<WebsiteCatalog> getAllWebsiteCatalogsWithCatalogId(String catalogInternalId);
+
     boolean toggleCatalog(String catalogId, FindBy findBy, Toggle toggle);
+
+    void updateWebsiteCatalog(WebsiteCatalog websiteCatalog);
 }
