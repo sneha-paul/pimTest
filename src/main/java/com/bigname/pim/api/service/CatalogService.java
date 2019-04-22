@@ -75,4 +75,5 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
 
     List<RootCategory> getAllRootCategories(String catalogInternalId);
 
+    boolean toggleCatalog(String catalogId, FindBy findBy, Toggle toggle);
 }

@@ -5,10 +5,7 @@ import com.bigname.core.exception.EntityNotFoundException;
 import com.bigname.core.service.BaseServiceSupport;
 import com.bigname.core.util.FindBy;
 import com.bigname.core.util.Toggle;
-import com.bigname.pim.api.domain.Catalog;
-import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.RelatedCategory;
-import com.bigname.pim.api.domain.RootCategory;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
@@ -21,11 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +36,6 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     private RootCategoryDAO rootCategoryDAO;
     private RelatedCategoryDAO relatedCategoryDAO;
     private CategoryService categoryService;
-
 
     @Autowired
     public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService) {
@@ -291,5 +285,22 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         return null;
     }
 
+    @Override
+    public boolean toggleCatalog(String catalogId, FindBy findBy, Toggle toggle) {
 
+        return get(catalogId, findBy, false)
+                .map(catalog -> {
+
+                    catalog.setGroup("DETAILS");
+                    catalog.setActive(toggle.state());
+                    catalogDAO.save(catalog);
+
+                    List<WebsiteCatalog> websiteCatalogs = websiteCatalogDAO.findByCatalogId(catalog.getId());
+                    websiteCatalogs.forEach(websiteCatalog -> {
+                            websiteCatalog.setActive(toggle.state());
+                            websiteCatalogDAO.save(websiteCatalog);
+                    });
+                    return true;
+                }).orElseThrow(() -> new EntityNotFoundException("unable to find"));
+    }
 }

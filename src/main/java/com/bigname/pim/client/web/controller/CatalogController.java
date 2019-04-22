@@ -13,7 +13,6 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.data.exportor.CatalogExporter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -170,5 +169,14 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getCategoriesHierarchy(@PathVariable(value = "id") String id) {
         return catalogService.getCategoryHierarchy(id);
+    }
+
+    @RequestMapping(value = "/{catalogId}/catalogs/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleCatalogs(@PathVariable(value = "catalogId") String catalogId,
+                                                  @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", catalogService.toggleCatalog(catalogId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
     }
 }
