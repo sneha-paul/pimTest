@@ -83,7 +83,14 @@ public class AssetFamilyController extends BaseController<AssetFamily ,AssetFami
         model.put("active", "ASSET_FAMILY");
         model.put("view", "settings/assetFamilies");
         model.put("title", "Asset Families");
-        return all(model);
+        return new ModelAndView("settings/assetFamilies",model);
+    }
+
+    @RequestMapping(value =  {"/list", "/data"})
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> all(HttpServletRequest request) {
+        return all(request, "assetFamilyName");
     }
 
 
