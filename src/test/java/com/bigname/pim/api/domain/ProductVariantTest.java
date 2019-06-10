@@ -1,6 +1,5 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
@@ -14,9 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 21/03/2019.

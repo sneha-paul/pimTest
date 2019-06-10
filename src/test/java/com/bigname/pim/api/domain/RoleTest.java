@@ -1,9 +1,9 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.RoleDAO;
 import com.bigname.pim.api.service.RoleService;
+import com.m7.common.util.ValidationUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,8 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
+import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+
 
 /**
  * Created by sanoop on 20/03/2019.

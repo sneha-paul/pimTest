@@ -1,20 +1,20 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.ProductUtil;
 import com.google.common.base.Preconditions;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.service.BaseServiceSupport;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -24,9 +24,9 @@ import javax.validation.Validator;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 import static com.bigname.pim.util.PIMConstants.ReorderingDirection.DOWN;
 import static com.bigname.pim.util.PIMConstants.ReorderingDirection.UP;
+import static com.m7.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * Created by sruthi on 20-09-2018.

@@ -1,13 +1,13 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.*;
-import com.bigname.pim.api.service.*;
+import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.ProductDAO;
+import com.bigname.pim.api.service.FamilyService;
+import com.bigname.pim.api.service.ProductService;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,10 +19,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 12/03/2019.

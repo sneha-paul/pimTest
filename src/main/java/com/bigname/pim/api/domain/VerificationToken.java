@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.domain.User;
 import org.springframework.data.annotation.Transient;
 
 import java.util.Date;

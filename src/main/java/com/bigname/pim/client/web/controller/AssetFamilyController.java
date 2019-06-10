@@ -1,19 +1,17 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Result;
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.AssetFamily;
 import com.bigname.pim.api.service.AssetFamilyService;
+import com.m7.common.datatable.model.Result;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +20,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("pim/assetFamilies")
-public class AssetFamilyController extends BaseController<AssetFamily ,AssetFamilyService>{
+public class AssetFamilyController extends BaseController<AssetFamily ,AssetFamilyService> {
     private AssetFamilyService assetFamilyService;
 
     public AssetFamilyController(AssetFamilyService assetFamilyService) {

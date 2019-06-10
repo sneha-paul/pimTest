@@ -1,15 +1,11 @@
 package com.bigname.common.util;
 
-import com.bigname.pim.api.domain.Website;
-import org.junit.After;
+import com.m7.common.util.CollectionsUtil;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
 import java.util.stream.Stream;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sruthi on 27-02-2019.
@@ -73,11 +69,16 @@ public class CollectionsUtilTest {
 
     @Test
     public void generifyMap() throws Exception {
-        Map<String, Object> input=new HashMap<>();
+        Map<String, Integer> input=new HashMap<>();
         input.put("50", 9);
         input.put("25", 6);
         input.put("10", 3);
-        Assert.assertEquals(CollectionsUtil.generifyMap(input), input);
+        Map<String, Object> output=new HashMap<>();
+        output.put("50", 9);
+        output.put("25", 6);
+        output.put("10", 3);
+
+        Assert.assertEquals(CollectionsUtil.generifyMap(input), output);
     }
 
     @Test

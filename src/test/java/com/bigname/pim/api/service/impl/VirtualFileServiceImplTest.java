@@ -1,12 +1,12 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.m7.common.util.CollectionsUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
+import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+
 
 /**
  * Created by sruthi on 23-02-2019.

@@ -1,17 +1,17 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Request;
-import com.bigname.common.datatable.model.Result;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
-import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.data.exportor.CatalogExporter;
+import com.m7.common.datatable.model.Request;
+import com.m7.common.datatable.model.Result;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
+import com.m7.xcore.web.controller.BaseController;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
+import static com.m7.common.util.ValidationUtil.isEmpty;
 
 /**
  *

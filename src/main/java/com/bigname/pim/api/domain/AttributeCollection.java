@@ -1,10 +1,9 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.pim.util.PIMConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.common.util.StringUtil;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 

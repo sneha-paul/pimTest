@@ -1,18 +1,15 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.data.loader.ProductLoader1;
-import com.bigname.pim.util.PimUtil;
-import org.javatuples.Pair;
-import org.javatuples.Triplet;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -227,7 +224,7 @@ public class ProductVariantRepositoryTest {
         //create productVariantInstance
         Product newProduct = productDAO.findById(product.getProductId(), FindBy.EXTERNAL_ID).orElse(null);
 
-        Page<FamilyAttributeOption> familyAttributeOptions = familyService.getFamilyAttributeOptions(familyDetails.getFamilyId(),FindBy.EXTERNAL_ID, attributeDetails.getId(), 0, 2, null);
+        Page<FamilyAttributeOption> familyAttributeOptions = familyService.getFamilyAttributeOptions(familyDetails.getFamilyId(), FindBy.EXTERNAL_ID, attributeDetails.getId(), 0, 2, null);
 
         List<FamilyAttribute> variantAxisAttributes = familyService.getVariantAxisAttributes(familyDetails.getFamilyId(),attributeDetails.getId().toUpperCase(), FindBy.EXTERNAL_ID, null);
 

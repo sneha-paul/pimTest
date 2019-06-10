@@ -1,14 +1,14 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.ChannelDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.FamilyService;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,8 +22,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 14/03/2019.

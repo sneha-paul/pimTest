@@ -1,12 +1,12 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.POIUtil;
+import com.m7.common.util.StringUtil;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.FindBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.m7.common.util.ValidationUtil.*;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

@@ -1,17 +1,17 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.junit.After;
@@ -32,7 +32,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
+import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -186,7 +187,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting FamilyAttributes
-            Page<FamilyAttribute> result=familyService.getFamilyAttributes(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 3, null);
+            Page<FamilyAttribute> result=familyService.getFamilyAttributes(family.getFamilyId(), EXTERNAL_ID, 0, 3, null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.getContent().get(0).getName(), "Test_Attribute");
         });
@@ -283,7 +284,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting variantGroups
-            Page<VariantGroup> result=familyService.getVariantGroups(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+            Page<VariantGroup> result=familyService.getVariantGroups(family.getFamilyId(), EXTERNAL_ID, 0, 1, null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.getSize(), 1);
         });
@@ -362,7 +363,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting AttributeGroups
-            List<Pair<String, String>> result=familyService.getAttributeGroupsIdNamePair(family.getFamilyId(), FindBy.EXTERNAL_ID,null);
+            List<Pair<String, String>> result=familyService.getAttributeGroupsIdNamePair(family.getFamilyId(), EXTERNAL_ID,null);
             Assert.assertEquals(result.size(),3);
         });
     }
@@ -440,7 +441,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting ParentAttributeGroups
-            List<Pair<String, String>> result=familyService.getParentAttributeGroupsIdNamePair(family.getFamilyId(), FindBy.EXTERNAL_ID, null);
+            List<Pair<String, String>> result=familyService.getParentAttributeGroupsIdNamePair(family.getFamilyId(), EXTERNAL_ID, null);
             Assert.assertEquals(result.get(0).getValue(0),"DETAILS_GROUP");
         });
     }
@@ -528,7 +529,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
             FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
             //Getting FamilyAttributeOptions
-            Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
+            Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
             Assert.assertEquals(result.getContent().size(), 1);
             Assert.assertEquals(result.getContent().get(0).getValue(), "TestOption");
         });
@@ -630,7 +631,7 @@ public class FamilyServiceImplTest {
 
             familyDAO.save(family);
             //Getting VariantAxisAttributes
-            List<FamilyAttribute> result=familyService.getVariantAxisAttributes(family.getFamilyId(),variantGroup.getId(), FindBy.EXTERNAL_ID, null);
+            List<FamilyAttribute> result=familyService.getVariantAxisAttributes(family.getFamilyId(),variantGroup.getId(), EXTERNAL_ID, null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.get(0).getName(),attribute.getName());
         });
@@ -900,7 +901,7 @@ public class FamilyServiceImplTest {
             Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
             Assert.assertTrue(family != null);
             //Getting family
-            Family result=familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID,false).orElse(null);
+            Family result=familyService.get(family.getFamilyId(), EXTERNAL_ID,false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.getFamilyName(), "Test1");
         });
@@ -1019,7 +1020,7 @@ public class FamilyServiceImplTest {
         });
         String[] ids = {familiesData.get(0).get("externalId").toString(), familiesData.get(1).get("externalId").toString(), familiesData.get(2).get("externalId").toString()};
         //Getting Families
-        List<Family> ListedData = familyService.getAll(ids, FindBy.EXTERNAL_ID, null);
+        List<Family> ListedData = familyService.getAll(ids, EXTERNAL_ID, null);
         Assert.assertEquals(ListedData.size(),familiesData.size());
     }
 
@@ -1112,7 +1113,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //toggle
-            boolean result=familyService.toggleVariantGroup(family.getId(), FindBy.INTERNAL_ID,"TEST_VARIANT_1", FindBy.EXTERNAL_ID, Toggle.get("active"));
+            boolean result=familyService.toggleVariantGroup(family.getId(), FindBy.INTERNAL_ID,"TEST_VARIANT_1", EXTERNAL_ID, Toggle.get("active"));
             Assert.assertTrue(result);
         });
     }
@@ -1128,7 +1129,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -1144,7 +1145,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionService.update(attributeList);
 
-        Page<Attribute> attribute1= attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, 0, 1, null);
+        Page<Attribute> attribute1= attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, 0, 1, null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attribute1));
         Assert.assertEquals(attribute1.getContent().get(0).getName(),attribute.getName());
 
@@ -1159,7 +1160,7 @@ public class FamilyServiceImplTest {
         attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
         attributeCollectionService.update(attributeList);
 
-        Page<AttributeOption> attributeOption1= attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attribute.getFullId(), 0, 1, null);
+        Page<AttributeOption> attributeOption1= attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, attribute.getFullId(), 0, 1, null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeOption1));
         Assert.assertEquals(attributeOption1.getContent().get(0).getValue(),attributeOption.getValue());
         //creating family
@@ -1169,7 +1170,7 @@ public class FamilyServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1193,7 +1194,7 @@ public class FamilyServiceImplTest {
         List<Family> familyList= new ArrayList<>();
         familyList.add(family);
         familyService.update(familyList);
-        Page<FamilyAttribute> familyAttributes= familyService.getFamilyAttributes(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+        Page<FamilyAttribute> familyAttributes= familyService.getFamilyAttributes(family.getFamilyId(), EXTERNAL_ID, 0, 1, null);
         Assert.assertEquals(familyAttributes.getContent().get(0).getName(),familyAttributeDTO.getName());
 
         FamilyAttribute familyAttribute1 = family.getAllAttributesMap(false).get(attribute.getId());
@@ -1217,7 +1218,7 @@ public class FamilyServiceImplTest {
         family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
         familyDAO.save(family);
         FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
-        Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
+        Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
         Assert.assertEquals(result.getContent().size(), 1);
         Assert.assertEquals(result.getContent().get(0).getValue(), "TestOption");
 
@@ -1289,16 +1290,16 @@ public class FamilyServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
 
         //toggle
         familyService.toggle(family.getFamilyId(), EXTERNAL_ID, Toggle.get(family.getActive()));
-        Family updatedFamily = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family updatedFamily = familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily));
         Assert.assertEquals(updatedFamily.getActive(), "N");
 
         familyService.toggle(updatedFamily.getFamilyId(), EXTERNAL_ID, Toggle.get(updatedFamily.getActive()));
-        Family updatedFamily1 = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family updatedFamily1 = familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily1));
         Assert.assertEquals(updatedFamily1.getActive(), "Y");
     }
@@ -1392,7 +1393,7 @@ public class FamilyServiceImplTest {
 
             familyDAO.save(family);
             //Getting Family
-            Family family1=familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family1=familyService.get(family.getFamilyId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family1));
             Assert.assertEquals(family1.getFamilyName(),familiesData.get(0).get("name"));
             Assert.assertEquals(family1.getAllAttributes().size(),1);
@@ -2137,14 +2138,14 @@ public class FamilyServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         attributeCollection.setActive("N");
         attributeCollection.setGroup("DETAILS");
 
         attributeCollectionService.update(attributeCollection.getCollectionId(), EXTERNAL_ID, attributeCollection);
-        AttributeCollection updatedCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection updatedCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCollection));
         Assert.assertEquals(updatedCollection.getActive(), "N");
         //Cteating Attribute
@@ -2159,7 +2160,7 @@ public class FamilyServiceImplTest {
         attributeList.add(attributeCollection);
         attributeCollectionService.update(attributeList);
 
-        AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
         Attribute attribute1 = new Attribute();
         attribute1.setActive("Y");
@@ -2172,7 +2173,7 @@ public class FamilyServiceImplTest {
         attributeList= new ArrayList<>();
         attributeList.add(attributeCollectionUpdate);
         attributeCollectionService.update(attributeList);
-        Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+        Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID,0,3,null);
         Assert.assertEquals(result.getContent().get(0).getName(),attribute1.getName());
 
         //Creating Family
@@ -2182,13 +2183,13 @@ public class FamilyServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
         family.setActive("N");
         family.setGroup("DETAILS");
 
         //updating family
         familyService.update(family.getFamilyId(), EXTERNAL_ID, family);
-        Family updatedFamily = familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family updatedFamily = familyService.get(family.getFamilyId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily));
         Assert.assertEquals(updatedFamily.getActive(), "N");
         //TODO Update  familyAttribute and familyOption is pending
@@ -2509,7 +2510,7 @@ public class FamilyServiceImplTest {
         context.clear();
 
         /*Testing uniqueConstraint violation of familyId with update operation*/
-        Family family = familyDAO.findById(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family = familyDAO.findById(familyDTO.getFamilyId(), EXTERNAL_ID).orElse(null);
         family.setFamilyName("Envelope");
         family.setFamilyId("TEST_1");
         family.setActive("Y");

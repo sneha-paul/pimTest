@@ -1,33 +1,31 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.exception.GenericEntityException;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
 import com.bigname.pim.util.ProductUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.exception.GenericEntityException;
+import com.m7.xcore.service.BaseServiceSupport;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.m7.common.util.ValidationUtil.*;
 
 /**
  * Created by sruthi on 19-09-2018.

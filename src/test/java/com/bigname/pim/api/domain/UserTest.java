@@ -1,11 +1,10 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.UserDAO;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
-import com.bigname.pim.api.service.UserService;
-import com.bigname.pim.api.service.WebsiteService;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.domain.User;
+import com.m7.xcore.persistence.dao.UserDAO;
+import com.m7.xcore.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,8 +19,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
+import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+
 
 /**
  * Created by sanoop on 20/03/2019.

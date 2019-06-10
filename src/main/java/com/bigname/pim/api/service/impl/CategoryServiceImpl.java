@@ -1,12 +1,5 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.EntityAssociation;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
@@ -15,14 +8,19 @@ import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.domain.EntityAssociation;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.service.BaseServiceSupport;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -1,13 +1,13 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.core.service.BaseService;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.CategoryProduct;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
+import com.m7.xcore.service.BaseService;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

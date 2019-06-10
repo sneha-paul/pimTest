@@ -1,16 +1,16 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeGroup;
 import com.bigname.pim.api.domain.AttributeOption;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

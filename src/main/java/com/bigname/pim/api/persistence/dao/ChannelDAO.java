@@ -1,7 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.core.persistence.dao.GenericDAO;
 import com.bigname.pim.api.domain.Channel;
+import com.m7.xcore.persistence.dao.GenericDAO;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

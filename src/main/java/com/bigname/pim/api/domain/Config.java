@@ -1,9 +1,7 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.Entity;
-
+import com.m7.common.util.ConversionUtil;
+import com.m7.xcore.domain.Entity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;

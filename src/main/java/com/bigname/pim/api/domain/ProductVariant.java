@@ -1,10 +1,10 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.domain.Entity;
 import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.xcore.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -1,10 +1,10 @@
 package com.bigname.pim.util;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.FileAsset;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.ValidationUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,12 +1,12 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.core.service.BaseService;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.domain.FamilyAttribute;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
+import com.m7.xcore.service.BaseService;
+import com.m7.xcore.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;

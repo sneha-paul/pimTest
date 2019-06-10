@@ -26,5 +26,4 @@ public class PIMConstants {
 
     public enum ReorderingDirection {UP, DOWN}
 
-    public static String DEFAULT_GRID_STATUS_OPTIONS = "110"; // ACTIVE - 1 (TRUE), INACTIVE - 1 (TRUE), DISCONTINUED - 0 (FALSE)
 }

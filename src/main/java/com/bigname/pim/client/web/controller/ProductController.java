@@ -1,42 +1,36 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Pagination;
-import com.bigname.common.datatable.model.Request;
-import com.bigname.common.datatable.model.Result;
-import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.EntityAssociation;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
-import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
+import com.m7.common.datatable.model.Request;
+import com.m7.common.datatable.model.Result;
+import com.m7.common.util.StringUtil;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
+import com.m7.xcore.web.controller.BaseController;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
+import static com.m7.common.util.ValidationUtil.isEmpty;
+
 
 /**
  * Created by Manu on 8/3/2018.

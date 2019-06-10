@@ -1,9 +1,9 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.core.persistence.dao.GenericRepository;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
+import com.m7.xcore.persistence.dao.GenericRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

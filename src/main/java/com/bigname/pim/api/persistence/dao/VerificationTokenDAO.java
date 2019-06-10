@@ -1,8 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
-
-import com.bigname.core.persistence.dao.BaseDAO;
 import com.bigname.pim.api.domain.VerificationToken;
+import com.m7.xcore.persistence.dao.BaseDAO;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**

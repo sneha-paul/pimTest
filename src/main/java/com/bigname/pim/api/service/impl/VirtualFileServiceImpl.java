@@ -1,24 +1,19 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.service.BaseServiceSupport;
+import com.m7.xcore.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

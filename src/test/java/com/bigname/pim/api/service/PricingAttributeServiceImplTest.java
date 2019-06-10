@@ -1,15 +1,15 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
+import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+
 
 /**
  * Created by aswathy on 11-03-2019.

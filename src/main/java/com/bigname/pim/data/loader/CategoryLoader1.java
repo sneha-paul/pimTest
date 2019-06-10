@@ -1,9 +1,9 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.POIUtil;
+import com.m7.common.util.CollectionsUtil;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
 import static com.bigname.pim.api.domain.Category.Property.*;
+import static com.m7.common.util.ValidationUtil.isEmpty;
 
 /**
  * Created by sanoop on 31/01/2019.

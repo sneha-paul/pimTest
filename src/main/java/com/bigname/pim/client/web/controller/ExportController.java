@@ -6,7 +6,7 @@ import com.bigname.pim.data.exportor.CatalogExporter;
 import com.bigname.pim.data.exportor.CategoryExporter;
 import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.data.loader.exporter.WebsiteExporter;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.PimUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

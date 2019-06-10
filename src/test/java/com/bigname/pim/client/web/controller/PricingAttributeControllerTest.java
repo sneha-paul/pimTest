@@ -1,12 +1,12 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.PricingAttribute;
-import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
-import com.bigname.pim.api.service.UserService;
+import com.m7.common.util.ConversionUtil;
+import com.m7.xcore.domain.User;
+import com.m7.xcore.service.UserService;
+import com.m7.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

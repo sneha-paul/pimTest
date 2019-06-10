@@ -1,13 +1,13 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.core.util.FindBy;
-import com.bigname.core.web.controller.BaseController;
-import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.domain.VerificationToken;
 import com.bigname.pim.api.persistence.dao.VerificationTokenDAO;
 import com.bigname.pim.api.service.RegistrationService;
-import com.bigname.pim.api.service.UserService;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.m7.xcore.domain.User;
+import com.m7.xcore.service.UserService;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 @Controller
 @RequestMapping("pim/user")
-public class RegistrationController extends BaseController<User,UserService> {
+public class RegistrationController extends BaseController<User, UserService> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class);
 

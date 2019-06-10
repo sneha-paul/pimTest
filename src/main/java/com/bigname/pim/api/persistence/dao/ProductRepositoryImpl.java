@@ -1,11 +1,11 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.persistence.dao.GenericRepositoryImpl;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductCategory;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.xcore.persistence.dao.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

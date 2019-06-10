@@ -1,14 +1,18 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.*;
+import com.bigname.pim.api.domain.Attribute;
+import com.bigname.pim.api.domain.AttributeCollection;
+import com.bigname.pim.api.domain.AttributeGroup;
+import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.api.service.UserService;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.xcore.domain.User;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.service.UserService;
+import com.m7.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

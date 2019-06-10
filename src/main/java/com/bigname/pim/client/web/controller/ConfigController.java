@@ -1,11 +1,11 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.Config;
 import com.bigname.pim.api.service.ConfigService;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;

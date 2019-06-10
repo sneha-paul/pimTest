@@ -1,9 +1,9 @@
 
 package com.bigname.pim.api.service;
 
-import com.bigname.core.service.BaseService;
 import com.bigname.pim.api.domain.Role;
 import com.bigname.pim.api.persistence.dao.RoleDAO;
+import com.m7.xcore.service.BaseService;
 
 
 /**

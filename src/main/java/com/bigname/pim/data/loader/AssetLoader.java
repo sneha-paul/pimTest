@@ -1,11 +1,11 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.m7.common.util.ConversionUtil;
+import com.m7.xcore.util.FindBy;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.bigname.common.util.StringUtil.trim;
-import static com.bigname.common.util.ValidationUtil.isEmpty;
-import static com.bigname.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.common.util.ValidationUtil.isEmpty;
+import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.trim;
+
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

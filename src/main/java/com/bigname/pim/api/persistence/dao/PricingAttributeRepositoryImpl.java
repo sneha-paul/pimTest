@@ -1,7 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.core.persistence.dao.GenericRepositoryImpl;
 import com.bigname.pim.api.domain.PricingAttribute;
+import com.m7.xcore.persistence.dao.GenericRepositoryImpl;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**

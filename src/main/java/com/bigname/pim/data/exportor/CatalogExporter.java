@@ -1,10 +1,10 @@
 package com.bigname.pim.data.exportor;
 
-import com.bigname.core.data.exporter.BaseExporter;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.util.POIUtil;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.xcore.data.exporter.BaseExporter;
 import org.springframework.stereotype.Component;
 
 import java.util.Iterator;

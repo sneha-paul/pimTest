@@ -1,10 +1,5 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
@@ -12,7 +7,12 @@ import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.service.BaseServiceSupport;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

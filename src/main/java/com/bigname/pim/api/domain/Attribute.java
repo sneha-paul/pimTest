@@ -1,9 +1,8 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.pim.util.PIMConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.common.util.StringUtil;
+import com.m7.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 
 import javax.validation.constraints.NotEmpty;

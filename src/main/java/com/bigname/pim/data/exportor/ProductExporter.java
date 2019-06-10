@@ -1,25 +1,23 @@
 package com.bigname.pim.data.exportor;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.data.exporter.BaseExporter;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.POIUtil;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.xcore.data.exporter.BaseExporter;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.util.FindBy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.StringUtil.*;
+import static com.m7.common.util.StringUtil.getSimpleId;
+
 
 /**
  * Created by sruthi on 31-01-2019.

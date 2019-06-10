@@ -1,14 +1,18 @@
 package com.bigname.pim.client.util;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.URLUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.service.BaseService;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.client.model.Breadcrumbs;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.StringUtil;
+import com.m7.common.util.URLUtil;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.domain.Event;
+import com.m7.xcore.domain.User;
+import com.m7.xcore.service.BaseService;
+import com.m7.xcore.service.EventService;
+import com.m7.xcore.service.UserService;
+import com.m7.xcore.util.FindBy;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -16,9 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
-import static com.bigname.common.util.ValidationUtil.isNotEmpty;
 import static com.bigname.pim.util.PIMConstants.Character.EQUALS;
+import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -234,9 +238,9 @@ public class BreadcrumbsBuilder {
                 return new String[] {"Pricing Attributes", "pricingAttributes"};
             case "com.bigname.pim.api.domain.Family":
                 return new String[] {"Product Types", "families"};
-            case "com.bigname.pim.api.domain.User":
+            case "com.m7.xcore.domain.User":
                 return new String[] {"User", "users"};
-            case "com.bigname.pim.api.domain.Event":
+            case "com.m7.xcore.domain.Event":
                 return new String[] {"Event", "events"};
             case "com.bigname.pim.api.domain.Config":
                 return new String[] {"Config", "configs"};
@@ -266,9 +270,9 @@ public class BreadcrumbsBuilder {
                 return ((PricingAttributeService)services.get("pricingAttributeService")).get(id, FindBy.EXTERNAL_ID, false).map(PricingAttribute::getPricingAttributeName).orElse("");
             case "com.bigname.pim.api.domain.Family":
                 return ((FamilyService)services.get("familyService")).get(id, FindBy.EXTERNAL_ID, false).map(Family::getFamilyName).orElse("");
-            case "com.bigname.pim.api.domain.User":
+            case "com.m7.xcore.domain.User":
                 return ((UserService)services.get("userService")).get(id, FindBy.EXTERNAL_ID, false).map(User::getUserName).orElse("");
-            case "com.bigname.pim.api.domain.Event":
+            case "com.m7.xcore.domain.Event":
                 return ((EventService)services.get("eventService")).get(id, FindBy.EXTERNAL_ID, false).map(Event::getUser).orElse("");
             case "com.bigname.pim.api.domain.Config":
                 return ((ConfigService)services.get("configService")).get(id, FindBy.EXTERNAL_ID, false).map(Config::getConfigName).orElse("");

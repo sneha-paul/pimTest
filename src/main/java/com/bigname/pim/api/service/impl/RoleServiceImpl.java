@@ -1,10 +1,10 @@
 
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.core.service.BaseServiceSupport;
 import com.bigname.pim.api.domain.Role;
 import com.bigname.pim.api.persistence.dao.RoleDAO;
 import com.bigname.pim.api.service.RoleService;
+import com.m7.xcore.service.BaseServiceSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,7 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xcore.domain.Entity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.bigname.common.util.RegExBuilder.*;
 import static com.bigname.pim.api.domain.Website.Property.*;
+import static com.m7.common.util.RegExBuilder.*;
 
 
 public class Website extends Entity<Website> {

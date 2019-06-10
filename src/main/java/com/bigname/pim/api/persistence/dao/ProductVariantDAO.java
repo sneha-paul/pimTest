@@ -1,7 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.core.persistence.dao.GenericDAO;
 import com.bigname.pim.api.domain.ProductVariant;
+import com.m7.xcore.persistence.dao.GenericDAO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

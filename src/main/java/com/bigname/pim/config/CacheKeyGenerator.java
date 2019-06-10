@@ -1,6 +1,6 @@
 package com.bigname.pim.config;
 
-import com.bigname.core.service.BaseService;
+import com.m7.xcore.service.BaseService;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.util.StringUtils;
 

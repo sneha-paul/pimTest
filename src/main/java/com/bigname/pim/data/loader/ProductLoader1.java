@@ -1,15 +1,14 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.POIUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.StringUtil;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.FindBy;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
@@ -23,9 +22,10 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.StringUtil.split;
-import static com.bigname.common.util.StringUtil.trim;
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.m7.common.util.StringUtil.split;
+import static com.m7.common.util.StringUtil.trim;
+import static com.m7.common.util.ValidationUtil.*;
+
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -1139,7 +1139,7 @@ public class ProductLoader1 {
                     //If the current attribute is selectable, add any new attribute options, if any
                     if(isSelectable) {
                         // cellValue can either be a simple single value or delimited multiple values
-                        List<String> attributeOptionValues = StringUtil.split(cellValue, delimiters.split(""));
+                        List<String> attributeOptionValues = split(cellValue, delimiters.split(""));
 
                         //Add the single or multi option values
                         attributeOptionValues.forEach(attributeOptionValue -> {

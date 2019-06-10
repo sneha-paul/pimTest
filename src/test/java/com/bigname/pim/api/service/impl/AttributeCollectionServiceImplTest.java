@@ -1,17 +1,15 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.util.PimUtil;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.junit.After;
 import org.junit.Assert;
@@ -31,7 +29,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
+import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -65,7 +64,7 @@ public class AttributeCollectionServiceImplTest {
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
 
         attributesCollectionData.forEach(AttributeCollection -> {
-            AttributeCollection attributeCollectionDTO= new AttributeCollection();
+            com.bigname.pim.api.domain.AttributeCollection attributeCollectionDTO= new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)AttributeCollection.get("name"));
             attributeCollectionDTO.setCollectionId((String)AttributeCollection.get("externalId"));
             attributeCollectionDTO.setActive((String)AttributeCollection.get("active"));
@@ -86,14 +85,14 @@ public class AttributeCollectionServiceImplTest {
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
 
         attributesCollectionData.forEach(AttributeCollection -> {
-            AttributeCollection attributeCollectionDTO= new AttributeCollection();
+            com.bigname.pim.api.domain.AttributeCollection attributeCollectionDTO= new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)AttributeCollection.get("name"));
             attributeCollectionDTO.setCollectionId((String)AttributeCollection.get("externalId"));
             attributeCollectionDTO.setActive((String)AttributeCollection.get("active"));
             attributeCollectionDAO.insert(attributeCollectionDTO);
 
             //Getting AttributeCollection
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            com.bigname.pim.api.domain.AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
             Map<String, Object> diff = attributeCollectionDTO.diff(attributeCollectionDetails);
             Assert.assertEquals(diff.size(), 0);
@@ -109,13 +108,13 @@ public class AttributeCollectionServiceImplTest {
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
 
         attributesCollectionData.forEach(AttributeCollection -> {
-            AttributeCollection attributeCollectionDTO= new AttributeCollection();
+            com.bigname.pim.api.domain.AttributeCollection attributeCollectionDTO= new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)AttributeCollection.get("name"));
             attributeCollectionDTO.setCollectionId((String)AttributeCollection.get("externalId"));
             attributeCollectionDTO.setActive((String)AttributeCollection.get("active"));
             attributeCollectionDAO.insert(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            com.bigname.pim.api.domain.AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
             //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -132,7 +131,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDAO.save(attributeCollectionDetails);
 
             //Getting Attributes
-            Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+            Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID,0,3,null);
             String[] actual = result.get().map(attribute -> attribute.getName()).collect(Collectors.toList()).toArray(new String[]{});
             String[] expected = attributesData.stream().map(attributes -> (String)attributes.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
             Assert.assertArrayEquals(expected, actual);
@@ -148,13 +147,13 @@ public class AttributeCollectionServiceImplTest {
         attributesCollectionData.add(CollectionsUtil.toMap("name", "Test3.com", "externalId", "TEST_3", "active", "N"));
 
         attributesCollectionData.forEach(AttributeCollection -> {
-            AttributeCollection attributeCollectionDTO= new AttributeCollection();
+            com.bigname.pim.api.domain.AttributeCollection attributeCollectionDTO= new AttributeCollection();
             attributeCollectionDTO.setCollectionName((String)AttributeCollection.get("name"));
             attributeCollectionDTO.setCollectionId((String)AttributeCollection.get("externalId"));
             attributeCollectionDTO.setActive((String)AttributeCollection.get("active"));
             attributeCollectionDAO.insert(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            com.bigname.pim.api.domain.AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
 
             //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -210,7 +209,7 @@ public class AttributeCollectionServiceImplTest {
         attributeCollectionDAO.save(attributeCollectionDetails);
 
         //Getting AttributeOption
-        Page<AttributeOption> result = attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attributeCollectionDTO.getAttributeFullId(attributeOption),0,1,null);
+        Page<AttributeOption> result = attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, attributeCollectionDTO.getAttributeFullId(attributeOption),0,1,null);
         Assert.assertEquals(result.getContent().size(), 1);
         Assert.assertEquals(result.getContent().get(0).getValue(), "TestOption");
 
@@ -250,7 +249,7 @@ public class AttributeCollectionServiceImplTest {
         attributeCollectionDAO.save(attributeCollectionDetails);
 
         //Getting Attributes
-        Optional<Attribute> result = attributeCollectionService.findAttribute(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attributeCollectionDTO.getAttributeFullId(attributeOption));
+        Optional<Attribute> result = attributeCollectionService.findAttribute(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, attributeCollectionDTO.getAttributeFullId(attributeOption));
         Assert.assertEquals(result.get().getName(), "Test_Attribute");
     }
 
@@ -339,7 +338,7 @@ public class AttributeCollectionServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
 
@@ -356,7 +355,7 @@ public class AttributeCollectionServiceImplTest {
 
         attributeCollectionService.update(attributeList);
 
-        Page<Attribute> attribute1= attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, 0, 1, null);
+        Page<Attribute> attribute1= attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, 0, 1, null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attribute1));
         Assert.assertEquals(attribute1.getContent().get(0).getName(),attribute.getName());
 
@@ -372,7 +371,7 @@ public class AttributeCollectionServiceImplTest {
         attributeCollectionService.update(attributeList);
 
         //Getting AttributeOption
-        Page<AttributeOption> attributeOption1= attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attribute.getFullId(), 0, 1, null);
+        Page<AttributeOption> attributeOption1= attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, attribute.getFullId(), 0, 1, null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeOption1));
         Assert.assertEquals(attributeOption1.getContent().get(0).getValue(),attributeOption.getValue());
     }
@@ -407,15 +406,15 @@ public class AttributeCollectionServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         //toggle
         attributeCollectionService.toggle(attributeCollection.getCollectionId(), EXTERNAL_ID, Toggle.get(attributeCollection.getActive()));
-        AttributeCollection updatedAttributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection updatedAttributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedAttributeCollection));
         Assert.assertEquals(updatedAttributeCollection.getActive(), "N");
 
         attributeCollectionService.toggle(attributeCollection.getCollectionId(), EXTERNAL_ID, Toggle.get(updatedAttributeCollection.getActive()));
-        AttributeCollection updatedAttributeCollection1 = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection updatedAttributeCollection1 = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedAttributeCollection1));
         Assert.assertEquals(updatedAttributeCollection1.getActive(), "Y");
     }
@@ -430,7 +429,7 @@ public class AttributeCollectionServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -455,7 +454,7 @@ public class AttributeCollectionServiceImplTest {
         attributeCollectionService.update(attributeList);
 
         //Getting AttributeCollection
-        AttributeCollection collection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection collection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(collection));
         Assert.assertEquals(collection.getCollectionName(),"Test_AttributeCollection");
         Assert.assertEquals(collection.getAllAttributes().size(),1);
@@ -476,7 +475,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             attributeCollectionService.create(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
             //Creating AttributeCollection
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -581,7 +580,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             attributeCollectionService.create(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
             //Creating Attribute
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -641,7 +640,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             attributeCollectionService.create(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
             //Creating Attribute
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -700,7 +699,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             attributeCollectionService.create(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
             //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -760,7 +759,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             attributeCollectionService.create(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
             //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -819,7 +818,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             attributeCollectionService.create(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
             //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -892,14 +891,14 @@ public class AttributeCollectionServiceImplTest {
 
        attributeCollectionService.create(attributeCollectionDTO);
 
-       AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+       AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
        Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
        Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
        attributeCollection.setActive("N");
        attributeCollection.setGroup("DETAILS");
 
        attributeCollectionService.update(attributeCollection.getCollectionId(), EXTERNAL_ID, attributeCollection);
-       AttributeCollection updatedCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+       AttributeCollection updatedCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
        Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCollection));
        Assert.assertEquals(updatedCollection.getActive(), "N");
 
@@ -915,7 +914,7 @@ public class AttributeCollectionServiceImplTest {
        attributeList.add(attributeCollection);
        attributeCollectionService.update(attributeList);
 
-       AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+       AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
        //Updating AttributeCollection
        Attribute attribute1 = new Attribute();
        attribute1.setActive("Y");
@@ -929,7 +928,7 @@ public class AttributeCollectionServiceImplTest {
        attributeList= new ArrayList<>();
        attributeList.add(attributeCollectionUpdate);
        attributeCollectionService.update(attributeList);
-       Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+       Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID,0,3,null);
        Assert.assertEquals(result.getContent().get(0).getName(),attribute1.getName());
 
    }
@@ -950,7 +949,7 @@ public class AttributeCollectionServiceImplTest {
              attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
              attributeCollectionService.create(attributeCollectionDTO);
 
-             AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+             AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
              //Creating Attributes
              List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -967,7 +966,7 @@ public class AttributeCollectionServiceImplTest {
              attributeList.add(attributeCollection);
              attributeCollectionService.update(attributeList);
 
-             AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+             AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
 
              List<Map<String, Object>> attributesUpdateData = new ArrayList<>();
@@ -984,7 +983,7 @@ public class AttributeCollectionServiceImplTest {
              attributeList= new ArrayList<>();
              attributeList.add(attributeCollectionUpdate);
              attributeCollectionService.update(attributeList);
-             Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+             Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID,0,3,null);
              Assert.assertEquals(result.getContent().get(0).getName(),attributesUpdateData.get(0).get("name"));
          });
 
@@ -1023,7 +1022,7 @@ public class AttributeCollectionServiceImplTest {
            attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
            attributeCollectionService.create(attributeCollectionDTO);
 
-           AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+           AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
            //Creating Attributes
            List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -1081,7 +1080,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionDTO.setDiscontinued((String)collectionData.get("discontinued"));
             attributeCollectionService.create(attributeCollectionDTO);
 
-            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
 
             //Creating Attributes
             List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -1204,7 +1203,7 @@ public class AttributeCollectionServiceImplTest {
         context.clear();
 
         /*Testing uniqueConstraint violation of collectionId with update operation*/
-        AttributeCollection attributeCollection = attributeCollectionDAO.findById(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionDAO.findById(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID).orElse(null);
         attributeCollection.setCollectionName("Test_AttributeCollection1");
         attributeCollection.setCollectionId("TEST_ATTRIBUTECOLLECTION_1");
         attributeCollection.setActive("Y");

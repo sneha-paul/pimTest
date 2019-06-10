@@ -1,13 +1,13 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
+import com.m7.common.util.CollectionsUtil;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.ValidationUtil;
+import com.m7.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -276,14 +276,14 @@ public class WebsiteRepositoryTest {
         });
 
         //Getting websiteCatalogs
-        Page<Map<String, Object>> websiteCatalogMap = websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size(), null));
+        Page<Map<String, Object>> websiteCatalogMap = websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size(), null));
         Assert.assertEquals(websiteCatalogMap.getSize(), catalogsData.size());
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size(), null)).getTotalElements(), catalogsData.size());
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getTotalElements(), catalogsData.size());
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size(), null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size()-1, null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
         Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(1, 1, null)).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -334,7 +334,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
         Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(), "catalogName", "test", PageRequest.of(1, 1, null)).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -422,7 +422,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getContent().size(), catalogsData.size()-1 );
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(), "catalogName", "test", PageRequest.of(1, 1), false).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1), false).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 2);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 2);
 
 
         //Creating websiteCatalogs
@@ -443,7 +443,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getContent().size(), catalogsData.size() - 1);
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(), "catalogName", "test", PageRequest.of(1, 1), false).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1), false).getContent().size(), 0);
-        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 1);
 
     }
 

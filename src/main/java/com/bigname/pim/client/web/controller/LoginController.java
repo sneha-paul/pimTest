@@ -1,8 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.Event;
-import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.service.EventService;
+import com.m7.xcore.domain.Event;
+import com.m7.xcore.domain.User;
+import com.m7.xcore.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;

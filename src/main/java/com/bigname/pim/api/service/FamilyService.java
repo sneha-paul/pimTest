@@ -1,13 +1,13 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.core.service.BaseService;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.Family;
 import com.bigname.pim.api.domain.FamilyAttribute;
 import com.bigname.pim.api.domain.FamilyAttributeOption;
 import com.bigname.pim.api.domain.VariantGroup;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.m7.xcore.service.BaseService;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.data.domain.Page;

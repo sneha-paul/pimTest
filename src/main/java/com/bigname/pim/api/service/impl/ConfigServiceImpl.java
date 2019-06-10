@@ -1,12 +1,11 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.core.service.BaseServiceSupport;
-
 import com.bigname.pim.api.domain.Config;
 
 import com.bigname.pim.api.persistence.dao.ConfigDAO;
 
 import com.bigname.pim.api.service.ConfigService;
+import com.m7.xcore.service.BaseServiceSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,18 +1,19 @@
 package com.bigname.pim.util;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.Website;
+import com.m7.common.util.ConversionUtil;
+import com.m7.common.util.PimUtil;
+import com.m7.xcore.util.FindBy;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -166,7 +167,7 @@ public class PimUtilTest {
         List<Website> Ids = new ArrayList<>();
         Ids.add(website);
 
-        Map<String,Website> map= new HashMap<>();
+        Map<String, Website> map= new HashMap<>();
         map.put(website.getId(), website);
 
         Assert.assertEquals(PimUtil.getIdedMap(Ids, FindBy.INTERNAL_ID), map);

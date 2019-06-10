@@ -1,13 +1,12 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.core.domain.Entity;
-import com.bigname.core.service.BaseService;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.FileAsset;
-import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
+import com.m7.xcore.domain.Entity;
+import com.m7.xcore.service.BaseService;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,7 +20,7 @@ import java.util.Optional;
  */
 public interface ProductVariantService extends BaseService<ProductVariant, ProductVariantDAO> {
 
-    boolean toggle(String productId, FindBy productIdFindBy,  String channelId, String productVariantId, FindBy variantIdFindBy, Toggle active);
+    boolean toggle(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, Toggle active);
 
     ProductVariant cloneInstance(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, Entity.CloneType type);
 

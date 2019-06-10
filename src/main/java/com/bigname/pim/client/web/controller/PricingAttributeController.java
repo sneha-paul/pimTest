@@ -1,30 +1,19 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Pagination;
-import com.bigname.common.datatable.model.Request;
-import com.bigname.common.datatable.model.Result;
-import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.service.PricingAttributeService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import com.m7.common.datatable.model.Result;
+import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xcore.util.FindBy;
+import com.m7.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
 
 /**
  * Created by dona on 08-11-2018.
