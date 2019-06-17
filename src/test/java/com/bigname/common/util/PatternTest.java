@@ -1,6 +1,6 @@
 package com.bigname.common.util;
 
-import com.m7.common.util.Pattern;
+import com.m7.xtreme.common.util.Pattern;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

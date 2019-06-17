@@ -2,7 +2,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.Role;
-import com.m7.xcore.persistence.dao.GenericRepository;
+import com.m7.xtreme.xcore.persistence.dao.GenericRepository;
 
 
 /**

@@ -5,18 +5,18 @@ import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.client.model.Breadcrumbs;
-import com.m7.common.datatable.model.Pagination;
-import com.m7.common.datatable.model.Request;
-import com.m7.common.datatable.model.Result;
-import com.m7.common.datatable.model.SortOrder;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.ConversionUtil;
-import com.m7.common.util.StringUtil;
-import com.m7.common.util.ValidationUtil;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.util.Toggle;
-import com.m7.xcore.web.controller.BaseController;
+import com.m7.xtreme.common.datatable.model.Pagination;
+import com.m7.xtreme.common.datatable.model.Request;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**

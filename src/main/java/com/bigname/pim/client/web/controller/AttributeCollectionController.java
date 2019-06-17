@@ -5,16 +5,16 @@ import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.client.model.Breadcrumbs;
-import com.m7.common.datatable.model.Pagination;
-import com.m7.common.datatable.model.Request;
-import com.m7.common.datatable.model.Result;
-import com.m7.common.datatable.model.SortOrder;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.PimUtil;
-import com.m7.common.util.StringUtil;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.web.controller.BaseController;
+import com.m7.xtreme.common.datatable.model.Pagination;
+import com.m7.xtreme.common.datatable.model.Request;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**

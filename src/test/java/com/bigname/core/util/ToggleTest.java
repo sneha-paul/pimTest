@@ -1,11 +1,11 @@
 package com.bigname.core.util;
 
-import com.m7.xcore.util.Toggle;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.m7.xcore.util.Toggle.DISABLE;
-import static com.m7.xcore.util.Toggle.ENABLE;
+import static com.m7.xtreme.xcore.util.Toggle.DISABLE;
+import static com.m7.xtreme.xcore.util.Toggle.ENABLE;
 
 
 /**

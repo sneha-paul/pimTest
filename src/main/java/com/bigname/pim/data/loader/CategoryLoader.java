@@ -10,7 +10,7 @@ import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.POIUtil;
-import com.m7.common.util.ValidationUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

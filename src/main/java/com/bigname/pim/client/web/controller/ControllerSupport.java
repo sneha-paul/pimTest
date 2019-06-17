@@ -1,9 +1,9 @@
 package com.bigname.pim.client.web.controller;
 
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.domain.ValidatableEntity;
-import com.m7.xcore.exception.FileNotFoundException;
-import com.m7.xcore.service.BaseService;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.exception.FileNotFoundException;
+import com.m7.xtreme.xcore.service.BaseService;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.m7.common.util.ValidationUtil.isEmpty;
-import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**

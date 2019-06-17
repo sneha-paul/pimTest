@@ -3,9 +3,9 @@ package com.bigname.pim.api.domain;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
 import com.bigname.pim.api.service.PricingAttributeService;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.ValidationUtil;
-import com.m7.xcore.domain.Entity;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Entity;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

@@ -6,7 +6,7 @@ import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
-import com.m7.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 /**
  * Created by sruthi on 23-02-2019.

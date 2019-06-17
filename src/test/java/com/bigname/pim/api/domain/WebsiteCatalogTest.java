@@ -4,7 +4,7 @@ import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
-import com.m7.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

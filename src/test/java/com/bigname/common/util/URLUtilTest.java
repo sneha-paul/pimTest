@@ -1,6 +1,6 @@
 package com.bigname.common.util;
 
-import com.m7.common.util.URLUtil;
+import com.m7.xtreme.common.util.URLUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

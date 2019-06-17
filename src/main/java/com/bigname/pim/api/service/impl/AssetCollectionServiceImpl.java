@@ -5,9 +5,9 @@ import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
-import com.m7.common.util.ValidationUtil;
-import com.m7.xcore.service.BaseServiceSupport;
-import com.m7.xcore.util.FindBy;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.FindBy;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;

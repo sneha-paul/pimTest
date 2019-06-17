@@ -1,7 +1,7 @@
 package com.bigname.pim.config;
 
-import com.m7.xcore.config.AjaxAwareAuthenticationEntryPoint;
-import com.m7.xcore.config.BaseSecurityConfig;
+import com.m7.xtreme.xcore.config.AjaxAwareAuthenticationEntryPoint;
+import com.m7.xtreme.xcore.config.BaseSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

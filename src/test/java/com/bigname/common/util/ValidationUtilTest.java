@@ -1,6 +1,6 @@
 package com.bigname.common.util;
 
-import com.m7.common.util.ValidationUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

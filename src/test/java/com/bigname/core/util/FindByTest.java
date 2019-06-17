@@ -1,11 +1,11 @@
 package com.bigname.core.util;
 
-import com.m7.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.FindBy;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
-import static com.m7.xcore.util.FindBy.INTERNAL_ID;
+import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
+import static com.m7.xtreme.xcore.util.FindBy.INTERNAL_ID;
 
 
 /**

@@ -1,6 +1,6 @@
 package com.bigname.common.util;
 
-import com.m7.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

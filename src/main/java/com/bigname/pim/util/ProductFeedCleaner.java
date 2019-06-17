@@ -1,8 +1,8 @@
 package com.bigname.pim.util;
 
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.PimUtil;
-import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;

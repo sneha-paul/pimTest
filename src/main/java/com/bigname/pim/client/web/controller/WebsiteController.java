@@ -3,12 +3,12 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.service.WebsiteService;
-import com.m7.common.datatable.model.Request;
-import com.m7.common.datatable.model.Result;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.web.controller.BaseController;
+import com.m7.xtreme.common.datatable.model.Request;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.m7.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 
 
 /**

@@ -4,11 +4,11 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.POIUtil;
-import com.m7.common.util.ConversionUtil;
-import com.m7.common.util.StringUtil;
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.domain.ValidatableEntity;
-import com.m7.xcore.util.FindBy;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.FindBy;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
@@ -22,9 +22,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.m7.common.util.StringUtil.split;
-import static com.m7.common.util.StringUtil.trim;
-import static com.m7.common.util.ValidationUtil.*;
+import static com.m7.xtreme.common.util.StringUtil.split;
+import static com.m7.xtreme.common.util.StringUtil.trim;
+import static com.m7.xtreme.common.util.ValidationUtil.*;
 
 
 /**

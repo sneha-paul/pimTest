@@ -1,7 +1,7 @@
 package com.bigname.common.util;
 
 import com.bigname.pim.api.domain.Website;
-import com.m7.common.util.ReflectionUtil;
+import com.m7.xtreme.common.util.ReflectionUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

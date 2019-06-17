@@ -1,6 +1,6 @@
 package com.bigname.pim.api.domain;
 
-import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
 
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;

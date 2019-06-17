@@ -1,7 +1,7 @@
 package com.bigname.pim.api.domain;
 
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import javax.validation.constraints.NotEmpty;
@@ -9,7 +9,7 @@ import javax.validation.constraints.Pattern;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static com.bigname.pim.api.domain.Website.Property.*;
-import static com.m7.common.util.RegExBuilder.*;
+import static com.m7.xtreme.common.util.RegExBuilder.*;
 
 /**
  * Created by sanoop on 14/02/2019.

@@ -1,6 +1,6 @@
 package com.bigname.common.util;
 
-import com.m7.common.util.StringUtil;
+import com.m7.xtreme.common.util.StringUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

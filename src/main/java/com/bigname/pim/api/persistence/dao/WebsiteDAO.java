@@ -1,7 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.Website;
-import com.m7.xcore.persistence.dao.GenericDAO;
+import com.m7.xtreme.xcore.persistence.dao.GenericDAO;
 
 import java.util.Optional;
 

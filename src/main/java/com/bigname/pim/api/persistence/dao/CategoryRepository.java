@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.CategoryProduct;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.RelatedCategory;
-import com.m7.xcore.persistence.dao.GenericRepository;
+import com.m7.xtreme.xcore.persistence.dao.GenericRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,6 +1,6 @@
 package com.bigname.pim.util;
 
-import com.m7.common.util.PimUtil;
+import com.m7.xtreme.common.util.PimUtil;
 
 /**
  * Created by Manu on 8/7/2018.

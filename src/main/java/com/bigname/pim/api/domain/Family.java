@@ -1,8 +1,8 @@
 package com.bigname.pim.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 

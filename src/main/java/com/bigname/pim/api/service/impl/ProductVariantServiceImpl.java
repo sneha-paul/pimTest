@@ -8,13 +8,13 @@ import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import com.google.common.base.Preconditions;
-import com.m7.common.util.ConversionUtil;
-import com.m7.common.util.PimUtil;
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.service.BaseServiceSupport;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.util.Toggle;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.bigname.pim.util.PIMConstants.ReorderingDirection.DOWN;
 import static com.bigname.pim.util.PIMConstants.ReorderingDirection.UP;
-import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * Created by sruthi on 20-09-2018.

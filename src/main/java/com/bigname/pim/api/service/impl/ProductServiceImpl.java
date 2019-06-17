@@ -7,15 +7,15 @@ import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.ConversionUtil;
-import com.m7.common.util.PimUtil;
-import com.m7.common.util.ValidationUtil;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.exception.GenericEntityException;
-import com.m7.xcore.service.BaseServiceSupport;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.util.Toggle;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.exception.GenericEntityException;
+import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.Validator;
 import java.util.*;
 
-import static com.m7.common.util.ValidationUtil.*;
+import static com.m7.xtreme.common.util.ValidationUtil.*;
 
 /**
  * Created by sruthi on 19-09-2018.

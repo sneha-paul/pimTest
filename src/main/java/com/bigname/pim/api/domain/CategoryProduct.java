@@ -2,13 +2,13 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
-import com.m7.xcore.domain.EntityAssociation;
+import com.m7.xtreme.xcore.domain.EntityAssociation;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**

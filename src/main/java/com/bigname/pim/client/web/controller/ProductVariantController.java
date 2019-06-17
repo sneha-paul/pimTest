@@ -4,19 +4,19 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.util.PIMConstants;
-import com.m7.common.datatable.model.Pagination;
-import com.m7.common.datatable.model.Request;
-import com.m7.common.datatable.model.Result;
-import com.m7.common.datatable.model.SortOrder;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.ConversionUtil;
-import com.m7.common.util.StringUtil;
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.domain.ValidatableEntity;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.service.BaseService;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.util.Toggle;
+import com.m7.xtreme.common.datatable.model.Pagination;
+import com.m7.xtreme.common.datatable.model.Request;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.apache.commons.collections4.MapUtils;
 import org.javatuples.Pair;
 import org.springframework.core.io.Resource;
@@ -33,8 +33,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.m7.common.util.ValidationUtil.isEmpty;
-import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**

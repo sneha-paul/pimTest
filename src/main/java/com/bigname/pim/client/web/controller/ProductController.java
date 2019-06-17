@@ -5,14 +5,14 @@ import com.bigname.pim.api.service.*;
 import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
-import com.m7.common.datatable.model.Request;
-import com.m7.common.datatable.model.Result;
-import com.m7.common.util.StringUtil;
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.util.Toggle;
-import com.m7.xcore.web.controller.BaseController;
+import com.m7.xtreme.common.datatable.model.Request;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.m7.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 
 
 /**

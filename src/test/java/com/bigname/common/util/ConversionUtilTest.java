@@ -2,7 +2,7 @@ package com.bigname.common.util;
 
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.service.WebsiteService;
-import com.m7.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

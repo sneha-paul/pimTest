@@ -1,9 +1,9 @@
 package com.bigname.pim.util;
 
 import com.bigname.pim.api.domain.Website;
-import com.m7.common.util.ConversionUtil;
-import com.m7.common.util.PimUtil;
-import com.m7.xcore.util.FindBy;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.xcore.util.FindBy;
 import org.junit.Assert;
 import org.junit.Test;
 

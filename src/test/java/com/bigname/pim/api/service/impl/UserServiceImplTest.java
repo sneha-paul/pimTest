@@ -1,10 +1,10 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.PimApplication;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.xcore.domain.User;
-import com.m7.xcore.persistence.dao.UserDAO;
-import com.m7.xcore.service.UserService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.xcore.domain.User;
+import com.m7.xtreme.xcore.persistence.dao.UserDAO;
+import com.m7.xtreme.xcore.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

@@ -12,7 +12,7 @@ import java.util.Optional;
 import static com.bigname.pim.util.ConvertUtil.toBoolean;
 import static com.bigname.pim.util.Defaults.PAGE_SIZE;
 import static com.bigname.pim.util.Defaults.PAGE_SIZES;
-import static com.m7.xcore.util.FindBy.findBy;
+import static com.m7.xtreme.xcore.util.FindBy.findBy;
 
 @RestController
 @RequestMapping("pim/api/websites")

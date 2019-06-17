@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.m7.xtream</groupId>
+		<groupId>com.m7.xtreme</groupId>
 		<artifactId>xcore</artifactId>
 		<version>1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath>src/main/resources/xtreme/xcore-1.0.pom</relativePath> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>com.bigname</groupId>
@@ -31,7 +31,7 @@
 			<version>1.0</version>
 			<scope>system</scope>
 			<systemPath>
-				C:/DevStudio/Projects/xcore.jar
+                ${project.basedir}/src/main/resources/xtreme/xcore.jar
 			</systemPath>
 		</dependency>
 	</dependencies>

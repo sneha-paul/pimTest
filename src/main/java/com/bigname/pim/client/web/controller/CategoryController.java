@@ -7,12 +7,12 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.data.exportor.CategoryExporter;
-import com.m7.common.datatable.model.Request;
-import com.m7.common.datatable.model.Result;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.util.Toggle;
-import com.m7.xcore.web.controller.BaseController;
+import com.m7.xtreme.common.datatable.model.Request;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.m7.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 
 
 /**

@@ -6,13 +6,13 @@ import com.bigname.pim.api.persistence.dao.*;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.PimUtil;
-import com.m7.common.util.ValidationUtil;
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.domain.ValidatableEntity;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.util.Toggle;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

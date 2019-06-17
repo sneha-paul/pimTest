@@ -1,10 +1,10 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
-import com.m7.common.util.ValidationUtil;
-import com.m7.xcore.domain.Event;
-import com.m7.xcore.persistence.dao.EventDAO;
-import com.m7.xcore.service.EventService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Event;
+import com.m7.xtreme.xcore.persistence.dao.EventDAO;
+import com.m7.xtreme.xcore.service.EventService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static com.m7.xcore.util.FindBy.EXTERNAL_ID;
+import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

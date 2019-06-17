@@ -3,7 +3,7 @@ package com.bigname.pim.api.domain;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
-import com.m7.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.FindBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -2,7 +2,7 @@ package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
-import com.m7.xcore.service.BaseService;
+import com.m7.xtreme.xcore.service.BaseService;
 
 import java.util.List;
 import java.util.Optional;

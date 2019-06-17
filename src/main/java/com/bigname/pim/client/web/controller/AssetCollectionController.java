@@ -5,11 +5,11 @@ import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.model.Breadcrumbs;
-import com.m7.common.datatable.model.Result;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.xcore.exception.EntityNotFoundException;
-import com.m7.xcore.util.FindBy;
-import com.m7.xcore.web.controller.BaseController;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
@@ -28,8 +28,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.m7.common.util.ValidationUtil.isEmpty;
-import static com.m7.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**

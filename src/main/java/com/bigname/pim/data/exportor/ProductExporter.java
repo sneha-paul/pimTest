@@ -4,19 +4,19 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.POIUtil;
-import com.m7.common.util.CollectionsUtil;
-import com.m7.common.util.ConversionUtil;
-import com.m7.common.util.PimUtil;
-import com.m7.xcore.data.exporter.BaseExporter;
-import com.m7.xcore.domain.Entity;
-import com.m7.xcore.util.FindBy;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.xcore.data.exporter.BaseExporter;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.util.FindBy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.m7.common.util.StringUtil.getSimpleId;
+import static com.m7.xtreme.common.util.StringUtil.getSimpleId;
 
 
 /**
