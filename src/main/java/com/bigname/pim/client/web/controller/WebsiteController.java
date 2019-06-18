@@ -145,7 +145,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                 WebsiteCatalog.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
                         return websiteService.findAllWebsiteCatalogs(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }

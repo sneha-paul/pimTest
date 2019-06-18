@@ -32,6 +32,7 @@
             pageUrl: '/pim/products/',
             toolbar: [{name: 'EXPORT', actionUrl: '/pim/products/export'}, {name: 'IMPORT'}],
             dataUrl: '/pim/products/data',
+            toggleUrl:'/pim/products/{externalId}/products/active/{active}',
             columns: [
                 {
                     data: 'productName', name : 'productName' , title : 'Parent Product Name', width: '35%',

@@ -15,5 +15,6 @@ import java.util.Optional;
 public interface ProductCategoryDAO extends BaseAssociationDAO<ProductCategory>, MongoRepository<ProductCategory, String> {
     Page<ProductCategory> findByProductIdAndActiveIn(String productId, String active[], Pageable pageable);
     List<ProductCategory> findByProductId(String productId);
+    List<ProductCategory> findByCategoryId(String categoryId);
     Optional<ProductCategory> findFirstByProductIdAndCategoryId(String productId, String categoryId);
 }

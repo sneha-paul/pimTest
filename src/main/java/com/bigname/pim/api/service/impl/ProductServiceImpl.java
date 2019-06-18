@@ -421,7 +421,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public Page<Map<String, Object>> getCategories(String productId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(productId, findBy, false)
-                .map(catalog -> productDAO.getCategories(catalog.getId(), pageable))
+                .map(catalog -> productDAO.getCategories(catalog.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
@@ -550,5 +550,30 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                 .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id:" + productId));
     }
 
+    @Override
+    public boolean toggleProduct(String productId, FindBy findBy, Toggle toggle) {
+        return get(productId, findBy, false)
+                .map(product -> {
+                    product.setGroup("DETAILS");
+                    product.setActive(toggle.state());
+                    productDAO.save(product);
 
+                    categoryProductDAO.findByProductId(product.getId())
+                            .forEach(categoryProduct -> {
+                                categoryProduct.setActive(toggle.state());
+                                categoryProductDAO.save(categoryProduct);
+                            });
+                    return true;
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find"));
+    }
+
+    @Override
+    public List<CategoryProduct> getAllCategoryProductsWithProductId(String productInternalId) {
+        return categoryProductDAO.findByProductId(productInternalId);
+    }
+
+    @Override
+    public void updateCategoryProduct(CategoryProduct categoryProduct) {
+        categoryProductDAO.save(categoryProduct);
+    }
 }

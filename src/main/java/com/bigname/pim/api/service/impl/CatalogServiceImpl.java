@@ -1,10 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.CatalogDAO;
-import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
-import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
-import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
+import com.bigname.pim.api.persistence.dao.*;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
@@ -36,15 +33,17 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     private RootCategoryDAO rootCategoryDAO;
     private RelatedCategoryDAO relatedCategoryDAO;
     private CategoryService categoryService;
+    private CategoryDAO categoryDAO;
 
     @Autowired
-    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService) {
+    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService, CategoryDAO categoryDAO) {
         super(catalogDAO, "catalog", validator);
         this.catalogDAO = catalogDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
         this.rootCategoryDAO = rootCategoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
         this.categoryService = categoryService;
+        this.categoryDAO = categoryDAO;
     }
 
     @Override
@@ -111,7 +110,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     @Override
     public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(catalogId, findBy, false)
-                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), pageable))
+                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 

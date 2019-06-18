@@ -15,7 +15,7 @@ import java.util.Map;
  * @since 1.0
  */
 public interface ProductRepository extends GenericRepository<Product> {
-    Page<Map<String, Object>> getCategories(String productId, Pageable pageable);
+    Page<Map<String, Object>> getCategories(String productId, Pageable pageable, boolean... activeRequired);
 
     Page<Map<String, Object>> findAllProductCategories(String productId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 

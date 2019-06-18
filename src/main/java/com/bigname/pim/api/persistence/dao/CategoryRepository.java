@@ -16,7 +16,7 @@ import java.util.Map;
  * @since 1.0
  */
 public interface CategoryRepository extends GenericRepository<Category> {
-    Page<Map<String, Object>> getSubCategories(String categoryId, Pageable pageable);
+    Page<Map<String, Object>> getSubCategories(String categoryId, Pageable pageable, boolean... activeRequired);
 
     List<RelatedCategory> getAllSubCategories(String categoryId, boolean... activeRequired);
 
@@ -24,7 +24,7 @@ public interface CategoryRepository extends GenericRepository<Category> {
 
     Page<Map<String, Object>> findAllSubCategories(String categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
-    Page<Map<String, Object>> getProducts(String categoryId, Pageable pageable);
+    Page<Map<String, Object>> getProducts(String categoryId, Pageable pageable, boolean... activeRequired);
 
     Page<Map<String, Object>> findAllCategoryProducts(String categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 

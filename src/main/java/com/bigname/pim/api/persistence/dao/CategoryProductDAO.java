@@ -18,4 +18,5 @@ public interface CategoryProductDAO extends BaseAssociationDAO<CategoryProduct>,
     Optional<CategoryProduct> findFirstByCategoryIdAndProductId(String categoryId, String productIds);
     List<CategoryProduct> findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(String categoryId, long sequenceNum, int subSequenceNum);
     List<CategoryProduct> findByCategoryId(String categoryId);
+    List<CategoryProduct> findByProductId(String productId);
 }

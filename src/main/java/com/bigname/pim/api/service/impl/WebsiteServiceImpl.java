@@ -90,7 +90,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     @Override
     public Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(websiteId, findBy, false)
-                .map(website -> websiteDAO.getWebsiteCatalogs(website.getId(), pageable))
+                .map(website -> websiteDAO.getWebsiteCatalogs(website.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 

@@ -5,6 +5,7 @@ $(function(){
         pageUrl: '/pim/categories/',
         toolbar: [{name: 'EXPORT', actionUrl: '/pim/categories/export'}, {name: 'IMPORT'}],
         dataUrl: '/pim/categories/data',
+        toggleUrl:'/pim/categories/{externalId}/categories/active/{active}',
         columns: [
             { data: 'categoryName', name : 'categoryName' , title : 'Category Name', width:'45%', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6>';}},
             { data: 'externalId', name : 'externalId', title : 'Category ID', width:'30%' }

@@ -132,4 +132,9 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
 
     Page<Map<String, Object>> findAllProductCategories(String productId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
+    boolean toggleProduct(String productId, FindBy findBy, Toggle toggle);
+    
+    List<CategoryProduct> getAllCategoryProductsWithProductId(String productInternalId);
+
+    void updateCategoryProduct(CategoryProduct categoryProduct);
 }
