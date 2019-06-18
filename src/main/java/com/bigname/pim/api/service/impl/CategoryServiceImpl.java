@@ -265,7 +265,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.getSubCategories(category.getId(), pageable))
+                .map(category -> categoryDAO.getSubCategories(category.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
@@ -496,7 +496,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public Page<Map<String, Object>> getCategoryProducts(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
         return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.getProducts(category.getId(), pageable))
+                .map(category -> categoryDAO.getProducts(category.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
