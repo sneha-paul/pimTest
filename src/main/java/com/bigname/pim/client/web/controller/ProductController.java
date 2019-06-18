@@ -74,6 +74,14 @@ public class ProductController extends BaseController<Product, ProductService> {
     public Map<String, Object> update(@PathVariable(value = "productId") String productId, Product product, HttpServletRequest request) {
         productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
         product.setAttributeValues(getAttributesMap(request));
+
+        Product productDetails = productService.get(productId, FindBy.EXTERNAL_ID, false).orElse(null);
+        productService.getAllCategoryProductsWithProductId(productDetails.getId())
+                .forEach(categoryProduct -> {
+                    categoryProduct.setActive(product.getActive());
+                    productService.updateCategoryProduct(categoryProduct);
+                });
+
         return update(productId, product, "/pim/products/", product.getGroup().length == 1 && product.getGroup()[0].equals("DETAILS") ? Product.DetailsGroup.class : null);
     }
 
@@ -249,5 +257,14 @@ public class ProductController extends BaseController<Product, ProductService> {
     public ResponseEntity<Resource> downloadDigitalAssetsImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request)  {
         VirtualFile asset = assetService.get(fileId, FindBy.INTERNAL_ID,false).orElse(null);
         return downloadAsset(asset.getInternalFileName(), request);
+    }
+
+    @RequestMapping(value = "/{productId}/products/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleCatalogs(@PathVariable(value = "productId") String productId,
+                                              @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", productService.toggleProduct(productId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
     }
 }

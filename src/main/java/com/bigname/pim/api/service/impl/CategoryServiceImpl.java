@@ -1,10 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
-import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
-import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
+import com.bigname.pim.api.persistence.dao.*;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.PIMConstants;
@@ -38,15 +35,17 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     private ProductCategoryDAO productCategoryDAO;
     private CategoryProductDAO categoryProductDAO;
     private ProductService productService;
+    private RootCategoryDAO rootCategoryDAO;
 
     @Autowired
-    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductCategoryDAO productCategoryDAO, ProductService productService) {
+    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductCategoryDAO productCategoryDAO, ProductService productService, RootCategoryDAO rootCategoryDAO) {
         super(categoryDAO, "category", validator);
         this.categoryDAO = categoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
         this.categoryProductDAO = categoryProductDAO;
         this.productCategoryDAO = productCategoryDAO;
         this.productService = productService;
+        this.rootCategoryDAO = rootCategoryDAO;
     }
 
     @Override
@@ -542,5 +541,65 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean toggleCategory(String categoryId, FindBy findBy, Toggle toggle) {
+        return get(categoryId, findBy, false)
+                .map(category -> {
+
+                    category.setGroup("DETAILS");
+                    category.setActive(toggle.state());
+                    categoryDAO.save(category);
+
+                    rootCategoryDAO.findByRootCategoryId(category.getId())
+                            .forEach(rootCategory -> {
+                                rootCategory.setActive(toggle.state());
+                                rootCategoryDAO.save(rootCategory);
+                            });
+                    relatedCategoryDAO.findBySubCategoryId(category.getId())
+                            .forEach(relatedCategory -> {
+                                relatedCategory.setActive(toggle.state());
+                                relatedCategoryDAO.save(relatedCategory);
+                            });
+                    productCategoryDAO.findByCategoryId(category.getId())
+                            .forEach(productCategory -> {
+                                productCategory.setActive(toggle.state());
+                                productCategoryDAO.save(productCategory);
+                            });
+
+                    return true;
+
+                }).orElseThrow(() -> new EntityNotFoundException("unable to find"));
+    }
+
+    @Override
+    public List<RootCategory> getAllRootCategoriesWithCategoryId(String categoryInternalId) {
+        return rootCategoryDAO.findByRootCategoryId(categoryInternalId);
+    }
+
+    @Override
+    public List<RelatedCategory> getAllRelatedCategoriesWithSubCategoryId(String categoryInternalId) {
+        return relatedCategoryDAO.findBySubCategoryId(categoryInternalId);
+    }
+
+    @Override
+    public List<ProductCategory> getAllProductCategoriesWithCategoryId(String categoryInternalId) {
+        return productCategoryDAO.findByCategoryId(categoryInternalId);
+    }
+
+    @Override
+    public void updateRootCategory(RootCategory rootCategory) {
+        rootCategoryDAO.save(rootCategory);
+    }
+
+    @Override
+    public void updateRelatedCategory(RelatedCategory relatedCategory) {
+        relatedCategoryDAO.save(relatedCategory);
+    }
+
+    @Override
+    public void updateProductCategory(ProductCategory productCategory) {
+        productCategoryDAO.save(productCategory);
     }
 }

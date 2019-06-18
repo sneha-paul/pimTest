@@ -58,6 +58,23 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{categoryId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
+        Category category1 = categoryService.get(categoryId, FindBy.EXTERNAL_ID, false).orElse(null);
+        categoryService.getAllRootCategoriesWithCategoryId(category1.getId())
+                .forEach(rootCategory -> {
+                    rootCategory.setActive(category.getActive());
+                    categoryService.updateRootCategory(rootCategory);
+                });
+        categoryService.getAllRelatedCategoriesWithSubCategoryId(category1.getId())
+                .forEach(relatedCategory -> {
+                    relatedCategory.setActive(category.getActive());
+                    categoryService.updateRelatedCategory(relatedCategory);
+                });
+        categoryService.getAllProductCategoriesWithCategoryId(category1.getId())
+                .forEach(productCategory -> {
+                    productCategory.setActive(category.getActive());
+                    categoryService.updateProductCategory(productCategory);
+                });
+
         return update(categoryId, category, "/pim/categories/", category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null);
     }
 
@@ -110,7 +127,7 @@ public class CategoryController extends BaseController<Category, CategoryService
                 RelatedCategory.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
                         return categoryService.findAllSubCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
@@ -133,7 +150,7 @@ public class CategoryController extends BaseController<Category, CategoryService
                 CategoryProduct.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
                         return categoryService.findAllCategoryProducts(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
@@ -235,6 +252,15 @@ public class CategoryController extends BaseController<Category, CategoryService
                                                  @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", categoryService.toggleProduct(categoryId, FindBy.EXTERNAL_ID, productId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        return model;
+    }
+
+    @RequestMapping(value = "/{categoryId}/categories/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleCategory(@PathVariable(value = "categoryId") String categoryId,
+                                              @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", categoryService.toggleCategory(categoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
         return model;
     }
 

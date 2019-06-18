@@ -1,9 +1,6 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.CategoryProduct;
-import com.bigname.pim.api.domain.Product;
-import com.bigname.pim.api.domain.RelatedCategory;
+import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.FindBy;
@@ -130,5 +127,19 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
     Page<Map<String, Object>> findAllCategoryProducts(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
     List<CategoryProduct> getAllCategoryProducts(String categoryInternalId);
+
+    boolean toggleCategory(String categoryId, FindBy findBy, Toggle toggle);
+
+    List<RootCategory> getAllRootCategoriesWithCategoryId(String categoryInternalId);
+
+    List<RelatedCategory> getAllRelatedCategoriesWithSubCategoryId(String categoryInternalId);
+
+    List<ProductCategory> getAllProductCategoriesWithCategoryId(String categoryInternalId);
+
+    void updateRootCategory(RootCategory rootCategory);
+
+    void updateRelatedCategory(RelatedCategory relatedCategory);
+
+    void updateProductCategory(ProductCategory productCategory);
 }
 

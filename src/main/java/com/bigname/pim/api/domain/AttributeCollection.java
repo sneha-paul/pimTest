@@ -105,25 +105,26 @@ public class AttributeCollection extends Entity<AttributeCollection> {
                     //If parent option is modified, update the parentBasedOptions map in the corresponding attribute
                     String existingFullParentOptionId = attributeOption.getParentOptionFullId();
                     String newFullParentOptionId = attributeOptionDTO.getParentOptionFullId();
+                    if(existingFullParentOptionId != null && newFullParentOptionId != null) {
+                        if (!existingFullParentOptionId.equals(newFullParentOptionId)) {   // Parent option modified
 
-                    if(!existingFullParentOptionId.equals(newFullParentOptionId)) {   // Parent option modified
+                            //Get the attribute
+                            getAttribute(attributeFullId)
+                                    .map(attribute -> {
+                                        String existingSimpleParentOptionId = existingFullParentOptionId.substring(existingFullParentOptionId.lastIndexOf("|") + 1);
+                                        String newSimpleParentOptionId = newFullParentOptionId.substring(newFullParentOptionId.lastIndexOf("|") + 1);
 
-                        //Get the attribute
-                        getAttribute(attributeFullId)
-                                .map(attribute -> {
-                                    String existingSimpleParentOptionId = existingFullParentOptionId.substring(existingFullParentOptionId.lastIndexOf("|") + 1);
-                                    String newSimpleParentOptionId = newFullParentOptionId.substring(newFullParentOptionId.lastIndexOf("|") + 1);
-
-                                    //If the parentBaseOptions have no entry for the newParentOptionId, create an empty entry
-                                    if(!attribute.getParentBasedOptions().containsKey(newSimpleParentOptionId)) {
-                                        attribute.getParentBasedOptions().put(newSimpleParentOptionId, new ArrayList<>());
-                                    }
-                                    //Swap the optionId in the parentBasedOptions map, from existingParentId to newParentId
-                                    attribute.getParentBasedOptions().get(newSimpleParentOptionId).add(attributeOptionDTO.getId());
-                                    //Remove the optionId from
-                                    attribute.getParentBasedOptions().get(existingSimpleParentOptionId).remove(attributeOptionDTO.getId());
-                                    return attribute;
-                                });
+                                        //If the parentBaseOptions have no entry for the newParentOptionId, create an empty entry
+                                        if (!attribute.getParentBasedOptions().containsKey(newSimpleParentOptionId)) {
+                                            attribute.getParentBasedOptions().put(newSimpleParentOptionId, new ArrayList<>());
+                                        }
+                                        //Swap the optionId in the parentBasedOptions map, from existingParentId to newParentId
+                                        attribute.getParentBasedOptions().get(newSimpleParentOptionId).add(attributeOptionDTO.getId());
+                                        //Remove the optionId from
+                                        attribute.getParentBasedOptions().get(existingSimpleParentOptionId).remove(attributeOptionDTO.getId());
+                                        return attribute;
+                                    });
+                        }
                     }
                     attributeOption.merge(attributeOptionDTO);
 
