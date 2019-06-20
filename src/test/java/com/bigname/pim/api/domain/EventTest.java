@@ -3,7 +3,7 @@ package com.bigname.pim.api.domain;
 import com.bigname.pim.PimApplication;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Event;
-import com.m7.xtreme.xcore.persistence.dao.EventDAO;
+import com.m7.xtreme.xcore.persistence.mongo.dao.EventDAO;
 import com.m7.xtreme.xcore.service.EventService;
 import org.junit.After;
 import org.junit.Assert;

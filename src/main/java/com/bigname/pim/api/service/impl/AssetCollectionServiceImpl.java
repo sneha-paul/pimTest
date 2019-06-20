@@ -6,7 +6,7 @@ import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
 import org.springframework.stereotype.Service;
 

@@ -3,7 +3,7 @@ package com.bigname.pim.api.persistence.dao;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PimUtil;
-import com.m7.xtreme.xcore.persistence.dao.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.persistence.mongo.dao.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

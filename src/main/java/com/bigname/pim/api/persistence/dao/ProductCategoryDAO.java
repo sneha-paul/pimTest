@@ -1,7 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.ProductCategory;
-import com.m7.xtreme.xcore.persistence.dao.BaseAssociationDAO;
+import com.m7.xtreme.xcore.persistence.mongo.dao.BaseAssociationDAO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

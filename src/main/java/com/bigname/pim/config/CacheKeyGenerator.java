@@ -1,6 +1,6 @@
 package com.bigname.pim.config;
 
-import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.service.mongo.BaseService;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.util.StringUtils;
 

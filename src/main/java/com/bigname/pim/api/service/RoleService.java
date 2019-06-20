@@ -3,7 +3,7 @@ package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.Role;
 import com.bigname.pim.api.persistence.dao.RoleDAO;
-import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.service.mongo.BaseService;
 
 
 /**

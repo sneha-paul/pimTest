@@ -2,7 +2,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.Role;
-import com.m7.xtreme.xcore.persistence.dao.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.persistence.mongo.dao.GenericRepositoryImpl;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 

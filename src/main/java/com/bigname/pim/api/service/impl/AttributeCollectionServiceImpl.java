@@ -6,7 +6,7 @@ import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
-import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;

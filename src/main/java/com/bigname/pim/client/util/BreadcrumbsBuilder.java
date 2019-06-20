@@ -9,7 +9,7 @@ import com.m7.xtreme.common.util.URLUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.Event;
 import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.service.mongo.BaseService;
 import com.m7.xtreme.xcore.service.EventService;
 import com.m7.xtreme.xcore.service.UserService;
 import com.m7.xtreme.xcore.util.FindBy;

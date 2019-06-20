@@ -3,7 +3,7 @@ package com.bigname.pim.api.persistence.dao;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
-import com.m7.xtreme.xcore.persistence.dao.GenericRepository;
+import com.m7.xtreme.xcore.persistence.mongo.dao.GenericRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

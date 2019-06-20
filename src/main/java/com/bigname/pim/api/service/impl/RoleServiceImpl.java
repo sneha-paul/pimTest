@@ -4,7 +4,7 @@ package com.bigname.pim.api.service.impl;
 import com.bigname.pim.api.domain.Role;
 import com.bigname.pim.api.persistence.dao.RoleDAO;
 import com.bigname.pim.api.service.RoleService;
-import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

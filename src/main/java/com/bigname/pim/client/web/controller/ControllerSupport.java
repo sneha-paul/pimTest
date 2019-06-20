@@ -3,7 +3,7 @@ package com.bigname.pim.client.web.controller;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.exception.FileNotFoundException;
-import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.service.mongo.BaseService;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

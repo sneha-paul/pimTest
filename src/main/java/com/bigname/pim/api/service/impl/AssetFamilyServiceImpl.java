@@ -3,7 +3,7 @@ package com.bigname.pim.api.service.impl;
 import com.bigname.pim.api.domain.AssetFamily;
 import com.bigname.pim.api.persistence.dao.AssetFamilyDAO;
 import com.bigname.pim.api.service.AssetFamilyService;
-import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

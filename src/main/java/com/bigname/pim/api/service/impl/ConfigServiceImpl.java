@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.Config;
 import com.bigname.pim.api.persistence.dao.ConfigDAO;
 
 import com.bigname.pim.api.service.ConfigService;
-import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

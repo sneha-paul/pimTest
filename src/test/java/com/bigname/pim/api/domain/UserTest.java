@@ -3,7 +3,7 @@ package com.bigname.pim.api.domain;
 import com.bigname.pim.PimApplication;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.persistence.dao.UserDAO;
+import com.m7.xtreme.xcore.persistence.mongo.dao.UserDAO;
 import com.m7.xtreme.xcore.service.UserService;
 import org.junit.After;
 import org.junit.Assert;

@@ -13,7 +13,7 @@ import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.exception.GenericEntityException;
-import com.m7.xtreme.xcore.service.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;

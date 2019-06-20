@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.domain.FamilyAttribute;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
-import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.service.mongo.BaseService;
 import com.m7.xtreme.xcore.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
