@@ -6,6 +6,7 @@ import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
@@ -156,8 +157,8 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public Optional<Family> get(String id, FindBy findBy, boolean... activeRequired) {
-        Optional<Family> family = super.get(id, findBy, activeRequired);
+    public <String> Optional<Family> get(ID<String> familyId, boolean... activeRequired) {
+        Optional<Family> family = super.get(familyId, activeRequired);
         family.ifPresent(family1 -> {
             family1.getAllAttributes();
             family1.getVariantGroups().forEach((k1, variantGroup) -> variantGroup.setFamily(family1));

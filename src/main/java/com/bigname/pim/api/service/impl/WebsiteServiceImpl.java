@@ -11,6 +11,7 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 //@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -41,8 +43,8 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     }
 
     @Override
-    public Page<Map<String, Object>> findAllWebsiteCatalogs(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(websiteId, findBy, false)
+    public Page<Map<String, Object>> findAllWebsiteCatalogs(ID<String> websiteId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(websiteId, false)
                 .map(catalog -> websiteDAO.findAllWebsiteCatalogs(catalog.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
@@ -53,8 +55,8 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     }
 
     @Override
-    public Page<Catalog> findAvailableCatalogsForWebsite(String websiteId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(websiteId, findBy, false)
+    public Page<Catalog> findAvailableCatalogsForWebsite(ID<String> websiteId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(websiteId, false)
                 .map(catalog -> websiteDAO.findAvailableCatalogsForWebsite(catalog.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
@@ -62,19 +64,18 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     /**
      * Method to get available catalogs of a website in paginated format.
      *
-     * @param id Internal or External id of the Website
-     * @param findBy Type of the website id, INTERNAL_ID or EXTERNAL_ID
+     * @param websiteId Internal or External id of the Website
      * @param page page number
      * @param size page size
      * @param sort sort object
      * @return
      */
     @Override
-    public Page<Catalog> getAvailableCatalogsForWebsite(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        Optional<Website> website = get(id, findBy, false);
+    public Page<Catalog> getAvailableCatalogsForWebsite(ID<String> websiteId, int page, int size, Sort sort, boolean... activeRequired) {
+        Optional<Website> website = get(websiteId,false);
         Set<String> catalogIds = new HashSet<>();
         website.ifPresent(catalog1 -> websiteCatalogDAO.findByWebsiteId(catalog1.getId()).forEach(rc -> catalogIds.add(rc.getCatalogId())));
-        return catalogService.getAllWithExclusions(catalogIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
+        return catalogService.getAllWithExclusions(catalogIds.stream().map(e -> ID.INTERNAL_ID(e)).collect(Collectors.toList()), page, size, sort, true);
     }
 
 
@@ -82,14 +83,13 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
      * Method to get catalogs of a website in paginated format.
      *
      * @param websiteId Internal or External id of the Website
-     * @param findBy Type of the website id, INTERNAL_ID or EXTERNAL_ID
      * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
-        return get(websiteId, findBy, false)
+    public Page<Map<String, Object>> getWebsiteCatalogs(ID<String> websiteId, Pageable pageable, boolean... activeRequired) {
+        return get(websiteId, false)
                 .map(website -> websiteDAO.getWebsiteCatalogs(website.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
@@ -97,17 +97,15 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     /**
      * Method to add catalog for a website.
      *
-     * @param id Internal or External id of the Website
-     * @param findBy1 Type of the website id, INTERNAL_ID or EXTERNAL_ID
+     * @param websiteId Internal or External id of the Website
      * @param catalogId Internal or External id of the Catalog
-     * @param findBy2 Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */
     @Override
-    public WebsiteCatalog addCatalog(String id, FindBy findBy1, String catalogId, FindBy findBy2) {
-        Optional<Website> website = proxy().get(id, findBy1, false);
+    public WebsiteCatalog addCatalog(ID<String> websiteId, ID<String> catalogId) {
+        Optional<Website> website = proxy().get(websiteId, false);
         if(website.isPresent()) {
-            Optional<Catalog> catalog = catalogService.get(catalogId, findBy2, false);
+            Optional<Catalog> catalog = catalogService.get(catalogId, false);
             if(catalog.isPresent()) {
                 Optional<WebsiteCatalog> top = websiteCatalogDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
                 return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
@@ -129,7 +127,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, Website website, String group) {
         Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, website, group);
-        Website existing = ValidationUtil.isNotEmpty(context.get("id")) ? get((String)context.get("id"), FindBy.EXTERNAL_ID, false).orElse(null) : null;
+        Website existing = ValidationUtil.isNotEmpty(context.get("id")) ? get(ID.EXTERNAL_ID(context.get("id")), false).orElse(null) : null;
 
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getWebsiteName().equals(website.getWebsiteName()))) {
             findOne(CollectionsUtil.toMap("websiteName", website.getWebsiteName()))
