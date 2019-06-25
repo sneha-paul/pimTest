@@ -5,8 +5,9 @@ import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.domain.FamilyAttribute;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
-import com.m7.xtreme.xcore.service.mongo.BaseService;
+import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -24,46 +25,42 @@ public interface AttributeCollectionService extends BaseService<AttributeCollect
      * Method to get attributes of an attributeCollection in paginated format.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param page page number
      * @param size page size
      * @param sort sort Object
      * @return
      */
-    Page<Attribute> getAttributes(String collectionId, FindBy findBy, int page, int size, Sort sort);
+    Page<Attribute> getAttributes(ID<String> collectionId, int page, int size, Sort sort);
 
     /**
      * Method to get attributeGroups of an attributeCollection in list format.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param sort sort Object
      * @return
      */
-    List<Pair<String, String>> getAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort);
+    List<Pair<String, String>> getAttributeGroupsIdNamePair(ID<String> collectionId, Sort sort);
 
     /**
      * Method to get attributeOptions of an attribute in paginated format.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param attributeId Internal or External id of the Attribute
      * @param pageNumber page number
      * @param size page size
      * @param sort sort Object
      * @return
      */
-    Page<AttributeOption> getAttributeOptions(String collectionId, FindBy findBy, String attributeId, int pageNumber, int size, Sort sort);
+    Page<AttributeOption> getAttributeOptions(ID<String> collectionId, String attributeId, int pageNumber, int size, Sort sort);
 
     /**
      * Method to find an attribute from an attributeCollection.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param attributeFullId Internal or External id of the Attribute
      * @return
      */
-    Optional<Attribute> findAttribute(String collectionId, FindBy findBy, String attributeFullId);
+    Optional<Attribute> findAttribute(ID<String> collectionId, String attributeFullId);
 
     /**
      * Method to find attributeOptions of an attribute.

@@ -3,7 +3,7 @@ package com.bigname.pim.api.persistence.dao;
 import com.bigname.pim.api.domain.ProductVariant;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PimUtil;
-import com.m7.xtreme.xcore.persistence.mongo.dao.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +27,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class ProductVariantRepositoryImpl extends GenericRepositoryImpl<ProductVariant> implements ProductVariantRepository {
+public class ProductVariantRepositoryImpl extends GenericRepositoryImpl<ProductVariant, Criteria> implements ProductVariantRepository {
 
     public ProductVariantRepositoryImpl(MongoTemplate mongoTemplate) {
         super(mongoTemplate, ProductVariant.class);

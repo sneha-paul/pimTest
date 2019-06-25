@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -16,7 +17,7 @@ import static com.bigname.pim.api.domain.Website.Property.*;
 import static com.m7.xtreme.common.util.RegExBuilder.*;
 
 
-public class Website extends Entity<Website> {
+public class Website extends MongoEntity<Website> {
 
     @Transient
     @NotEmpty(message = "Website Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})

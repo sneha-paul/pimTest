@@ -9,7 +9,7 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;

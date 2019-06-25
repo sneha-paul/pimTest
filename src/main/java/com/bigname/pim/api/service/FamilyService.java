@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.FamilyAttribute;
 import com.bigname.pim.api.domain.FamilyAttributeOption;
 import com.bigname.pim.api.domain.VariantGroup;
 import com.bigname.pim.api.persistence.dao.FamilyDAO;
-import com.m7.xtreme.xcore.service.mongo.BaseService;
+import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;

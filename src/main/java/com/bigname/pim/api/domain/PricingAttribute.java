@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 /**
  * Created by dona on 08-11-2018.
  */
-public class PricingAttribute extends Entity<PricingAttribute> {
+public class PricingAttribute extends MongoEntity<PricingAttribute> {
 
     @Transient
     @NotEmpty(message = "Pricing Attribute Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})

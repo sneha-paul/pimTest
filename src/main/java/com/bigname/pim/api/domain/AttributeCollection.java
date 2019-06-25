@@ -3,6 +3,7 @@ package com.bigname.pim.api.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class AttributeCollection extends Entity<AttributeCollection> {
+public class AttributeCollection extends MongoEntity<AttributeCollection> {
 
     @Transient
     @NotEmpty(message = "Collection Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})

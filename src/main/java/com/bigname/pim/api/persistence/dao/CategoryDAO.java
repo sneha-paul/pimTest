@@ -1,7 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.Category;
-import com.m7.xtreme.xcore.persistence.mongo.dao.GenericDAO;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericDAO;
 
 /**
  * Created by sruthi on 29-08-2018.

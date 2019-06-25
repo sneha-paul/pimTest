@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PimUtil;
-import com.m7.xtreme.xcore.persistence.mongo.dao.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class CatalogRepositoryImpl extends GenericRepositoryImpl<Catalog> implements CatalogRepository {
+public class CatalogRepositoryImpl extends GenericRepositoryImpl<Catalog, Criteria> implements CatalogRepository {
 
     public CatalogRepositoryImpl(MongoTemplate mongoTemplate) {
         super(mongoTemplate, Catalog.class);

@@ -3,7 +3,7 @@ package com.bigname.pim.api.service.impl;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
 import com.bigname.pim.api.service.PricingAttributeService;
-import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

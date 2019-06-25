@@ -7,7 +7,7 @@ import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
-import com.m7.xtreme.xcore.service.mongo.BaseServiceSupport;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;

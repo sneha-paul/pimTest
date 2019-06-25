@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class Channel extends Entity<Channel> {
+public class Channel extends MongoEntity<Channel> {
     @Transient
     @NotEmpty(message = "Channel Id cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
     String channelId;

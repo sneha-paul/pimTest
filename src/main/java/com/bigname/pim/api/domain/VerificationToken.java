@@ -1,7 +1,8 @@
 package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.xcore.domain.Entity;
-import com.m7.xtreme.xcore.domain.User;
+import com.m7.xtreme.xcore.domain.MongoEntity;
+import com.m7.xtreme.xplatform.domain.User;
 import org.springframework.data.annotation.Transient;
 
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  * Created by sruthi on 12-11-2018.
  */
-public class VerificationToken extends Entity<VerificationToken> {
+public class VerificationToken extends MongoEntity<VerificationToken> {
 
     @Transient
     private String verificationId;

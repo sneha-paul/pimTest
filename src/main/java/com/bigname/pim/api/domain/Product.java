@@ -8,6 +8,7 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,7 +22,7 @@ import java.util.Map;
  * Created by sruthi on 19-09-2018.
  */
 @Document
-public class Product extends Entity<Product> {
+public class Product extends MongoEntity<Product> {
 
 
     @Transient

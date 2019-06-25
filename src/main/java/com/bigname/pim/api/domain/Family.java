@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * Created by manu on 9/1/18.
  */
-public class Family extends Entity<Family> {
+public class Family extends MongoEntity<Family> {
 
     @Transient
     @NotEmpty(message = "Family Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})

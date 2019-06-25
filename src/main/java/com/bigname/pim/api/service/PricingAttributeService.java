@@ -2,7 +2,7 @@ package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
-import com.m7.xtreme.xcore.service.mongo.BaseService;
+import com.m7.xtreme.xcore.service.BaseService;
 
 import java.util.List;
 

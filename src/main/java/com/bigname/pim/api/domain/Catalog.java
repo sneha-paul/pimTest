@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -17,7 +18,7 @@ import static com.bigname.pim.api.domain.Catalog.Property.*;
  * Created by Manu on 8/9/2018.
  */
 @Document
-public class Catalog extends Entity<Catalog> {
+public class Catalog extends MongoEntity<Catalog> {
 
 
     @Transient

@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductCategory;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PimUtil;
-import com.m7.xtreme.xcore.persistence.mongo.dao.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class ProductRepositoryImpl extends GenericRepositoryImpl<Product> implements ProductRepository {
+public class ProductRepositoryImpl extends GenericRepositoryImpl<Product, Criteria> implements ProductRepository {
 
     public ProductRepositoryImpl(MongoTemplate mongoTemplate) {
         super(mongoTemplate, Product.class);

@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,7 +19,7 @@ import static com.bigname.pim.api.domain.Category.Property.*;
  * Created by sruthi on 29-08-2018.
  */
 @Document
-public class Category extends Entity<Category> {
+public class Category extends MongoEntity<Category> {
 
 
     @Transient

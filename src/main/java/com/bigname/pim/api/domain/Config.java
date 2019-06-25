@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
@@ -15,7 +16,7 @@ import java.util.Map;
  * Created by sanoop on 12/02/2019.
  */
 
-public class Config extends Entity<Config> {
+public class Config extends MongoEntity<Config> {
 
     @Indexed(unique = true)
     @NotEmpty(message = "Config name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})

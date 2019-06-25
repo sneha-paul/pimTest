@@ -1,6 +1,6 @@
 package com.bigname.pim.api.domain;
 
-import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -14,7 +14,7 @@ import static com.m7.xtreme.common.util.RegExBuilder.*;
 /**
  * Created by sanoop on 14/02/2019.
  */
-public class AssetFamily extends Entity<AssetFamily> {
+public class AssetFamily extends MongoEntity<AssetFamily> {
 
     @Transient
     @NotEmpty(message = "AssetFamily Id cannot be empty", groups = {ValidatableEntity.CreateGroup.class, ValidatableEntity.DetailsGroup.class})

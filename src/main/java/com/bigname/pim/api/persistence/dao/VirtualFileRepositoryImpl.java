@@ -2,7 +2,7 @@ package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.api.domain.VirtualFile;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.xcore.persistence.mongo.dao.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -23,7 +23,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.newA
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class VirtualFileRepositoryImpl extends GenericRepositoryImpl<VirtualFile> implements VirtualFileRepository {
+public class VirtualFileRepositoryImpl extends GenericRepositoryImpl<VirtualFile, Criteria> implements VirtualFileRepository {
     public VirtualFileRepositoryImpl(MongoTemplate mongoTemplate) {
         super(mongoTemplate, VirtualFile.class);
     }

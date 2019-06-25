@@ -2,6 +2,7 @@ package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -21,7 +22,7 @@ import java.util.Map;
 @CompoundIndexes({
         @CompoundIndex(name = "uniqueFileName", unique = true, def = "{'parentDirectoryId':1, 'fileName':1}")
 })
-public class VirtualFile extends Entity<VirtualFile> {
+public class VirtualFile extends MongoEntity<VirtualFile> {
 
     @Transient
     @NotEmpty(message = "Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
