@@ -41,55 +41,55 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public Page<FamilyAttribute> getFamilyAttributes(String familyId, FindBy findBy, int page, int size, Sort sort) {
+    public Page<FamilyAttribute> getFamilyAttributes(ID<String> familyId, int page, int size, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         final Map<String, FamilyAttributeGroup> attributeGroups = new HashMap<>();
         List<FamilyAttribute> attributes = new ArrayList<>();
-        get(familyId, findBy, false).ifPresent(family -> attributeGroups.putAll(family.getAttributes()));
+        get(familyId, false).ifPresent(family -> attributeGroups.putAll(family.getAttributes()));
         FamilyAttributeGroup.getAllAttributeGroups(attributeGroups, FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         //            TODO - sort this based on the requested sort
         return paginate(attributes, page, size);
     }
 
     @Override
-    public Page<VariantGroup> getVariantGroups(String familyId, FindBy findBy, int page, int size, Sort sort) {
+    public Page<VariantGroup> getVariantGroups(ID<String> familyId, int page, int size, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         final Map<String, VariantGroup> variantGroupsMap = new HashMap<>();
-        get(familyId, findBy, false).ifPresent(family -> variantGroupsMap.putAll(family.getVariantGroups()));
+        get(familyId, false).ifPresent(family -> variantGroupsMap.putAll(family.getVariantGroups()));
         List<VariantGroup> variantGroups = variantGroupsMap.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
         //            TODO - sort this based on the requested sort
         return paginate(variantGroups, page, size);
     }
 
     @Override
-    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String familyId, FindBy findBy, Sort sort) {
+    public List<Pair<String, String>> getAttributeGroupsIdNamePair(ID<String> familyId, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<Family> family = get(familyId, findBy, false);
+        Optional<Family> family = get(familyId, false);
         family.ifPresent(family1 -> FamilyAttributeGroup.getAllAttributeGroups(family1.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), FamilyAttributeGroup.getUniqueLeafGroupLabel(attributeGroup, " > ")))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
 
     @Override
-    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(String familyId, FindBy findBy, Sort sort) {
+    public List<Pair<String, String>> getParentAttributeGroupsIdNamePair(ID<String> familyId, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<Family> family = get(familyId, findBy, false);
+        Optional<Family> family = get(familyId, false);
         family.ifPresent(family1 -> FamilyAttributeGroup.getAllAttributeGroups(family1.getAttributes(), FamilyAttributeGroup.GetMode.MASTER_ONLY, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), attributeGroup.getLabel()))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
     }
 
     @Override
-    public Page<FamilyAttributeOption> getFamilyAttributeOptions(String familyId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
+    public Page<FamilyAttributeOption> getFamilyAttributeOptions(ID<String> familyId, String attributeId, int page, int size, Sort sort) {
          /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         List<FamilyAttributeOption> options = new ArrayList<>();
-        Optional<Family> family = get(familyId, findBy, false);
+        Optional<Family> family = get(familyId, false);
         if(family.isPresent()) {
             attributeId = family.get().getAttributeFullId(attributeId);
             options = FamilyAttributeGroup.getLeafGroup(attributeId.substring(0, attributeId.lastIndexOf("|")), family.get().getAttributes())
@@ -102,12 +102,12 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public List<FamilyAttribute> getVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort) {
+    public List<FamilyAttribute> getVariantAxisAttributes(ID<String> familyId, String variantGroupId, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         List<FamilyAttribute> attributes = new ArrayList<>();
-        Optional<Family> _family = get(familyId, findBy, false);
+        Optional<Family> _family = get(familyId, false);
         _family.ifPresent(family ->
                 family.getVariantGroups().get(variantGroupId).getVariantAxis().forEach((key, value) -> value
                         .forEach(attributeId -> {
@@ -120,13 +120,13 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public List<FamilyAttribute> getAvailableVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort) {
+    public List<FamilyAttribute> getAvailableVariantAxisAttributes(ID<String> familyId, String variantGroupId, Sort sort) {
         /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         List<FamilyAttribute> attributes = new ArrayList<>();
         List<FamilyAttribute> setAttributes = new ArrayList<>();
-        Optional<Family> _family = get(familyId, findBy, false);
+        Optional<Family> _family = get(familyId, false);
 
         //All valid variant axis attributes -- TODO refactor using family.getAllAttributes()
         _family.ifPresent(family -> FamilyAttributeGroup.getAllAttributeGroups(family.getAttributes(), FamilyAttributeGroup.GetMode.LEAF_ONLY, true)
@@ -174,15 +174,15 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public List<Family> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired) {
-        List<Family> families =  super.getAll(ids, findBy, sort, activeRequired);
+    public <I> List<Family> getAll(List<ID<I>> ids, Sort sort, boolean... activeRequired) {
+        List<Family> families =  super.getAll(ids, sort, activeRequired);
         families.forEach(family -> family.getVariantGroups().forEach((k, variantGroup) -> variantGroup.setFamily(family)));
         return families;
     }
 
     @Override
-    public boolean toggleVariantGroup(String familyId, FindBy familyIdFindBy, String variantGroupId, FindBy variantGroupIdFindBy, Toggle active) {
-        return get(familyId, familyIdFindBy, false)
+    public boolean toggleVariantGroup(ID<String> familyId, String variantGroupId, Toggle active) {
+        return get(familyId, false)
                 .map(family -> {
                     family.getVariantGroups().get(variantGroupId).setActive(active.state());
                     familyDAO.save(family);

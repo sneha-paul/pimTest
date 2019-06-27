@@ -34,12 +34,12 @@ public interface FamilyService extends BaseService<Family, FamilyDAO> {
 
     Page<FamilyAttributeOption> getFamilyAttributeOptions(ID<String> familyId, String attributeId, int pageNumber, int size, Sort sort);
 
-    List<FamilyAttribute> getVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort);
+    List<FamilyAttribute> getVariantAxisAttributes(ID<String> familyId, String variantGroupId, Sort sort);
 
-    List<FamilyAttribute> getAvailableVariantAxisAttributes(String familyId, String variantGroupId, FindBy findBy, Sort sort);
+    List<FamilyAttribute> getAvailableVariantAxisAttributes(ID<String> familyId, String variantGroupId, Sort sort);
 
     List<Triplet<String, String, String>> getFamilyVariantGroups();
 
-    boolean toggleVariantGroup(ID<String> familyId, ID<String>  variantGroupId, Toggle active);
+    boolean toggleVariantGroup(ID<String> familyId, String  variantGroupId, Toggle active);
 
 }
