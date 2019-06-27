@@ -14,6 +14,7 @@ import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,16 +50,16 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public Page<ProductVariant> findAll(String searchField, String keyword, String productId, FindBy findBy, String channelId, Pageable pageable, boolean... activeRequired) {
-        return productDAO.findById(productId, findBy)
+    public Page<ProductVariant> findAll(String searchField, String keyword, ID<String> productId, String channelId, Pageable pageable, boolean... activeRequired) {
+        return productDAO.findById(productId)
                 .map(product -> productVariantDAO.findAll(searchField, keyword, product.getId(), channelId, pageable, activeRequired))
-                .orElse(new PageImpl<ProductVariant>(new ArrayList<>()));
+                .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public ProductVariant update(String variantId, FindBy variantIdFindBy, ProductVariant productVariant) {
+    public <I> ProductVariant update(ID<I> productVariantId, ProductVariant productVariant) {
         //Variant cannot be loading using the externalId alone at the base layer. So if the id is EXTERNAL, convert it to the INTERNAL one
-        if(variantIdFindBy == FindBy.EXTERNAL_ID) {
+        if(productVariantId.isExternalId()) {
             Optional<ProductVariant> _variant = get(productVariant.getProductId(), FindBy.INTERNAL_ID, productVariant.getChannelId(), variantId, variantIdFindBy, false);
             if(_variant.isPresent()) {
                 variantId = _variant.get().getId();
@@ -79,12 +80,12 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
-    public Optional<ProductVariant> get(String id, FindBy findBy, boolean... activeRequired) {
+    public <I> Optional<ProductVariant> get(ID<I> productVariantId, boolean... activeRequired) {
         return findBy == FindBy.INTERNAL_ID ? super.get(id, findBy, activeRequired) : Optional.empty();
     }
 
     @Override
-    public Optional<ProductVariant> get(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired) {
+    public Optional<ProductVariant> get(ID<String> productId, String channelId, ID<String> productVariantId, boolean... activeRequired) {
         if(variantIdFindBy == FindBy.INTERNAL_ID) {
             return get(productVariantId, FindBy.INTERNAL_ID, activeRequired);
         } else {
@@ -101,18 +102,18 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public Optional<ProductVariant> get(String productVariantId, FindBy findBy, String channelId, boolean... activeRequired) {
+    public Optional<ProductVariant> get(ID<String> productVariantId, String channelId, boolean... activeRequired) {
         return findBy == FindBy.INTERNAL_ID ? productVariantDAO.findByIdAndChannelIdAndActiveIn(productVariantId, channelId, PimUtil.getActiveOptions(activeRequired)) : productVariantDAO.findByExternalIdAndChannelIdAndActiveIn(productVariantId, channelId, PimUtil.getActiveOptions(activeRequired));
     }
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
-    public boolean toggle(String id, FindBy findBy, Toggle active) {
+    public <I> boolean toggle(ID<I> productVariantId, Toggle active) {
         return findBy == FindBy.INTERNAL_ID && super.toggle(id, findBy, active);
     }
 
     @Override
-    public boolean toggle(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, Toggle active) {
+    public boolean toggle(ID<String> productId, String channelId, ID<String> productVariantId, Toggle active) {
         Optional<ProductVariant> _variant = get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy, false);
 
         if(_variant.isPresent()) {
@@ -127,12 +128,12 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
-    public ProductVariant cloneInstance(String id, FindBy findBy, Entity.CloneType type) {
+    public <I> ProductVariant cloneInstance(ID<I> productVariantId, Entity.CloneType type) {
         return findBy == FindBy.INTERNAL_ID ? super.cloneInstance(id, findBy, type) : null;
     }
 
     @Override
-    public ProductVariant cloneInstance(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, Entity.CloneType type) {
+    public ProductVariant cloneInstance(ID<String> productId, String channelId, ID<String> productVariantId, Entity.CloneType type) {
         return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy, false)
                 .map(productVariant -> cloneInstance(productVariant.getId(), FindBy.INTERNAL_ID, type)).orElse(null);
     }
@@ -144,7 +145,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, int page, int size, Sort sort, boolean... activeRequired) {
+    public Page<ProductVariant> getAll(ID<String> productId,  String channelId, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             //sort = new Sort(Sort.Direction.ASC, "externalId");
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
@@ -161,7 +162,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public List<ProductVariant> getAll(String[] productIds, FindBy productIdFindBy,  String channelId, boolean... activeRequired) {
+    public List<ProductVariant> getAll(List<ID<String>> productIds,  String channelId, boolean... activeRequired) {
         if(productIdFindBy == FindBy.EXTERNAL_ID) {
             productIds = productDAO.findByExternalIdInAndActiveIn(productIds, PimUtil.getActiveOptions(activeRequired)).stream().map(Entity::getId).collect(Collectors.toList()).toArray(new String[0]);
             if(productIds.length == 0) {
@@ -178,13 +179,13 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public List<ProductVariant> getAll(String productId, FindBy productIdFindBy, String channelId, Sort sort, boolean... activeRequired) {
+    public List<ProductVariant> getAll(ID<String> productId, String channelId, Sort sort, boolean... activeRequired) {
         return getAll(productId, productIdFindBy, channelId, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
-    public Page<ProductVariant> getAll(String[] ids, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+    public <I> Page<ProductVariant> getAll(List<ID<I>> productVariantIds, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
@@ -192,7 +193,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public Page<ProductVariant> getAll(String productId, FindBy productIdFindBy, String channelId, String[] variantIds, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired) {
+    public Page<ProductVariant> getAll(ID<String> productId, String channelId, List<ID<String>> productVariantIds, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
@@ -213,23 +214,23 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
     @Override
-    public List<ProductVariant> getAll(String[] ids, FindBy findBy, Sort sort, boolean... activeRequired) {
+    public <I> List<ProductVariant> getAll(List<ID<I>> productVariantIds, Sort sort, boolean... activeRequired) {
         return getAll(ids, findBy, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
     @Override
-    public List<ProductVariant> getAll(String productId, FindBy productIdFindBy, String channelId, String[] variantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired) {
+    public List<ProductVariant> getAll(ID<String> productId, String channelId, List<ID<String>> productVariantIds, Sort sort, boolean... activeRequired) {
         return getAll(productId, productIdFindBy, channelId, variantIds, variantIdFindBy, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
     //Don't use this method, use the below method with productId and channelId instead
     @Override
-    public Page<ProductVariant> getAllWithExclusions(String[] excludedIds, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+    public <I> Page<ProductVariant> getAllWithExclusions(List<ID<I>> excludedIds, int page, int size, Sort sort, boolean... activeRequired) {
         return new PageImpl<>(new ArrayList<>()); //IMPORTANT - Purposely returning empty page
     }
 
     @Override
-    public Page<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy, String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired) {
+    public Page<ProductVariant> getAllWithExclusions(ID<String> productId, String channelId, List<ID<String>> excludedVariantIds, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
@@ -250,12 +251,12 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
 
     //Don't use this method, use the below method with productId and channelId instead
     @Override
-    public List<ProductVariant> getAllWithExclusions(String[] excludedIds, FindBy findBy, Sort sort, boolean... activeRequired) {
+    public <I> List<ProductVariant> getAllWithExclusions(List<ID<I>> excludedIds, Sort sort, boolean... activeRequired) {
         return new ArrayList<>(); //IMPORTANT - Purposely returning empty list
     }
 
     @Override
-    public List<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy, String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired) {
+    public List<ProductVariant> getAllWithExclusions(ID<String> productId, String channelId, List<ID<String>> excludedVariantIds, Sort sort, boolean... activeRequired) {
         return getAllWithExclusions(productId, productIdFindBy, channelId, excludedVariantIds, variantIdFindBy, 0, PIMConstants.MAX_FETCH_SIZE, sort, activeRequired).getContent();
     }
 
@@ -286,7 +287,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public Page<ProductVariant> getProductVariantPricing(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired) {
+    public Page<ProductVariant> getProductVariantPricing(ID<String> productId, String channelId, ID<String> productVariantId, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
@@ -302,7 +303,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public ProductVariant addAssets(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String[] assetIds, FileAsset.AssetFamily assetFamily) {
+    public ProductVariant addAssets(ID<String> productId, String channelId, ID<String> productVariantId, String[] assetIds, FileAsset.AssetFamily assetFamily) {
         return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
                 .map(productVariant -> {
 
@@ -354,7 +355,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public ProductVariant deleteAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily) {
+    public ProductVariant deleteAsset(ID<String> productId, String channelId, ID<String> productVariantId, String assetId, FileAsset.AssetFamily assetFamily) {
         return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
                 .map(productVariant -> {
                     //Existing variant assets
@@ -376,7 +377,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public ProductVariant reorderAssets(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String[] assetIds, FileAsset.AssetFamily assetFamily) {
+    public ProductVariant reorderAssets(ID<String> productId, String channelId, ID<String> productVariantId, String[] assetIds, FileAsset.AssetFamily assetFamily) {
         return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
                 .map(productVariant -> {
                     //Existing variant assets
@@ -398,7 +399,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public ProductVariant setAsDefaultAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily) {
+    public ProductVariant setAsDefaultAsset(ID<String> productId, String channelId, ID<String> productVariantId, String assetId, FileAsset.AssetFamily assetFamily) {
         return get(productId, productIdFindBy, channelId, productVariantId, variantIdFindBy,  false)
                 .map(productVariant -> {
                     //Existing variant assets
@@ -438,7 +439,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public boolean setProductVariantsSequence(String productId, FindBy productIdFindBy, String channelId, FindBy channelIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy) {
+    public boolean setProductVariantsSequence(ID<String> productId, ID<String> channelId, ID<String> sourceId, ID<String> destinationId) {
 
         return get(sourceId, sourceIdFindBy, channelId,  false)
                 .map(product -> {

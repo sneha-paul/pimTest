@@ -157,7 +157,7 @@ public class FamilyServiceImpl extends BaseServiceSupport<Family, FamilyDAO, Fam
     }
 
     @Override
-    public <String> Optional<Family> get(ID<String> familyId, boolean... activeRequired) {
+    public <I> Optional<Family> get(ID<I> familyId, boolean... activeRequired) {
         Optional<Family> family = super.get(familyId, activeRequired);
         family.ifPresent(family1 -> {
             family1.getAllAttributes();
