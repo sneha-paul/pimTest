@@ -41,13 +41,13 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     Page<ProductVariant> findAll(String searchField, String keyword, ID<String> productId, String channelId, Pageable pageable, boolean... activeRequired);
 
-    Optional<ProductVariant> get(ID<String> productId, String channelId, ID<String> productVariantId, boolean... activeRequired);
+    <I> Optional<ProductVariant> get(ID<I> productId, String channelId, ID<I> productVariantId, boolean... activeRequired);
 
     Optional<ProductVariant> get(ID<String> productVariantId, String channelId, boolean... activeRequired);
 
     Page<ProductVariant> getProductVariantPricing(ID<String> productId, String channelId, ID<String> productVariantId, int page, int size, Sort sort, boolean... activeRequired);
 
-    ProductVariant addAssets(ID<String> productId, String channelId, ID<String> productVariantId, String[] assetIds, FileAsset.AssetFamily assetFamily);
+    ProductVariant addAssets(ID<String> productId, String channelId, ID<String> productVariantId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily);
 
     ProductVariant deleteAsset(ID<String> productId, String channelId, ID<String> productVariantId, String assetId, FileAsset.AssetFamily assetFamily);
 
