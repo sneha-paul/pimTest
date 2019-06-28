@@ -366,7 +366,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public ProductVariant deleteAsset(ID<String> productId, String channelId, ID<String> productVariantId, String assetId, FileAsset.AssetFamily assetFamily) {
+    public ProductVariant deleteAsset(ID<String> productId, String channelId, ID<String> productVariantId, ID<String> assetId, FileAsset.AssetFamily assetFamily) {
         return get(productId, channelId, productVariantId,  false)
                 .map(productVariant -> {
                     //Existing variant assets
@@ -388,7 +388,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public ProductVariant reorderAssets(ID<String> productId, String channelId, ID<String> productVariantId, String[] assetIds, FileAsset.AssetFamily assetFamily) {
+    public ProductVariant reorderAssets(ID<String> productId, String channelId, ID<String> productVariantId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily) {
         return get(productId, channelId, productVariantId, false)
                 .map(productVariant -> {
                     //Existing variant assets
@@ -399,7 +399,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                     List<Object> variantAssets = variantAssetsMap.containsKey(_assetFamily) ? (List<Object>)variantAssetsMap.get(_assetFamily) : new ArrayList<>();
 
                     //AssetIds arrays contains the assetIds in the required order
-                    variantAssetsMap.put(_assetFamily, ProductUtil.reorderAssets(ConversionUtil.toGenericMap(variantAssets), Arrays.asList(assetIds)));
+                    variantAssetsMap.put(_assetFamily, ProductUtil.reorderAssets(ConversionUtil.toGenericMap(variantAssets), assetIds.stream().map(ID::getId).collect(Collectors.toList())));
                     productVariant.setVariantAssets(variantAssetsMap);
                     productVariant.setGroup("ASSETS");
                     update(productVariantId, productVariant);
@@ -410,7 +410,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
     }
 
     @Override
-    public ProductVariant setAsDefaultAsset(ID<String> productId, String channelId, ID<String> productVariantId, String assetId, FileAsset.AssetFamily assetFamily) {
+    public ProductVariant setAsDefaultAsset(ID<String> productId, String channelId, ID<String> productVariantId, ID<String> assetId, FileAsset.AssetFamily assetFamily) {
         return get(productId, channelId, productVariantId, false)
                 .map(productVariant -> {
                     //Existing variant assets

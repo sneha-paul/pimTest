@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.ProductDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +20,12 @@ import java.util.Optional;
 public interface ProductService extends BaseService<Product, ProductDAO> {
 
 
-    Page<Category> findAvailableCategoriesForProduct(String productId, FindBy externalId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+    Page<Category> findAvailableCategoriesForProduct(ID<String> productId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
     /**
      * Method to get variants of a product in paginated format.
      *
      * @param productId Internal or External id of the Product
-     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param channelId Id of the Channel to which the product belongs
      * @param page page number
      * @param size page size
@@ -33,108 +33,97 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, int page, int size, Sort sort, boolean... activeRequired);
+    Page<ProductVariant> getProductVariants(ID<String> productId, String channelId, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to get variants of a product in list format.
      *
      * @param productId Internal or External id of the Product
-     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param channelId Internal or External id of the Channel to which the product belongs
      * @param sort sort Object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    List<ProductVariant> getProductVariants(String productId, FindBy findBy, String channelId, Sort sort, boolean... activeRequired);
+    List<ProductVariant> getProductVariants(ID<String> productId, String channelId, Sort sort, boolean... activeRequired);
 
     /**
      * Method to get variant of a product
      *
      * @param productId Internal or External id of the Product
-     * @param productIdFindBy
      * @param channelId Internal or External id of the Channel to which the product belongs
      * @param productVariantId Internal or External id of the ProductVariant of the product
-     * @param variantIdFindBy
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Optional<ProductVariant> getProductVariant(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
+    Optional<ProductVariant> getProductVariant(ID<String> productId, String channelId, ID<String> productVariantId, boolean... activeRequired);
 
     /**
      * Method to get available variants of a product in paginated format.
      *
      * @param productId Internal or External id of the Product
-     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param channelId Internal or External id of the Channel to which the product belongs
-     * @param pageNumber page number
-     * @param pageSize page size
      * @param sort sort Object
      * @return
      */
-    Page<Map<String, String>> getAvailableVariants(String productId, FindBy findBy, String channelId, Integer pageNumber, Integer pageSize, Sort sort);
+    Page<Map<String, String>> getAvailableVariants(ID<String> productId, String channelId, int page, int size, Sort sort);
 
     /**
      * Method to get categories of a product in paginated format.
      *
      * @param productId Internal or External id of the Product
-     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param page page number
      * @param size page size
      * @param sort sort Object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<ProductCategory> getProductCategories(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<ProductCategory> getProductCategories(ID<String> productId, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to get available categories of a product in paginated format.
      *
      * @param productId Internal or External id of the Product
-     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param page page number
      * @param size page size
      * @param sort sort object
      * @return
      */
-    Page<Category> getAvailableCategoriesForProduct(String productId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<Category> getAvailableCategoriesForProduct(ID<String> productId, int page, int size, Sort sort, boolean... activeRequired);
 
     /**
      * Method to add category for a product.
      *
      * @param productId Internal or External id of the Product
-     * @param productIdFindBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param categoryId Internal or External id of the Category
-     * @param categoryIdFindBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */
-    ProductCategory addCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy);
+    ProductCategory addCategory(ID<String> productId, ID<String> categoryId);
 
-    boolean toggleProductCategory(String productId, FindBy productIdFindBy, String categoryId, FindBy categoryIdFindBy, Toggle active);
+    boolean toggleProductCategory(ID<String> productId, ID<String> categoryId, Toggle active);
 
     /**
      * Method to get categories of a Product in paginated format.
      *
      * @param productId Internal or External id of the Product
-     * @param findBy Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
-    Page<Map<String,Object>> getCategories(String productId, FindBy findBy, Pageable pageable, boolean... activeRequired);
+    Page<Map<String,Object>> getCategories(ID<String> productId, Pageable pageable, boolean... activeRequired);
 
-    Product addAssets(String productId, FindBy findBy, String channelId, String[] assetIds, FileAsset.AssetFamily assetFamily);
+    Product addAssets(ID<String> productId, String channelId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily);
 
-    Product reorderAssets(String productId, FindBy findBy, String channelId, String[] assetIds, FileAsset.AssetFamily assetFamily);
+    Product reorderAssets(ID<String> productId, String channelId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily);
 
-    Product setAsDefaultAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily);
+    Product setAsDefaultAsset(ID<String> productId, String channelId, ID<String> assetId, FileAsset.AssetFamily assetFamily);
 
-    Product deleteAsset(String productId, FindBy findBy, String channelId, String assetId, FileAsset.AssetFamily assetFamily);
+    Product deleteAsset(ID<String> productId, String channelId, ID<String> assetId, FileAsset.AssetFamily assetFamily);
 
-    Page<Map<String, Object>> findAllProductCategories(String productId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+    Page<Map<String, Object>> findAllProductCategories(ID<String> productId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
-    boolean toggleProduct(String productId, FindBy findBy, Toggle toggle);
+    boolean toggleProduct(ID<String> productId, Toggle toggle);
     
-    List<CategoryProduct> getAllCategoryProductsWithProductId(String productInternalId);
+    List<CategoryProduct> getAllCategoryProductsWithProductId(ID<String> productId);
 
     void updateCategoryProduct(CategoryProduct categoryProduct);
 }

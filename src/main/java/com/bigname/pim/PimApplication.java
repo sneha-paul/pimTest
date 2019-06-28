@@ -15,8 +15,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 
 @SpringBootApplication(scanBasePackages = {"com.m7.xtreme.xcore", "com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor"})
-@EnableMongoRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.mongo", "com.bigname.pim.api.persistence"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.mongo.dao.GenericDAO"})})
-@EnableJpaRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.jpa"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.jpa.dao.GenericDAO"})})
+@EnableMongoRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.dao.mongo", "com.bigname.pim.api.persistence"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.mongo.dao.GenericDAO"})})
+@EnableJpaRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.dao.jpa"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.jpa.dao.GenericDAO"})})
 @EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass = true)
 @EnableConfigurationProperties(ConfigProperties.class)
 //@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)

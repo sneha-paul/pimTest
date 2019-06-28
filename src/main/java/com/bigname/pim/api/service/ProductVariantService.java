@@ -49,11 +49,11 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     ProductVariant addAssets(ID<String> productId, String channelId, ID<String> productVariantId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily);
 
-    ProductVariant deleteAsset(ID<String> productId, String channelId, ID<String> productVariantId, String assetId, FileAsset.AssetFamily assetFamily);
+    ProductVariant deleteAsset(ID<String> productId, String channelId, ID<String> productVariantId, ID<String> assetId, FileAsset.AssetFamily assetFamily);
 
-    ProductVariant reorderAssets(ID<String> productId, String channelId, ID<String> productVariantId, String[] assetIds, FileAsset.AssetFamily assetFamily);
+    ProductVariant reorderAssets(ID<String> productId, String channelId, ID<String> productVariantId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily);
 
-    ProductVariant setAsDefaultAsset(ID<String> productId, String channelId, ID<String> productVariantId, String assetId, FileAsset.AssetFamily assetFamily);
+    ProductVariant setAsDefaultAsset(ID<String> productId, String channelId, ID<String> productVariantId, ID<String> assetId, FileAsset.AssetFamily assetFamily);
 
     List<Map<String,Object>> getAll();
 
