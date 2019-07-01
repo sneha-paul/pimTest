@@ -1,7 +1,7 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.m7.xtreme.xcore.domain.JobInstance;
-import com.m7.xtreme.xcore.service.JobInstanceService;
+import com.m7.xtreme.xplatform.domain.JobInstance;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 

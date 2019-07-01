@@ -7,14 +7,16 @@ import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.common.util.URLUtil;
 import com.m7.xtreme.xcore.domain.Entity;
-import com.m7.xtreme.xcore.domain.Event;
-import com.m7.xtreme.xcore.domain.User;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.Event;
+import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xcore.service.BaseService;
-import com.m7.xtreme.xcore.service.EventService;
-import com.m7.xtreme.xcore.service.UserService;
+import com.m7.xtreme.xplatform.service.EventService;
+import com.m7.xtreme.xplatform.service.UserService;
 import com.m7.xtreme.xcore.util.FindBy;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -253,31 +255,31 @@ public class BreadcrumbsBuilder {
     private String getCrumbName(String id, Class<?> entity) {
         switch(entity.getCanonicalName()) {
             case "com.bigname.pim.api.domain.Website":
-                return ((WebsiteService)services.get("websiteService")).get(id, FindBy.EXTERNAL_ID, false).map(Website::getWebsiteName).orElse("");
+                return ((WebsiteService)services.get("websiteService")).get(ID.EXTERNAL_ID(id), false).map(Website::getWebsiteName).orElse("");
             case "com.bigname.pim.api.domain.Catalog":
-                return ((CatalogService)services.get("catalogService")).get(id, FindBy.EXTERNAL_ID, false).map(Catalog::getCatalogName).orElse("");
+                return ((CatalogService)services.get("catalogService")).get(ID.EXTERNAL_ID(id), false).map(Catalog::getCatalogName).orElse("");
             case "com.bigname.pim.api.domain.Category":
-                return ((CategoryService)services.get("categoryService")).get(id, FindBy.EXTERNAL_ID, false).map(Category::getCategoryName).orElse("");
+                return ((CategoryService)services.get("categoryService")).get(ID.EXTERNAL_ID(id), false).map(Category::getCategoryName).orElse("");
             case "com.bigname.pim.api.domain.Product":
-                return ((ProductService)services.get("productService")).get(id, FindBy.EXTERNAL_ID, false).map(Product::getProductName).orElse("");
+                return ((ProductService)services.get("productService")).get(ID.EXTERNAL_ID(id), false).map(Product::getProductName).orElse("");
             case "com.bigname.pim.api.domain.ProductVariant":
-                return ((ProductVariantService)services.get("productVariantService")).get(id, FindBy.EXTERNAL_ID, getParameter("channelId"), false).map(ProductVariant::getProductVariantName).orElse("");
+                return ((ProductVariantService)services.get("productVariantService")).get(ID.EXTERNAL_ID(id), getParameter("channelId"), false).map(ProductVariant::getProductVariantName).orElse("");
             case "com.bigname.pim.api.domain.AttributeCollection":
-                return ((AttributeCollectionService)services.get("attributeCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AttributeCollection::getCollectionName).orElse("");
+                return ((AttributeCollectionService)services.get("attributeCollectionService")).get(ID.EXTERNAL_ID(id), false).map(AttributeCollection::getCollectionName).orElse("");
             case "com.bigname.pim.api.domain.AssetCollection":
-                return ((AssetCollectionService)services.get("assetCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AssetCollection::getCollectionName).orElse("");
+                return ((AssetCollectionService)services.get("assetCollectionService")).get(ID.EXTERNAL_ID(id), false).map(AssetCollection::getCollectionName).orElse("");
             case "com.bigname.pim.api.domain.PricingAttribute":
-                return ((PricingAttributeService)services.get("pricingAttributeService")).get(id, FindBy.EXTERNAL_ID, false).map(PricingAttribute::getPricingAttributeName).orElse("");
+                return ((PricingAttributeService)services.get("pricingAttributeService")).get(ID.EXTERNAL_ID(id), false).map(PricingAttribute::getPricingAttributeName).orElse("");
             case "com.bigname.pim.api.domain.Family":
-                return ((FamilyService)services.get("familyService")).get(id, FindBy.EXTERNAL_ID, false).map(Family::getFamilyName).orElse("");
+                return ((FamilyService)services.get("familyService")).get(ID.EXTERNAL_ID(id), false).map(Family::getFamilyName).orElse("");
             case "com.m7.xtreme.xcore.domain.User":
-                return ((UserService)services.get("userService")).get(id, FindBy.EXTERNAL_ID, false).map(User::getUserName).orElse("");
+                return ((UserService)services.get("userService")).get(ID.EXTERNAL_ID(id), false).map(User::getUserName).orElse("");
             case "com.m7.xtreme.xcore.domain.Event":
-                return ((EventService)services.get("eventService")).get(id, FindBy.EXTERNAL_ID, false).map(Event::getUser).orElse("");
+                return ((EventService)services.get("eventService")).get(ID.EXTERNAL_ID(id), false).map(Event::getUser).orElse("");
             case "com.bigname.pim.api.domain.Config":
-                return ((ConfigService)services.get("configService")).get(id, FindBy.EXTERNAL_ID, false).map(Config::getConfigName).orElse("");
+                return ((ConfigService)services.get("configService")).get(ID.EXTERNAL_ID(id), false).map(Config::getConfigName).orElse("");
             case "com.bigname.pim.api.domain.AssetFamily":
-                return ((AssetFamilyService)services.get("assetFamilyService")).get(id, FindBy.EXTERNAL_ID, false).map(AssetFamily::getAssetFamilyName).orElse("");
+                return ((AssetFamilyService)services.get("assetFamilyService")).get(ID.EXTERNAL_ID(id), false).map(AssetFamily::getAssetFamilyName).orElse("");
         }
         return "";
     }
@@ -306,7 +308,7 @@ public class BreadcrumbsBuilder {
         if(isNotEmpty(getParameter("parentId"))) {
             String parentId = getParameter("parentId");
             String[] parentIds = StringUtil.splitPipeDelimited(parentId);
-            Map<String, Category> parentsMap = ((CategoryService) services.get("categoryService")).getAll(parentIds, FindBy.EXTERNAL_ID, null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
+            Map<String, Category> parentsMap = ((CategoryService) services.get("categoryService")).getAll(Arrays.stream(parentIds).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
 
             String _parentId = "";
             for (int i = 0; i < parentIds.length; i++) {

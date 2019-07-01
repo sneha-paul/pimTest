@@ -1,8 +1,8 @@
 package com.bigname.pim.config;
 
-import com.m7.xtreme.xcore.domain.Event;
-import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.service.EventService;
+import com.m7.xtreme.xplatform.domain.Event;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;

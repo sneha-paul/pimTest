@@ -2,8 +2,8 @@ package com.bigname.pim.util;
 
 import com.bigname.pim.api.persistence.dao.SimpleJob;
 import com.m7.xtreme.common.util.StatusUpdateUtil;
-import com.m7.xtreme.xcore.domain.JobInstance;
-import com.m7.xtreme.xcore.service.JobInstanceService;
+import com.m7.xtreme.xplatform.domain.JobInstance;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 

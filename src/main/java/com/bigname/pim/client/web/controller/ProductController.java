@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
@@ -93,7 +90,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                          @RequestParam(value="assetIds[]") String[] assetIds,
                                          @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.addAssets(ID.EXTERNAL_ID(id), channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.addAssets(ID.EXTERNAL_ID(id), channelId, Arrays.stream(assetIds).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -105,7 +102,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                            @RequestParam(value="assetId") String assetId,
                                            @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.deleteAsset(ID.EXTERNAL_ID(id), channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.deleteAsset(ID.EXTERNAL_ID(id), channelId, ID.INTERNAL_ID(assetId), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -118,7 +115,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                                  @RequestParam(value="assetId") String assetId,
                                                  @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.setAsDefaultAsset(ID.EXTERNAL_ID(id), channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.setAsDefaultAsset(ID.EXTERNAL_ID(id), channelId, ID.INTERNAL_ID(assetId), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -130,7 +127,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                             @RequestParam(value="assetIds[]") String[] assetIds,
                                             @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.reorderAssets(ID.EXTERNAL_ID(id), channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.reorderAssets(ID.EXTERNAL_ID(id), channelId, Arrays.stream(assetIds).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -179,7 +176,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                 },
                 paginatedResult -> {
                     List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
-                    List<ProductVariant> productVariants = productVariantService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, false);
+                    List<ProductVariant> productVariants = productVariantService.getAll(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), PIMConstants.DEFAULT_CHANNEL_ID, false);
                     Map<String, Map<String, Object>> productsVariantsInfo = ProductUtil.getVariantDetailsForProducts(productIds, productVariants, 4);
 
                     List<Map<String, String>> dataObjects = new ArrayList<>();

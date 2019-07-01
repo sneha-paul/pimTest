@@ -175,7 +175,7 @@ public class ProductVariantController extends ControllerSupport {
                                          @RequestParam(value="assetIds[]") String[] assetIds,
                                          @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), Arrays.stream(assetIds).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -188,7 +188,7 @@ public class ProductVariantController extends ControllerSupport {
                                            @RequestParam(value="assetId") String assetId,
                                            @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.deleteAsset(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.deleteAsset(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), ID.INTERNAL_ID(assetId), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -202,7 +202,7 @@ public class ProductVariantController extends ControllerSupport {
                                                  @RequestParam(value="assetId") String assetId,
                                                  @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.setAsDefaultAsset(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.setAsDefaultAsset(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), ID.INTERNAL_ID(assetId), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -215,7 +215,7 @@ public class ProductVariantController extends ControllerSupport {
                                             @RequestParam(value="assetIds[]") String[] assetIds,
                                             @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.reorderAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.reorderAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), Arrays.stream(assetIds).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -343,7 +343,7 @@ public class ProductVariantController extends ControllerSupport {
         } else {
 
             if(isNotEmpty(productId) && isNotEmpty(channelId)) {
-                productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                productService.get(ID.EXTERNAL_ID(productId), false).ifPresent(product -> {
                     Sort sort = null;
                     if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
                         sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
@@ -392,7 +392,7 @@ public class ProductVariantController extends ControllerSupport {
                 ProductVariant productVariant = _productVariant.get();
                 productVariant.setProduct(product);
                 model.put("productVariant", productVariant);
-                model.put("availablePricingAttributes", pricingAttributeService.getAllWithExclusions(new ArrayList<>(productVariant.getPricingDetails().keySet()).toArray(new String[0]), FindBy.EXTERNAL_ID, null));
+                model.put("availablePricingAttributes", pricingAttributeService.getAllWithExclusions(productVariant.getPricingDetails().keySet().stream().map(ID::EXTERNAL_ID).collect(Collectors.toList()), null));
                 PricingAttribute pricingAttribute = isEmpty(pricingAttributeId) ? null : pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeId), false).orElse(null);
                 model.put("pricingDetails", getAttributePricingDetails(productVariant.getPricingDetails(), pricingAttribute));
                 if(isNotEmpty(pricingAttributeId)) {

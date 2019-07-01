@@ -6,6 +6,7 @@ import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class AssetLoader {
         if(isNotEmpty(folderName) && isNotEmpty(parentId)) {
             folderName = trim(folderName);
             parentId = trim(parentId);
-            VirtualFile parentFolder = assetService.get(parentId, FindBy.INTERNAL_ID, false).orElse(null);
+            VirtualFile parentFolder = assetService.get(ID.EXTERNAL_ID(parentId), false).orElse(null);
             if (isNotEmpty(parentFolder)) {
                 VirtualFile folder = assetService.getFile(folderName, parentId).orElse(null);
                 if (isNotEmpty(folder)) {

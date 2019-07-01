@@ -10,6 +10,7 @@ import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -242,7 +243,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
                                                         "ACTIVE",           category.getActive(),
                                                         "DISCONTINUED",     category.getDiscontinued());
             int[] seqNum = {0};
-            categoryNode.put("PRODUCTS", categoryService.getAllCategoryProducts(category.getId()).stream()
+            categoryNode.put("PRODUCTS", categoryService.getAllCategoryProducts(ID.INTERNAL_ID(category.getId())).stream()
                     .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
                     .map(categoryProduct -> CollectionsUtil.toMap("_ID", categoryProduct.getProductId(), "ACTIVE", categoryProduct.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
                     .collect(Collectors.toList()));
@@ -283,7 +284,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
             }
             productNode.put("DIGITAL_ASSETS", digitalAssets);
             int[] seqNum = {0};
-            productNode.put("PRODUCT_VARIANTS", productService.getProductVariants(product.getProductId(), FindBy.EXTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, null, false).stream()
+            productNode.put("PRODUCT_VARIANTS", productService.getProductVariants(ID.EXTERNAL_ID(product.getProductId()), PIMConstants.DEFAULT_CHANNEL_ID, null, false).stream()
                     .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
                     .map(productVariant -> {
                         Map<String, Object> variantNode =  CollectionsUtil.toMap(
@@ -390,7 +391,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
         List<Product> products =  productService.getAll(null, false);
         data.add(Arrays.asList(new String[]{"CHILD PRODUCT NAME", "CHILD PRODUCT ID", "PARENT PRODUCT ID"}));
         products.forEach(product -> {
-            List<ProductVariant> variants =  productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, product.getChannelId(), null, false);
+            List<ProductVariant> variants =  productVariantService.getAll(ID.INTERNAL_ID(product.getId()), product.getChannelId(), null, false);
             variants.forEach(variant -> data.add(Arrays.asList(variant.getProductVariantName(), variant.getProductVariantId(),product.getExternalId())));
         });
 

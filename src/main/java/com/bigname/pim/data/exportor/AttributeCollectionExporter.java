@@ -7,6 +7,7 @@ import com.bigname.pim.util.POIUtil;
 import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -34,7 +35,7 @@ public class AttributeCollectionExporter implements BaseExporter<AttributeCollec
 
     public boolean exportAttributeData(String filePath, String attributeCollectionId) {
 
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false);
+        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false);
         List<List<Object>> data = new ArrayList<>();
         data.add(Arrays.asList(new String[]{"ID", "NAME", "DATA TYPE", "UI TYPE", "PARENT ATTRIBUTE ID"}));
         attributeCollection.ifPresent(attributeCollection1 ->
@@ -50,7 +51,7 @@ public class AttributeCollectionExporter implements BaseExporter<AttributeCollec
 
         Map<String, List<List<Object>>> attributesOptions = new HashMap<>();
 
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false);
+        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false);
 
         attributeCollection.ifPresent(attributeCollection1 -> attributeCollection1.getAllAttributes().forEach(attribute -> {
             if ("Y".equals(attribute.getSelectable())) {
