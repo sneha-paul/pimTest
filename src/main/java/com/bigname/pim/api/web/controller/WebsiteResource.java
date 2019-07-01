@@ -2,6 +2,7 @@ package com.bigname.pim.api.web.controller;
 
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.service.WebsiteService;
+import com.m7.xtreme.xcore.util.ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public class WebsiteResource {
             @RequestParam(value = "activeOnly", defaultValue = "true") String activeOnly,
             @RequestParam(value = "useExternalId", defaultValue = "false") String useExternalId) {
 
-        return websiteService.get(id, findBy(toBoolean(useExternalId)), toBoolean(activeOnly));
+        return websiteService.get(toBoolean(useExternalId) ? ID.EXTERNAL_ID(id) : ID.INTERNAL_ID(id), toBoolean(activeOnly));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
@@ -48,7 +49,7 @@ public class WebsiteResource {
             @RequestBody Website website,
             @RequestParam(value = "useExternalId", defaultValue = "true") String useExternalId) {
 
-        return websiteService.update(id, findBy(toBoolean(useExternalId)), website);
+        return websiteService.update(toBoolean(useExternalId) ? ID.EXTERNAL_ID(id) : ID.INTERNAL_ID(id), website);
     }
 
     @RequestMapping(method = RequestMethod.GET)

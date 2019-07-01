@@ -8,6 +8,7 @@ import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -76,7 +77,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("id", id));
         if(isValid(website, model, website.getGroup().length == 1 && website.getGroup()[0].equals("DETAILS") ? Website.DetailsGroup.class : null)) {
-            websiteService.update(id, FindBy.EXTERNAL_ID, website);
+            websiteService.update(ID.EXTERNAL_ID(id), website);
             model.put("success", true);
             if(!id.equals(website.getWebsiteId())) {
                 model.put("refreshUrl", "/pim/websites/" + website.getWebsiteId());
@@ -101,7 +102,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "website/website" + (reload ? "_body" : ""));
 
-        return id == null ? super.details(model) : websiteService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : websiteService.get(ID.EXTERNAL_ID(id), false)
                 .map(website -> {
                     model.put("website", website);
                     return super.details(id, model);
@@ -145,9 +146,9 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                 WebsiteCatalog.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return websiteService.getWebsiteCatalogs(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
+                        return websiteService.getWebsiteCatalogs(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
-                        return websiteService.findAllWebsiteCatalogs(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return websiteService.findAllWebsiteCatalogs(ID.EXTERNAL_ID(id), "catalogName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
                 });
     }
@@ -178,9 +179,9 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                 dataTableRequest -> {
                     PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return websiteService.getAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                        return websiteService.getAvailableCatalogsForWebsite(ID.EXTERNAL_ID(id), pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
                     } else {
-                        return websiteService.findAvailableCatalogsForWebsite(id, FindBy.EXTERNAL_ID, "catalogName", dataTableRequest.getSearch(), pageRequest, false);
+                        return websiteService.findAvailableCatalogsForWebsite(ID.EXTERNAL_ID(id), "catalogName", dataTableRequest.getSearch(), pageRequest, false);
                     }
                 },
                 paginatedResult -> {
@@ -201,7 +202,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     @RequestMapping(value = "/{id}/catalogs/{catalogId}", method = RequestMethod.POST)
     public Map<String, Object> addCatalog(@PathVariable(value = "id") String id, @PathVariable(value = "catalogId") String catalogId) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = websiteService.addCatalog(id, FindBy.EXTERNAL_ID, catalogId, FindBy.EXTERNAL_ID) != null;
+        boolean success = websiteService.addCatalog(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(catalogId)) != null;
         model.put("success", success);
         return model;
     }

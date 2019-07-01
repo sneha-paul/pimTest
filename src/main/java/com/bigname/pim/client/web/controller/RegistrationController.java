@@ -4,8 +4,9 @@ import com.bigname.pim.api.domain.VerificationToken;
 import com.bigname.pim.api.persistence.dao.VerificationTokenDAO;
 import com.bigname.pim.api.service.RegistrationService;
 import com.bigname.pim.client.model.Breadcrumbs;
-import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.service.UserService;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.slf4j.Logger;
@@ -100,7 +101,7 @@ public class RegistrationController extends BaseController<User, UserService> {
         user.setActive("Y");
         user.setGroup("DETAILS");
         user.setStatus("Active");
-        userService.update(user.getEmail(), FindBy.EXTERNAL_ID,user);
+        userService.update(ID.EXTERNAL_ID(user.getEmail()), user);
         redirectAttributes.addFlashAttribute("message" , "Your Account Verified Successfully");
         return new ModelAndView("redirect:/pim/dashboard");
     }

@@ -8,7 +8,7 @@ import com.bigname.pim.client.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
-import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -85,7 +85,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("id", id));
         if(isValid(assetCollection, model, assetCollection.getGroup().length == 1 && assetCollection.getGroup()[0].equals("DETAILS") ? AssetCollection.DetailsGroup.class : null)) {
-            assetCollectionService.update(id, FindBy.EXTERNAL_ID, assetCollection);
+            assetCollectionService.update(ID.EXTERNAL_ID(id), assetCollection);
             model.put("success", true);
         }
         return model;
@@ -98,7 +98,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         model.put("active", "ASSET_COLLECTIONS");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/assetCollection" + (reload ? "_body" : ""));
-        return id == null ? super.details(model) : assetCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : assetCollectionService.get(ID.EXTERNAL_ID(id),false)
                 .map(assetCollection -> {
                     model.put("assetCollection", assetCollection);
                     List<VirtualFile> assets = assetService.getFiles(assetCollection.getRootId());
@@ -117,7 +117,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                                      @RequestParam(name = "reload", required = false) boolean reload) {
         Map<String, Object> model = new HashMap<>();
 
-        Optional<AssetCollection> assetCollection = assetCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false);
+        Optional<AssetCollection> assetCollection = assetCollectionService.get(ID.EXTERNAL_ID(collectionId), false);
         model.put("active", "ASSET_COLLECTIONS");
         if(assetId == null) {
             model.put("mode", "CREATE");
@@ -129,7 +129,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
             if(assetCollection.isPresent()) {
                 model.put("mode", "DETAILS");
                 model.put("assetCollection", assetCollection.get());
-                VirtualFile asset = assetService.get(assetId, FindBy.INTERNAL_ID, false).orElse(null);
+                VirtualFile asset = assetService.get(ID.INTERNAL_ID(assetId), false).orElse(null);
                 model.put("asset", asset);
                 List<VirtualFile> assets = isNotEmpty(asset) && asset.getIsDirectory().equals("Y") ? assetService.getFiles(asset.getId()) : new ArrayList<>();
                 model.put("folders", assets.stream().filter(a -> "Y".equals(a.getIsDirectory())).collect(Collectors.toList()));
@@ -140,7 +140,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                 List<String> crumbs = new ArrayList<>();
                 crumbs.addAll(Arrays.asList("Asset Collections", "/pim/assetCollections"));
                 crumbs.addAll(Arrays.asList(assetCollection.get().getCollectionName(), "/pim/assetCollections/" + collectionId));
-                for (VirtualFile virtualFile : assetService.getAll(parentChain.toArray(new String[0]), FindBy.INTERNAL_ID, null, false)) {
+                for (VirtualFile virtualFile : assetService.getAll(parentChain.stream().map(e -> ID.INTERNAL_ID(e)).collect(Collectors.toList()), null, false)) {
                     crumbs.addAll(Arrays.asList(virtualFile.getFileName(), "/pim/assetCollections/" + collectionId + "/assets/" + virtualFile.getId()));
                 }
                 crumbs.set(crumbs.size() - 1, "");
@@ -171,7 +171,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
     public Map<String, Object> getAssetsData(@RequestParam(value="directoryId", defaultValue = "") String directoryId) {
         boolean success = false;
         Map<String, Object> model = new HashMap<>();
-        VirtualFile directory = isEmpty(directoryId) ? null : assetService.get(directoryId, FindBy.INTERNAL_ID).orElse(null);
+        VirtualFile directory = isEmpty(directoryId) ? null : assetService.get(ID.INTERNAL_ID(directoryId)).orElse(null);
         if(directory == null) {
             model.put("folders", assetCollectionService.getAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "collectionName"))).stream().map(AssetCollection::toMap1).collect(Collectors.toList()));
             model.put("files", new ArrayList<>());
@@ -188,7 +188,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
                 list.add(assetCollectionService.findOne(CollectionsUtil.toMap("rootId", directory.getParentIds().remove(0))).map(AssetCollection::toMap1)); // Root Directory, so add the associated asset collection
                 List<String> parentChain = directory.getParentIds();
                 parentChain.add(directory.getId());
-                list.addAll(assetService.getAll(parentChain.toArray(new String[0]), FindBy.INTERNAL_ID, null, false).stream().map(VirtualFile::toMap).collect(Collectors.toList()));
+                list.addAll(assetService.getAll(parentChain.stream().map(e -> ID.INTERNAL_ID(e)).collect(Collectors.toList()), null, false).stream().map(VirtualFile::toMap).collect(Collectors.toList()));
             } else {
                 list.add(assetCollectionService.findOne(CollectionsUtil.toMap("rootId", directory.getId())).map(AssetCollection::toMap1));
             }
@@ -205,12 +205,12 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("forceUniqueId", true));
         if(isValid(asset, model, assetService, VirtualFile.CreateGroup.class)) {
-            assetCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+            assetCollectionService.get(ID.EXTERNAL_ID(id), false)
                 .ifPresent(assetCollection -> {
                     if(asset.getParentDirectoryId().equals("ROOT")) {
                         asset.setParentDirectoryId(assetCollection.getRootId());
                     }
-                    VirtualFile parent = assetService.get(asset.getParentDirectoryId(), FindBy.INTERNAL_ID, false).orElse(null);
+                    VirtualFile parent = assetService.get(ID.INTERNAL_ID(asset.getParentDirectoryId()), false).orElse(null);
                     if(isNotEmpty(parent)) {
                         asset.setParentIds(parent.getParentIds()).add(parent.getId());
                     }
@@ -231,7 +231,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
         try {
             modelMap.addAttribute("file", file);
             String assetGroupId = parameterMap.containsKey("assetGroupId") ? (String) parameterMap.get("assetGroupId") : "";
-            VirtualFile directory = assetService.get(assetGroupId, FindBy.INTERNAL_ID).orElseThrow(() -> new EntityNotFoundException("Unable to find the uploading directory wit id:" + assetGroupId));
+            VirtualFile directory = assetService.get(ID.INTERNAL_ID(assetGroupId)).orElseThrow(() -> new EntityNotFoundException("Unable to find the uploading directory wit id:" + assetGroupId));
             VirtualFile asset = new VirtualFile(file, directory.getId(), directory.getRootDirectoryId());
             //TODO validation
             Files.write(Paths.get(filePath + asset.getInternalFileName()), file.getBytes());
@@ -250,12 +250,12 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getAllAsHierarchy(@PathVariable(value = "id") String id,
                                                        @PathVariable(value = "assetGroupId") String assetGroupId) {
-        return assetCollectionService.getAssetsHierarchy(id, FindBy.EXTERNAL_ID, assetGroupId, false);
+        return assetCollectionService.getAssetsHierarchy(ID.EXTERNAL_ID(id), assetGroupId, false);
     }
 
     @RequestMapping("/downloadAsset")
     public ResponseEntity<Resource> downloadImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request)  {
-        VirtualFile asset = assetService.get(fileId, FindBy.INTERNAL_ID,false).orElse(null);
+        VirtualFile asset = assetService.get(ID.INTERNAL_ID(fileId), false).orElse(null);
         return downloadAsset(asset.getInternalFileName(), request);
     }
 

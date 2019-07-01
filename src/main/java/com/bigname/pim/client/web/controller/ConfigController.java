@@ -5,6 +5,7 @@ import com.bigname.pim.api.service.ConfigService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("id", id));
         if (isValid(config, model, config.getGroup().length == 1 && config.getGroup()[0].equals("DETAILS") ? Config.DetailsGroup.class : null)) {
-            configService.update(id, FindBy.EXTERNAL_ID, config);
+            configService.update(ID.EXTERNAL_ID(id), config);
             model.put("success", true);
             if (!id.equals(config.getConfigId())) {
                 model.put("refreshUrl", "/pim/configs/" + config.getConfigId());
@@ -66,7 +67,7 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "config/config" + (reload ? "_body" : ""));
 
-        return id == null ? super.details(model) : configService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : configService.get(ID.EXTERNAL_ID(id), false)
                 .map(config -> {
                     model.put("config", config);
                     return super.details(id, model);

@@ -14,6 +14,7 @@ import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -59,7 +60,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/attributeCollection" + (reload ? "_body" : ""));
 
-        return id == null ? super.details(model) : attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : attributeCollectionService.get(ID.EXTERNAL_ID(id), false)
                 .map(attributeCollection -> {
                     model.put("attributeCollection", attributeCollection);
                     return super.details(id, model);
@@ -123,7 +124,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @RequestMapping(value= {"/{collectionId}/attributes/{attributeId}", "/{collectionId}/attributes/create"})
     public ModelAndView attributeDetails(@PathVariable(value = "collectionId") String collectionId,
                                          @PathVariable(value = "attributeId", required = false) String attributeId) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     Attribute attribute;
@@ -145,7 +146,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                     } else {
                         attribute = new Attribute();
                         mode = "CREATE";
-                        model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(collectionId, FindBy.EXTERNAL_ID, null));
+                        model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(ID.EXTERNAL_ID(collectionId), null));
 
                     }
                     model.put("attribute", attribute);
@@ -161,12 +162,12 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> createAttribute(@PathVariable(value = "collectionId") String id, Attribute attribute) {
         Map<String, Object> model = new HashMap<>();
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false);
+        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(id), false);
         // TODO - cross field validation to see if one of attributeGroup ID and attributeGroup name is not empty
         if(attributeCollection.isPresent() && isValid(attribute, model)) {
             attributeCollection.get().setGroup("ATTRIBUTES");
             attributeCollection.get().addAttribute(attribute);
-            attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection.get());
+            attributeCollectionService.update(ID.EXTERNAL_ID(id), attributeCollection.get());
             model.put("success", true);
         }
         return model;
@@ -178,7 +179,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     public Map<String, Object> updateAttribute(@PathVariable(value = "collectionId") String collectionId,
                                                @PathVariable(value = "attributeId") String attributeId,
                                                @RequestParam Map<String, Object> parameterMap) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     String attributeFullId = (String)parameterMap.get("fullId");
@@ -194,7 +195,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                                 if(isValid(attribute, model)) {
                                     attributeCollection.setGroup("ATTRIBUTES");
                                     attributeCollection.updateAttribute(attribute);
-                                    attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                                    attributeCollectionService.update(ID.EXTERNAL_ID(collectionId), attributeCollection);
                                     model.put("success", true);
                                 }
                                 return model;
@@ -218,7 +219,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Attribute> paginatedResult = attributeCollectionService.getAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Attribute> paginatedResult = attributeCollectionService.getAttributes(ID.EXTERNAL_ID(id), pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -242,7 +243,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                 sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(ID.EXTERNAL_ID(collectionId), attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
             paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -251,7 +252,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         } else {    // Handsontable
             Result<Map<String, String>> result = new Result<>();
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId, 0, 300, null);
+            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(ID.EXTERNAL_ID(collectionId), attributeId, 0, 300, null);
             paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -264,7 +265,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                                          @PathVariable(value = "attributeId") String attributeId,
                                          @PathVariable(value = "attributeOptionId", required = false) String attributeOptionId) {
 
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
             .map(attributeCollection -> {
                 Map<String, Object> model = new HashMap<>();
                 Attribute attribute = attributeCollection.getAllAttributes().stream()
@@ -301,13 +302,13 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> createAttributeOption(@PathVariable(value = "collectionId") String collectionId,
                                                     AttributeOption attributeOptionDTO) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     if(isValid(attributeOptionDTO, model)) {
                         attributeCollection.setGroup("ATTRIBUTES");
                         attributeCollection.addAttributeOption(attributeOptionDTO);
-                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                        attributeCollectionService.update(ID.EXTERNAL_ID(collectionId), attributeCollection);
                         model.put("success", true);
                     }
                     return model;
@@ -318,13 +319,13 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> updateAttributeOption(@PathVariable(value = "collectionId") String collectionId,
                                                     AttributeOption attributeOptionDTO) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     if(isValid(attributeOptionDTO, model)) {
                         attributeCollection.setGroup("ATTRIBUTES");
                         attributeCollection.updateAttributeOption(attributeOptionDTO);
-                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                        attributeCollectionService.update(ID.EXTERNAL_ID(collectionId), attributeCollection);
                         model.put("success", true);
                     }
                     return model;

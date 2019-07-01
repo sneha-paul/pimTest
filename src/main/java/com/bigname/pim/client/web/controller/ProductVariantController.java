@@ -16,6 +16,7 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.apache.commons.collections4.MapUtils;
 import org.javatuples.Pair;
@@ -93,7 +94,7 @@ public class ProductVariantController extends ControllerSupport {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Map<String, String>> paginatedResult = productService.getAvailableVariants(productId, FindBy.EXTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Map<String, String>> paginatedResult = productService.getAvailableVariants(ID.EXTERNAL_ID(productId), channelId, pagination.getPageNumber(), pagination.getPageSize(), sort);
         dataObjects.addAll(paginatedResult.getContent());
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -111,7 +112,7 @@ public class ProductVariantController extends ControllerSupport {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
         if(isNotEmpty(productId) && isNotEmpty(channelId) && isNotEmpty(variantIdentifier)) {
-            productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+            productService.get(ID.EXTERNAL_ID(productId), false).ifPresent(product -> {
                 Family productFamily = product.getProductFamily();
                 String variantGroupId = productFamily.getChannelVariantGroups().get(channelId);
                 VariantGroup variantGroup = productFamily.getVariantGroups().get(variantGroupId);
@@ -160,7 +161,7 @@ public class ProductVariantController extends ControllerSupport {
         productVariantDTO.setLevel(1); //TODO - make this dynamic
         setVariantAttributeValues(productVariantDTO, request);
         if(isValid(productVariantDTO, model, productVariantDTO.getGroup().length == 1 && productVariantDTO.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : null)) {
-            productVariantService.update(productVariantId, FindBy.EXTERNAL_ID, productVariantDTO);
+            productVariantService.update(ID.EXTERNAL_ID(productVariantId), productVariantDTO);
             model.put("success", true);
         }
         return model;
@@ -174,7 +175,7 @@ public class ProductVariantController extends ControllerSupport {
                                          @RequestParam(value="assetIds[]") String[] assetIds,
                                          @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -187,7 +188,7 @@ public class ProductVariantController extends ControllerSupport {
                                            @RequestParam(value="assetId") String assetId,
                                            @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.deleteAsset(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.deleteAsset(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetId, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -201,7 +202,7 @@ public class ProductVariantController extends ControllerSupport {
                                                  @RequestParam(value="assetId") String assetId,
                                                  @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.setAsDefaultAsset(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.setAsDefaultAsset(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetId, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -214,13 +215,13 @@ public class ProductVariantController extends ControllerSupport {
                                             @RequestParam(value="assetIds[]") String[] assetIds,
                                             @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productVariantService.reorderAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productVariantService.reorderAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
 
     private void setVariantAttributeValues(ProductVariant productVariantDTO, HttpServletRequest request) {
-        productService.get(productVariantDTO.getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+        productService.get(ID.EXTERNAL_ID(productVariantDTO.getProductId()), false).ifPresent(product -> {
             product.setChannelId(productVariantDTO.getChannelId());
             productVariantDTO.setProduct(product);
             Family productFamily = product.getProductFamily();
@@ -319,12 +320,12 @@ public class ProductVariantController extends ControllerSupport {
 
         if(isEmpty(dataTableRequest.getSearch())) {
             if(isNotEmpty(productId) && isNotEmpty(channelId)) {
-                productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+                productService.get(ID.EXTERNAL_ID(productId), false).ifPresent(product -> {
                     Sort sort = null;
                     if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
                         sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
                     }
-                    Page<ProductVariant> paginatedResult = productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+                    Page<ProductVariant> paginatedResult = productVariantService.getAll(ID.EXTERNAL_ID(product.getId()), channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
                     List<Map<String, String>> dataObjects = new ArrayList<>();
                     int seq[] = {1};
                     paginatedResult.getContent().forEach(e -> {
@@ -349,7 +350,7 @@ public class ProductVariantController extends ControllerSupport {
                     } else {
                         sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "productVariantName")); //TODO : verify this logic
                     }
-                    Page<ProductVariant> paginatedResult = productVariantService.findAll("productVariantName", dataTableRequest.getSearch(),product.getId(), FindBy.INTERNAL_ID, channelId, PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
+                    Page<ProductVariant> paginatedResult = productVariantService.findAll("productVariantName", dataTableRequest.getSearch(), ID.INTERNAL_ID(product.getId()), channelId, PageRequest.of(pagination.getPageNumber(), pagination.getPageSize(), sort), false);
                     List<Map<String, String>> dataObjects = new ArrayList<>();
                     int seq[] = {1};
                     paginatedResult.getContent().forEach(e -> {
@@ -371,7 +372,7 @@ public class ProductVariantController extends ControllerSupport {
     @ResponseBody
     public Map<String, Object> setProductVariantsSequence(@PathVariable(name = "productId") String productId, @PathVariable(name = "channelId") String channelId, @RequestParam Map<String, String> parameterMap) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = productVariantService.setProductVariantsSequence(productId, FindBy.EXTERNAL_ID, channelId, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
+        boolean success = productVariantService.setProductVariantsSequence(ID.EXTERNAL_ID(productId), ID.EXTERNAL_ID(channelId), ID.EXTERNAL_ID(parameterMap.get("sourceId")), ID.EXTERNAL_ID(parameterMap.get("destinationId")));
         model.put("success", success);
         return model;
     }
@@ -383,16 +384,16 @@ public class ProductVariantController extends ControllerSupport {
                                        @RequestParam(name = "channelId") String channelId) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
-        Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
+        Optional<Product> _product = productService.get(ID.EXTERNAL_ID(productId), false);
         if(_product.isPresent()) {
             Product product = _product.get();
-            Optional<ProductVariant> _productVariant = productVariantService.get(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, false);
+            Optional<ProductVariant> _productVariant = productVariantService.get(ID.INTERNAL_ID(product.getId()), channelId, ID.EXTERNAL_ID(variantId), false);
             if(_productVariant.isPresent()) {
                 ProductVariant productVariant = _productVariant.get();
                 productVariant.setProduct(product);
                 model.put("productVariant", productVariant);
                 model.put("availablePricingAttributes", pricingAttributeService.getAllWithExclusions(new ArrayList<>(productVariant.getPricingDetails().keySet()).toArray(new String[0]), FindBy.EXTERNAL_ID, null));
-                PricingAttribute pricingAttribute = isEmpty(pricingAttributeId) ? null : pricingAttributeService.get(pricingAttributeId, FindBy.EXTERNAL_ID, false).orElse(null);
+                PricingAttribute pricingAttribute = isEmpty(pricingAttributeId) ? null : pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeId), false).orElse(null);
                 model.put("pricingDetails", getAttributePricingDetails(productVariant.getPricingDetails(), pricingAttribute));
                 if(isNotEmpty(pricingAttributeId)) {
                     model.put("pricingAttribute", pricingAttribute);
@@ -416,20 +417,20 @@ public class ProductVariantController extends ControllerSupport {
         boolean success = false;
         pricingDetail.setPricing(pricingDetailMap.entrySet().stream().filter(e -> e.getKey().startsWith("q.") && isNotEmpty(e.getValue())).collect(CollectionsUtil.toTreeMap(e -> new Integer(e.getKey().replaceAll("q.", "")), e -> new BigDecimal((String)e.getValue()))));
         if(isValid(pricingDetail, model)) {
-            Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
+            Optional<Product> _product = productService.get(ID.EXTERNAL_ID(productId), false);
             if (_product.isPresent()) {
                 String channelId = pricingDetail.getChannelId();
                 Product product = _product.get();
-                Optional<Channel> _channel = channelService.get(channelId, FindBy.EXTERNAL_ID);
+                Optional<Channel> _channel = channelService.get(ID.EXTERNAL_ID(channelId));
                 if (_channel.isPresent()) {
-                    Optional<ProductVariant> _productVariant = productVariantService.get(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, false);
+                    Optional<ProductVariant> _productVariant = productVariantService.get(ID.INTERNAL_ID(product.getId()), channelId, ID.EXTERNAL_ID(variantId), false);
                     if (_productVariant.isPresent()) {
                         ProductVariant productVariant = _productVariant.get();
                         productVariant.setProduct(product);
                         productVariant.setGroup("PRICING_DETAILS");
                         model.put("refreshPage", !getQuantityBreaks(productVariant.getPricingDetails()).containsAll(pricingDetail.getPricing().keySet()));
                         productVariant.getPricingDetails().put(pricingDetail.getPricingAttributeId(), pricingDetail.getPricing());
-                        productVariantService.update(productVariant.getId(), FindBy.INTERNAL_ID, productVariant);
+                        productVariantService.update(ID.INTERNAL_ID(productVariant.getId()), productVariant);
                         success = true;
                     } else {
                         throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);
@@ -454,7 +455,7 @@ public class ProductVariantController extends ControllerSupport {
                                        HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
-        Optional<Product> _product = productService.get(productId, FindBy.findBy(true), false);
+        Optional<Product> _product = productService.get(ID.EXTERNAL_ID(productId), false);
         if(_product.isPresent()) {
             Product product = _product.get();
             if(variantId == null) {
@@ -465,7 +466,7 @@ public class ProductVariantController extends ControllerSupport {
                 model.put("productVariant", productVariant);
                 model.put("axisAttributes", ConversionUtil.toJSONString(family.getVariantGroups().get(variantGroupId).getVariantAxis().get(1).stream().collect(CollectionsUtil.toLinkedMap(id -> id, id -> product.getProductFamily().getAllAttributesMap().get(id).getName()))));
             } else {
-                Optional<ProductVariant> _productVariant = productVariantService.get(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, false);
+                Optional<ProductVariant> _productVariant = productVariantService.get(ID.INTERNAL_ID(product.getId()), channelId, ID.EXTERNAL_ID(variantId), false);
                 if(_productVariant.isPresent()) {
                     parameterMap.put("productId", productId);
                     ProductVariant productVariant = _productVariant.get();
@@ -494,8 +495,8 @@ public class ProductVariantController extends ControllerSupport {
                                             @PathVariable(value = "variantId") String variantId,
                                             @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product ->
-                model.put("success", productVariantService.toggle(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, Toggle.get(active))));
+        productService.get(ID.EXTERNAL_ID(productId), false).ifPresent(product ->
+                model.put("success", productVariantService.toggle(ID.INTERNAL_ID(product.getId()), channelId, ID.EXTERNAL_ID(variantId), Toggle.get(active))));
         return model;
     }
 
@@ -525,8 +526,8 @@ public class ProductVariantController extends ControllerSupport {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        productService.get(productId, FindBy.EXTERNAL_ID, false)
-                .ifPresent(product -> productVariantService.get(product.getId(), FindBy.INTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, false)
+        productService.get(ID.EXTERNAL_ID(productId), false)
+                .ifPresent(product -> productVariantService.get(ID.INTERNAL_ID(product.getId()), channelId, ID.EXTERNAL_ID(variantId), false)
                         .ifPresent(productVariant -> dataObjects.addAll(getPricingGridData(productVariant.getPricingDetails(), pricingAttributeService.getAll(null, false)))));
 
         result.setDataObjects(dataObjects);
@@ -586,7 +587,7 @@ public class ProductVariantController extends ControllerSupport {
     @RequestMapping("/downloadVariantAsset")
     public ResponseEntity<Resource> downloadVariantAssetsImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request){
 
-        VirtualFile asset = assetService.get(fileId, FindBy.INTERNAL_ID,false).orElse(null);
+        VirtualFile asset = assetService.get(ID.INTERNAL_ID(fileId), false).orElse(null);
         return downloadAsset(asset.getInternalFileName(), request);
 }
 

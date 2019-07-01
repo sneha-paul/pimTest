@@ -11,6 +11,7 @@ import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.context.annotation.Lazy;
@@ -58,18 +59,18 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{categoryId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
-        Category category1 = categoryService.get(categoryId, FindBy.EXTERNAL_ID, false).orElse(null);
-        categoryService.getAllRootCategoriesWithCategoryId(category1.getId())
+        Category category1 = categoryService.get(ID.EXTERNAL_ID(categoryId), false).orElse(null);
+        categoryService.getAllRootCategoriesWithCategoryId(ID.INTERNAL_ID(category1.getId()))
                 .forEach(rootCategory -> {
                     rootCategory.setActive(category.getActive());
                     categoryService.updateRootCategory(rootCategory);
                 });
-        categoryService.getAllRelatedCategoriesWithSubCategoryId(category1.getId())
+        categoryService.getAllRelatedCategoriesWithSubCategoryId(ID.INTERNAL_ID(category1.getId()))
                 .forEach(relatedCategory -> {
                     relatedCategory.setActive(category.getActive());
                     categoryService.updateRelatedCategory(relatedCategory);
                 });
-        categoryService.getAllProductCategoriesWithCategoryId(category1.getId())
+        categoryService.getAllProductCategoriesWithCategoryId(ID.EXTERNAL_ID(category1.getId()))
                 .forEach(productCategory -> {
                     productCategory.setActive(category.getActive());
                     categoryService.updateProductCategory(productCategory);
@@ -88,7 +89,7 @@ public class CategoryController extends BaseController<Category, CategoryService
         model.put("active", "CATEGORIES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "category/category"  + (reload ? "_body" : ""));
-        return id == null ? super.details(model) : categoryService.get(id, FindBy.findBy(true), false)
+        return id == null ? super.details(model) : categoryService.get(ID.EXTERNAL_ID(id), false)
                 .map(category -> {
                     if(parameterMap.containsKey("parentId")) {
                         model.put("parentId", parameterMap.get("parentId"));
@@ -127,9 +128,9 @@ public class CategoryController extends BaseController<Category, CategoryService
                 RelatedCategory.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return categoryService.getSubCategories(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
+                        return categoryService.getSubCategories(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
-                        return categoryService.findAllSubCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return categoryService.findAllSubCategories(ID.EXTERNAL_ID(id), "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
                 });
     }
@@ -138,7 +139,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> setSubCategoriesSequence(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = categoryService.setSubCategorySequence(id, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
+        boolean success = categoryService.setSubCategorySequence(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(parameterMap.get("sourceId")), ID.EXTERNAL_ID(parameterMap.get("destinationId")));
         model.put("success", success);
         return model;
     }
@@ -150,9 +151,9 @@ public class CategoryController extends BaseController<Category, CategoryService
                 CategoryProduct.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return categoryService.getCategoryProducts(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
+                        return categoryService.getCategoryProducts(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
-                        return categoryService.findAllCategoryProducts(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return categoryService.findAllCategoryProducts(ID.EXTERNAL_ID(id), "productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
                 });
     }
@@ -161,7 +162,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> setProductsSequence(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = categoryService.setProductSequence(id, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
+        boolean success = categoryService.setProductSequence(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(parameterMap.get("sourceId")), ID.EXTERNAL_ID(parameterMap.get("destinationId")));
         model.put("success", success);
         return model;
     }
@@ -179,9 +180,9 @@ public class CategoryController extends BaseController<Category, CategoryService
                 dataTableRequest -> {
                     PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return categoryService.getAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                        return categoryService.getAvailableSubCategoriesForCategory(ID.EXTERNAL_ID(id), pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
                     } else {
-                        return categoryService.findAvailableSubCategoriesForCategory(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), pageRequest, false);
+                        return categoryService.findAvailableSubCategoriesForCategory(ID.EXTERNAL_ID(id), "categoryName", dataTableRequest.getSearch(), pageRequest, false);
                     }
                 },
                 paginatedResult -> {
@@ -195,7 +196,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{id}/subCategories/{subCategoryId}", method = RequestMethod.POST)
     public Map<String, Object> addSubCategory(@PathVariable(value = "id") String id, @PathVariable(value = "subCategoryId") String subCategoryId) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = categoryService.addSubCategory(id, FindBy.EXTERNAL_ID, subCategoryId, FindBy.EXTERNAL_ID) != null;
+        boolean success = categoryService.addSubCategory(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(subCategoryId)) != null;
         model.put("success", success);
         return model;
     }
@@ -206,7 +207,7 @@ public class CategoryController extends BaseController<Category, CategoryService
                                       @PathVariable(value = "subCategoryId") String subCategoryId,
                                       @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", categoryService.toggleSubCategory(categoryId, FindBy.EXTERNAL_ID, subCategoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", categoryService.toggleSubCategory(ID.EXTERNAL_ID(categoryId), ID.EXTERNAL_ID(subCategoryId), Toggle.get(active)));
         return model;
     }
 
@@ -224,9 +225,9 @@ public class CategoryController extends BaseController<Category, CategoryService
                 dataTableRequest -> {
                     PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return categoryService.getAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                        return categoryService.getAvailableProductsForCategory(ID.EXTERNAL_ID(id), pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
                     } else {
-                        return categoryService.findAvailableProductsForCategory(id, FindBy.EXTERNAL_ID, "productName", dataTableRequest.getSearch(), pageRequest, false);
+                        return categoryService.findAvailableProductsForCategory(ID.EXTERNAL_ID(id), "productName", dataTableRequest.getSearch(), pageRequest, false);
                     }
                 },
                 paginatedResult -> {
@@ -240,7 +241,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{id}/products/{productId}", method = RequestMethod.POST)
     public Map<String, Object> addProduct(@PathVariable(value = "id") String id, @PathVariable(value = "productId") String productId) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = categoryService.addProduct(id, FindBy.EXTERNAL_ID, productId, FindBy.EXTERNAL_ID) != null;
+        boolean success = categoryService.addProduct(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(productId)) != null;
         model.put("success", success);
         return model;
     }
@@ -251,7 +252,7 @@ public class CategoryController extends BaseController<Category, CategoryService
                                                  @PathVariable(value = "productId") String productId,
                                                  @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", categoryService.toggleProduct(categoryId, FindBy.EXTERNAL_ID, productId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", categoryService.toggleProduct(ID.EXTERNAL_ID(categoryId), ID.EXTERNAL_ID(productId), Toggle.get(active)));
         return model;
     }
 
@@ -260,7 +261,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     public Map<String, Object> toggleCategory(@PathVariable(value = "categoryId") String categoryId,
                                               @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", categoryService.toggleCategory(categoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", categoryService.toggleCategory(ID.EXTERNAL_ID(categoryId), Toggle.get(active)));
         return model;
     }
 

@@ -6,6 +6,7 @@ import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +49,7 @@ public class AssetFamilyController extends BaseController<AssetFamily ,AssetFami
         Map<String, Object> model = new HashMap<>();
         model.put("context", CollectionsUtil.toMap("id", id));
         if (isValid(assetFamily, model, assetFamily.getGroup().length == 1 && assetFamily.getGroup()[0].equals("DETAILS") ? AssetFamily.DetailsGroup.class : null)) {
-            assetFamilyService.update(id, FindBy.EXTERNAL_ID, assetFamily);
+            assetFamilyService.update(ID.EXTERNAL_ID(id), assetFamily);
             model.put("success", true);
             if (!id.equals(assetFamily.getAssetFamilyName())) {
                 model.put("refreshUrl", "/pim/assetFamilies/" + assetFamily.getAssetFamilyId());
@@ -67,7 +68,7 @@ public class AssetFamilyController extends BaseController<AssetFamily ,AssetFami
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/assetFamily" + (reload ? "_body" : ""));
 
-        return id == null ? super.details(model) : assetFamilyService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : assetFamilyService.get(ID.EXTERNAL_ID(id), false)
                 .map(assetFamily -> {
                     model.put("assetFamily", assetFamily);
                     return super.details(id, model);

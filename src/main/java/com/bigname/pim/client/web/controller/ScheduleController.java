@@ -2,10 +2,10 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.persistence.dao.SimpleJob;
 import com.m7.xtreme.common.util.StatusUpdateUtil;
-import com.m7.xtreme.xcore.domain.CronDetails;
-import com.m7.xtreme.xcore.domain.JobInstance;
-import com.m7.xtreme.xcore.service.CronJobService;
-import com.m7.xtreme.xcore.service.JobInstanceService;
+import com.m7.xtreme.xplatform.domain.CronDetails;
+import com.m7.xtreme.xplatform.domain.JobInstance;
+import com.m7.xtreme.xplatform.service.CronJobService;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;

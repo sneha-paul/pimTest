@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 
-@SpringBootApplication(scanBasePackages = {"com.m7.xtreme.xcore", "com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor"})
+@SpringBootApplication(scanBasePackages = {"com.m7.xtreme.xcore", "com.m7.xtreme.xplatform", "com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor"})
 @EnableMongoRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.dao.mongo", "com.bigname.pim.api.persistence"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.mongo.dao.GenericDAO"})})
 @EnableJpaRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.dao.jpa"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.jpa.dao.GenericDAO"})})
 @EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass = true)

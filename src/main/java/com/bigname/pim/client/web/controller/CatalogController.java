@@ -10,6 +10,7 @@ import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.context.annotation.Lazy;
@@ -61,7 +62,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String catalogId, Catalog catalog) {
         //updating websiteCatalog
-        Catalog catalog1 = catalogService.get(catalogId, FindBy.EXTERNAL_ID, false).orElse(null);
+        Catalog catalog1 = catalogService.get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
         List<WebsiteCatalog> websiteCatalogs = catalogService.getAllWebsiteCatalogsWithCatalogId(catalog1.getId());
         websiteCatalogs.forEach(websiteCatalog -> {
             websiteCatalog.setActive(catalog.getActive());
@@ -81,7 +82,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
         model.put("active", "CATALOGS");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "catalog/catalog"  + (reload ? "_body" : ""));
-        return id == null ? super.details(model) : catalogService.get(id, FindBy.findBy(true), false)
+        return id == null ? super.details(model) : catalogService.get(ID.EXTERNAL_ID(id), false)
                 .map(catalog -> {
                     model.put("catalog", catalog);
                     return super.details(id, parameterMap, request, model);
@@ -112,9 +113,9 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
                 RootCategory.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return catalogService.getRootCategories(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
+                        return catalogService.getRootCategories(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
-                        return catalogService.findAllRootCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return catalogService.findAllRootCategories(ID.EXTERNAL_ID(id), "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
                 });
     }
@@ -132,9 +133,9 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
                 dataTableRequest -> {
                     PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return catalogService.getAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                        return catalogService.getAvailableRootCategoriesForCatalog(ID.EXTERNAL_ID(id), pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
                     } else {
-                        return catalogService.findAvailableRootCategoriesForCatalog(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), pageRequest, false);
+                        return catalogService.findAvailableRootCategoriesForCatalog(ID.EXTERNAL_ID(id), "categoryName", dataTableRequest.getSearch(), pageRequest, false);
                     }
                 },
                 paginatedResult -> {
@@ -148,7 +149,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @RequestMapping(value = "/{id}/rootCategories/{rootCategoryId}", method = RequestMethod.POST)
     public Map<String, Object> addRootCategory(@PathVariable(value = "id") String id, @PathVariable(value = "rootCategoryId") String rootCategoryId) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = catalogService.addRootCategory(id, FindBy.EXTERNAL_ID, rootCategoryId, FindBy.EXTERNAL_ID) != null;
+        boolean success = catalogService.addRootCategory(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(rootCategoryId)) != null;
         model.put("success", success);
         return model;
     }
@@ -157,7 +158,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @ResponseBody
     public Map<String, Object> setRootCategoriesSequence(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = catalogService.setRootCategorySequence(id, FindBy.EXTERNAL_ID, parameterMap.get("sourceId"), FindBy.EXTERNAL_ID, parameterMap.get("destinationId"), FindBy.EXTERNAL_ID);
+        boolean success = catalogService.setRootCategorySequence(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(parameterMap.get("sourceId")), ID.EXTERNAL_ID(parameterMap.get("destinationId")));
         model.put("success", success);
         return model;
     }
@@ -168,7 +169,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
                                              @PathVariable(value = "rootCategoryId") String rootCategoryId,
                                              @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", catalogService.toggleRootCategory(catalogId, FindBy.EXTERNAL_ID, rootCategoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", catalogService.toggleRootCategory(ID.EXTERNAL_ID(catalogId), ID.EXTERNAL_ID(rootCategoryId), Toggle.get(active)));
         return model;
     }
 
@@ -176,7 +177,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @ResponseBody
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getCategoriesHierarchy(@PathVariable(value = "id") String id) {
-        return catalogService.getCategoryHierarchy(id);
+        return catalogService.getCategoryHierarchy(ID.EXTERNAL_ID(id));
     }
 
     @RequestMapping(value = "/{catalogId}/catalogs/active/{active}", method = RequestMethod.PUT)
@@ -184,7 +185,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     public Map<String, Object> toggleCatalogs(@PathVariable(value = "catalogId") String catalogId,
                                                   @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", catalogService.toggleCatalog(catalogId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", catalogService.toggleCatalog(ID.EXTERNAL_ID(catalogId), Toggle.get(active)));
         return model;
     }
 }

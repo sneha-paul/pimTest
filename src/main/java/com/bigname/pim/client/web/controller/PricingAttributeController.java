@@ -5,6 +5,7 @@ import com.bigname.pim.api.service.PricingAttributeService;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -95,7 +96,7 @@ public class PricingAttributeController extends BaseController<PricingAttribute,
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/pricingAttribute"  + (reload ? "_body" : ""));
 
-        return id == null ? super.details(model) : pricingAttributeService.get(id, FindBy.EXTERNAL_ID, false)
+        return id == null ? super.details(model) : pricingAttributeService.get(ID.EXTERNAL_ID(id), false)
                 .map(pricingAttribute -> {
                     model.put("pricingAttribute", pricingAttribute);
                     return super.details(id, model);

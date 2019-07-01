@@ -11,6 +11,7 @@ import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.context.annotation.Lazy;
@@ -72,11 +73,11 @@ public class ProductController extends BaseController<Product, ProductService> {
     @RequestMapping(value = "/{productId}/channels/{channelId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "productId") String productId, Product product, HttpServletRequest request) {
-        productService.get(productId, FindBy.EXTERNAL_ID, false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
+        productService.get(ID.EXTERNAL_ID(productId), false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
         product.setAttributeValues(getAttributesMap(request));
 
-        Product productDetails = productService.get(productId, FindBy.EXTERNAL_ID, false).orElse(null);
-        productService.getAllCategoryProductsWithProductId(productDetails.getId())
+        Product productDetails = productService.get(ID.EXTERNAL_ID(productId), false).orElse(null);
+        productService.getAllCategoryProductsWithProductId(ID.INTERNAL_ID(productDetails.getId()))
                 .forEach(categoryProduct -> {
                     categoryProduct.setActive(product.getActive());
                     productService.updateCategoryProduct(categoryProduct);
@@ -92,7 +93,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                          @RequestParam(value="assetIds[]") String[] assetIds,
                                          @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.addAssets(id, FindBy.EXTERNAL_ID, channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.addAssets(ID.EXTERNAL_ID(id), channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -104,7 +105,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                            @RequestParam(value="assetId") String assetId,
                                            @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.deleteAsset(id, FindBy.EXTERNAL_ID, channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.deleteAsset(ID.EXTERNAL_ID(id), channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -117,7 +118,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                                  @RequestParam(value="assetId") String assetId,
                                                  @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.setAsDefaultAsset(id, FindBy.EXTERNAL_ID, channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.setAsDefaultAsset(ID.EXTERNAL_ID(id), channelId, assetId, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -129,7 +130,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                                             @RequestParam(value="assetIds[]") String[] assetIds,
                                             @RequestParam(value="assetFamily") String assetFamily) {
         Map<String, Object> model = new HashMap<>();
-        productService.reorderAssets(id, FindBy.EXTERNAL_ID, channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
+        productService.reorderAssets(ID.EXTERNAL_ID(id), channelId, assetIds, FileAsset.AssetFamily.getFamily(assetFamily));
         model.put("success", true);
         return model;
     }
@@ -147,7 +148,7 @@ public class ProductController extends BaseController<Product, ProductService> {
         model.put("view", "product/product" + (reload ? "_body" : ""));
         model.put("productFamilies", productFamilyService.getAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))));
         model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - replace with a separate service method
-        return id == null ? super.details(model) : productService.get(id, FindBy.findBy(true), false)
+        return id == null ? super.details(model) : productService.get(ID.EXTERNAL_ID(id), false)
                 .map(product -> {
                     product.setChannelId(channelId);
                     model.put("product", product);
@@ -200,9 +201,9 @@ public class ProductController extends BaseController<Product, ProductService> {
                 ProductCategory.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return productService.getCategories(id, FindBy.EXTERNAL_ID, dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
+                        return productService.getCategories(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
-                        return productService.findAllProductCategories(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return productService.findAllProductCategories(ID.EXTERNAL_ID(id), "categoryName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
                 });
 
@@ -222,9 +223,9 @@ public class ProductController extends BaseController<Product, ProductService> {
                 dataTableRequest -> {
                     PageRequest pageRequest = dataTableRequest.getPageRequest(defaultSort);
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        return productService.getAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
+                        return productService.getAvailableCategoriesForProduct(ID.EXTERNAL_ID(id), pageRequest.getPageNumber(), pageRequest.getPageSize(), pageRequest.getSort(), false);
                     } else {
-                        return productService.findAvailableCategoriesForProduct(id, FindBy.EXTERNAL_ID, "categoryName", dataTableRequest.getSearch(), pageRequest, false);
+                        return productService.findAvailableCategoriesForProduct(ID.EXTERNAL_ID(id), "categoryName", dataTableRequest.getSearch(), pageRequest, false);
                     }
                 },
                 paginatedResult -> {
@@ -238,7 +239,7 @@ public class ProductController extends BaseController<Product, ProductService> {
     @RequestMapping(value = "/{id}/categories/{categoryId}", method = RequestMethod.POST)
     public Map<String, Object> addCategory(@PathVariable(value = "id") String id, @PathVariable(value = "categoryId") String categoryId) {
         Map<String, Object> model = new HashMap<>();
-        boolean success = productService.addCategory(id, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID) != null;
+        boolean success = productService.addCategory(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(categoryId)) != null;
         model.put("success", success);
         return model;
     }
@@ -249,13 +250,13 @@ public class ProductController extends BaseController<Product, ProductService> {
                                                   @PathVariable(value = "categoryId") String categoryId,
                                                   @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", productService.toggleProductCategory(productId, FindBy.EXTERNAL_ID, categoryId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", productService.toggleProductCategory(ID.EXTERNAL_ID(productId), ID.EXTERNAL_ID(categoryId), Toggle.get(active)));
         return model;
     }
 
     @RequestMapping("/downloadDigitalAsset")
     public ResponseEntity<Resource> downloadDigitalAssetsImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request)  {
-        VirtualFile asset = assetService.get(fileId, FindBy.INTERNAL_ID,false).orElse(null);
+        VirtualFile asset = assetService.get(ID.INTERNAL_ID(fileId),false).orElse(null);
         return downloadAsset(asset.getInternalFileName(), request);
     }
 
@@ -264,7 +265,7 @@ public class ProductController extends BaseController<Product, ProductService> {
     public Map<String, Object> toggleCatalogs(@PathVariable(value = "productId") String productId,
                                               @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
-        model.put("success", productService.toggleProduct(productId, FindBy.EXTERNAL_ID, Toggle.get(active)));
+        model.put("success", productService.toggleProduct(ID.EXTERNAL_ID(productId), Toggle.get(active)));
         return model;
     }
 }
