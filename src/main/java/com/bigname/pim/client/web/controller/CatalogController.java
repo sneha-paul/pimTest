@@ -9,7 +9,6 @@ import com.bigname.pim.data.exportor.CatalogExporter;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;

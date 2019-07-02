@@ -5,7 +5,9 @@ import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,9 +38,13 @@ public class AttributeOptionTest {
     AttributeCollectionService attributeCollectionService;
     @Autowired
     AttributeCollectionDAO attributeCollectionDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)attributeCollectionDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
     @Test
     public void accessorsTest() {
@@ -76,7 +83,7 @@ public class AttributeOptionTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        Page<AttributeOption> result = attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attributeCollectionDTO.getAttributeFullId(attributeOption),0,1,null);
+        Page<AttributeOption> result = attributeCollectionService.getAttributeOptions(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), attributeCollectionDTO.getAttributeFullId(attributeOption),0,1,null);
 
         Assert.assertEquals(attributeOption.getActive(), "Y");
         Assert.assertEquals(attributeOption.getValue(), "TestOption");
@@ -234,6 +241,6 @@ public class AttributeOptionTest {
     }
     @After
     public void tearDown() throws Exception {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 }

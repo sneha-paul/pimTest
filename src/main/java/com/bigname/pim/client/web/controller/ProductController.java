@@ -10,7 +10,6 @@ import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;

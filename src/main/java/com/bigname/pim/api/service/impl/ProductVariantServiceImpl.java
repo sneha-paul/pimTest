@@ -13,7 +13,6 @@ import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;
@@ -22,12 +21,14 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.bigname.pim.util.PIMConstants.ReorderingDirection.DOWN;
 import static com.bigname.pim.util.PIMConstants.ReorderingDirection.UP;
-import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 /**
  * Created by sruthi on 20-09-2018.

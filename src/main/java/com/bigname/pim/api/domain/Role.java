@@ -1,6 +1,5 @@
 package com.bigname.pim.api.domain;
 
-import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

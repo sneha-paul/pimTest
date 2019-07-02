@@ -9,8 +9,10 @@ import com.bigname.pim.api.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.service.UserService;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,10 +35,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -84,9 +88,11 @@ public class CategoryControllerTest {
     @Autowired
     private CategoryProductDAO categoryProductDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
             user.setUserName("MANU@BLACWOOD.COm");
             user.setPassword("temppass");
@@ -94,10 +100,13 @@ public class CategoryControllerTest {
             user.setActive("Y");
             userService.create(user);
         }
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)categoryDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
     @Test
@@ -193,8 +202,8 @@ public class CategoryControllerTest {
                 .andExpect(model().attribute("category", hasProperty("externalId", is(categoryId))));
 
         //Adding subCategory
-        categoryService.addSubCategory(createdCategoryInstances.get(0).getCategoryId(), EXTERNAL_ID, createdCategoryInstances.get(1).getCategoryId(), EXTERNAL_ID);
-        Category category = categoryService.get(createdCategoryInstances.get(0).getCategoryId(), EXTERNAL_ID, false).orElse(null);
+        categoryService.addSubCategory(ID.EXTERNAL_ID(createdCategoryInstances.get(0).getCategoryId()), ID.EXTERNAL_ID(createdCategoryInstances.get(1).getCategoryId()));
+        Category category = categoryService.get(ID.EXTERNAL_ID(createdCategoryInstances.get(0).getCategoryId()), false).orElse(null);
 
         //Details mode with valid categoryID and parentID
         String categoryId1 = createdCategoryInstances.get(1).getCategoryId();
@@ -315,16 +324,16 @@ public class CategoryControllerTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
 
-        categoryService.addSubCategory(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(1).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(2).get("externalId").toString(), EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(2).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(3).get("externalId").toString(), EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(2).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(5).get("externalId").toString(), EXTERNAL_ID);
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(2).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(2).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(2).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(5).get("externalId").toString()));
 
         MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
         detailsParams.put("start", ConversionUtil.toList("0"));
@@ -389,7 +398,7 @@ public class CategoryControllerTest {
         });
 
         //Adding subCategory
-        categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), EXTERNAL_ID);
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
 
         //Getting subCategories
         MultiValueMap<String, String> detailsParams1 = new LinkedMultiValueMap<>();
@@ -433,11 +442,11 @@ public class CategoryControllerTest {
         });
 
         //adding subCategories
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId()};
 
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(e -> ID.EXTERNAL_ID(e)).collect(Collectors.toList()), null, false);
         int count[] = {1};
         categories.forEach(relatedCategoryData -> {
             //categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategoryData.getExternalId(), FindBy.EXTERNAL_ID);
@@ -466,7 +475,7 @@ public class CategoryControllerTest {
 
         result.andExpect(jsonPath("$.success").value(true));
 
-        Page<Map<String, Object>> subCategories = categoryService.getSubCategories(category.getCategoryId(), EXTERNAL_ID, PageRequest.of(0, categoriesData.size(), null), false);
+        Page<Map<String, Object>> subCategories = categoryService.getSubCategories(ID.EXTERNAL_ID(category.getCategoryId()), PageRequest.of(0, categoriesData.size(), null), false);
         List<Map<String, Object>> subCategoriesList = subCategories.getContent();
 
         long actualValue1 = 1;
@@ -489,7 +498,7 @@ public class CategoryControllerTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -502,7 +511,7 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -516,8 +525,8 @@ public class CategoryControllerTest {
             productDTO.setActive((String)productData.get("active"));
             productService.create(productDTO);
 
-            Product product = productService.get(productData.get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
-            categoryService.addProduct(category.getCategoryId(), EXTERNAL_ID, product.getProductId(), EXTERNAL_ID);
+            Product product = productService.get(ID.EXTERNAL_ID(productData.get("externalId").toString()), false).orElse(null);
+            categoryService.addProduct(ID.EXTERNAL_ID(category.getCategoryId()), ID.EXTERNAL_ID(product.getProductId()));
         });
 
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
@@ -552,7 +561,7 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
@@ -564,7 +573,7 @@ public class CategoryControllerTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -608,7 +617,7 @@ public class CategoryControllerTest {
 
         result.andExpect(jsonPath("$.success").value(true));
 
-        List<CategoryProduct> categoryProducts = categoryService.getAllCategoryProducts(category.getId());
+        List<CategoryProduct> categoryProducts = categoryService.getAllCategoryProducts(ID.EXTERNAL_ID(category.getId()));
         Assert.assertEquals(categoryProducts.get(0).getSequenceNum(), 1);
         Assert.assertEquals(categoryProducts.get(0).getSubSequenceNum(), 0);
 
@@ -655,7 +664,7 @@ public class CategoryControllerTest {
         });
 
         //Adding subCategory
-        categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), EXTERNAL_ID);
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
 
         //Getting availableSubCategories
         MultiValueMap<String, String> detailsParams1 = new LinkedMultiValueMap<>();
@@ -695,8 +704,8 @@ public class CategoryControllerTest {
 
         //Adding subCategoriues
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
-        Page<Category> availableSubCategories = categoryService.getAvailableSubCategoriesForCategory(category.getExternalId(), EXTERNAL_ID, 1, 1, null, false);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
+        Page<Category> availableSubCategories = categoryService.getAvailableSubCategoriesForCategory(ID.EXTERNAL_ID(category.getExternalId()), 1, 1, null, false);
 
         MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
         detailsParams.put("id", ConversionUtil.toList("TEST_1"));
@@ -711,7 +720,7 @@ public class CategoryControllerTest {
         result.andExpect(jsonPath("$.size()").value(1));
         result.andExpect(jsonPath("$.success").value(true));
 
-        Page<Category> availableSubCategories1 = categoryService.getAvailableSubCategoriesForCategory(category.getExternalId(), EXTERNAL_ID, 1, 1, null, false);
+        Page<Category> availableSubCategories1 = categoryService.getAvailableSubCategoriesForCategory(ID.EXTERNAL_ID(category.getExternalId()), 1, 1, null, false);
         Assert.assertEquals(availableSubCategories1.getTotalElements(), availableSubCategories.getTotalElements() - 1);
     }
 
@@ -736,7 +745,7 @@ public class CategoryControllerTest {
         });
 
         //Toggle
-        categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), EXTERNAL_ID);
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("id", ConversionUtil.toList("TEST_4"));
         params.put("subCategoryId", ConversionUtil.toList("TEST_5"));
@@ -749,7 +758,7 @@ public class CategoryControllerTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.size()").value(1));
 
-        Page<Map<String, Object>> relatedCategories = categoryService.getSubCategories(categoriesData.get(3).get("externalId").toString(), EXTERNAL_ID, PageRequest.of(0, categoriesData.size(), null), false);
+        Page<Map<String, Object>> relatedCategories = categoryService.getSubCategories(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), PageRequest.of(0, categoriesData.size(), null), false);
         List<Map<String, Object>> relatedCategoriesList = relatedCategories.getContent();
         Assert.assertEquals(relatedCategoriesList.get(0).get("active"), "N");
 
@@ -786,7 +795,7 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
@@ -798,7 +807,7 @@ public class CategoryControllerTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -813,8 +822,8 @@ public class CategoryControllerTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
-        categoryService.addProduct(category.getCategoryId(), EXTERNAL_ID, product.getProductId(), EXTERNAL_ID);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
+        categoryService.addProduct(ID.EXTERNAL_ID(category.getCategoryId()), ID.EXTERNAL_ID(product.getProductId()));
 
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
         detailParams.put("start", ConversionUtil.toList("0"));
@@ -848,7 +857,7 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test Family 1", "externalId", "TEST_FAMILY_1", "active", "Y"));
@@ -860,7 +869,7 @@ public class CategoryControllerTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -875,7 +884,7 @@ public class CategoryControllerTest {
             productService.create(productDTO);
         });
 
-        Page<Product> categoryProducts = categoryService.getAvailableProductsForCategory(category.getCategoryId(), EXTERNAL_ID, 0, 1, null, false);
+        Page<Product> categoryProducts = categoryService.getAvailableProductsForCategory(ID.EXTERNAL_ID(category.getCategoryId()), 0, 1, null, false);
 
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
         detailParams.put("id", ConversionUtil.toList("TEST_1"));
@@ -891,7 +900,7 @@ public class CategoryControllerTest {
         result1.andExpect(jsonPath("$.size()").value(1));
         result1.andExpect(jsonPath("$.success").value(true));
 
-        Page<Product> categoryProducts1 = categoryService.getAvailableProductsForCategory(category.getCategoryId(), EXTERNAL_ID, 0, 1, null, false);
+        Page<Product> categoryProducts1 = categoryService.getAvailableProductsForCategory(ID.EXTERNAL_ID(category.getCategoryId()), 0, 1, null, false);
         Assert.assertEquals(categoryProducts1.getTotalElements(), categoryProducts.getTotalElements() - 1);
     }
 
@@ -908,7 +917,7 @@ public class CategoryControllerTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -921,7 +930,7 @@ public class CategoryControllerTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -935,8 +944,8 @@ public class CategoryControllerTest {
             productDTO.setActive((String)productData.get("active"));
             productService.create(productDTO);
 
-            Product product = productService.get(productData.get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
-            categoryService.addProduct(category.getCategoryId(), EXTERNAL_ID, product.getProductId(), EXTERNAL_ID);
+            Product product = productService.get(ID.EXTERNAL_ID(productData.get("externalId").toString()), false).orElse(null);
+            categoryService.addProduct(ID.EXTERNAL_ID(category.getCategoryId()), ID.EXTERNAL_ID(product.getProductId()));
         });
 
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
@@ -953,7 +962,7 @@ public class CategoryControllerTest {
         result.andExpect(jsonPath("$.size()").value(1));
         result.andExpect(jsonPath("$.success").value(true));
 
-        Page<Map<String, Object>> categoryProduct = categoryService.getCategoryProducts(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, PageRequest.of(0, productsData.size(), null), false);
+        Page<Map<String, Object>> categoryProduct = categoryService.getCategoryProducts(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), PageRequest.of(0, productsData.size(), null), false);
         List<Map<String, Object>> categoryProductList = categoryProduct.getContent();
 
         Assert.assertEquals(categoryProductList.get(2).get("active"), "N");
@@ -961,10 +970,10 @@ public class CategoryControllerTest {
 
     @After
     public void tearDown() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Product.class);
 
     }
 

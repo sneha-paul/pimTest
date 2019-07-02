@@ -4,8 +4,6 @@ import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 
-import java.util.List;
-
 /**
  * Created by dona on 08-11-2018.
  */

@@ -9,7 +9,10 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -46,12 +50,16 @@ public class ProductCategoryTest {
     CategoryService categoryService;
     @Autowired
     CategoryDAO categoryDAO;
-
+    private MongoTemplate mongoTemplate;
+    
     @Before
     public void setUp() throws Exception {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Category.class);
     }
     @Test
     public void accessorsTest() {
@@ -68,7 +76,7 @@ public class ProductCategoryTest {
             familyService.create(familyDTO);
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
@@ -82,7 +90,7 @@ public class ProductCategoryTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //Create Product Category
         List<Map<String, Object>> categoriesData = new ArrayList<>();
@@ -94,9 +102,9 @@ public class ProductCategoryTest {
             categoryDTO.setActive((String)categoryData.get("active"));
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryService.create(categoryDTO);
-            Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
-          ProductCategory productCategory = productService.addCategory(product.getProductId(), FindBy.EXTERNAL_ID, categoryDTO.getCategoryId(), FindBy.EXTERNAL_ID);
+          ProductCategory productCategory = productService.addCategory(ID.EXTERNAL_ID(product.getProductId()), ID.EXTERNAL_ID(categoryDTO.getCategoryId()));
 
             Assert.assertEquals(productCategory.getProductId(), product.getId());
             Assert.assertEquals(productCategory.getCategoryId(), category.getId());
@@ -128,9 +136,9 @@ public class ProductCategoryTest {
     }
     @After
     public void tearDown() throws Exception {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Category.class);
     }
 
 }

@@ -7,7 +7,6 @@ import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;

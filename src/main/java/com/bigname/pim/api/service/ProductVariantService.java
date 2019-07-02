@@ -5,7 +5,6 @@ import com.bigname.pim.api.domain.ProductVariant;
 import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.service.BaseService;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.data.domain.Page;

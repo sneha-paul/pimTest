@@ -3,7 +3,10 @@ package com.bigname.pim.api.domain;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.CategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -27,9 +31,13 @@ public class RelatedCategoryTest {
     CategoryService categoryService;
     @Autowired
     CategoryDAO categoryDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)categoryDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Category.class);
     }
     @Test
     public void accessorsTest() {
@@ -43,7 +51,7 @@ public class RelatedCategoryTest {
         categoryDTO.setMetaDescription("test");
         categoryService.create(categoryDTO);
 
-        Category category = categoryService.get(categoryDTO.getCategoryId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
 
         //Create Parent Category Instance
         Category categoryDTO1 = new Category();
@@ -56,7 +64,7 @@ public class RelatedCategoryTest {
         categoryService.create(categoryDTO1);
 
         //Checking Parent id and Child id
-        RelatedCategory relatedCategory = categoryService.addSubCategory(categoryDTO1.getCategoryId(), FindBy.EXTERNAL_ID, category.getCategoryId(), FindBy.EXTERNAL_ID);
+        RelatedCategory relatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(categoryDTO1.getCategoryId()), ID.EXTERNAL_ID(category.getCategoryId()));
         Assert.assertEquals(relatedCategory.getCategoryId(), categoryDTO1.getId());
         Assert.assertEquals(relatedCategory.getSubCategoryId(), categoryDTO.getId());
     }
@@ -98,7 +106,7 @@ public class RelatedCategoryTest {
 
     @After
     public void tearDown() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
     }
 
 

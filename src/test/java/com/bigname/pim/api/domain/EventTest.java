@@ -2,9 +2,11 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.domain.Event;
-import com.m7.xtreme.xcore.persistence.mongo.dao.EventDAO;
-import com.m7.xtreme.xcore.service.EventService;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.Event;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.EventDAO;
+import com.m7.xtreme.xplatform.service.EventService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,11 +14,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**
@@ -31,9 +32,15 @@ public class EventTest {
     EventService eventService;
     @Autowired
     EventDAO eventDAO;
+
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        eventDAO.getMongoTemplate().dropCollection(Event.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)eventDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Event.class);
     }
     @Test
     public void accessorsTest() {
@@ -54,7 +61,7 @@ public class EventTest {
 
         //create
         eventService.create(eventDTO);
-        Event newEvent = eventService.get(eventDTO.getExternalId(), EXTERNAL_ID, false).orElse(null);
+        Event newEvent = eventService.get(ID.EXTERNAL_ID(eventDTO.getExternalId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newEvent));
         Assert.assertEquals(newEvent.getExternalId(), eventDTO.getExternalId());
         Assert.assertEquals(newEvent.getUser(), eventDTO.getUser());
@@ -71,7 +78,7 @@ public class EventTest {
     }
     @After
     public void tearDown() throws Exception {
-        eventDAO.getMongoTemplate().dropCollection(Event.class);
+        mongoTemplate.dropCollection(Event.class);
     }
 
 }

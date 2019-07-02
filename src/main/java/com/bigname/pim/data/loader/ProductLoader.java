@@ -6,7 +6,6 @@ import com.bigname.pim.util.ConvertUtil;
 import com.bigname.pim.util.POIUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

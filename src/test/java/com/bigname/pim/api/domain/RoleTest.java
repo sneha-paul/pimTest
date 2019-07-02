@@ -4,6 +4,8 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.RoleDAO;
 import com.bigname.pim.api.service.RoleService;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,9 +34,13 @@ public class RoleTest {
     RoleDAO roleDAO;
     @Autowired
     RoleService roleService;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        roleDAO.getMongoTemplate().dropCollection(Role.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)roleDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Role.class);
     }
     @Test
     public void accessorsTest() {
@@ -51,7 +58,7 @@ public class RoleTest {
         Assert.assertEquals(roleDTO.getExternalId(), "TEST");
 
         roleService.create(roleDTO);
-        Role newRole = roleService.get(roleDTO.getRoleId(), EXTERNAL_ID, false).orElse(null);
+        Role newRole = roleService.get(ID.EXTERNAL_ID(roleDTO.getRoleId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newRole));
         Assert.assertEquals(newRole.getRoleId(), roleDTO.getRoleId());
         Assert.assertEquals(newRole.getUserRole(), roleDTO.getUserRole());
@@ -67,7 +74,7 @@ public class RoleTest {
     }
     @After
     public void tearDown() throws Exception {
-        roleDAO.getMongoTemplate().dropCollection(Role.class);
+        mongoTemplate.dropCollection(Role.class);
     }
 
 }

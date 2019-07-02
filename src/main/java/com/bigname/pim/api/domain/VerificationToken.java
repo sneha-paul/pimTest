@@ -1,6 +1,5 @@
 package com.bigname.pim.api.domain;
 
-import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xplatform.domain.User;
 import org.springframework.data.annotation.Transient;

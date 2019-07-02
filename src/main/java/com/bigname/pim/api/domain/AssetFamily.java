@@ -4,10 +4,12 @@ import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import static com.bigname.pim.api.domain.Website.Property.*;
 import static com.m7.xtreme.common.util.RegExBuilder.*;
 

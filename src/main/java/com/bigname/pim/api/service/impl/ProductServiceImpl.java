@@ -15,7 +15,6 @@ import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.exception.GenericEntityException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;

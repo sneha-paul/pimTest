@@ -1,9 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.Config;
-
 import com.bigname.pim.api.persistence.dao.ConfigDAO;
-
 import com.bigname.pim.api.service.ConfigService;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import org.springframework.beans.factory.annotation.Autowired;

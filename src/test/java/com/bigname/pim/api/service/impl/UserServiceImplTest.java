@@ -2,9 +2,12 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.PimApplication;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.persistence.mongo.dao.UserDAO;
-import com.m7.xtreme.xcore.service.UserService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,8 +27,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**
@@ -50,9 +52,14 @@ public class UserServiceImplTest {
     @Autowired
     public PasswordEncoder passwordEncoder;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)userDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(User.class);
     }
 
     @Test
@@ -72,7 +79,7 @@ public class UserServiceImplTest {
             userDTO.setGroup("CREATE");
             userService.create(userDTO);
 
-            User newUser = userService.get(userDTO.getEmail(), EXTERNAL_ID, false).orElse(null);
+            User newUser = userService.get(ID.EXTERNAL_ID(userDTO.getEmail()), false).orElse(null);
             Assert.assertTrue(newUser != null);
             Assert.assertTrue(newUser.diff(userDTO).isEmpty());
 
@@ -88,7 +95,7 @@ public class UserServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        mongoTemplate.dropCollection(User.class);
     }
 
 }

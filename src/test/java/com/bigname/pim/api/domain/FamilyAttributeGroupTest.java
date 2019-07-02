@@ -7,6 +7,7 @@ import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,10 +36,14 @@ public class FamilyAttributeGroupTest {
     FamilyService familyService;
     @Autowired
     AttributeCollectionDAO attributeCollectionDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)familyDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
     @Test
     public void accessorsTest(){
@@ -276,8 +282,8 @@ public class FamilyAttributeGroupTest {
     }
     @After
     public void tearDown() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 
 }

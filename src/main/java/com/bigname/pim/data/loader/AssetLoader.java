@@ -5,7 +5,6 @@ import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.slf4j.Logger;

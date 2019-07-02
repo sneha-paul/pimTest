@@ -4,6 +4,8 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.ConfigDAO;
 import com.bigname.pim.api.service.ConfigService;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,10 +36,14 @@ public class ConfigTest {
     ConfigService configService;
     @Autowired
     ConfigDAO configDAO;
+    private MongoTemplate mongoTemplate;
 
     @Before
     public void setUp() throws Exception {
-        configDAO.getMongoTemplate().dropCollection(Config.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)configDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Config.class);
     }
     @Test
     public void accessorsTest(){
@@ -53,7 +60,7 @@ public class ConfigTest {
         Assert.assertEquals(configDTO.getActive(), "N");
 
         configService.create(configDTO);
-        Config newConfig = configService.get(configDTO.getConfigId(), EXTERNAL_ID, false).orElse(null);
+        Config newConfig = configService.get(ID.EXTERNAL_ID(configDTO.getConfigId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newConfig));
         Assert.assertEquals(newConfig.getConfigName(), configDTO.getConfigName());
         Assert.assertEquals(newConfig.getActive(), configDTO.getActive());
@@ -119,7 +126,7 @@ public class ConfigTest {
     }
     @After
     public void tearDown() throws Exception {
-        configDAO.getMongoTemplate().dropCollection(Config.class);
+        mongoTemplate.dropCollection(Config.class);
     }
 
 

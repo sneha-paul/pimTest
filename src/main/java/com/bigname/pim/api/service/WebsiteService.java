@@ -5,7 +5,6 @@ import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.m7.xtreme.xcore.service.BaseService;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

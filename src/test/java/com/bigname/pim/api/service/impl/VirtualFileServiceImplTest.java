@@ -7,6 +7,9 @@ import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -42,9 +46,14 @@ public class VirtualFileServiceImplTest {
     @Autowired
     private VirtualFileService assetService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)assetCollectionDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
     @Test
@@ -69,7 +78,7 @@ public class VirtualFileServiceImplTest {
             assetCollectionDTO.setRootId(assetService.create(VirtualFile.getRootInstance()).getId());
             assetCollectionDAO.insert(assetCollectionDTO);
 
-            AssetCollection newAssetCollection = assetCollectionService.get(assetCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
+            AssetCollection newAssetCollection = assetCollectionService.get(ID.EXTERNAL_ID(assetCollectionDTO.getCollectionId()), false).orElse(null);
             Assert.assertTrue(newAssetCollection != null);
             Assert.assertTrue(newAssetCollection.diff(assetCollectionDTO).isEmpty());
 
@@ -88,7 +97,7 @@ public class VirtualFileServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
 }

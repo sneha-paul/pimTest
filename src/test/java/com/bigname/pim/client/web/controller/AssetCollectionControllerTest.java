@@ -5,9 +5,11 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.service.UserService;
-import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -52,9 +55,11 @@ public class AssetCollectionControllerTest {
     @Autowired
     private AssetCollectionDAO assetCollectionDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
             user.setUserName("MANU@BLACWOOD.COm");
             user.setPassword("temppass");
@@ -62,12 +67,15 @@ public class AssetCollectionControllerTest {
             user.setActive("Y");
             userService.create(user);
         }
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)assetCollectionDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
     @After
     public void tearDown() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
     @Test

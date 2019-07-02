@@ -5,7 +5,6 @@ import com.bigname.pim.api.service.AssetFamilyService;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;

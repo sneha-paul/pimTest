@@ -5,7 +5,9 @@ import com.bigname.pim.api.domain.*;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -44,14 +47,17 @@ public class CategoryRepositoryTest {
     private ProductDAO productDAO;
     @Autowired
     private CategoryProductDAO categoryProductDAO;
-
+    private MongoTemplate mongoTemplate;
 
     @Before
     public void setUp() {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Product.class);
         categoryProductDAO.deleteAll();
     }
 
@@ -89,9 +95,9 @@ public class CategoryRepositoryTest {
 
             Optional<Category> category = categoryDAO.findByExternalId(categoryDTO.getCategoryId());
             Assert.assertTrue(category.isPresent());
-            category = categoryDAO.findById(categoryDTO.getCategoryId(), FindBy.EXTERNAL_ID);
+            category = categoryDAO.findById(ID.EXTERNAL_ID(categoryDTO.getCategoryId()));
             Assert.assertTrue(category.isPresent());
-            category = categoryDAO.findById(categoryDTO.getId(), FindBy.INTERNAL_ID);
+            category = categoryDAO.findById(ID.INTERNAL_ID(categoryDTO.getId()));
             Assert.assertTrue(category.isPresent());
         });
     }
@@ -165,7 +171,7 @@ public class CategoryRepositoryTest {
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(1, categoriesData.size() - 1), false).getContent().size(), 1);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size() - 1), false).getTotalPages(), 2);
 
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
 
         categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "description", "TEST_1description", "active", "N", "discontinued", "N"));
@@ -203,7 +209,7 @@ public class CategoryRepositoryTest {
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), false, true, true).getTotalElements(), inactiveCount[0] + discontinued[0]);
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoriesData.size()), true, true, true).getTotalElements(), activeCount[0] + inactiveCount[0] + discontinued[0]);
 
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
 
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
@@ -272,10 +278,10 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         categoriesData.stream().skip(1).forEach(categoryData -> {
-            Category category1 = categoryDAO.findById(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Category category1 = categoryDAO.findById(ID.EXTERNAL_ID(categoryData.get("externalId").toString())).orElse(null);
             RelatedCategory relatedCategory = new RelatedCategory();
             relatedCategory.setCategoryId(category.getId());
             relatedCategory.setSubCategoryId(category1.getId());
@@ -310,10 +316,10 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         categoriesData.stream().skip(1).forEach(categoryData -> {
-            Category category1 = categoryDAO.findById(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Category category1 = categoryDAO.findById(ID.EXTERNAL_ID(categoryData.get("externalId").toString())).orElse(null);
             RelatedCategory relatedCategory = new RelatedCategory();
             relatedCategory.setCategoryId(category.getId());
             relatedCategory.setSubCategoryId(category1.getId());
@@ -344,8 +350,8 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
-        Category category1 = categoryDAO.findById(categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
+        Category category1 = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(2).get("externalId").toString())).orElse(null);
 
         RelatedCategory relatedCategory = new RelatedCategory();
         relatedCategory.setCategoryId(category.getId());
@@ -380,10 +386,10 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         categoriesData.stream().skip(1).forEach(categoryData -> {
-            Category category1 = categoryDAO.findById(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Category category1 = categoryDAO.findById(ID.EXTERNAL_ID(categoryData.get("externalId").toString())).orElse(null);
             RelatedCategory relatedCategory = new RelatedCategory();
             relatedCategory.setCategoryId(category.getId());
             relatedCategory.setSubCategoryId(category1.getId());
@@ -415,7 +421,7 @@ public class CategoryRepositoryTest {
             familyDAO.insert(familyDTO);
         });
 
-        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -428,7 +434,7 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -442,7 +448,7 @@ public class CategoryRepositoryTest {
             productDTO.setActive((String)productData.get("active"));
             productDAO.insert(productDTO);
 
-            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Product product = productDAO.findById(ID.EXTERNAL_ID(productData.get("externalId").toString())).orElse(null);
 
             CategoryProduct categoryProduct = new CategoryProduct();
             categoryProduct.setCategoryId(category.getId());
@@ -474,7 +480,7 @@ public class CategoryRepositoryTest {
             familyDAO.insert(familyDTO);
         });
 
-        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -487,7 +493,7 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -501,7 +507,7 @@ public class CategoryRepositoryTest {
             productDTO.setActive((String)productData.get("active"));
             productDAO.insert(productDTO);
 
-            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Product product = productDAO.findById(ID.EXTERNAL_ID(productData.get("externalId").toString())).orElse(null);
 
             CategoryProduct categoryProduct = new CategoryProduct();
             categoryProduct.setCategoryId(category.getId());
@@ -535,7 +541,7 @@ public class CategoryRepositoryTest {
             familyDAO.insert(familyDTO);
         });
 
-        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -548,7 +554,7 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -562,7 +568,7 @@ public class CategoryRepositoryTest {
             productDTO.setActive((String)productData.get("active"));
             productDAO.insert(productDTO);
 
-            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Product product = productDAO.findById(ID.EXTERNAL_ID(productData.get("externalId").toString())).orElse(null);
 
             CategoryProduct categoryProduct = new CategoryProduct();
             categoryProduct.setCategoryId(category.getId());
@@ -589,7 +595,7 @@ public class CategoryRepositoryTest {
             familyDAO.insert(familyDTO);
         });
 
-        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -602,7 +608,7 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -617,7 +623,7 @@ public class CategoryRepositoryTest {
             productDAO.insert(productDTO);
         });
 
-        Product product = productDAO.findById(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Product product = productDAO.findById(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString())).orElse(null);
 
         CategoryProduct categoryProduct = new CategoryProduct();
         categoryProduct.setCategoryId(category.getId());
@@ -639,10 +645,10 @@ public class CategoryRepositoryTest {
 
     @After
     public void tearDown() {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Product.class);
         categoryProductDAO.deleteAll();
     }
 }

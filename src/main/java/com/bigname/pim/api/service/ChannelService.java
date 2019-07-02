@@ -4,8 +4,6 @@ import com.bigname.pim.api.domain.Channel;
 import com.bigname.pim.api.persistence.dao.ChannelDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 
-import java.util.List;
-
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0

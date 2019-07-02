@@ -6,6 +6,8 @@ import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,8 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**
@@ -39,9 +40,14 @@ public class CategoryTest {
     @Autowired
     CategoryDAO categoryDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)categoryDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Category.class);
     }
     @Test
     public void accessorsTest(){
@@ -67,7 +73,7 @@ public class CategoryTest {
 
         //Create
         categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+        Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
 
         Assert.assertEquals(newCategory.getCategoryId(), categoryDTO.getCategoryId());
@@ -113,11 +119,11 @@ public class CategoryTest {
             categoryDAO.insert(categoryDTO);
 
             //Clone Category
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(newCategory != null);
          //   Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
 
-            Category categoryClone = categoryService.cloneInstance(newCategory.getCategoryId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Category categoryClone = categoryService.cloneInstance(ID.EXTERNAL_ID(newCategory.getCategoryId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(categoryClone.getCategoryId() .equals(newCategory.getCategoryId() + "_COPY") && categoryClone.getCategoryName().equals(newCategory.getCategoryName() + "_COPY") && categoryClone.getDescription().equals(newCategory.getDescription() + "_COPY") && categoryClone.getActive() != newCategory.getActive());
         });
     }
@@ -246,7 +252,7 @@ public class CategoryTest {
     }
     @After
     public void tearDown() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
     }
 
 }

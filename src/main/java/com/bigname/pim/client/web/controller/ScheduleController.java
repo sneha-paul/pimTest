@@ -2,11 +2,10 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.persistence.dao.SimpleJob;
 import com.m7.xtreme.common.util.StatusUpdateUtil;
-import com.m7.xtreme.xplatform.domain.CronDetails;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.domain.JobInstance;
 import com.m7.xtreme.xplatform.service.CronJobService;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
-import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller

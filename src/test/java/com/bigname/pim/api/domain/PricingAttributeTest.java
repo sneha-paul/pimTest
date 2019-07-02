@@ -6,6 +6,8 @@ import com.bigname.pim.api.service.PricingAttributeService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,8 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**
@@ -34,12 +35,16 @@ import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 @ContextConfiguration(classes={PimApplication.class})
 public class PricingAttributeTest {
     @Autowired
-    PricingAttributeService pricingAttributeService;
+    private PricingAttributeService pricingAttributeService;
     @Autowired
-    PricingAttributeDAO pricingAttributeDAO;
+    private PricingAttributeDAO pricingAttributeDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)pricingAttributeDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(PricingAttribute.class);
     }
     @Test
     public void accessorsTest() {
@@ -56,7 +61,7 @@ public class PricingAttributeTest {
         Assert.assertEquals(pricingAttributeDTO.getActive(), "N");
 
         pricingAttributeService.create(pricingAttributeDTO);
-        PricingAttribute newPricingAttribute = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+        PricingAttribute newPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newPricingAttribute));
         Assert.assertEquals(newPricingAttribute.getPricingAttributeId(), pricingAttributeDTO.getPricingAttributeId());
         Assert.assertEquals(newPricingAttribute.getPricingAttributeName(), pricingAttributeDTO.getPricingAttributeName());
@@ -77,11 +82,11 @@ public class PricingAttributeTest {
             pricingAttributeDAO.insert(pricingAttributeDTO);
 
             //Clone PricingAttribute
-            PricingAttribute newPricingAttribute = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+            PricingAttribute newPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId()), false).orElse(null);
            Assert.assertTrue(newPricingAttribute != null);
              Assert.assertTrue(newPricingAttribute.diff(pricingAttributeDTO).isEmpty());
 
-            PricingAttribute pricingAttributeClone = pricingAttributeService.cloneInstance(newPricingAttribute.getPricingAttributeId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            PricingAttribute pricingAttributeClone = pricingAttributeService.cloneInstance(ID.EXTERNAL_ID(newPricingAttribute.getPricingAttributeId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(pricingAttributeClone.getPricingAttributeId() .equals(newPricingAttribute.getPricingAttributeId() + "_COPY") && pricingAttributeClone.getPricingAttributeName().equals(newPricingAttribute.getPricingAttributeName() + "_COPY") &&  pricingAttributeClone.getActive() != newPricingAttribute.getActive());
         });
     }
@@ -177,7 +182,7 @@ public class PricingAttributeTest {
     }
     @After
     public void tearDown() throws Exception {
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+        mongoTemplate.dropCollection(PricingAttribute.class);
     }
 
 }

@@ -4,6 +4,8 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.ChannelDAO;
 import com.bigname.pim.api.service.ChannelService;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,10 +37,14 @@ public class ChannelTest {
     ChannelService channelService;
     @Autowired
     ChannelDAO channelDAO;
+    private MongoTemplate mongoTemplate;
 
     @Before
     public void setUp() throws Exception {
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)channelDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Channel.class);
     }
     @Test
     public void accessorsTest(){
@@ -54,7 +61,7 @@ public class ChannelTest {
         Assert.assertEquals(channelDTO.getActive(), "N");
 
         channelService.create(channelDTO);
-        Channel newChannel = channelService.get(channelDTO.getChannelId(), EXTERNAL_ID, false).orElse(null);
+        Channel newChannel = channelService.get(ID.EXTERNAL_ID(channelDTO.getChannelId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newChannel));
         Assert.assertEquals(newChannel.getChannelId(), channelDTO.getChannelId());
         Assert.assertEquals(newChannel.getChannelName(), channelDTO.getChannelName());
@@ -129,7 +136,7 @@ public class ChannelTest {
     }
     @After
     public void tearDown() throws Exception {
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Channel.class);
     }
 
 }

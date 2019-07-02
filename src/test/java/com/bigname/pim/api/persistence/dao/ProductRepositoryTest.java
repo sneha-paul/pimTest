@@ -8,7 +8,9 @@ import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -50,15 +53,22 @@ public class ProductRepositoryTest {
     @Autowired
     private AttributeCollectionService attributeCollectionService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+        }
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Product.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Family.class);
+
+        mongoTemplate.dropCollection(AttributeCollection.class);
+
+        mongoTemplate.dropCollection(Channel.class);
     }
 
     @Test
@@ -74,7 +84,7 @@ public class ProductRepositoryTest {
             channelDAO.insert(channel);
         });
 
-        Channel channel = channelDAO.findById(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Channel channel = channelDAO.findById(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString())).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -111,7 +121,7 @@ public class ProductRepositoryTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -238,9 +248,9 @@ public class ProductRepositoryTest {
         productDAO.insert(productDTO);
         Optional<Product> product = productDAO.findByExternalId(productDTO.getProductId());
         Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDTO.getProductId(), FindBy.EXTERNAL_ID);
+        product = productDAO.findById(ID.EXTERNAL_ID(productDTO.getProductId()));
         Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDTO.getId(), FindBy.INTERNAL_ID);
+        product = productDAO.findById(ID.INTERNAL_ID(productDTO.getId()));
         Assert.assertTrue(product.isPresent());
     }
 
@@ -375,9 +385,9 @@ public class ProductRepositoryTest {
 
         Optional<Product> product1 = productDAO.findByExternalId(productDetails.getProductId());
         Assert.assertTrue(product1.isPresent());
-        product1 = productDAO.findById(productDetails.getProductId(), FindBy.EXTERNAL_ID);
+        product1 = productDAO.findById(ID.EXTERNAL_ID(productDetails.getProductId()));
         Assert.assertTrue(product1.isPresent());
-        product1 = productDAO.findById(productDetails.getId(), FindBy.INTERNAL_ID);
+        product1 = productDAO.findById(ID.INTERNAL_ID(productDetails.getId()));
         Assert.assertTrue(product1.isPresent());
 
     }
@@ -415,7 +425,7 @@ public class ProductRepositoryTest {
         Assert.assertEquals(productDAO.findAll(PageRequest.of(1, productDTOs.size() - 1), false).getContent().size(), 1);
         Assert.assertEquals(productDAO.findAll(PageRequest.of(0, productDTOs.size() - 1), false).getTotalPages(), 2);
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
         productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "productFamilyId", "7abf9064-aba5-4573-9557-e1d83547e771", "active", "N", "discontinued", "N"));
@@ -455,7 +465,7 @@ public class ProductRepositoryTest {
         Assert.assertEquals(productDAO.findAll(PageRequest.of(0, productDTOs.size()), false, true, true).getTotalElements(), inactiveCount[0] + discontinued[0]);
         Assert.assertEquals(productDAO.findAll(PageRequest.of(0, productDTOs.size()), true, true, true).getTotalElements(), activeCount[0] + inactiveCount[0] + discontinued[0]);
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
@@ -511,13 +521,13 @@ public class ProductRepositoryTest {
 
     @After
     public void tearDown() {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Channel.class);
     }
 
 }

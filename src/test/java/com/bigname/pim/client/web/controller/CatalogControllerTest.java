@@ -11,9 +11,11 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.service.UserService;
-import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -76,9 +79,11 @@ public class CatalogControllerTest {
     @Autowired
     private CategoryService categoryService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
             user.setUserName("MANU@BLACWOOD.COm");
             user.setPassword("temppass");
@@ -86,15 +91,18 @@ public class CatalogControllerTest {
             user.setActive("Y");
             userService.create(user);
         }
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)catalogDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Catalog.class);
+        mongoTemplate.dropCollection(Category.class);
         rootCategoryDAO.deleteAll();
     }
 
     @After
     public void tearDown() throws Exception {
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Catalog.class);
+        mongoTemplate.dropCollection(Category.class);
         rootCategoryDAO.deleteAll();
     }
 
@@ -294,7 +302,7 @@ public class CatalogControllerTest {
         });
 
         //Create Categories and add them as rootCategories
-        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
@@ -308,8 +316,8 @@ public class CatalogControllerTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryService.create(categoryDTO);
 
-            Category category = categoryService.get(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-            catalogService.addRootCategory(catalog.getExternalId(), FindBy.EXTERNAL_ID, category.getExternalId(), FindBy.EXTERNAL_ID);
+            Category category = categoryService.get(ID.EXTERNAL_ID(categoryData.get("externalId").toString()), false).orElse(null);
+            catalogService.addRootCategory(ID.EXTERNAL_ID(catalog.getExternalId()), ID.EXTERNAL_ID(category.getExternalId()));
         });
 
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
@@ -347,7 +355,7 @@ public class CatalogControllerTest {
         });
 
         //creating category
-        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
@@ -435,7 +443,7 @@ public class CatalogControllerTest {
         });
 
         //creating categories
-        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
@@ -452,8 +460,8 @@ public class CatalogControllerTest {
         });
 
         //Adding root category
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-        catalogService.addRootCategory(catalog.getExternalId(), FindBy.EXTERNAL_ID, category.getExternalId(), FindBy.EXTERNAL_ID);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
+        catalogService.addRootCategory(ID.EXTERNAL_ID(catalog.getExternalId()), ID.EXTERNAL_ID(category.getExternalId()));
 
         //Getting available root categories
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
@@ -504,9 +512,9 @@ public class CatalogControllerTest {
         });
 
         //Adding root categories
-        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()), false).orElse(null);
 
-        Page<Category> rootCategories = catalogService.getAvailableRootCategoriesForCatalog(catalog.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
+        Page<Category> rootCategories = catalogService.getAvailableRootCategoriesForCatalog(ID.EXTERNAL_ID(catalog.getExternalId()), 1, 1, null, false);
 
         MultiValueMap<String, String> detailParams = new LinkedMultiValueMap<>();
         detailParams.put("id", ConversionUtil.toList("TEST_CATALOG_MAIN"));
@@ -522,7 +530,7 @@ public class CatalogControllerTest {
         result1.andExpect(jsonPath("$.size()").value(1));
         result1.andExpect(jsonPath("$.success").value(true));
 
-        Page<Category> availableRootCategories = catalogService.getAvailableRootCategoriesForCatalog(catalog.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
+        Page<Category> availableRootCategories = catalogService.getAvailableRootCategoriesForCatalog(ID.EXTERNAL_ID(catalog.getExternalId()), 1, 1, null, false);
         Assert.assertEquals(availableRootCategories.getTotalElements(), rootCategories.getTotalElements()-1);
     }
 
@@ -542,7 +550,7 @@ public class CatalogControllerTest {
         });
 
         //creating categories
-        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y"));
@@ -556,8 +564,8 @@ public class CatalogControllerTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryService.create(categoryDTO);
 
-            Category category = categoryService.get(categoryData.get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
-            catalogService.addRootCategory(catalog.getExternalId(), FindBy.EXTERNAL_ID, category.getExternalId(), FindBy.EXTERNAL_ID);
+            Category category = categoryService.get(ID.EXTERNAL_ID(categoryData.get("externalId").toString()), false).orElse(null);
+            catalogService.addRootCategory(ID.EXTERNAL_ID(catalog.getExternalId()), ID.EXTERNAL_ID(category.getExternalId()));
         });
 
         //Toggle
@@ -597,7 +605,7 @@ public class CatalogControllerTest {
         });
 
         //creating categories
-        Catalog catalog = catalogService.get(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test Category 1", "externalId", "TEST_CATEGORY_1", "description", "Test description 1", "active", "Y", "parent", "0", "isParent", "true", "level", "0", "parentChain", ""));
@@ -617,15 +625,15 @@ public class CatalogControllerTest {
         });
 
         //Adding root categories
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()),  false).orElse(null);
 
-        catalogService.addRootCategory(catalog.getExternalId(), FindBy.EXTERNAL_ID, category.getExternalId(), FindBy.EXTERNAL_ID);
+        catalogService.addRootCategory(ID.EXTERNAL_ID(catalog.getExternalId()), ID.EXTERNAL_ID(category.getExternalId()));
 
-        categoryService.addSubCategory(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
-        categoryService.addSubCategory(categoriesData.get(2).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(5).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(2).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(2).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
+        categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(2).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(5).get("externalId").toString()));
 
         //Getting categories in hierarchy
         MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();

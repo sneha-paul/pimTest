@@ -7,7 +7,9 @@ import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -43,12 +46,14 @@ public class WebsiteRepositoryTest {
     private CatalogDAO catalogDAO;
     @Autowired
     private WebsiteCatalogDAO websiteCatalogDAO;
-
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() {
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)websiteDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
 
     @Test
@@ -90,9 +95,9 @@ public class WebsiteRepositoryTest {
 
             Optional<Website> website = websiteDAO.findByExternalId(websiteDTO.getWebsiteId());
             Assert.assertTrue(website.isPresent());
-            website = websiteDAO.findById(websiteDTO.getWebsiteId(), FindBy.EXTERNAL_ID);
+            website = websiteDAO.findById(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()));
             Assert.assertTrue(website.isPresent());
-            website = websiteDAO.findById(websiteDTO.getId(), FindBy.INTERNAL_ID);
+            website = websiteDAO.findById(ID.INTERNAL_ID(websiteDTO.getId()));
             Assert.assertTrue(website.isPresent());
         });
     }
@@ -158,7 +163,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(1, websitesData.size() - 1), false).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size() - 1), false).getTotalPages(), 2);
 
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        mongoTemplate.dropCollection(Website.class);
 
         websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "N"));
@@ -193,7 +198,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false, false, true).getTotalElements(), 0);
 
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        mongoTemplate.dropCollection(Website.class);
 
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
@@ -248,7 +253,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -264,7 +269,7 @@ public class WebsiteRepositoryTest {
             catalogDAO.insert(catalogDTO);
 
             //creating WebsiteCatalogs
-            Catalog catalog = catalogDAO.findById((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+            Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID((String) catalogData.get("externalId"))).orElse(null);
 
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
             websiteCatalog.setWebsiteId(website.getId());
@@ -301,7 +306,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -314,7 +319,7 @@ public class WebsiteRepositoryTest {
             catalogDTO.setActive((String)catalogData.get("active"));
             catalogDAO.insert(catalogDTO);
 
-            Catalog catalog = catalogDAO.findById((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+            Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID((String) catalogData.get("externalId"))).orElse(null);
 
             //creating WebsiteCatalogs
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
@@ -352,7 +357,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating Catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -368,7 +373,7 @@ public class WebsiteRepositoryTest {
             catalogDAO.insert(catalogDTO);
 
             //Creating websiteCatalogs
-            Catalog catalog = catalogDAO.findById((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+            Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID((String) catalogData.get("externalId"))).orElse(null);
 
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
             websiteCatalog.setWebsiteId(website.getId());
@@ -399,7 +404,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -426,7 +431,7 @@ public class WebsiteRepositoryTest {
 
 
         //Creating websiteCatalogs
-        Catalog catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString())).orElse(null);
         WebsiteCatalog websiteCatalog = new WebsiteCatalog();
         websiteCatalog.setWebsiteId(website.getId());
         websiteCatalog.setCatalogId(catalog.getId());
@@ -449,8 +454,8 @@ public class WebsiteRepositoryTest {
 
     @After
     public void tearDown() {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
 
 }

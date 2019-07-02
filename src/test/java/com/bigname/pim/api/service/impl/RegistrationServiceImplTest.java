@@ -2,9 +2,11 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.service.RegistrationService;
-import com.m7.xtreme.xcore.domain.User;
-import com.m7.xtreme.xcore.persistence.mongo.dao.UserDAO;
-import com.m7.xtreme.xcore.service.UserService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,9 +41,14 @@ public class RegistrationServiceImplTest {
     @Autowired
     private RegistrationService registrationService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)userDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(User.class);
     }
 
     @Test
@@ -76,7 +84,7 @@ public class RegistrationServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        mongoTemplate.dropCollection(User.class);
     }
 
 

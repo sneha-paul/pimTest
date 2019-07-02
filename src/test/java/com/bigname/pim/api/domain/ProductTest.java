@@ -7,7 +7,9 @@ import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,11 +44,14 @@ public class ProductTest {
     FamilyService familyService;
     @Autowired
     FamilyDAO familyDAO;
-
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
     }
     @Test
     public void accessorsTest() {
@@ -61,12 +67,12 @@ public class ProductTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         //Creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
@@ -79,7 +85,7 @@ public class ProductTest {
             productDTO.setActive((String)productData.get("active"));
             productService.create(productDTO);
         });
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //Testing equals unique id
         Assert.assertEquals(product.getProductId(), "TEST");
@@ -189,8 +195,8 @@ public class ProductTest {
     }
     @After
     public void tearDown() throws Exception {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
 }

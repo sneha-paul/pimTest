@@ -1,6 +1,8 @@
 package com.bigname.pim;
 
-import com.bigname.pim.config.*;
+import com.bigname.pim.config.PIMSecurityConfig;
+import com.bigname.pim.config.TilesConfig;
+import com.bigname.pim.config.WebConfig;
 import com.m7.xtreme.xcore.XcoreApplication;
 import com.m7.xtreme.xcore.config.CacheConfig;
 import com.m7.xtreme.xcore.config.ConfigProperties;
@@ -9,7 +11,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 

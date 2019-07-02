@@ -15,7 +15,6 @@ import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.BaseService;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.apache.commons.collections4.MapUtils;

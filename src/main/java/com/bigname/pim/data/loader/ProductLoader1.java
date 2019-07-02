@@ -8,7 +8,6 @@ import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.javatuples.Pair;

@@ -1,7 +1,6 @@
 package com.bigname.pim.api.domain;
 
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;

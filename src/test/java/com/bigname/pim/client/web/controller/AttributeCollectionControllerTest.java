@@ -9,10 +9,12 @@ import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.xcore.domain.User;
+import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.service.UserService;
-import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -65,9 +68,11 @@ public class AttributeCollectionControllerTest {
     @Autowired
     AttributeCollectionService attributeCollectionService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
             user.setUserName("MANU@BLACWOOD.COm");
             user.setPassword("temppass");
@@ -75,7 +80,10 @@ public class AttributeCollectionControllerTest {
             user.setActive("Y");
             userService.create(user);
         }
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)attributeCollectionDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 
     @Test
@@ -263,7 +271,7 @@ public class AttributeCollectionControllerTest {
                 .andExpect(model().attribute("mode", is("CREATE")));
 
         //Details mode
-        List<Attribute> attributeList = attributeCollectionService.getAttributes(collectionId, FindBy.EXTERNAL_ID, 0, 10, null).getContent();
+        List<Attribute> attributeList = attributeCollectionService.getAttributes(ID.EXTERNAL_ID(collectionId), 0, 10, null).getContent();
         String attributeId = attributeList.get(0).getId();
 
         mockMvc.perform(
@@ -340,7 +348,7 @@ public class AttributeCollectionControllerTest {
         });
 
         //updating attribute
-        List<Attribute> attributes = attributeCollectionService.getAttributes(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, 3, null).getContent();
+        List<Attribute> attributes = attributeCollectionService.getAttributes(ID.EXTERNAL_ID(collectionsData.get(0).get("externalId").toString()), 0, 3, null).getContent();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("name", ConversionUtil.toList("New Style"));
@@ -477,7 +485,7 @@ public class AttributeCollectionControllerTest {
         Assert.assertFalse(createdAttributeInstances.isEmpty());
 
         String collectionId = createdAttributeInstances.get(0).getCollectionId();
-        List<Attribute> attributeList = attributeCollectionService.getAttributes(collectionId, FindBy.EXTERNAL_ID, 0, 1, null).getContent();
+        List<Attribute> attributeList = attributeCollectionService.getAttributes(ID.EXTERNAL_ID(collectionId), 0, 1, null).getContent();
         String attributeId = attributeList.get(0).getId();
         String attributeId1 = attributeList.get(0).getFullId();
 
@@ -488,7 +496,7 @@ public class AttributeCollectionControllerTest {
                 .andExpect(forwardedUrl("/settings/attributeOption.jsp"))
                 .andExpect(model().attribute("mode", is("CREATE")));
 
-        List<AttributeOption> attributeOptionsList = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId1, 0, 1, null).getContent();
+        List<AttributeOption> attributeOptionsList = attributeCollectionService.getAttributeOptions(ID.EXTERNAL_ID(collectionId), attributeId1, 0, 1, null).getContent();
         String attributeOptionId = attributeOptionsList.get(0).getId();
 
         //Details mode
@@ -590,7 +598,7 @@ public class AttributeCollectionControllerTest {
 
     @After
     public void tearDown() throws Exception {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 
     private List<AttributeCollection> addAttributeCollectionInstances() {
@@ -635,7 +643,7 @@ public class AttributeCollectionControllerTest {
                 });
             });
             attributeCollectionService.update(ConversionUtil.toList(attributeCollectionDetails));
-            AttributeCollection attributeCollection = attributeCollectionService.get(collectionsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(collectionsData.get(0).get("externalId").toString()), false).orElse(null);
             createdAttributeCollectionInstances.add(attributeCollection);
         });
         return createdAttributeCollectionInstances;
