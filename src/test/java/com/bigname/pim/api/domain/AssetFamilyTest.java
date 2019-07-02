@@ -4,6 +4,8 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.AssetFamilyDAO;
 import com.bigname.pim.api.service.AssetFamilyService;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,10 +37,13 @@ public class AssetFamilyTest {
     AssetFamilyService assetFamilyService;
     @Autowired
     AssetFamilyDAO assetFamilyDAO;
-
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        assetFamilyDAO.getMongoTemplate().dropCollection(AssetFamily.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)assetFamilyDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(AssetFamily.class);
     }
     @Test
     public void accessorsTest(){
@@ -56,7 +62,7 @@ public class AssetFamilyTest {
         Assert.assertEquals(assetFamilyDTO.getActive(), "N");
 
         assetFamilyService.create(assetFamilyDTO);
-        AssetFamily newAssetFamily = assetFamilyService.get(assetFamilyDTO.getAssetFamilyId(), EXTERNAL_ID, false).orElse(null);
+        AssetFamily newAssetFamily = assetFamilyService.get(ID.EXTERNAL_ID(assetFamilyDTO.getAssetFamilyId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newAssetFamily));
         Assert.assertEquals(newAssetFamily.getAssetFamilyId(), assetFamilyDTO.getAssetFamilyId());
         Assert.assertEquals(newAssetFamily.getAssetFamilyName(), assetFamilyDTO.getAssetFamilyName());
@@ -117,6 +123,6 @@ public class AssetFamilyTest {
     }
     @After
     public void tearDown() throws Exception {
-        assetFamilyDAO.getMongoTemplate().dropCollection(AssetFamily.class);
+        mongoTemplate.dropCollection(AssetFamily.class);
     }
 }

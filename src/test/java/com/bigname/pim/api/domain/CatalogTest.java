@@ -6,6 +6,8 @@ import com.bigname.pim.api.service.CatalogService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,10 +41,13 @@ public class CatalogTest {
     CatalogService catalogService;
     @Autowired
     CatalogDAO catalogDAO;
-
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)catalogDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Catalog.class);
     }
     @Test
     public void accessorsTest(){
@@ -61,7 +67,7 @@ public class CatalogTest {
 
         //create
         catalogService.create(catalogDTO);
-        Catalog newCatalog = catalogService.get(catalogDTO.getCatalogId(), EXTERNAL_ID, false).orElse(null);
+        Catalog newCatalog = catalogService.get(ID.EXTERNAL_ID(catalogDTO.getCatalogId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newCatalog));
 
         Assert.assertEquals(newCatalog.getCatalogId(), catalogDTO.getCatalogId());
@@ -141,11 +147,11 @@ public class CatalogTest {
             catalogDAO.insert(catalogDTO);
 
             //Clone catalog
-            Catalog newCatalog = catalogService.get(catalogDTO.getCatalogId(), EXTERNAL_ID, false).orElse(null);
+            Catalog newCatalog = catalogService.get(ID.EXTERNAL_ID(catalogDTO.getCatalogId()), false).orElse(null);
             Assert.assertTrue(newCatalog != null);
             Assert.assertTrue(newCatalog.diff(catalogDTO).isEmpty());
 
-            Catalog catalogClone = catalogService.cloneInstance(newCatalog.getCatalogId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Catalog catalogClone = catalogService.cloneInstance(ID.EXTERNAL_ID(newCatalog.getCatalogId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(catalogClone.getCatalogId() .equals(newCatalog.getCatalogId() + "_COPY") && catalogClone.getCatalogName().equals(newCatalog.getCatalogName() + "_COPY") && catalogClone.getActive() != newCatalog.getActive());
         });
 
@@ -198,6 +204,6 @@ public class CatalogTest {
     }
     @After
     public void tearDown() throws Exception {
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
 }

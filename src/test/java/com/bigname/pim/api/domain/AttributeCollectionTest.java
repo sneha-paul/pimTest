@@ -4,6 +4,8 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,9 +36,13 @@ public class AttributeCollectionTest {
     AttributeCollectionService attributeCollectionService;
     @Autowired
     AttributeCollectionDAO attributeCollectionDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)attributeCollectionDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
     @Test
     public void accessorsTest() {
@@ -53,7 +60,7 @@ public class AttributeCollectionTest {
 
         //Create
         attributeCollectionService.create(attributeCollectionDTO);
-        AttributeCollection newAttributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
+        AttributeCollection newAttributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newAttributeCollection));
         Assert.assertEquals(newAttributeCollection.getCollectionId(), attributeCollectionDTO.getCollectionId());
         Assert.assertEquals(newAttributeCollection.getCollectionName(), attributeCollectionDTO.getCollectionName());
@@ -70,7 +77,7 @@ public class AttributeCollectionTest {
         newAttributeCollection.addAttribute(attributeDTO);
         attributeCollectionDAO.save(newAttributeCollection);
 
-        AttributeCollection newAttributeCollection2 = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
+        AttributeCollection newAttributeCollection2 = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newAttributeCollection2));
         Assert.assertEquals(newAttributeCollection2.getAllAttributes().get(0).getName(), attributeDTO.getName());
         Assert.assertEquals(newAttributeCollection2.getAllAttributes().get(0).getActive(), attributeDTO.getActive());
@@ -219,7 +226,7 @@ public class AttributeCollectionTest {
     }
     @After
     public void tearDown() throws Exception {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 
 
