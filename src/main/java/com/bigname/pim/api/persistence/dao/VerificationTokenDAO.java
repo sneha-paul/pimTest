@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 /**
  * Created by dona on 09-01-2019.
  */
-public interface VerificationTokenDAO extends GenericDAO<VerificationToken>, MongoRepository<VerificationToken, String> {
+public interface VerificationTokenDAO extends GenericDAO<VerificationToken>, VerificationTokenRepository {
 
     VerificationToken findByToken(String token);
 
