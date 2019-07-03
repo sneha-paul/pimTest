@@ -8,7 +8,9 @@ import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,10 +42,14 @@ public class VariantGroupTest {
     FamilyService familyService;
     @Autowired
     ChannelDAO channelDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)familyDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(Family.class);
+		mongoTemplate.dropCollection(AttributeCollection.class);
     }
     @Test
     public void accessorsTest() {
@@ -147,7 +154,7 @@ public class VariantGroupTest {
                 familyDAO.save(family);
 
                 //Getting Variant group using family service  and equals checking
-                Page<VariantGroup> result=familyService.getVariantGroups(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+                Page<VariantGroup> result=familyService.getVariantGroups(ID.EXTERNAL_ID(family.getFamilyId()), 0, 1, null);
 
                 Assert.assertEquals(variantGroup.getActive(), "Y");
 
@@ -292,7 +299,7 @@ public class VariantGroupTest {
     }
     @After
     public void tearDown() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+		mongoTemplate.dropCollection(Family.class);
+		mongoTemplate.dropCollection(AttributeCollection.class);
     }
 }

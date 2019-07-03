@@ -6,6 +6,8 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,9 +42,14 @@ public class WebsiteTest {
     @Autowired
     WebsiteDAO websiteDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)websiteDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(Website.class);
     }
     @Test
     public void accessorsTest(){
@@ -63,7 +71,7 @@ public class WebsiteTest {
 
         //create
         websiteService.create(websiteDTO);
-        Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+        Website newWebsite = websiteService.get(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
         Assert.assertEquals(newWebsite.getWebsiteId(), websiteDTO.getWebsiteId());
         Assert.assertEquals(newWebsite.getWebsiteName(), websiteDTO.getWebsiteName());
@@ -87,11 +95,11 @@ public class WebsiteTest {
             websiteDAO.insert(websiteDTO);
 
             //Clone website
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Website newWebsite = websiteService.get(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false).orElse(null);
             Assert.assertTrue(newWebsite != null);
             Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
 
-            Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Website websiteClone = websiteService.cloneInstance(ID.EXTERNAL_ID(newWebsite.getWebsiteId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
         });
     }
@@ -195,6 +203,6 @@ public class WebsiteTest {
     }
     @After
     public void tearDown() throws Exception {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+		mongoTemplate.dropCollection(Website.class);
     }
 }

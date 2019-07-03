@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.Website;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -170,10 +171,10 @@ public class PimUtilTest {
         Map<String, Website> map= new HashMap<>();
         map.put(website.getId(), website);
 
-        Assert.assertEquals(PimUtil.getIdedMap(Ids, FindBy.INTERNAL_ID), map);
+        Assert.assertEquals(PimUtil.getIdedMap(Ids, ID.Type.INTERNAL_ID), map);
         Map<String, Website> map1= new HashMap<>();
         map1.put(website.getExternalId(), website);
-        Assert.assertEquals(PimUtil.getIdedMap(Ids, FindBy.EXTERNAL_ID), map1);
+        Assert.assertEquals(PimUtil.getIdedMap(Ids, ID.Type.EXTERNAL_ID), map1);
 
     }
 

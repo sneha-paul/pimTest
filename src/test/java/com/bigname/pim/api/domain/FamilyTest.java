@@ -6,6 +6,8 @@ import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,9 +40,13 @@ public class FamilyTest {
     FamilyService familyService;
     @Autowired
     FamilyDAO familyDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)familyDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(Family.class);
     }
     @Test
     public void accessorsTest() {
@@ -55,7 +62,7 @@ public class FamilyTest {
         Assert.assertEquals(familyDTO.getActive(), "N");
 
         familyService.create(familyDTO);
-        Family newFamily = familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
+        Family newFamily = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newFamily));
         Assert.assertEquals(newFamily.getFamilyId(), familyDTO.getFamilyId());
         Assert.assertEquals(newFamily.getFamilyName(), familyDTO.getFamilyName());
@@ -158,11 +165,11 @@ public class FamilyTest {
             familyDAO.insert(familyDTO);
 
             //Clone Family
-            Family newFamily = familyService.get(familyDTO.getFamilyId(), EXTERNAL_ID, false).orElse(null);
+            Family newFamily = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(newFamily != null);
             Assert.assertTrue(newFamily.diff(familyDTO).isEmpty());
 
-            Family familyClone = familyService.cloneInstance(newFamily.getFamilyId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Family familyClone = familyService.cloneInstance(ID.EXTERNAL_ID(newFamily.getFamilyId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(familyClone.getFamilyId() .equals(newFamily.getFamilyId() + "_COPY") && familyClone.getFamilyName().equals(newFamily.getFamilyName() + "_COPY") && familyClone.getActive() != newFamily.getActive());
         });
     }
@@ -248,7 +255,7 @@ public class FamilyTest {
     }
     @After
     public void tearDown() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+		mongoTemplate.dropCollection(Family.class);
     }
 
 }

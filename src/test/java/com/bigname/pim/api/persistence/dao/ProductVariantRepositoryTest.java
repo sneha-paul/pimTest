@@ -9,7 +9,9 @@ import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -58,17 +61,21 @@ public class ProductVariantRepositoryTest {
     @Autowired
     private FamilyService familyService;
 
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() {
-        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(ProductVariant.class);
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+		mongoTemplate.dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+		mongoTemplate.dropCollection(Family.class);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+		mongoTemplate.dropCollection(AttributeCollection.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+		mongoTemplate.dropCollection(Channel.class);
     }
 
     @Test
@@ -84,7 +91,7 @@ public class ProductVariantRepositoryTest {
             channelDAO.insert(channel);
         });
 
-        Channel channel = channelDAO.findById(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Channel channel = channelDAO.findById(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString())).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -121,7 +128,7 @@ public class ProductVariantRepositoryTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -222,11 +229,11 @@ public class ProductVariantRepositoryTest {
         Assert.assertTrue(product.diff(productDTO).isEmpty());
 
         //create productVariantInstance
-        Product newProduct = productDAO.findById(product.getProductId(), FindBy.EXTERNAL_ID).orElse(null);
+        Product newProduct = productDAO.findById(ID.EXTERNAL_ID(product.getProductId())).orElse(null);
 
-        Page<FamilyAttributeOption> familyAttributeOptions = familyService.getFamilyAttributeOptions(familyDetails.getFamilyId(), FindBy.EXTERNAL_ID, attributeDetails.getId(), 0, 2, null);
+        Page<FamilyAttributeOption> familyAttributeOptions = familyService.getFamilyAttributeOptions(ID.EXTERNAL_ID(familyDetails.getFamilyId()), attributeDetails.getId(), 0, 2, null);
 
-        List<FamilyAttribute> variantAxisAttributes = familyService.getVariantAxisAttributes(familyDetails.getFamilyId(),attributeDetails.getId().toUpperCase(), FindBy.EXTERNAL_ID, null);
+        List<FamilyAttribute> variantAxisAttributes = familyService.getVariantAxisAttributes(ID.EXTERNAL_ID(familyDetails.getFamilyId()), attributeDetails.getId().toUpperCase(), null);
 
         variantAxisAttributes.get(0).getOptions().forEach((k, v) -> {
             ProductVariant productVariant = new ProductVariant(newProduct);
@@ -239,7 +246,7 @@ public class ProductVariantRepositoryTest {
             productVariant.setLevel(1);
             productVariant.setProductVariantName(newProduct.getProductName() + " - " + k);
 
-            Page<VariantGroup> variantGroups = familyService.getVariantGroups(familyDetails.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+            Page<VariantGroup> variantGroups = familyService.getVariantGroups(ID.EXTERNAL_ID(familyDetails.getFamilyId()), 0, 1, null);
 
             Map<Integer, List<String>> variantAttributesMap = variantGroups.getContent().get(0).getVariantAttributes();
             //String variantGroupId = newProduct.getProductFamily().getChannelVariantGroups().get(channel.getChannelId());
@@ -270,9 +277,9 @@ public class ProductVariantRepositoryTest {
         productVariantDAO.insert(productVariantDTO);
         Optional<ProductVariant> productVariant = productVariantDAO.findByExternalId(productVariantDTO.getProductVariantId());
         Assert.assertTrue(productVariant.isPresent());
-        productVariant = productVariantDAO.findById(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID);
+        productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()));
         Assert.assertTrue(productVariant.isPresent());
-        productVariant = productVariantDAO.findById(productVariantDTO.getId(), FindBy.INTERNAL_ID);
+        productVariant = productVariantDAO.findById(ID.INTERNAL_ID(productVariantDTO.getId()));
         Assert.assertTrue(productVariant.isPresent());
     }
 
@@ -311,14 +318,14 @@ public class ProductVariantRepositoryTest {
 
         Optional<ProductVariant> productVariant = productVariantDAO.findByExternalId(productVariantDetails.getProductVariantId());
         Assert.assertTrue(productVariant.isPresent());
-        productVariant = productVariantDAO.findById(productVariantDetails.getProductVariantId(), FindBy.EXTERNAL_ID);
+        productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDetails.getProductVariantId()));
         Assert.assertTrue(productVariant.isPresent());
-        productVariant = productVariantDAO.findById(productVariantDetails.getId(), FindBy.INTERNAL_ID);
+        productVariant = productVariantDAO.findById(ID.INTERNAL_ID(productVariantDetails.getId()));
         Assert.assertTrue(productVariant.isPresent());
 
-        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+		mongoTemplate.dropCollection(ProductVariant.class);
+		mongoTemplate.dropCollection(Product.class);
+		mongoTemplate.dropCollection(Family.class);
     }
 
     @Test
@@ -355,7 +362,7 @@ public class ProductVariantRepositoryTest {
         Assert.assertEquals(productVariantDAO.findAll(PageRequest.of(1, productVariantDTOs.size() - 1), false).getContent().size(), 1);
         Assert.assertEquals(productVariantDAO.findAll(PageRequest.of(0, productVariantDTOs.size() - 1), false).getTotalPages(), 2);
 
-        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
+		mongoTemplate.dropCollection(ProductVariant.class);
 
         productVariantsData = new ArrayList<>();
         productVariantsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "channelId", "ECOMMERCE", "productId", "11a8377c-6a97-49b8-b72a-5f98217e9b88", "active", "N", "discontinued", "N"));
@@ -396,7 +403,7 @@ public class ProductVariantRepositoryTest {
         Assert.assertEquals(productVariantDAO.findAll(PageRequest.of(0, productVariantDTOs.size()), false, true, true).getTotalElements(), inactiveCount[0] + discontinued[0]);
         Assert.assertEquals(productVariantDAO.findAll(PageRequest.of(0, productVariantDTOs.size()), true, true, true).getTotalElements(), activeCount[0] + inactiveCount[0] + discontinued[0]);
 
-        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
+		mongoTemplate.dropCollection(ProductVariant.class);
 
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
@@ -453,14 +460,14 @@ public class ProductVariantRepositoryTest {
 
     @After
     public void tearDown() {
-        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
+		mongoTemplate.dropCollection(ProductVariant.class);
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+		mongoTemplate.dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+		mongoTemplate.dropCollection(Family.class);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+		mongoTemplate.dropCollection(AttributeCollection.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+		mongoTemplate.dropCollection(Channel.class);
     }
 }

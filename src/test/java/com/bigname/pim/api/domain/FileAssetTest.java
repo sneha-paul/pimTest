@@ -4,6 +4,8 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.FamilyService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,9 +33,13 @@ public class FileAssetTest {
     AssetCollectionDAO assetCollectionDAO;
     @Autowired
     FamilyService familyService;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(FileAsset.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)assetCollectionDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(FileAsset.class);
     }
     @Test
     public void accessorsTest() {
@@ -58,6 +65,6 @@ public class FileAssetTest {
     }
     @After
     public void tearDown() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(FileAsset.class);
+		mongoTemplate.dropCollection(FileAsset.class);
     }
 }

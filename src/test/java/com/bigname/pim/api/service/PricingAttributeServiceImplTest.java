@@ -8,7 +8,10 @@ import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.junit.After;
 import org.junit.Assert;
@@ -20,15 +23,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
@@ -48,9 +49,13 @@ public class PricingAttributeServiceImplTest {
     @Autowired
     PricingAttributeDAO pricingAttributeDAO;
 
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)pricingAttributeDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(PricingAttribute.class);
     }
 
     @Test
@@ -69,7 +74,7 @@ public class PricingAttributeServiceImplTest {
 
             pricingAttributeService.create(pricingAttributeDTO);
 
-            PricingAttribute newPricingAttribute = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+            PricingAttribute newPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newPricingAttribute));
             Assert.assertTrue(newPricingAttribute.diff(pricingAttributeDTO).isEmpty());
         });
@@ -109,16 +114,16 @@ public class PricingAttributeServiceImplTest {
             pricingAttributeService.create(pricingAttributeDTO);
         });
 
-        PricingAttribute pricingAttributeDetails = pricingAttributeService.get(pricingAttributesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        PricingAttribute pricingAttributeDetails = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributesData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDetails));
         //toggle
-        pricingAttributeService.toggle(pricingAttributeDetails.getPricingAttributeId(), EXTERNAL_ID, Toggle.get(pricingAttributeDetails.getActive()));
-        PricingAttribute updatedPricingAttribute = pricingAttributeService.get(pricingAttributeDetails.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+        pricingAttributeService.toggle(ID.EXTERNAL_ID(pricingAttributeDetails.getPricingAttributeId()), Toggle.get(pricingAttributeDetails.getActive()));
+        PricingAttribute updatedPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDetails.getPricingAttributeId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedPricingAttribute));
         Assert.assertEquals(updatedPricingAttribute.getActive(), "N");
 
-        pricingAttributeService.toggle(updatedPricingAttribute.getPricingAttributeId(), EXTERNAL_ID, Toggle.get(updatedPricingAttribute.getActive()));
-        PricingAttribute updatedPricingAttribute1 = pricingAttributeService.get(updatedPricingAttribute.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+        pricingAttributeService.toggle(ID.EXTERNAL_ID(updatedPricingAttribute.getPricingAttributeId()), Toggle.get(updatedPricingAttribute.getActive()));
+        PricingAttribute updatedPricingAttribute1 = pricingAttributeService.get(ID.EXTERNAL_ID(updatedPricingAttribute.getPricingAttributeId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedPricingAttribute1));
         Assert.assertEquals(updatedPricingAttribute1.getActive(), "Y");
     }
@@ -140,7 +145,7 @@ public class PricingAttributeServiceImplTest {
             pricingAttributeDAO.insert(pricingAttributeDTO);
 
             //Getting pricingAttributes
-            PricingAttribute pricingAttributeDetails = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+            PricingAttribute pricingAttributeDetails = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDetails));
             Map<String, Object> diff = pricingAttributeDTO.diff(pricingAttributeDetails);
             Assert.assertEquals(diff.size(), 0);
@@ -189,7 +194,7 @@ public class PricingAttributeServiceImplTest {
         String[] expected = pricingAttributesData.stream().map(pricingAttributeData -> (String)pricingAttributeData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
         Assert.assertArrayEquals(expected, actual);
 
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+		mongoTemplate.dropCollection(PricingAttribute.class);
 
         // sorting : Descending
 
@@ -231,7 +236,7 @@ public class PricingAttributeServiceImplTest {
         String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
 
         //Getting pricingAttributes as page
-        Page<PricingAttribute> paginatedResult = pricingAttributeService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
+        Page<PricingAttribute> paginatedResult = pricingAttributeService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, 10, null, false);
         Map<String, PricingAttribute> pricingAttributesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
         Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
     }
@@ -255,7 +260,7 @@ public class PricingAttributeServiceImplTest {
         String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
 
         //Getting pricingAttributes as list
-        List<PricingAttribute> listedResult = pricingAttributeService.getAll(ids, EXTERNAL_ID, null, false);
+        List<PricingAttribute> listedResult = pricingAttributeService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, PricingAttribute> pricingAttributesMap = listedResult.stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
         Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
     }
@@ -279,7 +284,7 @@ public class PricingAttributeServiceImplTest {
         String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
 
         //Getting pricingAttributes with exclude Ids
-        Page<PricingAttribute> paginatedResult = pricingAttributeService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
+        Page<PricingAttribute> paginatedResult = pricingAttributeService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, 10, null, false);
         Map<String, PricingAttribute> pricingAttributesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
         Assert.assertTrue(pricingAttributesMap.size() == (pricingAttributesData.size() - ids.length) && !pricingAttributesMap.containsKey(ids[0]) && !pricingAttributesMap.containsKey(ids[1]) && !pricingAttributesMap.containsKey(ids[2]));
     }
@@ -303,7 +308,7 @@ public class PricingAttributeServiceImplTest {
         String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
 
         //Getting pricingAttributes with exclude Ids
-        List<PricingAttribute> listedResult = pricingAttributeService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<PricingAttribute> listedResult = pricingAttributeService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, PricingAttribute> pricingAttributesMap = listedResult.stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
         Assert.assertTrue(pricingAttributesMap.size() == (pricingAttributesData.size() - ids.length) && !pricingAttributesMap.containsKey(ids[0]) && !pricingAttributesMap.containsKey(ids[1]) && !pricingAttributesMap.containsKey(ids[2]));
     }
@@ -362,14 +367,14 @@ public class PricingAttributeServiceImplTest {
             pricingAttributeDAO.insert(pricingAttributeDTO);
         });
 
-        PricingAttribute pricingAttributeDetails = pricingAttributeService.get(pricingAttributesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        PricingAttribute pricingAttributeDetails = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributesData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(pricingAttributeDetails));
         pricingAttributeDetails.setPricingAttributeName("Test");
         pricingAttributeDetails.setGroup("DETAILS");
 
         //Updating pricingAttributes
-        pricingAttributeService.update(pricingAttributeDetails.getPricingAttributeId(), EXTERNAL_ID, pricingAttributeDetails);
-        PricingAttribute updatedPricingAttribute = pricingAttributeService.get(pricingAttributeDetails.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+        pricingAttributeService.update(ID.EXTERNAL_ID(pricingAttributeDetails.getPricingAttributeId()), pricingAttributeDetails);
+        PricingAttribute updatedPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDetails.getPricingAttributeId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedPricingAttribute));
         Assert.assertEquals(updatedPricingAttribute.getPricingAttributeName(), "Test");
     }
@@ -392,7 +397,7 @@ public class PricingAttributeServiceImplTest {
 
         String[] ids = {pricingAttributesData.get(0).get("externalId").toString(), pricingAttributesData.get(1).get("externalId").toString(), pricingAttributesData.get(2).get("externalId").toString()};
 
-        List<PricingAttribute> result = pricingAttributeService.getAll(ids, EXTERNAL_ID, null, false);
+        List<PricingAttribute> result = pricingAttributeService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, PricingAttribute> pricingAttributesMap = result.stream().collect(Collectors.toMap(pricingAttribute -> pricingAttribute.getPricingAttributeId(), pricingAttribute -> pricingAttribute));
         Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
 
@@ -422,11 +427,11 @@ public class PricingAttributeServiceImplTest {
             pricingAttributeDTO.setActive((String)pricingAttributeData.get("active"));
             pricingAttributeDAO.insert(pricingAttributeDTO);
 
-            PricingAttribute newPricingAttribute = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+            PricingAttribute newPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newPricingAttribute));
             Assert.assertTrue(newPricingAttribute.diff(pricingAttributeDTO).isEmpty());
             // cloning pricingAttribute
-            PricingAttribute pricingAttributeClone = pricingAttributeService.cloneInstance(newPricingAttribute.getPricingAttributeId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            PricingAttribute pricingAttributeClone = pricingAttributeService.cloneInstance(ID.EXTERNAL_ID(newPricingAttribute.getPricingAttributeId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(pricingAttributeClone.getPricingAttributeId() .equals(newPricingAttribute.getPricingAttributeId() + "_COPY") && pricingAttributeClone.getPricingAttributeName().equals(newPricingAttribute.getPricingAttributeName() + "_COPY") && pricingAttributeClone.getActive() != newPricingAttribute.getActive());
         });
     }
@@ -469,7 +474,7 @@ public class PricingAttributeServiceImplTest {
         });
 
         //Getting pricingAttributes
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<PricingAttribute> result = pricingAttributeService.findAll(criteria);
         Assert.assertTrue(result.size() == 1);
     }
@@ -511,7 +516,7 @@ public class PricingAttributeServiceImplTest {
             pricingAttributeDAO.insert(pricingAttributeDTO);
         });
         //Getting pricingAttribute
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name")));
+        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name")));
         PricingAttribute result = pricingAttributeService.findOne(criteria).orElse(null);
         Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.getPricingAttributeName());
     }
@@ -550,7 +555,7 @@ public class PricingAttributeServiceImplTest {
         context.clear();
 
         /*Testing uniqueConstraint violation of pricingAttributeId with update operation*/
-        PricingAttribute pricingAttribute = pricingAttributeDAO.findById(pricingAttributeDTO.getPricingAttributeId(), FindBy.EXTERNAL_ID).orElse(null);
+        PricingAttribute pricingAttribute = pricingAttributeDAO.findById(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId())).orElse(null);
         pricingAttribute.setPricingAttributeId("TEST_1");
         pricingAttribute.setGroup("DETAILS");
         pricingAttribute.setActive("Y");
@@ -568,7 +573,7 @@ public class PricingAttributeServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+		mongoTemplate.dropCollection(PricingAttribute.class);
 
     }
 

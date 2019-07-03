@@ -4,7 +4,10 @@ import com.bigname.pim.api.persistence.dao.CatalogDAO;
 import com.bigname.pim.api.persistence.dao.WebsiteDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,10 +37,14 @@ public class WebsiteCatalogTest {
     CatalogDAO catalogDAO;
     @Autowired
     WebsiteDAO websiteDAO;
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)websiteDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(Website.class);
+		mongoTemplate.dropCollection(Catalog.class);
     }
     @Test
     public void accessorsTest() {
@@ -47,7 +55,7 @@ public class WebsiteCatalogTest {
         catalogDTO.setDescription("test");
         catalogService.create(catalogDTO);
 
-        Catalog catalog = catalogService.get(catalogDTO.getCatalogId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogDTO.getCatalogId()), false).orElse(null);
 
         //Create Website
         Website websiteDTO = new Website();
@@ -58,7 +66,7 @@ public class WebsiteCatalogTest {
         websiteService.create(websiteDTO);
 
         //Equals Checking Catalog And Website
-        WebsiteCatalog websiteCatalog = websiteService.addCatalog(websiteDTO.getWebsiteId(), FindBy.EXTERNAL_ID, catalog.getCatalogId(), FindBy.EXTERNAL_ID);
+        WebsiteCatalog websiteCatalog = websiteService.addCatalog(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), ID.EXTERNAL_ID(catalog.getCatalogId()));
         Assert.assertEquals(websiteCatalog.getCatalogId(), catalog.getId());
         Assert.assertEquals(websiteCatalog.getWebsiteId(), websiteDTO.getId());
     }
@@ -76,7 +84,7 @@ public class WebsiteCatalogTest {
     }
     @After
     public void tearDown() throws Exception {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+		mongoTemplate.dropCollection(Website.class);
+		mongoTemplate.dropCollection(Catalog.class);
     }
 }

@@ -5,6 +5,7 @@ import com.bigname.pim.api.domain.*;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,10 +34,14 @@ public class FamilyRepositoryTest {
     @Autowired
     AttributeCollectionDAO attributeCollectionDAO;
 
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)familyDAO).getMongoTemplate();
+        }
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 
     @Test
@@ -54,7 +60,7 @@ public class FamilyRepositoryTest {
             Assert.assertTrue(family.diff(familyDTO).isEmpty());
         });
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
     @Test
@@ -76,7 +82,7 @@ public class FamilyRepositoryTest {
             Assert.assertTrue(family != null);
         });
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
     @Test
@@ -231,7 +237,7 @@ public class FamilyRepositoryTest {
 
     @After
     public void tearDown() {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 }

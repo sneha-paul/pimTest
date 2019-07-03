@@ -11,7 +11,10 @@ import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.FindBy;
+import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.junit.After;
 import org.junit.Assert;
@@ -23,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -67,13 +71,17 @@ public class CategoryServiceImplTest {
     @Autowired
     private CategoryProductDAO categoryProductDAO;
 
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+        }
+		mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
         categoryProductDAO.deleteAll();
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+		mongoTemplate.dropCollection(Family.class);
+		mongoTemplate.dropCollection(Product.class);
     }
 
     @Test
@@ -95,28 +103,28 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
             //Getting category
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         //Adding subCategory
-        RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory1));
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId(), categoriesData.get(3).get("externalId").toString(), categoriesData.get(4).get("externalId").toString()};
 
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
 
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
         //Getting subCategories
-        Page<Map<String, Object>> paginatedResult = categoryService.findAllSubCategories(category.getExternalId(), FindBy.EXTERNAL_ID, "description", "Test", PageRequest.of(0, newRelatedCategories.size(), null), false);
+        Page<Map<String, Object>> paginatedResult = categoryService.findAllSubCategories(ID.EXTERNAL_ID(category.getExternalId()), "description", "Test", PageRequest.of(0, newRelatedCategories.size(), null), false);
         Assert.assertEquals(paginatedResult.getSize(), newRelatedCategories.size());
     }
 
@@ -139,28 +147,28 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         //Adding subCategory
-        RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory1));
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId(), categoriesData.get(3).get("externalId").toString(), categoriesData.get(4).get("externalId").toString()};
 
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
 
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
         //Getting available subCategories
-        Page<Category> paginatedResult = categoryService.findAvailableSubCategoriesForCategory(category.getExternalId(), FindBy.EXTERNAL_ID, "description", "Test", PageRequest.of(0, 2, Sort.Direction.ASC, category.getCategoryName()), false);
+        Page<Category> paginatedResult = categoryService.findAvailableSubCategoriesForCategory(ID.EXTERNAL_ID(category.getExternalId()), "description", "Test", PageRequest.of(0, 2, Sort.Direction.ASC, category.getCategoryName()), false);
         Assert.assertEquals(paginatedResult.getSize(), (categoriesData.size()-1) - newRelatedCategories.size());
     }
 
@@ -183,18 +191,18 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId()};
         //Getting categories by ids
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
 
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
@@ -227,28 +235,28 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
         //Adding subCategory
-        RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(categoriesData.get(3).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        RelatedCategory newRelatedCategory1 = categoryService.addSubCategory(ID.EXTERNAL_ID(categoriesData.get(3).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory1));
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId(), categoriesData.get(3).get("externalId").toString(), categoriesData.get(4).get("externalId").toString()};
 
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
 
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
         //Getting availableSubCategoriesForCategory
-        Page<Category> paginatedResult = categoryService.getAvailableSubCategoriesForCategory(category.getExternalId(), FindBy.EXTERNAL_ID, 0, 2, null, false);
+        Page<Category> paginatedResult = categoryService.getAvailableSubCategoriesForCategory(ID.EXTERNAL_ID(category.getExternalId()), 0, 2, null, false);
         Assert.assertEquals(paginatedResult.getSize(), (categoriesData.size()-1) - newRelatedCategories.size());
     }
 
@@ -269,24 +277,24 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId()};
 
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         //Adding subCategory
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
         //Getting subCategories
-        Page<Map<String, Object>> subCategories = categoryService.getSubCategories(category.getExternalId(), EXTERNAL_ID, PageRequest.of(0, newRelatedCategories.size(), null), false);
+        Page<Map<String, Object>> subCategories = categoryService.getSubCategories(ID.EXTERNAL_ID(category.getExternalId()), PageRequest.of(0, newRelatedCategories.size(), null), false);
         Assert.assertEquals(subCategories.getSize(), newRelatedCategories.size());
     }
 
@@ -309,24 +317,24 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId()};
         // Getting Categories with exclude ids
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
 
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
         //setting subCategorySequence
-        boolean success = categoryService.setSubCategorySequence(category.getExternalId(), FindBy.EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID, categoriesData.get(4).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        boolean success = categoryService.setSubCategorySequence(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()), ID.EXTERNAL_ID(categoriesData.get(4).get("externalId").toString()));
         Assert.assertTrue(success);
     }
 
@@ -347,18 +355,18 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId()};
 
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         //Adding subCategory
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
@@ -382,31 +390,31 @@ public class CategoryServiceImplTest {
 
             categoryService.create(categoryDTO);
 
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
         String[] ids = {category.getCategoryId()};
         //Getting Categories with exclude ids
-        List<Category> categories = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> categories = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
 
         categories.forEach(relatedCategory -> {
-            RelatedCategory newRelatedCategory = categoryService.addSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, relatedCategory.getExternalId(), FindBy.EXTERNAL_ID);
+            RelatedCategory newRelatedCategory = categoryService.addSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(relatedCategory.getExternalId()));
             Assert.assertTrue(ValidationUtil.isNotEmpty(newRelatedCategory));
         });
         List<RelatedCategory> newRelatedCategories = relatedCategoryDAO.findByCategoryId(category.getId());
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
         //toggle
-        boolean success = categoryService.toggleSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID, Toggle.get("Y"));
+        boolean success = categoryService.toggleSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()), Toggle.get("Y"));
         Assert.assertTrue(success);
         List<RelatedCategory> relatedCategories = relatedCategoryDAO.findBySubCategoryId(newRelatedCategories.get(0).getSubCategoryId());
         Assert.assertEquals(relatedCategories.get(0).getSubCategoryId(), newRelatedCategories.get(0).getSubCategoryId());
         Assert.assertEquals(relatedCategories.get(0).getActive(), "N");
 
 
-        boolean activeSuccess = categoryService.toggleSubCategory(category.getExternalId(), FindBy.EXTERNAL_ID, categoriesData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID, Toggle.get("N"));
+        boolean activeSuccess = categoryService.toggleSubCategory(ID.EXTERNAL_ID(category.getExternalId()), ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()), Toggle.get("N"));
         Assert.assertTrue(activeSuccess);
         List<RelatedCategory> relatedCategories1 = relatedCategoryDAO.findBySubCategoryId(newRelatedCategories.get(0).getSubCategoryId());
         Assert.assertEquals(relatedCategories1.get(0).getSubCategoryId(), newRelatedCategories.get(0).getSubCategoryId());
@@ -426,7 +434,7 @@ public class CategoryServiceImplTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -439,7 +447,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
@@ -455,7 +463,7 @@ public class CategoryServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString())).orElse(null);
         //creating categoryProduct
         CategoryProduct categoryProduct = new CategoryProduct();
         categoryProduct.setCategoryId(category.getId());
@@ -465,7 +473,7 @@ public class CategoryServiceImplTest {
         categoryProduct.setActive(product.getActive());
         categoryProductDAO.insert(categoryProduct);
         //Getting availableProducts
-        Page<Product> availableProducts = categoryService.findAvailableProductsForCategory(category.getId(), FindBy.INTERNAL_ID, "productName", "Test", PageRequest.of(0,  productsData.size()),  false);
+        Page<Product> availableProducts = categoryService.findAvailableProductsForCategory(ID.INTERNAL_ID(category.getId()), "productName", "Test", PageRequest.of(0,  productsData.size()),  false);
         Assert.assertEquals(availableProducts.getContent().size(), 1);
     }
 
@@ -482,7 +490,7 @@ public class CategoryServiceImplTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -495,7 +503,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -524,11 +532,11 @@ public class CategoryServiceImplTest {
             count[0] ++;
         });
         //setting Sequence number
-        boolean success = categoryService.setProductSequence(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, productsData.get(1).get("externalId").toString(), FindBy.EXTERNAL_ID, productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        boolean success = categoryService.setProductSequence(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), ID.EXTERNAL_ID(productsData.get(1).get("externalId").toString()), ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()));
 
         Assert.assertTrue(success);
 
-        List<CategoryProduct> categoryProducts = categoryService.getAllCategoryProducts(category.getId());
+        List<CategoryProduct> categoryProducts = categoryService.getAllCategoryProducts(ID.INTERNAL_ID(category.getId()));
         Assert.assertEquals(categoryProducts.get(0).getSequenceNum(), 1);
         Assert.assertEquals(categoryProducts.get(0).getSubSequenceNum(), 0);
 
@@ -550,7 +558,7 @@ public class CategoryServiceImplTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -563,7 +571,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -576,7 +584,7 @@ public class CategoryServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString())).orElse(null);
         //creating categoryProduct
         CategoryProduct categoryProduct = new CategoryProduct();
         categoryProduct.setCategoryId(category.getId());
@@ -589,13 +597,13 @@ public class CategoryServiceImplTest {
         List<CategoryProduct> categoryProductList = categoryProductDAO.findByCategoryId(category.getId());
 
         //toggle
-        categoryService.toggleProduct(category.getId(), FindBy.INTERNAL_ID, product.getId(), FindBy.INTERNAL_ID, Toggle.get(product.getActive()));
+        categoryService.toggleProduct(ID.INTERNAL_ID(category.getId()), ID.INTERNAL_ID(product.getId()), Toggle.get(product.getActive()));
         List<CategoryProduct> updatedCategoryProduct = categoryProductDAO.findByCategoryId(categoryProductList.get(0).getCategoryId());
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategoryProduct));
         Assert.assertEquals(updatedCategoryProduct.get(0).getActive(), "N");
 
         List<CategoryProduct> categoryProductList1 = categoryProductDAO.findByCategoryId(category.getId());
-        categoryService.toggleProduct(category.getId(), FindBy.INTERNAL_ID, product.getId(), FindBy.INTERNAL_ID, Toggle.get(updatedCategoryProduct.get(0).getActive()));
+        categoryService.toggleProduct(ID.INTERNAL_ID(category.getId()), ID.INTERNAL_ID(product.getId()), Toggle.get(updatedCategoryProduct.get(0).getActive()));
         List<CategoryProduct> updatedCategoryProduct1 = categoryProductDAO.findByCategoryId(categoryProductList1.get(0).getCategoryId());
         Assert.assertEquals(updatedCategoryProduct1.get(0).getActive(), "Y");
 
@@ -614,7 +622,7 @@ public class CategoryServiceImplTest {
             familyDAO.insert(familyDTO);
         });
 
-        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -627,7 +635,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -639,7 +647,7 @@ public class CategoryServiceImplTest {
             productDTO.setActive((String)productData.get("active"));
             productDAO.insert(productDTO);
 
-            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Product product = productDAO.findById(ID.EXTERNAL_ID(productData.get("externalId").toString())).orElse(null);
             //creating categoryProduct
             CategoryProduct categoryProduct = new CategoryProduct();
             categoryProduct.setCategoryId(category.getId());
@@ -651,7 +659,7 @@ public class CategoryServiceImplTest {
         });
 
         List<CategoryProduct> categoryProductList = categoryProductDAO.findByCategoryId(category.getId());
-        Page<CategoryProduct> categoryProductsList = categoryService.getCategoryProducts(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 1, null, false);
+        Page<CategoryProduct> categoryProductsList = categoryService.getCategoryProducts(ID.EXTERNAL_ID(category.getCategoryId()), 0, 1, null, false);
         Assert.assertTrue(ValidationUtil.isNotEmpty(categoryProductsList));
         Assert.assertEquals(categoryProductsList.getContent().size(), categoryProductList.size());
     }
@@ -669,7 +677,7 @@ public class CategoryServiceImplTest {
             familyDAO.insert(familyDTO);
         });
 
-        Family family1 = familyDAO.findById(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -682,7 +690,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findById(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -694,7 +702,7 @@ public class CategoryServiceImplTest {
             productDTO.setActive((String)productData.get("active"));
             productDAO.insert(productDTO);
 
-            Product product = productDAO.findById(productData.get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+            Product product = productDAO.findById(ID.EXTERNAL_ID(productData.get("externalId").toString())).orElse(null);
             //creating categoryProduct
             CategoryProduct categoryProduct = new CategoryProduct();
             categoryProduct.setCategoryId(category.getId());
@@ -707,7 +715,7 @@ public class CategoryServiceImplTest {
 
         List<CategoryProduct> categoryProductList = categoryProductDAO.findByCategoryId(category.getId());
         //Getting categoryProduct
-        Page<Map<String, Object>> categoryProductsList = categoryService.getCategoryProducts(category.getCategoryId(), FindBy.EXTERNAL_ID, PageRequest.of(0,  productsData.size(), null), false);
+        Page<Map<String, Object>> categoryProductsList = categoryService.getCategoryProducts(ID.EXTERNAL_ID(category.getCategoryId()), PageRequest.of(0,  productsData.size(), null), false);
         Assert.assertTrue(ValidationUtil.isNotEmpty(categoryProductsList));
         Assert.assertEquals(categoryProductsList.getContent().size(), categoryProductList.size());
     }
@@ -725,7 +733,7 @@ public class CategoryServiceImplTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -738,7 +746,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -753,7 +761,7 @@ public class CategoryServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString())).orElse(null);
         //creating categoryProduct
         CategoryProduct categoryProduct = new CategoryProduct();
         categoryProduct.setCategoryId(category.getId());
@@ -764,7 +772,7 @@ public class CategoryServiceImplTest {
         categoryProductDAO.insert(categoryProduct);
 
         //Getting available product
-        Page<Product> availableProducts = categoryService.getAvailableProductsForCategory(category.getId(), FindBy.INTERNAL_ID, 0, 3, null, false);
+        Page<Product> availableProducts = categoryService.getAvailableProductsForCategory(ID.INTERNAL_ID(category.getId()), 0, 3, null, false);
         Assert.assertEquals(availableProducts.getContent().size(), productsData.size()-1);
     }
 
@@ -781,7 +789,7 @@ public class CategoryServiceImplTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -794,7 +802,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -809,9 +817,9 @@ public class CategoryServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString())).orElse(null);
         //Adding product
-        CategoryProduct categoryProduct = categoryService.addProduct(category.getId(), FindBy.INTERNAL_ID, product.getId(), FindBy.INTERNAL_ID);
+        CategoryProduct categoryProduct = categoryService.addProduct(ID.INTERNAL_ID(category.getId()), ID.INTERNAL_ID(product.getId()));
         List<CategoryProduct> categoryProductList = categoryProductDAO.findByCategoryId(category.getId());
         Assert.assertTrue(ValidationUtil.isNotEmpty(categoryProductList));
     }
@@ -829,7 +837,7 @@ public class CategoryServiceImplTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -842,7 +850,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -857,7 +865,7 @@ public class CategoryServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString())).orElse(null);
         //creating categoryProduct
         CategoryProduct categoryProduct = new CategoryProduct();
         categoryProduct.setCategoryId(category.getId());
@@ -868,7 +876,7 @@ public class CategoryServiceImplTest {
         categoryProductDAO.insert(categoryProduct);
 
         //Getting categoryProduct
-        Page<Map<String, Object>> categoryProductMap = categoryService.findAllCategoryProducts(category.getId(), FindBy.INTERNAL_ID, "active", "Y", PageRequest.of(0,productsData.size(),null), false);
+        Page<Map<String, Object>> categoryProductMap = categoryService.findAllCategoryProducts(ID.INTERNAL_ID(category.getId()), "active", "Y", PageRequest.of(0,productsData.size(),null), false);
         Assert.assertTrue(ValidationUtil.isNotEmpty(categoryProductMap));
         long size = productsData.stream().filter(x -> x.get("active").equals("Y")).count();
         Assert.assertEquals(categoryProductMap.getContent().size(),size-1);
@@ -887,7 +895,7 @@ public class CategoryServiceImplTest {
             familyService.create(familyDTO);
         });
 
-        Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString())).orElse(null);
         //creating categories
         List<Map<String, Object>> categoriesData = new ArrayList<>();
         categoriesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "description", "Test Category1", "active", "Y"));
@@ -900,7 +908,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
         });
 
-        Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString())).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test Product 1", "externalId", "TEST_PRODUCT_1", "productFamilyId", family1.getFamilyId(), "active", "Y"));
@@ -913,7 +921,7 @@ public class CategoryServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString())).orElse(null);
         //creating categoryProduct
         CategoryProduct categoryProduct = new CategoryProduct();
         categoryProduct.setCategoryId(category.getId());
@@ -923,7 +931,7 @@ public class CategoryServiceImplTest {
         categoryProduct.setActive(product.getActive());
         categoryProductDAO.insert(categoryProduct);
         //Getting categoryProduct
-        List<CategoryProduct> categoryProductsList = categoryService.getAllCategoryProducts(category.getId());
+        List<CategoryProduct> categoryProductsList = categoryService.getAllCategoryProducts(ID.INTERNAL_ID(category.getId()));
         Assert.assertTrue(ValidationUtil.isNotEmpty(categoryProductsList));
         Assert.assertEquals(categoryProductsList.size(),productsData.size());
     }
@@ -945,7 +953,7 @@ public class CategoryServiceImplTest {
             categoryService.create(categoryDTO);
 
             //Getting categories by categoryId
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
@@ -986,17 +994,17 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category categoryDetails = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+        Category categoryDetails = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDetails));
         //toggle
-        categoryService.toggle(categoryDetails.getCategoryId(), EXTERNAL_ID, Toggle.get(categoryDetails.getActive()));
-        Category updatedCategory = categoryService.get(categoryDetails.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+        categoryService.toggle(ID.EXTERNAL_ID(categoryDetails.getCategoryId()), Toggle.get(categoryDetails.getActive()));
+        Category updatedCategory = categoryService.get(ID.EXTERNAL_ID(categoryDetails.getCategoryId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategory));
         Assert.assertEquals(updatedCategory.getActive(), "N");
 
-        categoryService.toggle(categoryDetails.getCategoryId(), EXTERNAL_ID, Toggle.get(updatedCategory.getActive()));
+        categoryService.toggle(ID.EXTERNAL_ID(categoryDetails.getCategoryId()), Toggle.get(updatedCategory.getActive()));
 
-        Category updatedCategory1 = categoryService.get(categoryDetails.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+        Category updatedCategory1 = categoryService.get(ID.EXTERNAL_ID(categoryDetails.getCategoryId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategory1));
         Assert.assertEquals(updatedCategory1.getActive(), "Y");
     }
@@ -1017,7 +1025,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
 
             //Getting categories
-            Category categoryDetails = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category categoryDetails = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDetails));
             Map<String, Object> diff = categoryDTO.diff(categoryDetails);
             Assert.assertEquals(diff.size(), 0);
@@ -1117,7 +1125,7 @@ public class CategoryServiceImplTest {
 
         String[] ids = {categoriesData.get(0).get("externalId").toString(), categoriesData.get(1).get("externalId").toString(), categoriesData.get(2).get("externalId").toString()};
         //Getting categories as page
-        Page<Category> paginatedResult = categoryService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
+        Page<Category> paginatedResult = categoryService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, 10, null, false);
         Map<String, Category> categoriesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(category -> category.getCategoryId(), category -> category));
         Assert.assertTrue(categoriesMap.size() == ids.length && categoriesMap.containsKey(ids[0]) && categoriesMap.containsKey(ids[1]) && categoriesMap.containsKey(ids[2]));
     }
@@ -1143,7 +1151,7 @@ public class CategoryServiceImplTest {
 
         String[] ids = {categoriesData.get(0).get("externalId").toString(), categoriesData.get(1).get("externalId").toString(), categoriesData.get(2).get("externalId").toString()};
         //Getting categories by ids
-        List<Category> listedResult = categoryService.getAll(ids, EXTERNAL_ID, null, false);
+        List<Category> listedResult = categoryService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, Category> categoriesMap = listedResult.stream().collect(Collectors.toMap(category -> category.getCategoryId(), category -> category));
         Assert.assertTrue(categoriesMap.size() == ids.length && categoriesMap.containsKey(ids[0]) && categoriesMap.containsKey(ids[1]) && categoriesMap.containsKey(ids[2]));
     }
@@ -1169,7 +1177,7 @@ public class CategoryServiceImplTest {
 
         String[] ids = {categoriesData.get(0).get("externalId").toString(), categoriesData.get(1).get("externalId").toString(), categoriesData.get(2).get("externalId").toString()};
         //Getting categories with exclude Ids
-        Page<Category> paginatedResult = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
+        Page<Category> paginatedResult = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, 10, null, false);
         Map<String, Category> categoriesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(category -> category.getCategoryId(), category -> category));
         Assert.assertTrue(categoriesMap.size() == (categoriesData.size() - ids.length) && !categoriesMap.containsKey(ids[0]) && !categoriesMap.containsKey(ids[1]) && !categoriesMap.containsKey(ids[2]));
     }
@@ -1195,7 +1203,7 @@ public class CategoryServiceImplTest {
 
         String[] ids = {categoriesData.get(0).get("externalId").toString(), categoriesData.get(1).get("externalId").toString(), categoriesData.get(2).get("externalId").toString()};
         //Getting categories with exclude Ids
-        List<Category> listedResult = categoryService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Category> listedResult = categoryService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, Category> categoriesMap = listedResult.stream().collect(Collectors.toMap(category -> category.getCategoryId(), category -> category));
         Assert.assertTrue(categoriesMap.size() == (categoriesData.size() - ids.length) && !categoriesMap.containsKey(ids[0]) && !categoriesMap.containsKey(ids[1]) && !categoriesMap.containsKey(ids[2]));
     }
@@ -1260,15 +1268,15 @@ public class CategoryServiceImplTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryDAO.insert(categoryDTO);
 
-            Category categoryDetails = categoryService.get(categoriesData.get(0).get("externalId").toString(), EXTERNAL_ID, false).orElse(null);
+            Category categoryDetails = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(categoryDetails));
             //updating category
             categoryDetails.setDescription("Test Category");
             categoryDetails.setGroup("DETAILS");
 
-            categoryService.update(categoryDetails.getCategoryId(), EXTERNAL_ID, categoryDetails);
+            categoryService.update(ID.EXTERNAL_ID(categoryDetails.getCategoryId()), categoryDetails);
             //Getting updated categories
-            Category updatedCategory = categoryService.get(categoryDetails.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category updatedCategory = categoryService.get(ID.EXTERNAL_ID(categoryDetails.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategory));
             Map<String, Object> diff = categoryDTO.diff(updatedCategory);
             Assert.assertEquals(diff.size(), 1);
@@ -1297,7 +1305,7 @@ public class CategoryServiceImplTest {
 
         String[] ids = {categoriesData.get(0).get("externalId").toString(), categoriesData.get(1).get("externalId").toString(), categoriesData.get(2).get("externalId").toString()};
 
-        List<Category> result = categoryService.getAll(ids, EXTERNAL_ID, null, false);
+        List<Category> result = categoryService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, Category> categoriesMap = result.stream().collect(Collectors.toMap(category -> category.getCategoryId(), category -> category));
         Assert.assertTrue(categoriesMap.size() == ids.length && categoriesMap.containsKey(ids[0]) && categoriesMap.containsKey(ids[1]) && categoriesMap.containsKey(ids[2]));
         //updating categories
@@ -1328,11 +1336,11 @@ public class CategoryServiceImplTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryDAO.insert(categoryDTO);
             //Getting category
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
             //cloning category instance
-            Category websiteClone = categoryService.cloneInstance(newCategory.getCategoryId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Category websiteClone = categoryService.cloneInstance(ID.EXTERNAL_ID(newCategory.getCategoryId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(websiteClone.getCategoryId() .equals(newCategory.getCategoryId() + "_COPY") && websiteClone.getCategoryName().equals(newCategory.getCategoryName() + "_COPY") && websiteClone.getDescription().equals(newCategory.getDescription() + "_COPY") && websiteClone.getActive() != newCategory.getActive());
         });
     }
@@ -1381,7 +1389,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
         //Getting categories
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Category> result = categoryService.findAll(criteria);
         long size = categoriesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
@@ -1429,7 +1437,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
         //Getting category
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("categoryName", categoriesData.get(0).get("name")));
+        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("categoryName", categoriesData.get(0).get("name")));
         Optional<Category> result = categoryService.findOne(criteria);
         Assert.assertEquals(categoriesData.get(0).get("name"), result.get().getCategoryName());
     }
@@ -1470,7 +1478,7 @@ public class CategoryServiceImplTest {
         context.clear();
 
         /*Testing uniqueConstraint violation of categoryId with update operation*/
-        Category category = categoryDAO.findById(categoryDTO.getCategoryId(), FindBy.EXTERNAL_ID).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoryDTO.getCategoryId())).orElse(null);
         category.setCategoryName("Category1 Test");
         category.setCategoryId("CATEGORY_TEST_1");
         category.setDescription("Category1 description");
@@ -1488,11 +1496,11 @@ public class CategoryServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+		mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
         categoryProductDAO.deleteAll();
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+		mongoTemplate.dropCollection(Family.class);
+		mongoTemplate.dropCollection(Product.class);
     }
 
 }
