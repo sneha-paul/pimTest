@@ -40,7 +40,7 @@ public class VirtualFileTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)virtualFileDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) virtualFileDAO.getTemplate();
         }
         mongoTemplate.dropCollection(VirtualFile.class);
     }

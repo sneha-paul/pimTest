@@ -46,7 +46,7 @@ public class VariantGroupTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)familyDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) familyDAO.getTemplate();
         }
 		mongoTemplate.dropCollection(Family.class);
 		mongoTemplate.dropCollection(AttributeCollection.class);

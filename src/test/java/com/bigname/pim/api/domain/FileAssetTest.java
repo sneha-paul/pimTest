@@ -37,7 +37,7 @@ public class FileAssetTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)assetCollectionDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) assetCollectionDAO.getTemplate();
         }
 		mongoTemplate.dropCollection(FileAsset.class);
     }

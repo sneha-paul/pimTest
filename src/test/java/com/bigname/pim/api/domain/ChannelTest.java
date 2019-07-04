@@ -42,7 +42,7 @@ public class ChannelTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)channelDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) channelDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Channel.class);
     }

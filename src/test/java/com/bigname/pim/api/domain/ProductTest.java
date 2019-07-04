@@ -48,7 +48,7 @@ public class ProductTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Product.class);
         mongoTemplate.dropCollection(Family.class);

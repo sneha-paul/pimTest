@@ -38,7 +38,7 @@ public class RoleTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)roleDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) roleDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Role.class);
     }

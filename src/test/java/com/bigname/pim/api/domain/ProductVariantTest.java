@@ -33,7 +33,7 @@ public class ProductVariantTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)productVariantDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) productVariantDAO.getTemplate();
         }
         mongoTemplate.dropCollection(ProductVariant.class);
     }

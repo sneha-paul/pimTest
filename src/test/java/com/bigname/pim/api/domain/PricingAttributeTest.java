@@ -42,7 +42,7 @@ public class PricingAttributeTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)pricingAttributeDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) pricingAttributeDAO.getTemplate();
         }
         mongoTemplate.dropCollection(PricingAttribute.class);
     }

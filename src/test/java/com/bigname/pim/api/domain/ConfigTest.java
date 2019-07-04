@@ -41,7 +41,7 @@ public class ConfigTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)configDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) configDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Config.class);
     }

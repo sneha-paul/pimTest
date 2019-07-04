@@ -42,7 +42,7 @@ public class AttributeOptionTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)attributeCollectionDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) attributeCollectionDAO.getTemplate();
         }
         mongoTemplate.dropCollection(AttributeCollection.class);
     }

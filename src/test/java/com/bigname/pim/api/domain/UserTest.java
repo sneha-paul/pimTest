@@ -40,7 +40,7 @@ public class UserTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)userDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) userDAO.getTemplate();
         }
         mongoTemplate.dropCollection(User.class);
     }

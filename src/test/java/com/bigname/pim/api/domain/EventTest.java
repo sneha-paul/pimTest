@@ -38,7 +38,7 @@ public class EventTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)eventDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) eventDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Event.class);
     }

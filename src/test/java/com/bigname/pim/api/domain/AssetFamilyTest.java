@@ -41,7 +41,7 @@ public class AssetFamilyTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)assetFamilyDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) assetFamilyDAO.getTemplate();
         }
         mongoTemplate.dropCollection(AssetFamily.class);
     }
