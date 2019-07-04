@@ -145,8 +145,7 @@ public class ConversionUtilTest {
         Website website = new Website();
         website.setWebsiteName("Envelope");
         website.setWebsiteId("ENVELOPE");
-
-        String actual = "{\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
+        String actual = "{\"internalId\":null,\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
         Assert.assertEquals(ConversionUtil.toJSONString(website),actual);
     }
 
@@ -162,11 +161,12 @@ public class ConversionUtilTest {
         websiteMap.put("discontinuedToDate", null);
         websiteMap.put("lastModifiedDateTime", null);
         websiteMap.put("externalId", "ENVELOPE");
-        websiteMap.put("active","N");
+        websiteMap.put("active", "N");
         websiteMap.put("createdDateTime", null);
         websiteMap.put("discontinued", "N");
         websiteMap.put("discontinuedFromDate", null);
         websiteMap.put("url", null);
+        websiteMap.put("internalId", null);
         websiteMap.put("websiteName", "Envelope");
         websiteMap.put("websiteId", "ENVELOPE");
         websiteMap.put("lastModifiedUser", null);
