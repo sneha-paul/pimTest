@@ -202,7 +202,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     private void setProductFamily(Product product) {
-        familyService.get(ID.EXTERNAL_ID(product.getProductFamilyId())).ifPresent(product::setProductFamily);
+        familyService.get(ID.INTERNAL_ID(product.getProductFamilyId())).ifPresent(product::setProductFamily);
     }
 
     /**
