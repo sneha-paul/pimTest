@@ -81,7 +81,7 @@ public class AttributeCollectionControllerTest {
             userService.create(user);
         }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)attributeCollectionDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) attributeCollectionDAO.getTemplate();
         }
         mongoTemplate.dropCollection(AttributeCollection.class);
     }

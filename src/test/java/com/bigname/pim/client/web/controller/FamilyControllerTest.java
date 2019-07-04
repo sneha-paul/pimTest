@@ -96,7 +96,7 @@ public class FamilyControllerTest {
             userService.create(user);
         }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)channelDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) channelDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Channel.class);
         mongoTemplate.dropCollection(AttributeCollection.class);

@@ -68,7 +68,7 @@ public class AssetCollectionControllerTest {
             userService.create(user);
         }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)assetCollectionDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) assetCollectionDAO.getTemplate();
         }
         mongoTemplate.dropCollection(AssetCollection.class);
     }

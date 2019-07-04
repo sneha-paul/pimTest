@@ -105,7 +105,7 @@ public class ProductVariantControllerTest {
             userService.create(user);
         }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)productVariantDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) productVariantDAO.getTemplate();
         }
         mongoTemplate.dropCollection(ProductVariant.class);
         mongoTemplate.dropCollection(Channel.class);

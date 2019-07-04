@@ -101,7 +101,7 @@ public class CategoryControllerTest {
             userService.create(user);
         }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)categoryDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) categoryDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
