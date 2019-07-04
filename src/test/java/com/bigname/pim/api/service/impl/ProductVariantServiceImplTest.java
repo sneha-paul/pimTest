@@ -2569,8 +2569,8 @@ public class ProductVariantServiceImplTest {
         });
         // Getting productVariant
         List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        Page<ProductVariant> productVariants = productVariantService.getAll(Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
+        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
+        Page<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
@@ -2747,8 +2747,8 @@ public class ProductVariantServiceImplTest {
         });
         // Getting productVariants
         List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        Page<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
+        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
+        Page<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
@@ -2925,8 +2925,8 @@ public class ProductVariantServiceImplTest {
         });
         // Getting productVariant
         List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        List<ProductVariant> productVariants = productVariantService.getAll(Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), Sort.by("productVariantName"),false);
+        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
+        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), Sort.by("productVariantName"),false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
@@ -3847,8 +3847,8 @@ public class ProductVariantServiceImplTest {
         });
         // Getting productVariant
         List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), null, false);
+        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
+        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
