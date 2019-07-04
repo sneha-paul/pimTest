@@ -56,7 +56,7 @@ public class BaseServiceSupportTest {
     @Before
     public void setUp() {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)websiteDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Website.class);
     }
