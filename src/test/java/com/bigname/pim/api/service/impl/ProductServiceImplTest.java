@@ -2716,7 +2716,7 @@ public class ProductServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId",familyDetails.getId(), "productFamilyId", "FAMILY_TEST_1", "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -3262,9 +3262,9 @@ public class ProductServiceImplTest {
         // sorting : Descending
 
         productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", family.getId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
