@@ -75,7 +75,7 @@ public class CategoryServiceImplTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
 		mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();

@@ -75,7 +75,7 @@ public class CatalogServiceImplTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)catalogDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) catalogDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Catalog.class);
         mongoTemplate.dropCollection(Category.class);
