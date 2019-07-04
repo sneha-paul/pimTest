@@ -265,7 +265,7 @@ public class ProductControllerTest {
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("productName", ConversionUtil.toList("Test1"));
         params.put("productId", ConversionUtil.toList("TEST1"));
-        params.put("productFamilyId", ConversionUtil.toList(familyDetails.getFamilyId()));
+        params.put("productFamilyId", ConversionUtil.toList(familyDetails.getId()));
         params.put("channelId", ConversionUtil.toList(channel.getChannelId()));
 
         ResultActions result = mockMvc.perform(
@@ -428,7 +428,7 @@ public class ProductControllerTest {
         params.put("group", ConversionUtil.toList("CREATE"));
         params.put("productName", ConversionUtil.toList("Test1"));
         params.put("productId", ConversionUtil.toList("TEST1"));
-        params.put("productFamilyId", ConversionUtil.toList(familyDetails.getFamilyId()));
+        params.put("productFamilyId", ConversionUtil.toList(familyDetails.getId()));
         params.put("channelId", ConversionUtil.toList(channel.getChannelId()));
         ResultActions result = mockMvc.perform(
                 post("/pim/products")
@@ -671,15 +671,15 @@ public class ProductControllerTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 4", "externalId", "PRODUCT_TEST_4", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 5", "externalId", "PRODUCT_TEST_5", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 6", "externalId", "PRODUCT_TEST_6", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 7", "externalId", "PRODUCT_TEST_7", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 8", "externalId", "PRODUCT_TEST_8", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 9", "externalId", "PRODUCT_TEST_9", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 2", "externalId", "PRODUCT_TEST_2", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 3", "externalId", "PRODUCT_TEST_3", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 4", "externalId", "PRODUCT_TEST_4", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 5", "externalId", "PRODUCT_TEST_5", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 6", "externalId", "PRODUCT_TEST_6", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 7", "externalId", "PRODUCT_TEST_7", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 8", "externalId", "PRODUCT_TEST_8", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 9", "externalId", "PRODUCT_TEST_9", "productFamilyId", familyDetails.getId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -867,7 +867,7 @@ public class ProductControllerTest {
 
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1072,7 +1072,7 @@ public class ProductControllerTest {
 
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1265,7 +1265,7 @@ public class ProductControllerTest {
         //creating family
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1455,7 +1455,7 @@ public class ProductControllerTest {
 
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1656,7 +1656,7 @@ public class ProductControllerTest {
 
         List<Product> createdProductInstances = new ArrayList<>();
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
         productsData.forEach(productData ->{
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
