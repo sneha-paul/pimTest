@@ -38,7 +38,7 @@ public class FamilyRepositoryTest {
     @Before
     public void setUp() {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)familyDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) familyDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Family.class);
         mongoTemplate.dropCollection(AttributeCollection.class);

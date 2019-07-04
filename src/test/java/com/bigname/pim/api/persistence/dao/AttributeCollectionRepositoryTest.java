@@ -50,7 +50,7 @@ public class AttributeCollectionRepositoryTest {
     @Before
     public void setUp() {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)attributeCollectionDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) attributeCollectionDAO.getTemplate();
         }
         mongoTemplate.dropCollection(AttributeCollection.class);
     }

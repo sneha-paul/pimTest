@@ -59,7 +59,7 @@ public class ProductRepositoryTest {
     public void setUp() {
 
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
 
         mongoTemplate.dropCollection(Product.class);

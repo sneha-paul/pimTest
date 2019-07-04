@@ -65,7 +65,7 @@ public class ProductVariantRepositoryTest {
     @Before
     public void setUp() {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
 		mongoTemplate.dropCollection(ProductVariant.class);
 

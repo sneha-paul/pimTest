@@ -52,7 +52,7 @@ public class CategoryRepositoryTest {
     @Before
     public void setUp() {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)productDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) categoryDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();

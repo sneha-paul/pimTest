@@ -53,7 +53,7 @@ public class CatalogRepositoryTest {
     @Before
     public void setUp() {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)catalogDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) catalogDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Catalog.class);
         mongoTemplate.dropCollection(Category.class);
