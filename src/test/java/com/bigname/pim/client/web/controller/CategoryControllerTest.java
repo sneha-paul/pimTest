@@ -617,7 +617,7 @@ public class CategoryControllerTest {
 
         result.andExpect(jsonPath("$.success").value(true));
 
-        List<CategoryProduct> categoryProducts = categoryService.getAllCategoryProducts(ID.EXTERNAL_ID(category.getId()));
+        List<CategoryProduct> categoryProducts = categoryService.getAllCategoryProducts(ID.INTERNAL_ID(category.getId()));
         Assert.assertEquals(categoryProducts.get(0).getSequenceNum(), 1);
         Assert.assertEquals(categoryProducts.get(0).getSubSequenceNum(), 0);
 
