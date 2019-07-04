@@ -1,8 +1,9 @@
-package com.bigname.pim.api.service;
+package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
+import com.bigname.pim.api.service.PricingAttributeService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
@@ -53,7 +54,7 @@ public class PricingAttributeServiceImplTest {
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)pricingAttributeDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) pricingAttributeDAO.getTemplate();
         }
 		mongoTemplate.dropCollection(PricingAttribute.class);
     }
