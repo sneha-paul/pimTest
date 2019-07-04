@@ -88,7 +88,7 @@ public class WebsiteControllerTest {
             userService.create(user);
         }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
-            mongoTemplate = ((GenericRepositoryImpl)websiteDAO).getMongoTemplate();
+            mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Website.class);
         mongoTemplate.dropCollection(Catalog.class);
