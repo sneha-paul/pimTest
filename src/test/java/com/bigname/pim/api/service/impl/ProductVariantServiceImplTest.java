@@ -242,7 +242,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -418,7 +418,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -596,7 +596,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -767,7 +767,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -792,7 +792,7 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         //Getting productVariant
-        ProductVariant productVariant = productVariantService.get(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), ID.EXTERNAL_ID(productVariantData.get(0).get("externalId").toString()), false).orElse(null);
+        ProductVariant productVariant = productVariantService.get(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), ID.EXTERNAL_ID(productVariantData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertEquals(productVariant.getProductVariantName(), productVariantData.get(0).get("name"));
     }
 
@@ -942,7 +942,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -963,9 +963,9 @@ public class ProductVariantServiceImplTest {
         productVariantDTO.setChannelId(channel.getChannelId());
         productVariantDAO.insert(productVariantDTO);
         // Getting productVariant
-        ProductVariant productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId())).orElse(null);
+        ProductVariant productVariant = productVariantDAO.findById(productVariantDTO.getProductVariantId()).orElse(null);
         ProductVariant productVariant1 = productVariantService.get(ID.INTERNAL_ID(productVariant.getId()), false).orElse(null);
-        Assert.assertEquals(productVariant1.getProductVariantName(), productVariant.getProductVariantName());
+        Assert.assertEquals(productVariant1.getProductVariantName(), productVariantDTO.getProductVariantName());
     }
 
     @Test
@@ -1114,7 +1114,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1294,7 +1294,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1485,7 +1485,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1661,7 +1661,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -1838,7 +1838,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -2014,7 +2014,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -2040,7 +2040,7 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariants
-        Page<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), 0, productVariantData.size(), null, false);
+        Page<ProductVariant> productVariants = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
@@ -2190,7 +2190,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -2366,7 +2366,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -2392,7 +2392,7 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariants
-        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
+        List<ProductVariant> productVariants = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
@@ -2542,7 +2542,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -2568,9 +2568,9 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariant
-        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
-        Page<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
+        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
+        Page<ProductVariant> productVariants = productVariantService.getAll(Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
@@ -2720,7 +2720,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -2746,9 +2746,9 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariants
-        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
-        Page<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
+        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
+        Page<ProductVariant> productVariants = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
@@ -2898,7 +2898,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -2924,9 +2924,9 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariant
-        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
-        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), Sort.by("productVariantName"),false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
+        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
+        List<ProductVariant> productVariants = productVariantService.getAll(Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), Sort.by("productVariantName"),false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
@@ -3076,7 +3076,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -3255,7 +3255,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -3434,7 +3434,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -3612,7 +3612,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -3820,7 +3820,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -3846,9 +3846,9 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariant
-        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), null, false);
-        String[] ids={productVariants1.get(0).getProductVariantId(),productVariants1.get(1).getProductVariantId()};
-        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
+        String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
+        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), null, false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
@@ -3998,7 +3998,7 @@ public class ProductVariantServiceImplTest {
         Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -4210,7 +4210,7 @@ public class ProductVariantServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -4294,7 +4294,7 @@ public class ProductVariantServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -4378,7 +4378,7 @@ public class ProductVariantServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -4475,7 +4475,7 @@ public class ProductVariantServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -4559,7 +4559,7 @@ public class ProductVariantServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -4644,7 +4644,7 @@ public class ProductVariantServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));
@@ -4727,7 +4727,7 @@ public class ProductVariantServiceImplTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", family.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String)productData.get("name"));

@@ -171,7 +171,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -251,7 +251,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -347,7 +347,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -425,7 +425,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -503,7 +503,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -592,7 +592,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -812,7 +812,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -907,7 +907,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
             //Getting family
             Family result=familyService.get(ID.EXTERNAL_ID(family.getFamilyId()),false).orElse(null);
@@ -963,7 +963,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
         });
 
@@ -1023,7 +1023,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
         });
@@ -1081,7 +1081,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1361,7 +1361,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1457,7 +1457,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1602,7 +1602,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1701,7 +1701,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1799,7 +1799,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1897,7 +1897,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1995,7 +1995,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2091,7 +2091,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2276,7 +2276,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2337,7 +2337,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2414,7 +2414,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
             familyDAO.save(family);
         });
@@ -2471,7 +2471,7 @@ public class FamilyServiceImplTest {
             familyDTO.setActive((String)familyData.get("active"));
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
-            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);//familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
             familyDAO.save(family);
 

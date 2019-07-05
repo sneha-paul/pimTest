@@ -89,13 +89,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         if(productVariantId.isInternalId()) {
             return get(productVariantId, activeRequired);
         } else {
-            Optional<Product> _product = productId.isInternalId() ? productDAO.findById(productId) : productDAO.findByExternalId(productId);
-            if(_product.isPresent()) {
-                productId = ID.INTERNAL_ID((I)_product.get().getId());
-            } else {
-                return Optional.empty();
-            }
-            return productVariantDAO.findByProductIdAndChannelIdAndExternalIdAndActiveIn(productId.getId(), channelId, productVariantId.getId(), PimUtil.getActiveOptions(activeRequired));
+            return productDAO.findById(productId).map(product -> productVariantDAO.findByProductIdAndChannelIdAndExternalIdAndActiveIn(product.getId(), channelId, productVariantId.getId(), PimUtil.getActiveOptions(activeRequired))).orElse(Optional.empty());
         }
     }
 
