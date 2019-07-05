@@ -268,7 +268,7 @@ public class ProductVariantControllerTest {
         productDTO.setProductName("Test1");
         productDTO.setProductId("TEST1");
         productDTO.setChannelId(channel.getChannelId());
-        productDTO.setProductFamilyId(familyDetails.getFamilyId());
+        productDTO.setProductFamilyId(familyDetails.getId());
         productDTO.setActive("Y");
         Product product = productService.create(productDTO);
         Assert.assertTrue(product.diff(productDTO).isEmpty());
@@ -437,7 +437,7 @@ public class ProductVariantControllerTest {
         productDTO.setProductName("Test1");
         productDTO.setProductId("TEST1");
         productDTO.setChannelId(channel.getChannelId());
-        productDTO.setProductFamilyId(familyDetails.getFamilyId());
+        productDTO.setProductFamilyId(familyDetails.getId());
         productDTO.setActive("Y");
         Product product = productService.create(productDTO);
         Product product1 = productService.get(ID.EXTERNAL_ID(product.getProductId())).orElse(null);

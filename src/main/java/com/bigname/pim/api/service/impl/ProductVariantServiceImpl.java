@@ -142,13 +142,8 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             //sort = new Sort(Sort.Direction.ASC, "externalId");
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
-        Optional<Product> _product = productId.isInternalId() ? productDAO.findById(productId.getId()) : productDAO.findByExternalId(productId);
-        if(_product.isPresent()) {
-            productId = ID.INTERNAL_ID(_product.get().getId());
-        } else {
-            return null;
-        }
-        return productVariantDAO.findByProductIdAndChannelIdAndActiveIn(productId.getId(), channelId, PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
+        Sort finalSort = sort;
+        return productDAO.findById(productId).map(product -> productVariantDAO.findByProductIdAndChannelIdAndActiveIn(product.getId(), channelId, PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, finalSort))).orElse(null);
     }
 
     @Override
