@@ -80,7 +80,7 @@ public class ProductCategoryTest {
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
-        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId","PRODUCT_TEST_1", "productFamilyId", familyDetails.getId(), "active", "Y"));
+        productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId","PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
         productsData.forEach(productData -> {
             Product productDTO = new Product();
             productDTO.setProductName((String) productData.get("name"));
