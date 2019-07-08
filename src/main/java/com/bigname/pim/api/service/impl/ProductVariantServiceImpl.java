@@ -181,7 +181,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
-        return productVariantIds.get(0).isInternalId() ? productVariantDAO.findByIdInAndActiveIn(productVariantIds, PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort)) : new PageImpl<>(new ArrayList<>());
+        return productVariantIds.get(0).isInternalId() ? productVariantDAO.findByIdInAndActiveIn(productVariantIds.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort)) : new PageImpl<>(new ArrayList<>());
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
@@ -135,7 +136,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
          *  There is @NotEmpty validation constraint on the Product bean
          */
 
-        setProductFamily(product);
+        setProductFamily(product, ID.Type.EXTERNAL_ID);
         if(isEmpty(product.getProductFamily())) {
             throw new GenericEntityException("Unable to create product, invalid product family id : " + product.getProductFamilyId());
         } else {
@@ -152,7 +153,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public <I> Optional<Product> get(ID<I> productId, boolean... activeRequired) {
         Optional<Product> product = super.get(productId, activeRequired);
-        product.ifPresent(product1 -> setProductFamily(product1));
+        product.ifPresent(product1 -> setProductFamily(product1, ID.Type.INTERNAL_ID));
         return product;
     }
 
@@ -168,23 +169,30 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public Page<Product> getAll(int page, int size, Sort sort, boolean... activeRequired) {
         Page<Product> products = super.getAll(page, size, sort, activeRequired);
-        products.forEach(product -> setProductFamily(product));
+        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
     }
 
     @Override
     public Page<Product> findAll(Pageable pageable, boolean... activeRequired) {
         Page<Product> products = super.findAll(pageable, activeRequired);
-        products.forEach(product -> setProductFamily(product));
+        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
     }
 
     @Override
     public Page<Product> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         Page<Product> products = super.findAll(searchField, keyword, pageable, activeRequired);
-        products.forEach(product -> setProductFamily(product));
+        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
     }
+
+    /*@Override
+    public Page<Product> findAll(Criteria criteria, Pageable pageable){
+        Page<Product> products = super.findAll(criteria, pageable);
+        products.forEach(product -> setProductFamily(product));
+        return products;
+    }*/
 
     /**
      * Overriding the base service method to inject the productFamily instance
@@ -197,12 +205,12 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public <I> List<Product> getAll(List<ID<I>> productIds, Sort sort, boolean... activeRequired) {
         List<Product> products = super.getAll(productIds, sort, activeRequired);
-        products.forEach(product -> setProductFamily(product));
+        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
     }
 
-    private void setProductFamily(Product product) {
-        familyService.get(ID.INTERNAL_ID(product.getProductFamilyId())).ifPresent(product::setProductFamily);
+    private void setProductFamily(Product product, ID.Type type) {
+        familyService.get(type == ID.Type.EXTERNAL_ID ? ID.EXTERNAL_ID(product.getProductFamilyId()) : ID.INTERNAL_ID(product.getProductFamilyId())).ifPresent(product::setProductFamily);
     }
 
     /**

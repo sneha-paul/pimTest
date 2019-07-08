@@ -13,10 +13,12 @@ import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import org.javatuples.Pair;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
@@ -264,4 +267,40 @@ public class ProductController extends BaseController<Product, ProductService> {
         model.put("success", productService.toggleProduct(ID.EXTERNAL_ID(productId), Toggle.get(active)));
         return model;
     }
+
+    /*@RequestMapping(value =  {"/search"})           //TODO - frontend pending
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> search(HttpServletRequest request) {
+
+        Optional<Family> family = productFamilyService.get("ENVELOPE", FindBy.EXTERNAL_ID, false);
+
+        Map<String, Pair<String, Object>> criteriaMap = new HashMap<>();
+        criteriaMap.put("productFamilyId", Pair.with("equals", family.get().getId()));
+        criteriaMap.put("productName", Pair.with("startsWith", "10 x 12 x 2"));
+
+        System.out.println("SearchList: "+criteriaMap);
+
+        Criteria _criteria = new Criteria();
+        _criteria.andOperator(criteriaMap.entrySet().stream().map(entry -> Criteria.where(entry.getKey()).regex( Pattern.compile("^" + entry.getValue().getValue1(), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE))).collect(Collectors.toList()).toArray(new Criteria[0]));
+        _criteria.orOperator(Criteria.where("externalId").regex( Pattern.compile("EXp$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)));
+
+        return new Result<Map<String, String>>().buildResult(new Request(request),
+                dataTableRequest -> productService.findAll(_criteria, dataTableRequest.getPageRequest(defaultSort)),
+                paginatedResult -> {
+                    List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
+                    List<ProductVariant> productVariants = productVariantService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, false);
+                    Map<String, Map<String, Object>> productsVariantsInfo = ProductUtil.getVariantDetailsForProducts(productIds, productVariants, 4);
+
+                    List<Map<String, String>> dataObjects = new ArrayList<>();
+                    paginatedResult.forEach(e -> {
+                        Map<String, String> map = e.toMap();
+                        Map<String, Object> productVariantsInfo = productsVariantsInfo.get(e.getId());
+                        map.put("variantCount", Integer.toString((int)productVariantsInfo.get("totalVariants")));
+                        map.put("variantImages", StringUtil.concatinate((List<String>)productVariantsInfo.get("variantImages"), "|"));
+                        dataObjects.add(map);
+                    });
+                    return dataObjects;
+                });
+    }*/
 }

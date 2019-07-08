@@ -44,7 +44,7 @@ public class SimpleJob implements Job {
             jobs.setScheduledStartTime(scheduleTime);
             jobs.setActualStartTime(jobExecutionContext.getTrigger().getStartTime());
             jobs.setCompletedTime(endTime);
-            JobInstance jobNew = jobInstanceService.createJobsDetails(jobs);
+            //JobInstance jobNew = jobInstanceService.createJobsDetails(jobs);
         }
     }
 }

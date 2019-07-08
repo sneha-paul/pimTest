@@ -10,10 +10,10 @@
                         <label>Job Name</label>
                         <input type="text" name="jobName" class="form-control" />
                     </div>
-                    <%--<div class="">
+                    <div class="">
                         <label>Schedule Time</label>
                         <input type="date" name="scheduledStartTime" id="scheduledStartTime" class="form-control" />
-                    </div>--%>
+                    </div>
                 </div>
             </div>
             <br>
