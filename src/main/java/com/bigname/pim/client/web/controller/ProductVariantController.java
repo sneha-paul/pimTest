@@ -324,7 +324,7 @@ public class ProductVariantController extends ControllerSupport {
                     if(pagination.hasSorts() && !dataTableRequest.getOrder().getName().equals("sequenceNum")) {
                         sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
                     }
-                    Page<ProductVariant> paginatedResult = productVariantService.getAll(ID.EXTERNAL_ID(productId), channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
+                    Page<ProductVariant> paginatedResult = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channelId, pagination.getPageNumber(), pagination.getPageSize(), sort, false);
                     List<Map<String, String>> dataObjects = new ArrayList<>();
                     int seq[] = {1};
                     paginatedResult.getContent().forEach(e -> {
