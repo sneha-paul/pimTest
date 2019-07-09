@@ -12,7 +12,7 @@
                     </div>
                     <div class="">
                         <label>Schedule Time</label>
-                        <input type="date" name="scheduledStartTime" id="scheduledStartTime" class="form-control" />
+                        <input type="datetime-local" name="scheduledStartTime" id="scheduledStartTime" class="form-control" />
                     </div>
                 </div>
             </div>

@@ -5,6 +5,9 @@ import com.m7.xtreme.xplatform.service.JobInstanceService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,28 +26,32 @@ public class SimpleJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
 
+        System.out.println("============== : "+jobExecutionContext.getJobDetail().getJobDataMap().getString("jobService"));
+
         System.out.println("Job Executed");
         String jobName = jobExecutionContext.getJobDetail().getKey().getName();
         String jobType = jobExecutionContext.getJobDetail().getKey().getGroup();
         System.out.println("JobType : " + jobType);
-        System.out.println("========"+jobExecutionContext.getFireInstanceId());
+        System.out.println("========" + jobExecutionContext.getFireInstanceId());
         System.out.println(jobExecutionContext.getTrigger().getStartTime());
-        Date endTime = jobExecutionContext.getScheduledFireTime();
-        System.out.println("End Time : "+endTime);
+        Instant endDateInstant = Instant.ofEpochMilli(jobExecutionContext.getScheduledFireTime().getTime());
+        LocalDateTime endTime = LocalDateTime.ofInstant(endDateInstant, ZoneId.systemDefault());
+        System.out.println("End Time : " + endTime);
+        Instant startDateInstant = Instant.ofEpochMilli(jobExecutionContext.getTrigger().getStartTime().getTime());
+        LocalDateTime startDateTime = LocalDateTime.ofInstant(startDateInstant, ZoneId.systemDefault());
 
-        if(jobType.equals("CronJob")){
-            Date scheduleTime = new Date(System.currentTimeMillis());
+        if (jobType.equals("CronJob")) {
             //String cronExpression = "0 * * ? * *	";  //"*/10 * * * * ? *";
 
-            JobInstance jobs = new JobInstance();
-            jobs.setJobId(UUID.randomUUID().toString());
-            jobs.setJobName(jobName);
-            jobs.setJobType(jobType);
-            jobs.setStatus("Completed");
-            jobs.setScheduledStartTime(scheduleTime);
-            jobs.setActualStartTime(jobExecutionContext.getTrigger().getStartTime());
-            jobs.setCompletedTime(endTime);
-            //JobInstance jobNew = jobInstanceService.createJobsDetails(jobs);
+            JobInstance jobInstance = new JobInstance();
+            jobInstance.setExternalId(jobName);
+            jobInstance.setJobName(jobName);
+            jobInstance.setJobType(jobType);
+            jobInstance.setStatus("Completed");
+            jobInstance.setScheduledStartTime(startDateTime);
+            jobInstance.setActualStartTime(LocalDateTime.now());
+            jobInstance.setCompletedTime(endTime);
+            jobInstanceService.createJobsDetails(jobInstance);
         }
     }
 }
