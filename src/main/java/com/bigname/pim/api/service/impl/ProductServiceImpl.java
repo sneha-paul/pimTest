@@ -187,12 +187,12 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         return products;
     }
 
-    /*@Override
+    @Override
     public Page<Product> findAll(Criteria criteria, Pageable pageable){
         Page<Product> products = super.findAll(criteria, pageable);
-        products.forEach(product -> setProductFamily(product));
+        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
-    }*/
+    }
 
     /**
      * Overriding the base service method to inject the productFamily instance

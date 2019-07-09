@@ -268,12 +268,12 @@ public class ProductController extends BaseController<Product, ProductService> {
         return model;
     }
 
-    /*@RequestMapping(value =  {"/search"})           //TODO - frontend pending
+    @RequestMapping(value =  {"/search"})           //TODO - frontend pending
     @ResponseBody
     @SuppressWarnings("unchecked")
     public Result<Map<String, String>> search(HttpServletRequest request) {
 
-        Optional<Family> family = productFamilyService.get("ENVELOPE", FindBy.EXTERNAL_ID, false);
+        Optional<Family> family = productFamilyService.get(ID.EXTERNAL_ID("ENVELOPE"), false);
 
         Map<String, Pair<String, Object>> criteriaMap = new HashMap<>();
         criteriaMap.put("productFamilyId", Pair.with("equals", family.get().getId()));
@@ -289,7 +289,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                 dataTableRequest -> productService.findAll(_criteria, dataTableRequest.getPageRequest(defaultSort)),
                 paginatedResult -> {
                     List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
-                    List<ProductVariant> productVariants = productVariantService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, false);
+                    List<ProductVariant> productVariants = productVariantService.getAll(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), PIMConstants.DEFAULT_CHANNEL_ID, false);
                     Map<String, Map<String, Object>> productsVariantsInfo = ProductUtil.getVariantDetailsForProducts(productIds, productVariants, 4);
 
                     List<Map<String, String>> dataObjects = new ArrayList<>();
@@ -302,5 +302,5 @@ public class ProductController extends BaseController<Product, ProductService> {
                     });
                     return dataObjects;
                 });
-    }*/
+    }
 }
