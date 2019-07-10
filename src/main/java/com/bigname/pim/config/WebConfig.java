@@ -4,6 +4,8 @@ import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.repository.init.Jackson2RepositoryPopulatorFactoryBean;
@@ -24,6 +26,19 @@ import javax.sql.DataSource;
 public class WebConfig implements WebMvcConfigurer {
     @Value("${upload.file.path}")
     private String filePath;
+
+    @Value("${spring.datasource.username}")
+    private  String userName;
+
+    @Value("${spring.datasource.password}")
+    private String passWord;
+
+    @Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String driverClassName;
+
 
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
@@ -111,10 +126,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public DataSource getDataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver"); //TODO - read this from application properties, if present
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/test");
-        dataSourceBuilder.username("root");
-        dataSourceBuilder.password("admin");
+        dataSourceBuilder.driverClassName(driverClassName);
+        dataSourceBuilder.url(url);
+        dataSourceBuilder.username(userName);
+        dataSourceBuilder.password(passWord);
         return dataSourceBuilder.build();
     }
 
