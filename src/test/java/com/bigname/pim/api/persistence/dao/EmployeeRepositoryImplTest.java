@@ -75,6 +75,33 @@ public class EmployeeRepositoryImplTest {
         List<ID> ids1 = Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList());
         //ids1.add(ID.EXTERNAL_ID(employeesData.get(0).get("employeeId")));
        // employeeDAO.findByIdNotInAndActiveIn(ids1.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(false), PageRequest.of(1, employeesData.size(), Sort.by("firstName")));
+
+        //findByExternalIdNotInAndActiveIn
+        // employeeDAO.findByExternalIdNotInAndActiveIn(ids1.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(false), PageRequest.of(1, employeesData.size(), Sort.by("firstName")));
+
+        //findByIdInAndActiveIn
+        //employeeDAO.findByIdInAndActiveIn(ids1.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(false), PageRequest.of(1, employeesData.size(), Sort.by("firstName")));
+
+        //findByIdInAndActiveIn (list)
+        //employeeDAO.findByIdInAndActiveIn(ids1.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(false));
+
+        //findByExternalIdInAndActiveIn
+        //employeeDAO.findByExternalIdInAndActiveIn(ids1.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(false), PageRequest.of(1, employeesData.size(), Sort.by("firstName")));
+
+        //findByExternalIdInAndActiveIn (list)
+       // employeeDAO.findByExternalIdInAndActiveIn(ids1.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(false));
+
+        //findByExternalId
+       // employeeDAO.findByExternalId(ID.EXTERNAL_ID(employeesData.get(0).get("employeeId")));
+
+        //findByExternalIdStartingWith
+        //employeeDAO.findByExternalIdStartingWith(ID.EXTERNAL_ID(employeesData.get(0).get("employeeId")));
+
+        //findByIdAndActiveIn
+       // employeeDAO.findByIdAndActiveIn(ID.EXTERNAL_ID(employeesData.get(0).get("employeeId")), PimUtil.getActiveOptions(false));
+
+        //findByExternalIdAndActiveIn
+       // employeeDAO.findByExternalIdAndActiveIn(ID.EXTERNAL_ID(employeesData.get(0).get("employeeId")), PimUtil.getActiveOptions(false));
     }
 
     @After
