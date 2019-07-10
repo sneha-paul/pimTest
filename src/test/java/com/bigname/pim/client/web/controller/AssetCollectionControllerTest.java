@@ -3,10 +3,9 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.AssetCollection;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.service.UserService;

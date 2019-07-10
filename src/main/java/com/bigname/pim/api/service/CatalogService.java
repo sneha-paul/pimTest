@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.domain.WebsiteCatalog;
-import com.bigname.pim.api.persistence.dao.CatalogDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CatalogDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;

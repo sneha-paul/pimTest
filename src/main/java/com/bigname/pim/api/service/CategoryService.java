@@ -1,7 +1,7 @@
 package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;

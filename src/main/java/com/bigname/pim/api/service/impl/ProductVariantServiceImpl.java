@@ -1,8 +1,8 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.ProductDAO;
-import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.util.PIMConstants;

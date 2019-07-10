@@ -3,7 +3,7 @@ package com.bigname.pim.api.service;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
+import com.bigname.pim.api.persistence.dao.mongo.WebsiteDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;
 import org.springframework.data.domain.Page;

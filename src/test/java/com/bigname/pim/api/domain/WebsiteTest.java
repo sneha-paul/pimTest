@@ -1,12 +1,11 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
+import com.bigname.pim.api.persistence.dao.mongo.WebsiteDAO;
 import com.bigname.pim.api.service.WebsiteService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
@@ -24,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

@@ -1,8 +1,8 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
-import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.VirtualFileDAO;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;

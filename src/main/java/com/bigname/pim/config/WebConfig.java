@@ -1,6 +1,6 @@
 package com.bigname.pim.config;
 
-import com.bigname.pim.api.persistence.dao.ChannelDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;

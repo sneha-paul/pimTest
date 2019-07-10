@@ -1,7 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.*;
+import com.bigname.pim.api.persistence.dao.mongo.*;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.PIMConstants;

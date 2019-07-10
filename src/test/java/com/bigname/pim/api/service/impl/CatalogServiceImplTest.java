@@ -5,10 +5,10 @@ import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.domain.RootCategory;
-import com.bigname.pim.api.persistence.dao.CatalogDAO;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
-import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CatalogDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
@@ -16,8 +16,6 @@ import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
@@ -32,15 +30,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

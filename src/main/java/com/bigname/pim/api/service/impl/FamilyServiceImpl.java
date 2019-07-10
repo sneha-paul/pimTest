@@ -1,7 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;

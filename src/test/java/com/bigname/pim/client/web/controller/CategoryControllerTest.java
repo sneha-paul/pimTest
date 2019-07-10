@@ -2,14 +2,13 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.*;
+import com.bigname.pim.api.persistence.dao.mongo.*;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.service.UserService;

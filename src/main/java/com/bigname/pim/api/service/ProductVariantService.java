@@ -2,7 +2,7 @@ package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.FileAsset;
 import com.bigname.pim.api.domain.ProductVariant;
-import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductVariantDAO;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;

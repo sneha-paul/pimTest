@@ -1,9 +1,9 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
-import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
-import com.bigname.pim.api.persistence.dao.ProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;

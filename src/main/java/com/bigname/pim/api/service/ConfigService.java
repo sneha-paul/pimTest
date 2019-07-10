@@ -1,7 +1,7 @@
 package com.bigname.pim.api.service;
 
 import com.bigname.pim.api.domain.Config;
-import com.bigname.pim.api.persistence.dao.ConfigDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ConfigDAO;
 import com.m7.xtreme.xcore.service.BaseService;
 
 /**

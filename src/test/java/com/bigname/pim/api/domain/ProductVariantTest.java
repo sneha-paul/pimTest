@@ -1,10 +1,9 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

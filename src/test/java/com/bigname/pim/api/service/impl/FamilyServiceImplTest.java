@@ -2,8 +2,8 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.CollectionsUtil;

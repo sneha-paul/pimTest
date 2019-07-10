@@ -1,16 +1,14 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
-import com.bigname.pim.api.persistence.dao.ProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;

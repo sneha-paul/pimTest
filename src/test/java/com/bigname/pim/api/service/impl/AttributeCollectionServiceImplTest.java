@@ -2,14 +2,13 @@ package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
@@ -25,15 +24,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

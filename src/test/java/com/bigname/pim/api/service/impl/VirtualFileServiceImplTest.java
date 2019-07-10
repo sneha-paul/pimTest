@@ -3,12 +3,11 @@ package com.bigname.pim.api.service.impl;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
@@ -25,8 +24,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

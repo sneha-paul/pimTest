@@ -1,10 +1,9 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.RoleDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RoleDAO;
 import com.bigname.pim.api.service.RoleService;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
@@ -17,8 +16,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static com.m7.xtreme.xcore.util.FindBy.EXTERNAL_ID;
 
 
 /**

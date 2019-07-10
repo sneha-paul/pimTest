@@ -1,7 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.VerificationToken;
-import com.bigname.pim.api.persistence.dao.VerificationTokenDAO;
+import com.bigname.pim.api.persistence.dao.mongo.VerificationTokenDAO;
 import com.bigname.pim.api.service.RegistrationService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.m7.xtreme.xcore.util.ID;

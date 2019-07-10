@@ -1,11 +1,10 @@
 package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

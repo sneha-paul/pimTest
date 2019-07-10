@@ -1,7 +1,7 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
