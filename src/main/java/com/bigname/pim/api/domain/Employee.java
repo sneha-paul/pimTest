@@ -20,6 +20,9 @@ public class Employee extends JpaEntity<Employee> {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+    public  Employee(){
+        super("");
+    }
 
     public String getEmployeeId() {
         return employeeId;
