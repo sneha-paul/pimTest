@@ -23,11 +23,7 @@ public class EmployeeRepositoryImplTest {
    /* @PersistenceContext
     protected EntityManager entityManager;*/
     @Autowired
-   EmployeeDAO employeeDAO;
-
-    @Autowired
-    CategoryDAO categoryDAO;
-
+    private EmployeeDAO employeeDAO;
 
     @Before
     public void setUp() throws Exception {
