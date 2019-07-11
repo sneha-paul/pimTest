@@ -5,6 +5,7 @@ import com.m7.xtreme.xcore.domain.JpaEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 @Entity
@@ -77,5 +78,23 @@ public class Employee extends JpaEntity<Employee> {
             }
         }
         return this;
+    }
+
+    public Map<String, Object> diff(Employee employee, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(employee.getId())) {
+            diff.put("internalId", employee.getId());
+        }
+        if (!this.getFirstName().equals(employee.getFirstName())) {
+            diff.put("firstName", employee.getFirstName());
+        }
+        if (!this.getLastName().equals(employee.getLastName())) {
+            diff.put("lastName", employee.getLastName());
+        }
+        if (!this.getActive().equals(employee.getActive())) {
+            diff.put("active", employee.getActive());
+        }
+        return diff;
     }
 }
