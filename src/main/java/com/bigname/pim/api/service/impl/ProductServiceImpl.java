@@ -561,8 +561,9 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
 
     @Override
     public List<CategoryProduct> getAllCategoryProductsWithProductId(ID<String> productId) {
-        String internalProductId = productId.isInternalId() ? productId.getId() : get(productId, false).map(MongoEntity::getId).orElse("");
-        return isNotEmpty(internalProductId) ? categoryProductDAO.findByProductId(productId.getId()) : new ArrayList<>();
+        productId = getInternalId(productId);
+        //String internalProductId = productId.isInternalId() ? productId.getId() : get(productId, false).map(MongoEntity::getId).orElse("");
+        return isNotEmpty(productId) ? categoryProductDAO.findByProductId(productId.getId()) : new ArrayList<>();
     }
 
     @Override
