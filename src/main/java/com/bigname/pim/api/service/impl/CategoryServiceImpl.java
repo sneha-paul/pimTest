@@ -563,33 +563,27 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
     @Override
     public List<RootCategory> getAllRootCategoriesWithCategoryId(ID<String> categoryId) {
-        String internalId = getInternalId(categoryId);
-        return isNotEmpty(internalId) ? rootCategoryDAO.findByRootCategoryId(internalId) : new ArrayList<>();
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? rootCategoryDAO.findByRootCategoryId(internalId.getId()) : new ArrayList<>();
     }
 
     @Override
     public List<RelatedCategory> getAllRelatedCategoriesWithSubCategoryId(ID<String> categoryId) {
-        String internalId = getInternalId(categoryId);
-        return isNotEmpty(internalId) ? relatedCategoryDAO.findBySubCategoryId(internalId) : new ArrayList<>();
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? relatedCategoryDAO.findBySubCategoryId(internalId.getId()) : new ArrayList<>();
     }
 
     @Override
     public List<ProductCategory> getAllProductCategoriesWithCategoryId(ID<String> categoryId) {
-        String internalId = getInternalId(categoryId);
-        return isNotEmpty(internalId) ? productCategoryDAO.findByCategoryId(internalId) : new ArrayList<>();
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? productCategoryDAO.findByCategoryId(internalId.getId()) : new ArrayList<>();
     }
 
     @Override
     public List<CategoryProduct> getAllCategoryProducts(ID<String> categoryId) {
-        String internalId = getInternalId(categoryId);
-        return isNotEmpty(internalId) ? categoryProductDAO.findByCategoryId(internalId) : new ArrayList<>();
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? categoryProductDAO.findByCategoryId(internalId.getId()) : new ArrayList<>();
     }
-
-
-    protected String getInternalId(ID<String> categoryId) {
-        return categoryId.isInternalId() ? categoryId.getId() : get(categoryId, false).map(MongoEntity::getId).orElse("");
-    }
-
 
     @Override
     public void updateRootCategory(RootCategory rootCategory) {
