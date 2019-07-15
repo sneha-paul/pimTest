@@ -141,7 +141,7 @@ public class EmployeeRepositoryImplTest {
         //Getting employees as list
         Map<String, Object> conditions = CollectionsUtil.toMap("active", "Y", "lastName", "C", "firstName", "sruthi");
         List<Employee> result = employeeDAO.findAll(conditions);
-        Assert.assertEquals(result.size(), 2);
+        Assert.assertEquals(result.size(), 3);
         Assert.assertEquals(result.get(0).getFirstName() , "sruthi");
 
         //find all Employees as Page

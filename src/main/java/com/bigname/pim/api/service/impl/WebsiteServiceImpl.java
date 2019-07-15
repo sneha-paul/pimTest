@@ -107,7 +107,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
             Optional<Catalog> catalog = catalogService.get(catalogId, false);
             if(catalog.isPresent()) {
                 Optional<WebsiteCatalog> top = websiteCatalogDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return websiteCatalogDAO.save(new WebsiteCatalog(getInternalId(websiteId).getId().toString(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
+                return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
             }
         }
         return null;

@@ -271,11 +271,10 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     public RootCategory addRootCategory(ID<String> id, ID<String> rootCategoryId) {
         Optional<Catalog> catalog = get(id, false);
         if(catalog.isPresent()) {
-            ID<String> catalogId = getInternalId(id);
             Optional<Category> rootCategory = categoryService.get(rootCategoryId, false);
             if(rootCategory.isPresent()) {
                 Optional<RootCategory> top = rootCategoryDAO.findTopByCatalogIdAndSequenceNumOrderBySubSequenceNumDesc(catalog.get().getId(), 0);
-                return rootCategoryDAO.save(new RootCategory(getInternalId(id).getId().toString(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
+                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
             }
         }
         return null;
