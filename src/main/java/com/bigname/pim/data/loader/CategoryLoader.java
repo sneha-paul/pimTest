@@ -84,7 +84,7 @@ public class CategoryLoader {
                 parentId = parentId.contains("|") ? parentId.substring(parentId.lastIndexOf("|") + 1) : parentId;
             }
             String description = data.get(i).get(attributeNamesMetadata.indexOf("DESCRIPTION"));
-            String discontinued = data.get(i).get(attributeNamesMetadata.indexOf("DISCONTINUED"));
+            String discontinued = "N"; //data.get(i).get(attributeNamesMetadata.indexOf("DISCONTINUED")); //TODO change after testing
             String longDescription = data.get(i).get(attributeNamesMetadata.indexOf("LONG_DESCRIPTION"));
             String metaTitle = data.get(i).get(attributeNamesMetadata.indexOf("META_TITLE"));
             String metaDescription = data.get(i).get(attributeNamesMetadata.indexOf("META_DESCRIPTION"));

@@ -890,7 +890,7 @@ public class ProductLoader1 {
             //Product variants data WITHOUT metadata, this will be a sublist of the complete data without the metadata rows
             List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
 
-            Map<String, List<List<String>>> variantsAssets = getProductAssets();
+            //Map<String, List<List<String>>> variantsAssets = getProductAssets(); //TODO uncomment after testing
 
             //Map of valid attributeNames, grouped by familyId
             Map<String, Set<String>> familyAttributes = getFamilyAttributes(data);
@@ -1479,7 +1479,8 @@ public class ProductLoader1 {
                     //                        System.out.println(assetFileName + " <======= Not Found");
                 }
 
-                if (variantsAssets.containsKey(variantId)) {
+                //TODO uncomment after testing
+                /*if (variantsAssets.containsKey(variantId)) {
                     List<List<String>> variantAssets = variantsAssets.get(variantId);
                     for (int i = 0; i < variantAssets.size(); i++) {
                         List<String> variantAsset = variantAssets.get(i);
@@ -1499,7 +1500,7 @@ public class ProductLoader1 {
                             //                                System.out.println(assetFileName + " <======= Asset Not Found");
                         }
                     }
-                }
+                }*/
 
                 File[] files = getFileNames(new File(assetLoader.getSourceLocation()), variantId + "_");
                 for(int x = 0; x < files.length; x ++) {
