@@ -7,9 +7,12 @@ import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PimUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
@@ -281,12 +284,10 @@ public class ProductController extends BaseController<Product, ProductService> {
 
         System.out.println("SearchList: "+criteriaMap);
 
-        Criteria _criteria = new Criteria();
-        _criteria.andOperator(criteriaMap.entrySet().stream().map(entry -> Criteria.where(entry.getKey()).regex( Pattern.compile("^" + entry.getValue().getValue1(), Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE))).collect(Collectors.toList()).toArray(new Criteria[0]));
-        _criteria.orOperator(Criteria.where("externalId").regex( Pattern.compile("EXp$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)));
+        GenericCriteria criteria = PimUtil.buildCriteria1(criteriaMap);
 
         return new Result<Map<String, String>>().buildResult(new Request(request),
-                dataTableRequest -> productService.findAll(_criteria, dataTableRequest.getPageRequest(defaultSort)),
+                dataTableRequest -> productService.findAll(criteria, dataTableRequest.getPageRequest(defaultSort)),
                 paginatedResult -> {
                     List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
                     List<ProductVariant> productVariants = productVariantService.getAll(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), PIMConstants.DEFAULT_CHANNEL_ID, false);

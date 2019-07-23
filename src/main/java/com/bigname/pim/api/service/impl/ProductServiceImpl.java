@@ -15,6 +15,7 @@ import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.exception.GenericEntityException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;
@@ -188,7 +189,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     @Override
-    public Page<Product> findAll(Criteria criteria, Pageable pageable){
+    public Page<Product> findAll(GenericCriteria criteria, Pageable pageable){
         Page<Product> products = super.findAll(criteria, pageable);
         products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
