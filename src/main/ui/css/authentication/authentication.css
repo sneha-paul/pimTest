@@ -1,4 +1,4 @@
-.logo img{
+.logo img, .footer-logo img{
     width: 160px;
 }
 .register-box input.email {
@@ -65,4 +65,7 @@ a.button:hover {
     bottom: 4em;
     left: 50%;
     transform: translateX(-50%);
+}
+.footer-logo{
+    margin-bottom: 0px;
 }
