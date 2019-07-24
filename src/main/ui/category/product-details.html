@@ -8,6 +8,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+
     <!-- all css here -->
     <link rel="stylesheet" href="../template/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="../template/assets/css/magnific-popup.css">
@@ -22,7 +23,6 @@
     <link rel="stylesheet" href="../template/assets/css/style.css">
     <link rel="stylesheet" href="../template/assets/css/responsive.css">
     <link rel="stylesheet" href="../css/category/category.css">
-    <link rel="stylesheet" href="../css/category/category.css">
     <script src="../template/assets/js/vendor/modernizr-2.8.3.min.js"></script>
 </head>
 
@@ -32,7 +32,6 @@
         <![endif]-->
     <!-- header start -->
     <div class="wrapper">
-
         <header class="pl-155 pr-155 intelligent-header">
             <div class="header-area header-area-2">
                 <div class="container-fluid p-0">
@@ -339,9 +338,9 @@
             <div class="container">
                 <div class="breadcrumb-content-2">
                     <ul>
-                        <li><a class="#" href="#">home</a></li>
-                        <li><a class="" href="category.html">Category </a></li>
-                        <li><a class="active" href="subcategory.html">SubCategory </a></li>
+                        <li><a class="active" href="#">home</a></li>
+                        <li><a class="active" href="category.html">Category</a></li>
+                        <li><a class="active" href="subcategory.html">subcategory</a></li>
                         <li>Product Name</li>
                     </ul>
                 </div>
@@ -359,31 +358,65 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12 col-lg-7 col-12">
-                        <div class="product-details-6 pr-70 pro-stick">
-                            <div class="easyzoom easyzoom--overlay mb-30">
-                                <a href="../template/assets/img/product-details/bl2.jpg">
-                                    <img src="../template/assets/img/product-details/details-sticky1.jpg" alt="">
-                                </a>
-                            </div>
-                            <div class="easyzoom easyzoom--overlay mb-30">
-                                <a href="../template/assets/img/product-details/bl3.jpg">
-                                    <img src="../template/assets/img/product-details/details-sticky2.jpg" alt="">
-                                </a>
-                            </div>
-                            <div class="easyzoom easyzoom--overlay mb-30">
-                                <a href="../template/assets/img/product-details/bl2.jpg">
-                                    <img src="../template/assets/img/product-details/details-sticky3.jpg" alt="">
-                                </a>
-                            </div>
-                            <div class="easyzoom easyzoom--overlay mb-30">
-                                <a href="../template/assets/img/product-details/bl4.jpg">
-                                    <img src="../template/assets/img/product-details/details-sticky4.jpg" alt="">
-                                </a>
+                        <div class="product-details-img-content">
+                            <div class="product-details-tab mr-35 product-details-tab2">
+                                <div class="product-details-small nav mr-10 product-details-2" role=tablist>
+                                    <a class="active mb-10" href="#pro-details1" data-toggle="tab" role="tab"
+                                        aria-selected="true">
+                                        <img src="../template/assets/img/product-details/s5.jpg" alt="">
+                                    </a>
+                                    <a class="mb-10" href="#pro-details2" data-toggle="tab" role="tab"
+                                        aria-selected="true">
+                                        <img src="../template/assets/img/product-details/s6.jpg" alt="">
+                                    </a>
+                                    <a class="mb-10" href="#pro-details3" data-toggle="tab" role="tab"
+                                        aria-selected="true">
+                                        <img src="../template/assets/img/product-details/s7.jpg" alt="">
+                                    </a>
+                                    <a class="mb-10" href="#pro-details4" data-toggle="tab" role="tab"
+                                        aria-selected="true">
+                                        <img src="../template/assets/img/product-details/s8.jpg" alt="">
+                                    </a>
+                                </div>
+                                <div class="product-details-large tab-content">
+                                    <div class="tab-pane active show fade" id="pro-details1" role="tabpanel">
+                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                                            <a href="../template/assets/img/product-details/bl1.jpg">
+                                                <img src="../template/assets/img/product-details/l5-details-2.jpg"
+                                                    alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="pro-details2" role="tabpanel">
+                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                                            <a href="../template/assets/img/product-details/bl2.jpg">
+                                                <img src="../template/assets/img/product-details/l6-details-2.jpg"
+                                                    alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="pro-details3" role="tabpanel">
+                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                                            <a href="../template/assets/img/product-details/bl3.jpg">
+                                                <img src="../template/assets/img/product-details/l7-details-2.jpg"
+                                                    alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="pro-details4" role="tabpanel">
+                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                                            <a href="../template/assets/img/product-details/bl4.jpg">
+                                                <img src="../template/assets/img/product-details/l8-details-2.jpg"
+                                                    alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-12 col-lg-5 col-12">
-                        <div class="sidebar-active product-details-content">
+                        <div class="product-details-content">
                             <h3>Handcrafted Supper Mug</h3>
                             <div class="rating-number">
                                 <div class="quick-view-rating">
@@ -403,27 +436,25 @@
                             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmol tempor incidid
                                 ut labore et dolore magna aliqua. Ut enim ad minim veni quis nostrud exercitation
                                 ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in</p>
-                            <div class="product-color-2">
-                                <h4 class="details-title">Color*</h4>
-                                <div class="product-color-style2">
-                                    <ul>
-                                        <li class="orange"></li>
-                                        <li class="blue2"></li>
-                                        <li class="pink"></li>
-                                        <li class="yellow"></li>
-                                    </ul>
+                            <div class="quick-view-select">
+                                <div class="select-option-part">
+                                    <label>Size*</label>
+                                    <select class="select">
+                                        <option value="">- Please Select -</option>
+                                        <option value="">xl</option>
+                                        <option value="">ml</option>
+                                        <option value="">m</option>
+                                        <option value="">sl</option>
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="product-size-2">
-                                <h4 class="details-title">Size*</h4>
-                                <div class="product-size-style2">
-                                    <ul>
-                                        <li><a href="#">xl</a></li>
-                                        <li><a href="#">ml</a></li>
-                                        <li><a href="#">m</a></li>
-                                        <li><a href="#">sl</a></li>
-                                        <li><a href="#">ls</a></li>
-                                    </ul>
+                                <div class="select-option-part">
+                                    <label>Color*</label>
+                                    <select class="select">
+                                        <option value="">- Please Select -</option>
+                                        <option value="">orange</option>
+                                        <option value="">pink</option>
+                                        <option value="">yellow</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="quickview-plus-minus">
@@ -457,9 +488,9 @@
                                     <li><a href="#">jewellery</a></li>
                                 </ul>
                             </div>
-                            <div class="product-tags product-cat-tag">
+                            <div class="product-share">
                                 <ul>
-                                    <li class="categories-title">share :</li>
+                                    <li class="categories-title">Share :</li>
                                     <li>
                                         <a href="#">
                                             <i class="ion-social-twitter"></i>
@@ -652,53 +683,70 @@
         <footer class="footer-area gray-bg pt-100 pb-95">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-3 col-md-5 col-12">
+                    <div class="col-lg-3 col-md-6 col-12">
                         <div class="footer-widget">
-                            <div class="footer-widget-l-content">
-                                <h4>20 Years Experience</h4>
-                                <ul>
-                                    <li><a href="#"><i class="ion-social-twitter"></i></a></li>
-                                    <li><a href="#"><i class="ion-social-tumblr"></i></a></li>
-                                    <li><a href="#"><i class="ion-social-facebook"></i></a></li>
-                                    <li><a href="#"><i class="ion-social-instagram-outline"></i></a></li>
-                                </ul>
-                            </div>
+                            <h4 class="footer-title">Heading1</h4>
+                            <ul>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="col-lg-6 col-md-7 col-12">
+                    <div class="col-lg-3 col-md-6 col-12">
                         <div class="footer-widget">
-                            <div class="footer-widget-m-content text-center">
-                                <div class="footer-logo">
-                                    <a href="#"><img src="../template/assets/img/logo/logo.png" alt=""></a>
-                                </div>
-                                <div class="footer-nav">
-                                    <nav>
-                                        <ul>
-                                            <li><a href="index.html">home</a></li>
-                                            <li><a href="about-us.html">about us</a></li>
-                                            <li><a href="shop-grid-view-sidebar.html">shop </a></li>
-                                            <li><a href="blog-left-sidebar.html"> blog </a></li>
-                                            <li><a href="#">pages </a></li>
-                                        </ul>
-                                    </nav>
-                                </div>
-                                <p>Copyright © <a href="https://hastech.company/">HasTech</a> 2018 . All Right Reserved.
-                                </p>
-                            </div>
+                            <h4 class="footer-title">Heading2</h4>
+                            <ul>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-12 col-12">
-                        <div class="footer-widget f-right">
-                            <div class="footer-widget-r-content">
-                                <ul>
-                                    <li><span>Phone :</span> +00 123 54 0056</li>
-                                    <li><span>Email : </span> <a href="#">neha@gmail.com</a></li>
-                                    <li><span>Address :</span> Dhaka Bangladesh</li>
-                                </ul>
+                    <div class="col-lg-3 col-md-6 col-12">
+                        <div class="footer-widget">
+                            <h4 class="footer-title">Heading3</h4>
+                            <ul>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                                <li><a href="#">Lorem ipsum dolor sit</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-12">
+                        <div class="footer-widget ">
+                            <div class="food-single-newsletter mt-0">
+                                <p>Lorem ipsum dolor sit amet.</p>
+                                <div id="mc_embed_signup" class="subscribe-form pt-2 pb-4">
+                                    <form
+                                        action="http://devitems.us11.list-manage.com/subscribe/post?u=6bbb9b6f5827bd842d9640c82&amp;id=05d85f18ef"
+                                        method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form"
+                                        class="validate" target="_blank" novalidate>
+                                        <div id="mc_embed_signup_scroll" class="mc-form">
+                                            <input type="email" value="" name="EMAIL" class="email"
+                                                placeholder="Your Mail :" required>
+                                            <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                                            <div class="mc-news" aria-hidden="true"><input type="text"
+                                                    name="b_6bbb9b6f5827bd842d9640c82_05d85f18ef" tabindex="-1"
+                                                    value=""></div>
+                                            <div class="clear"><input type="submit" value="Subscribe" name="subscribe"
+                                                    id="mc-embedded-subscribe" class="button"></div>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
+                            <ul class="footer-social-media d-flex">
+                                <li><a href="#"><i class="ion-social-twitter"></i></a></li>
+                                <li><a href="#"><i class="ion-social-tumblr"></i></a></li>
+                                <li><a href="#"><i class="ion-social-facebook"></i></a></li>
+                                <li><a href="#"><i class="ion-social-instagram-outline"></i></a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
+                <hr class="my-3">
+
+                <p class="text-center">Copyright &copy; B2B2019. All Right Reserved.</p>
             </div>
         </footer>
         <!-- modal -->

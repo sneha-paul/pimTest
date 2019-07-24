@@ -42,10 +42,6 @@
             <div class="container">
                 <div class="breadcrumb-content">
                     <h2>Create a Free Account</h2>
-                    <!-- <ul>
-                    <li><a href="#">home</a></li>
-                    <li> register </li>
-                </ul> -->
                 </div>
             </div>
         </div>
@@ -121,7 +117,7 @@
                     </div>
                 </div>
                 <!-- Reseller info start -->
-                <div class="row reseller-info justify-content-center">
+                <div id="reseller-info" class="row justify-content-center">
                     <div class="col-lg-6 col-md-12 col-12">
                         <form action="#">
                             <div class="checkbox-form">
@@ -176,7 +172,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-12">
-                                        <a href="javascript:vioid(0)" class="button reseller-account">Create business
+                                        <a href="#get-verify" class="button reseller-account">Create business
                                             account</a>
                                     </div>
                                 </div>
@@ -185,7 +181,7 @@
                     </div>
                 </div>
                 <!-- Business card verification -->
-                <div class="row get-verify justify-content-center">
+                <div id="get-verify" class="row justify-content-center">
                     <div class="col-lg-6 col-md-12 col-12">
                         <a href="login-security.html" class="text-center mb-20 text-info d-block">Skip this step</a>
                         <form action="#">
@@ -329,22 +325,22 @@
         headroom.init();
         $(document).ready(function () {
 
-            $('.reseller-info').hide();
-            $('.get-verify').hide();
+            $('#reseller-info').hide();
+            $('#get-verify').hide();
             $('.business-account').click(function () {
                 if ($('input[name="terms"]').prop("checked") == true) {
-                    $('.reseller-info').show();
+                    $('#reseller-info').show();
                     $('.business-info').hide();
                 }
                 else if ($('input[name="terms"]').prop("checked") == false) {
-                    $('.reseller-info').hide();
-                    $('.get-verify').show();
+                    $('#reseller-info').hide();
+                    $('#get-verify').show();
                     $('.business-info').hide();
                 }
             });
             $('.reseller-account').click(function () {
-                $('.reseller-info').hide();
-                $('.get-verify').show();
+                $('#reseller-info').hide();
+                $('#get-verify').show();
                 $('.business-info').hide();
             })
 
