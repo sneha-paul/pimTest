@@ -4,11 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>B2Bplace</title>
+    <title>B2B - Home</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="template/assets/img/favicon.png">
 
 
     <!-- all css here -->
@@ -23,8 +21,11 @@
     <link rel="stylesheet" href="template/assets/css/bundle.css">
     <link rel="stylesheet" href="template/assets/css/style.css">
     <link rel="stylesheet" href="template/assets/css/responsive.css">
+    <link rel="stylesheet" href="jQuery-Multislider/css/multislider.css">
     <link rel="stylesheet" href="css/b2b.css">
     <script src="template/assets/js/vendor/modernizr-2.8.3.min.js"></script>
+
+
 </head>
 
 <body>
@@ -206,7 +207,7 @@
                 </div>
             </div>
         </header>
-        <div class="header-space"></div>
+        <!-- <div class="header-space"></div> -->
         <!-- header end -->
         <!-- sidebar-cart start -->
         <div class="sidebar-cart onepage-sidebar-area">
@@ -336,7 +337,8 @@
                 </div>
             </div>
         </div>
-        <div class="slider-area pl-60 pr-60">
+        <!-- Banner section -->
+        <div class="container-fluid slider-area p-0">
             <div class="slider-active owl-carousel">
                 <div class="single-slider single-slider-hm1 bg-img ptb-280"
                     style="background-image: url(template/assets/img/slider/2.jpg)">
@@ -360,403 +362,856 @@
                 </div>
             </div>
         </div>
-
-        <!-- Promo section -->
-        <section class="">
-            <div class="banner-area">
-                <div class="container custom">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <div class="single-banner-3 mb-10">
-                                <a href="#"><img src="template/assets/img/banner/9.jpg" alt=""></a>
-                                <div class="banner-content3-position1 common-banner-style-3">
-                                    <h2>Extra <span>40%</span> <br>Off All Sale <br>Styles</h2>
+        <div class="container">
+            <!-- Promo section -->
+            <section class="">
+                <div class="banner-area">
+                    <div class="custom">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="single-banner-3 mb-10">
+                                    <a href="#"><img src="template/assets/img/banner/9.jpg" alt=""></a>
+                                    <div class="banner-content3-position1 common-banner-style-3">
+                                        <h2>Extra <span>40%</span> <br>Off All Sale <br>Styles</h2>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="single-banner-3 mb-10">
-                                <a href="#"><img src="template/assets/img/banner/10.jpg" alt=""></a>
-                                <div class="banner-content3-position1 common-banner-style-3">
-                                    <h2>Sale Up To <br><span>50%</span> Off</h2>
+                            <div class="col-md-5">
+                                <div class="single-banner-3 mb-10">
+                                    <a href="#"><img src="template/assets/img/banner/10.jpg" alt=""></a>
+                                    <div class="banner-content3-position1 common-banner-style-3">
+                                        <h2>Sale Up To <br><span>50%</span> Off</h2>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="single-banner-3 mb-10">
-                                <a href="#"><img src="template/assets/img/banner/11.jpg" alt=""></a>
-                                <div class="banner-content3-position3 common-banner-style-3">
-                                    <h2>Sale Up To <br><span>60%</span> Off</h2>
+                            <div class="col-md-5">
+                                <div class="single-banner-3 mb-10">
+                                    <a href="#"><img src="template/assets/img/banner/11.jpg" alt=""></a>
+                                    <div class="banner-content3-position3 common-banner-style-3">
+                                        <h2>Sale Up To <br><span>60%</span> Off</h2>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-7">
-                            <div class="single-banner-3 mb-10">
-                                <a href="#"><img src="template/assets/img/banner/12.jpg" alt=""></a>
-                                <div class="banner-content3-position3 common-banner-style-3">
-                                    <h2><span>30%</span> Off or <br>More Beauty <br>Products</h2>
+                            <div class="col-md-7">
+                                <div class="single-banner-3 mb-10">
+                                    <a href="#"><img src="template/assets/img/banner/12.jpg" alt=""></a>
+                                    <div class="banner-content3-position3 common-banner-style-3">
+                                        <h2><span>30%</span> Off or <br>More Beauty <br>Products</h2>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- New arrivals -->
-        <section>
-            <div class="product-collection-area">
-                <div class="electronic-product container">
-                    <div class="section-title text-center mb-55">
-                        <h2>New Arrivals</h2>
-                        <p>It is a long established fact that a reader will be distracted by the readable content of a
-                            page
-                            when look</p>
+            <!-- New arrivals -->
+            <section>
+                <div class="product-collection-area">
+                    <div class="electronic-product">
+                        <div class="section-title text-center mb-55">
+                            <h2>New Arrivals</h2>
+                            <p>It is a long established fact that a reader will be distracted by the readable content of
+                                a
+                                page
+                                when look</p>
+                        </div>
                     </div>
+
+                    <div class="banner-area mb-55">
+                        <div id="" class="new-arrivalSlider mixedSlider p-0">
+                            <div class="MS-content">
+                                <div class="row item">
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/13.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/14.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/15.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row item">
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/5.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/6.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/7.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row item">
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/14.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/13.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="single-banner4">
+                                            <a href="#"><img src="template/assets/img/banner/15.jpg" alt=""></a>
+                                            <div class="rectangular-box">
+                                                <a href="category/product-details.html" class="product-name">WOODEN
+                                                    furniture</a>
+                                                <span class="price-right">
+                                                    $100.00
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="new-action">
+                                            <a title="Add To Cart" class="action-same" href="#"><i
+                                                    class="ion-bag"></i></a>
+                                            <a title="Quick View" class="action-eye" data-toggle="modal"
+                                                data-target="#exampleModal" href="#"><i
+                                                    class="ion-ios-eye-outline"></i></a>
+                                            <a title="Wishlist" class="action-same" href="#"><i
+                                                    class="ion-ios-heart-outline"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="MS-controls">
+                                <button class="MS-left"><i class="ion-chevron-left" aria-hidden="true"></i></button>
+                                <button class="MS-right"><i class="ion-chevron-right" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="load-more text-center">
+                            <a class="btn-hover load-more-style" href="new-arrivals.html">
+                                View All</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured products -->
+            <section>
+                <div class="product-collection-area">
+                    <div class="">
+                        <div class="section-title text-center mb-55">
+                            <h2>Featured Products</h2>
+                            <p>It is a long established fact that a reader will be distracted by the readable content of
+                                a
+                                page
+                                when look</p>
+                        </div>
+                        <div id="" class="featured-productSlider mixedSlider p-0">
+                            <div class="MS-content">
+                                <div class="row item">
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/1.jpg"
+                                                        alt=""></a>
+                                                <span>sale</span>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">WOODEN FURNITURE</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$110.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/2.jpg"
+                                                        alt=""></a>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">WOODEN FURNITURE</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$120.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/3.jpg"
+                                                        alt=""></a>
+                                                <span>sale</span>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">HANDCRAFTED MUG</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$130.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/4.jpg"
+                                                        alt=""></a>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">HANDCRAFTED MUG</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$140.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row item">
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/5.jpg"
+                                                        alt=""></a>
+                                                <span>sale</span>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">WOODEN FURNITURE</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$110.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/6.jpg"
+                                                        alt=""></a>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">WOODEN FURNITURE</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$120.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/7.jpg"
+                                                        alt=""></a>
+                                                <span>sale</span>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">HANDCRAFTED MUG</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$130.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
+                                        <div class="single-product mb-35">
+                                            <div class="product-img">
+                                                <a href="#"><img src="template/assets/img/product/jewellery/8.jpg"
+                                                        alt=""></a>
+                                                <div class="product-action">
+                                                    <a title="Wishlist" class="animate-left" href="#"><i
+                                                            class="ion-ios-heart-outline"></i></a>
+                                                    <a title="Quick View" data-toggle="modal"
+                                                        data-target="#exampleModal" class="animate-right" href="#"><i
+                                                            class="ion-ios-eye-outline"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="product-content">
+                                                <div class="product-title-price">
+                                                    <div class="product-title">
+                                                        <h4><a href="category/product-details.html">HANDCRAFTED MUG</a>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="product-price">
+                                                        <span>$140.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="product-cart-categori">
+                                                    <div class="product-cart">
+                                                        <span>jewellery</span>
+                                                    </div>
+                                                    <div class="product-categori">
+                                                        <a href="#"><i class="ion-bag"></i> Add to cart</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="MS-controls">
+                                <button class="MS-left"><i class="ion-chevron-left" aria-hidden="true"></i></button>
+                                <button class="MS-right"><i class="ion-chevron-right" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="load-more text-center">
+                                <a class="btn-hover load-more-style" href="featured-products.html">
+                                    View All</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Categories -->
+            <section>
+                <div class="section-title text-center mb-55">
+                    <h2>Top Categories</h2>
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a
+                        page
+                        when look</p>
                 </div>
                 <div class="banner-area">
-                    <div class="container-fluid p-0">
-                        <div class="row no-gutters">
-                            <div class="col-md-4">
-                                <div class="single-banner4">
-                                    <a href="#"><img src="template/assets/img/banner/13.jpg" alt=""></a>
-                                    <div class="banner-content-4">
-                                        <h3>For Women <br>Summer Collection.</h3>
-                                        <a href="#">View Collection</a>
+                    <div id="" class="top-categorySlider mixedSlider p-0">
+                        <div class="MS-content">
+                            <div class="row item">
+                                <div class="col-md-6 col-lg-3 col-12">
+                                    <div class="single-banner mb-30">
+                                        <a href="#"><img src="template/assets/img/banner/1.jpg" alt="">
+                                            <div class="banner-content banner-content-position1">
+                                                <h3>Category <span>1</span></h3>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="d-sm-none d-lg-block col-lg-6 col-12">
+                                    <div class="single-banner mb-30">
+                                        <a href="#"><img src="template/assets/img/banner/2.jpg" alt="">
+                                            <div class="banner-content banner-content-position2">
+                                                <h3>Category <span>2</span></h3>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 col-12">
+                                    <div class="single-banner mb-30">
+                                        <a href="#"><img src="template/assets/img/banner/3.jpg" alt="">
+                                            <div class="banner-content banner-content-position3">
+                                                <h3>Category <span>3</span></h3>
+                                            </div>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="single-banner4">
-                                    <a href="#"><img src="template/assets/img/banner/14.jpg" alt=""></a>
-                                    <div class="banner-content-4">
-                                        <h3>Only Women <br>Amazing Collection.</h3>
-                                        <a href="#">View Collection</a>
+                            <div class="row item">
+                                <div class="d-sm-none d-lg-block col-lg-6 col-12">
+                                    <div class="single-banner mb-30">
+                                        <a href="#"><img src="template/assets/img/banner/2.jpg" alt="">
+                                            <div class="banner-content banner-content-position2">
+                                                <h3>Category <span>2</span></h3>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 col-12">
+                                    <div class="single-banner mb-30">
+                                        <a href="#"><img src="template/assets/img/banner/1.jpg" alt="">
+                                            <div class="banner-content banner-content-position1">
+                                                <h3>Category <span>1</span></h3>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-lg-3 col-12">
+                                    <div class="single-banner mb-30">
+                                        <a href="#"><img src="template/assets/img/banner/3.jpg" alt="">
+                                            <div class="banner-content banner-content-position3">
+                                                <h3>Category <span>3</span></h3>
+                                            </div>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="single-banner4">
-                                    <a href="#"><img src="template/assets/img/banner/15.jpg" alt=""></a>
-                                    <div class="banner-content-4">
-                                        <h3>Best Collection <br>Only For Women. </h3>
-                                        <a href="#">View Collection</a>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="MS-controls">
+                            <button class="MS-left"><i class="ion-chevron-left" aria-hidden="true"></i></button>
+                            <button class="MS-right"><i class="ion-chevron-right" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="load-more text-center">
+                        <a class="btn-hover load-more-style" href="shop-grid-view-sidebar.html">
+                            View All</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Brands -->
+            <!-- <section class="bg-light">
+                <div class="section-title text-center mb-55">
+                    <h2> Top Brands</h2>
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page
+                        when look</p>
+                </div>
+                <div class="brand-logo">
+                    <div class="">
+                        <div class="brand-logo-active owl-carousel mb-55">
+                            <div class="single-logo">
+                                <img src="template/assets/img/brand-logo/1.png" alt="">
+                            </div>
+                            <div class="single-logo">
+                                <img src="template/assets/img/brand-logo/2.png" alt="">
+                            </div>
+                            <div class="single-logo">
+                                <img src="template/assets/img/brand-logo/3.png" alt="">
+                            </div>
+                            <div class="single-logo">
+                                <img src="template/assets/img/brand-logo/4.png" alt="">
+                            </div>
+                            <div class="single-logo">
+                                <img src="template/assets/img/brand-logo/5.png" alt="">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="load-more text-center">
+                                <a class="btn-hover load-more-style" href="shop-grid-view-sidebar.html">
+                                    View All</a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Featured products -->
-        <section>
-            <div class="product-collection-area">
-                <div class="container">
-                    <div class="section-title text-center mb-55">
-                        <h2>Featured Products</h2>
-                        <p>It is a long established fact that a reader will be distracted by the readable content of a
-                            page
-                            when look</p>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
-                            <div class="single-product mb-35">
-                                <div class="product-img">
-                                    <a href="#"><img src="template/assets/img/product/jewellery/1.jpg" alt=""></a>
-                                    <span>sale</span>
-                                    <div class="product-action">
-                                        <a title="Wishlist" class="animate-left" href="#"><i
-                                                class="ion-ios-heart-outline"></i></a>
-                                        <a title="Quick View" data-toggle="modal" data-target="#exampleModal"
-                                            class="animate-right" href="#"><i class="ion-ios-eye-outline"></i></a>
-                                    </div>
-                                </div>
-                                <div class="product-content">
-                                    <div class="product-title-price">
-                                        <div class="product-title">
-                                            <h4><a href="category/product-details.html">WOODEN FURNITURE</a></h4>
-                                        </div>
-                                        <div class="product-price">
-                                            <span>$110.00</span>
-                                        </div>
-                                    </div>
-                                    <div class="product-cart-categori">
-                                        <div class="product-cart">
-                                            <span>jewellery</span>
-                                        </div>
-                                        <div class="product-categori">
-                                            <a href="#"><i class="ion-bag"></i> Add to cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
-                            <div class="single-product mb-35">
-                                <div class="product-img">
-                                    <a href="#"><img src="template/assets/img/product/jewellery/2.jpg" alt=""></a>
-                                    <div class="product-action">
-                                        <a title="Wishlist" class="animate-left" href="#"><i
-                                                class="ion-ios-heart-outline"></i></a>
-                                        <a title="Quick View" data-toggle="modal" data-target="#exampleModal"
-                                            class="animate-right" href="#"><i class="ion-ios-eye-outline"></i></a>
-                                    </div>
-                                </div>
-                                <div class="product-content">
-                                    <div class="product-title-price">
-                                        <div class="product-title">
-                                            <h4><a href="category/product-details.html">WOODEN FURNITURE</a></h4>
-                                        </div>
-                                        <div class="product-price">
-                                            <span>$120.00</span>
-                                        </div>
-                                    </div>
-                                    <div class="product-cart-categori">
-                                        <div class="product-cart">
-                                            <span>jewellery</span>
-                                        </div>
-                                        <div class="product-categori">
-                                            <a href="#"><i class="ion-bag"></i> Add to cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
-                            <div class="single-product mb-35">
-                                <div class="product-img">
-                                    <a href="#"><img src="template/assets/img/product/jewellery/3.jpg" alt=""></a>
-                                    <span>sale</span>
-                                    <div class="product-action">
-                                        <a title="Wishlist" class="animate-left" href="#"><i
-                                                class="ion-ios-heart-outline"></i></a>
-                                        <a title="Quick View" data-toggle="modal" data-target="#exampleModal"
-                                            class="animate-right" href="#"><i class="ion-ios-eye-outline"></i></a>
-                                    </div>
-                                </div>
-                                <div class="product-content">
-                                    <div class="product-title-price">
-                                        <div class="product-title">
-                                            <h4><a href="category/product-details.html">HANDCRAFTED MUG</a></h4>
-                                        </div>
-                                        <div class="product-price">
-                                            <span>$130.00</span>
-                                        </div>
-                                    </div>
-                                    <div class="product-cart-categori">
-                                        <div class="product-cart">
-                                            <span>jewellery</span>
-                                        </div>
-                                        <div class="product-categori">
-                                            <a href="#"><i class="ion-bag"></i> Add to cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-4 col-xl-3 col-sm-6 col-12">
-                            <div class="single-product mb-35">
-                                <div class="product-img">
-                                    <a href="#"><img src="template/assets/img/product/jewellery/4.jpg" alt=""></a>
-                                    <div class="product-action">
-                                        <a title="Wishlist" class="animate-left" href="#"><i
-                                                class="ion-ios-heart-outline"></i></a>
-                                        <a title="Quick View" data-toggle="modal" data-target="#exampleModal"
-                                            class="animate-right" href="#"><i class="ion-ios-eye-outline"></i></a>
-                                    </div>
-                                </div>
-                                <div class="product-content">
-                                    <div class="product-title-price">
-                                        <div class="product-title">
-                                            <h4><a href="category/product-details.html">HANDCRAFTED MUG</a></h4>
-                                        </div>
-                                        <div class="product-price">
-                                            <span>$140.00</span>
-                                        </div>
-                                    </div>
-                                    <div class="product-cart-categori">
-                                        <div class="product-cart">
-                                            <span>jewellery</span>
-                                        </div>
-                                        <div class="product-categori">
-                                            <a href="#"><i class="ion-bag"></i> Add to cart</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="text-center">
-                        <a class="view-link" href="#">view all products</a>
-                    </div>
+            </section> -->
+            <section class="bg-light">
+                <div class="section-title text-center mb-55">
+                    <h2> Top Brands</h2>
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page
+                        when look</p>
                 </div>
-            </div>
-        </section>
+                <div class="brand-logo">
+                    <div id="" class="top-brandSlider mixedSlider">
+                        <div class="MS-content">
+                            <div class="row item mb-55 text-center">
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/1.png" alt="">
+                                    </div>
+                                </div>
 
-        <!-- Top Categories -->
-        <section>
-            <div class="section-title text-center mb-55">
-                <h2>Top Categories</h2>
-                <p>It is a long established fact that a reader will be distracted by the readable content of a
-                    page
-                    when look</p>
-            </div>
-            <div class="banner-area">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-6 col-lg-3 col-12">
-                            <div class="single-banner mb-30">
-                                <a href="#"><img src="template/assets/img/banner/1.jpg" alt="">
-                                    <div class="banner-content banner-content-position1">
-                                        <h3>Category <span>1</span></h3>
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/2.png" alt="">
                                     </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="d-sm-none d-lg-block col-lg-6 col-12">
-                            <div class="single-banner mb-30">
-                                <a href="#"><img src="template/assets/img/banner/2.jpg" alt="">
-                                    <div class="banner-content banner-content-position2">
-                                        <h3>Category <span>2</span></h3>
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/3.png" alt="">
                                     </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-3 col-12">
-                            <div class="single-banner mb-30">
-                                <a href="#"><img src="template/assets/img/banner/3.jpg" alt="">
-                                    <div class="banner-content banner-content-position3">
-                                        <h3>Category <span>3</span></h3>
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/4.png" alt="">
                                     </div>
-                                </a>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-12">
-                <div class="load-more text-center">
-                    <a class="btn-hover load-more-style" href="shop-grid-view-sidebar.html">
-                        View All</a>
-                </div>
-            </div>
-        </section>
+                            <div class="row item mb-55 text-center">
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/5.png" alt="">
+                                    </div>
+                                </div>
 
-        <!-- Top Brands -->
-        <section>
-            <div class="section-title text-center mb-55">
-                <h2> Top Brands</h2>
-                <p>It is a long established fact that a reader will be distracted by the readable content of a page
-                    when look</p>
-            </div>
-            <div class="brand-logo">
-                <div class="container-fluid">
-                    <div class="brand-logo-active owl-carousel mb-55">
-                        <div class="single-logo">
-                            <img src="template/assets/img/brand-logo/1.png" alt="">
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/1.png" alt="">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/4.png" alt="">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <div class="brand-logo-img">
+                                        <img src="template/assets/img/brand-logo/2.png" alt="">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="single-logo">
-                            <img src="template/assets/img/brand-logo/2.png" alt="">
-                        </div>
-                        <div class="single-logo">
-                            <img src="template/assets/img/brand-logo/3.png" alt="">
-                        </div>
-                        <div class="single-logo">
-                            <img src="template/assets/img/brand-logo/4.png" alt="">
-                        </div>
-                        <div class="single-logo">
-                            <img src="template/assets/img/brand-logo/5.png" alt="">
+                        <div class="MS-controls">
+                            <button class="MS-left"><i class="ion-chevron-left" aria-hidden="true"></i></button>
+                            <button class="MS-right"><i class="ion-chevron-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
                     <div class="col-lg-12">
                         <div class="load-more text-center">
                             <a class="btn-hover load-more-style" href="shop-grid-view-sidebar.html">
-                                See more brands</a>
+                                View All</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Top Stories -->
-        <section>
-            <div class="blog-area">
-                <div class="container">
-                    <div class="section-title text-center mb-55">
-                        <h2> Top Stories</h2>
-                        <p>It is a long established fact that a reader will be distracted by the readable content of a
-                            page
-                            when look</p>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-blog mb-30">
-                                <div class="blog-img">
-                                    <a href="#"><img src="template/assets/img/blog/1.jpg" alt=""></a>
-                                </div>
-                                <div class="blog-info">
-                                    <h3><a href="#">Standard blog post.</a></h3>
-                                    <div class="blog-meta">
-                                        <ul>
-                                            <li>February 13</li>
-                                            <li><a href="#">Momen Bhuiyan</a></li>
-                                            <li><a href="#">4 comments</a></li>
-                                        </ul>
+            <!-- Top Stories -->
+            <section>
+                <div class="blog-area">
+                    <div class="">
+                        <div class="section-title text-center mb-55">
+                            <h2> Top Stories</h2>
+                            <p>It is a long established fact that a reader will be distracted by the readable content of
+                                a
+                                page
+                                when look</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-blog mb-30">
+                                    <div class="blog-img">
+                                        <a href="#"><img src="template/assets/img/blog/1.jpg" alt=""></a>
                                     </div>
-                                    <p>Lorem ipsum dolor sit amet, sectetur adipising elit, sed do eimod tempor
-                                        incididunt
-                                        ut labore.</p>
+                                    <div class="blog-info">
+                                        <h3><a href="#">Standard blog post.</a></h3>
+                                        <div class="blog-meta">
+                                            <ul>
+                                                <li>February 13</li>
+                                                <li><a href="#">Momen Bhuiyan</a></li>
+                                                <li><a href="#">4 comments</a></li>
+                                            </ul>
+                                        </div>
+                                        <p>Lorem ipsum dolor sit amet, sectetur adipising elit, sed do eimod tempor
+                                            incididunt
+                                            ut labore.</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-blog mb-30">
-                                <div class="blog-img">
-                                    <a href="#"><img src="template/assets/img/blog/2.jpg" alt=""></a>
-                                </div>
-                                <div class="blog-info">
-                                    <h3><a href="#">But I must explain to you.</a></h3>
-                                    <div class="blog-meta">
-                                        <ul>
-                                            <li>February 13</li>
-                                            <li><a href="#">Momen Bhuiyan</a></li>
-                                            <li><a href="#">4 comments</a></li>
-                                        </ul>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-blog mb-30">
+                                    <div class="blog-img">
+                                        <a href="#"><img src="template/assets/img/blog/2.jpg" alt=""></a>
                                     </div>
-                                    <p>Lorem ipsum dolor sit amet, sectetur adipising elit, sed do eimod tempor
-                                        incididunt
-                                        ut labore.</p>
+                                    <div class="blog-info">
+                                        <h3><a href="#">But I must explain to you.</a></h3>
+                                        <div class="blog-meta">
+                                            <ul>
+                                                <li>February 13</li>
+                                                <li><a href="#">Momen Bhuiyan</a></li>
+                                                <li><a href="#">4 comments</a></li>
+                                            </ul>
+                                        </div>
+                                        <p>Lorem ipsum dolor sit amet, sectetur adipising elit, sed do eimod tempor
+                                            incididunt
+                                            ut labore.</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            <div class="single-blog mb-30">
-                                <div class="blog-img">
-                                    <a href="#"><img src="template/assets/img/blog/3.jpg" alt=""></a>
-                                </div>
-                                <div class="blog-info">
-                                    <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
-                                    <div class="blog-meta">
-                                        <ul>
-                                            <li>February 13</li>
-                                            <li><a href="#">Momen Bhuiyan</a></li>
-                                            <li><a href="#">4 comments</a></li>
-                                        </ul>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="single-blog mb-30">
+                                    <div class="blog-img">
+                                        <a href="#"><img src="template/assets/img/blog/3.jpg" alt=""></a>
                                     </div>
-                                    <p>Lorem ipsum dolor sit amet, sectetur adipising elit, sed do eimod tempor
-                                        incididunt
-                                        ut labore.</p>
+                                    <div class="blog-info">
+                                        <h3><a href="#">Lorem ipsum dolor sit.</a></h3>
+                                        <div class="blog-meta">
+                                            <ul>
+                                                <li>February 13</li>
+                                                <li><a href="#">Momen Bhuiyan</a></li>
+                                                <li><a href="#">4 comments</a></li>
+                                            </ul>
+                                        </div>
+                                        <p>Lorem ipsum dolor sit amet, sectetur adipising elit, sed do eimod tempor
+                                            incididunt
+                                            ut labore.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
+            </section>
+        </div>
         <footer class="footer-area gray-bg pt-100 pb-95">
             <div class="container">
                 <div class="row">
@@ -823,7 +1278,7 @@
                 </div>
                 <hr class="my-3">
 
-                <p class="text-center">Copyright &copy; B2B2019. All Right Reserved.</p>
+                <p class="copy-right">Copyright &copy; B2B2019. All Right Reserved.</p>
             </div>
         </footer>
         <!-- modal -->
@@ -940,13 +1395,28 @@
     <script src="template/assets/js/ajax-mail.js"></script>
     <script src="template/assets/js/owl.carousel.min.js"></script>
     <script src="template/assets/js/plugins.js"></script>
+    <script src="jQuery-Multislider/js/multislider.js"></script>
+
     <script type="text/javascript">
         // grab an element
         var myElement = document.querySelector(".intelligent-header");
         // construct an instance of Headroom, passing the element
         var headroom = new Headroom(myElement);
         // initialise
-        headroom.init(); 
+        headroom.init();
+        $('.new-arrivalSlider').multislider({
+            interval: 5000,
+        });
+        $('.featured-productSlider').multislider({
+            interval: 5000,
+        });
+        $('.top-categorySlider').multislider({
+            interval: 5000,
+        });
+        $('.top-brandSlider').multislider({
+            interval: 5000,
+        });
+
     </script>
     <script src="template/assets/js/main.js"></script>
 </body>
