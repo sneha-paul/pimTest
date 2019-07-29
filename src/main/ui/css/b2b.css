@@ -95,6 +95,10 @@ section{
     padding-bottom: 4em;
     padding-top: 4em;
 }
+.section-header{
+    padding: 0px 10px;
+}
+
 .footer-title {
     color: #313131;
     font-size: 14px;
@@ -155,15 +159,13 @@ section{
     display: flex;
     justify-content: space-between;
 }
-/* .rectangular-box {
-    position: absolute;
-    bottom: 60px;
-    padding: 5px 10px;
-    background-color: rgba(0, 0, 0, .2);
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-} */
+.product-img img{
+    border-radius: 8px;
+}
+.product-color-style2 > ul li {
+    border-radius: 0;
+}
+/* Dropdown Filter */
 .single-banner4{
     padding-bottom: 5px;
 }
@@ -207,4 +209,17 @@ section{
 }
 .grouplist-cover{
     background-color: #ffffff;
+}
+span.load-more-style.border-0 {
+    cursor: pointer;
+}
+span.load-more-style.border-0:hover {
+    color: #ee3333;
+}
+
+/* Media Queries*/
+@media(min-width: 768px){
+    .section-header{
+        padding: 0px 0px;
+    }
 }
