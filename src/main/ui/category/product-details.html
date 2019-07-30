@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Neha - Minimalist eCommerce HTML5 Template</title>
+    <title>B2B - Product details</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -22,6 +22,11 @@
     <link rel="stylesheet" href="../template/assets/css/bundle.css">
     <link rel="stylesheet" href="../template/assets/css/style.css">
     <link rel="stylesheet" href="../template/assets/css/responsive.css">
+
+    <!-- Thumbnail slider -->
+    <link rel="stylesheet" href="../thumbnailSlider/flexslider.css" type="text/css" media="screen" />
+
+    <link rel="stylesheet" href="../css/b2b.css">
     <link rel="stylesheet" href="../css/category/category.css">
     <script src="../template/assets/js/vendor/modernizr-2.8.3.min.js"></script>
 </head>
@@ -338,7 +343,7 @@
             <div class="container">
                 <div class="breadcrumb-content-2">
                     <ul>
-                        <li><a class="active" href="#">home</a></li>
+                        <li><a class="active" href="../home.html">home</a></li>
                         <li><a class="active" href="category.html">Category</a></li>
                         <li><a class="active" href="subcategory.html">subcategory</a></li>
                         <li>Product Name</li>
@@ -356,64 +361,72 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row row-eq-height">
                     <div class="col-md-12 col-lg-7 col-12">
-                        <div class="product-details-img-content">
-                            <div class="product-details-tab mr-35 product-details-tab2">
-                                <div class="product-details-small nav mr-10 product-details-2" role=tablist>
-                                    <a class="active mb-10" href="#pro-details1" data-toggle="tab" role="tab"
-                                        aria-selected="true">
-                                        <img src="../template/assets/img/product-details/s5.jpg" alt="">
-                                    </a>
-                                    <a class="mb-10" href="#pro-details2" data-toggle="tab" role="tab"
-                                        aria-selected="true">
-                                        <img src="../template/assets/img/product-details/s6.jpg" alt="">
-                                    </a>
-                                    <a class="mb-10" href="#pro-details3" data-toggle="tab" role="tab"
-                                        aria-selected="true">
-                                        <img src="../template/assets/img/product-details/s7.jpg" alt="">
-                                    </a>
-                                    <a class="mb-10" href="#pro-details4" data-toggle="tab" role="tab"
-                                        aria-selected="true">
-                                        <img src="../template/assets/img/product-details/s8.jpg" alt="">
-                                    </a>
-                                </div>
-                                <div class="product-details-large tab-content">
-                                    <div class="tab-pane active show fade" id="pro-details1" role="tabpanel">
-                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                        <section class="slider">
+                            <div id="slider" class="flexslider product-details-tab mr-70">
+                                <ul class="slides product-details-large tab-content">
+                                    <li>
+                                        <div class="easyzoom easyzoom--overlay">
                                             <a href="../template/assets/img/product-details/bl1.jpg">
                                                 <img src="../template/assets/img/product-details/l5-details-2.jpg"
                                                     alt="">
                                             </a>
                                         </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="pro-details2" role="tabpanel">
-                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                                    </li>
+                                    <li>
+                                        <div class="easyzoom easyzoom--overlay">
                                             <a href="../template/assets/img/product-details/bl2.jpg">
                                                 <img src="../template/assets/img/product-details/l6-details-2.jpg"
                                                     alt="">
                                             </a>
                                         </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="pro-details3" role="tabpanel">
-                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                                    </li>
+                                    <li>
+                                        <div class="easyzoom easyzoom--overlay">
                                             <a href="../template/assets/img/product-details/bl3.jpg">
                                                 <img src="../template/assets/img/product-details/l7-details-2.jpg"
                                                     alt="">
                                             </a>
                                         </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="pro-details4" role="tabpanel">
-                                        <div class="easyzoom easyzoom--overlay  is-ready">
+                                    </li>
+                                    <li>
+                                        <div class="easyzoom easyzoom--overlay">
                                             <a href="../template/assets/img/product-details/bl4.jpg">
                                                 <img src="../template/assets/img/product-details/l8-details-2.jpg"
                                                     alt="">
                                             </a>
                                         </div>
-                                    </div>
-                                </div>
+                                    </li>
+
+                                </ul>
                             </div>
-                        </div>
+                            <div id="carousel" class="flexslider">
+                                <ul class="slides product-details-small nav mt-12 main-product-details" role=tablist>
+                                    <li>
+
+                                        <img src="../template/assets/img/product-details/s5.jpg" alt="">
+
+                                    </li>
+                                    <li>
+
+                                        <img src="../template/assets/img/product-details/s6.jpg" alt="">
+
+                                    </li>
+                                    <li>
+
+                                        <img src="../template/assets/img/product-details/s7.jpg" alt="">
+
+                                    </li>
+                                    <li>
+
+                                        <img src="../template/assets/img/product-details/s8.jpg" alt="">
+
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </section>
                     </div>
                     <div class="col-md-12 col-lg-5 col-12">
                         <div class="product-details-content">
@@ -762,30 +775,41 @@
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="qwick-view-left">
-                            <div class="quick-view-learg-img">
+                            <div class="quick-view-learg-img position-relative">
                                 <div class="quick-view-tab-content tab-content">
-                                    <div class="tab-pane active show fade" id="modal1" role="tabpanel">
-                                        <img src="../template/assets/img/quick-view/l1.jpg" alt="">
+                                    <div class="hero-img active">
+                                        <img src="../template/assets/img/quick-view/l10.jpg" alt="">
                                     </div>
-                                    <div class="tab-pane fade" id="modal2" role="tabpanel">
-                                        <img src="../template/assets/img/quick-view/l2.jpg" alt="">
+                                    <div class="hero-img">
+                                        <img src="../template/assets/img/quick-view/l11.jpg" alt="">
                                     </div>
-                                    <div class="tab-pane fade" id="modal3" role="tabpanel">
-                                        <img src="../template/assets/img/quick-view/l3.jpg" alt="">
+                                    <div class="hero-img">
+                                        <img src="../template/assets/img/quick-view/l12.jpg" alt="">
                                     </div>
                                 </div>
+                                <div class="thumb-control">
+                                    <a class="prev" onclick="plusSlides(-1)">
+                                        <i class="ion-chevron-left" aria-hidden="true"></i>
+                                    </a>
+                                    <a class="next" onclick="plusSlides(1)">
+                                        <i class="ion-chevron-right" aria-hidden="true">
+
+                                        </i></a>
+                                </div>
                             </div>
-                            <div class="quick-view-list nav" role=tablist>
-                                <a class="active" href="#modal1" data-toggle="tab" role="tab" aria-selected="true">
-                                    <img src="../template/assets/img/quick-view/s1.jpg" alt="">
+
+                            <div class="quick-view-list nav">
+                                <a class="thumb" href="#" onclick="currentSlide(1)">
+                                    <img src="../template/assets/img/quick-view/s10.jpg" alt="">
                                 </a>
-                                <a href="#modal2" data-toggle="tab" role="tab" aria-selected="false">
-                                    <img src="../template/assets/img/quick-view/s2.jpg" alt="">
+                                <a class="thumb" href="#" onclick="currentSlide(2)">
+                                    <img src="../template/assets/img/quick-view/s11.jpg" alt="">
                                 </a>
-                                <a href="#modal3" data-toggle="tab" role="tab" aria-selected="false">
-                                    <img src="../template/assets/img/quick-view/s3.jpg" alt="">
+                                <a class="thumb" href="#" onclick="currentSlide(3)">
+                                    <img src="../template/assets/img/quick-view/s12.jpg" alt="">
                                 </a>
                             </div>
+
                         </div>
                         <div class="qwick-view-right">
                             <div class="qwick-view-content">
@@ -813,10 +837,10 @@
                                         <h4 class="details-title">Color*</h4>
                                         <div class="product-color-style2">
                                             <ul>
-                                                <li class="orange"></li>
-                                                <li class="blue2"></li>
-                                                <li class="pink"></li>
-                                                <li class="yellow"></li>
+                                                <li class="selected"><span class="orange"></span></li>
+                                                <li class=""><span class="blue2"></span></li>
+                                                <li class=""><span class="pink"></span></li>
+                                                <li class=""><span class="yellow"></span></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -873,15 +897,44 @@
     <script src="../template/assets/js/ajax-mail.js"></script>
     <script src="../template/assets/js/owl.carousel.min.js"></script>
     <script src="../template/assets/js/plugins.js"></script>
+
+    <!-- Thumbnail Slider -->
+    <script src="../thumbnailSlider/jquery.flexslider.js"></script>
+
     <script type="text/javascript">
         // grab an element
         var myElement = document.querySelector(".intelligent-header");
         // construct an instance of Headroom, passing the element
         var headroom = new Headroom(myElement);
         // initialise
-        headroom.init(); 
+        headroom.init();
+
+        $(window).load(function () {
+            $('#carousel').flexslider({
+                animation: "slide",
+                controlNav: false,
+                animationLoop: false,
+                slideshow: false,
+                itemWidth: 125,
+                itemMargin: 15,
+                asNavFor: '#slider'
+            });
+
+            $('#slider').flexslider({
+                animation: "slide",
+                controlNav: false,
+                animationLoop: false,
+                slideshow: false,
+                sync: "#carousel",
+                start: function (slider) {
+                    $('body').removeClass('loading');
+                }
+            });
+        });
     </script>
+
     <script src="../template/assets/js/main.js"></script>
+    <script src="../js/b2b.js"></script>
 </body>
 
 </html>
