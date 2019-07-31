@@ -6,7 +6,7 @@ import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.POIUtil;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.util.ID;
@@ -106,7 +106,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
 
     @Override
     public String getFileName(Type fileType) {
-        return "ProductExport" + PimUtil.getTimestamp() + fileType.getExt();
+        return "ProductExport" + PlatformUtil.getTimestamp() + fileType.getExt();
     }
 
     public boolean exportFullJsonData(String filePath) {

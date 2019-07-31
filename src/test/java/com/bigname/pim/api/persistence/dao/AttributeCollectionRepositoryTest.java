@@ -8,7 +8,7 @@ import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.ID;
@@ -220,9 +220,9 @@ public class AttributeCollectionRepositoryTest {
             attributeCollectionDTO.setActiveFrom((LocalDateTime) attributeCollectionData.get("activeFrom"));
             attributeCollectionDTO.setActiveTo((LocalDateTime) attributeCollectionData.get("activeTo"));
 
-            if(PimUtil.hasDiscontinued(attributeCollectionDTO.getDiscontinued(), attributeCollectionDTO.getDiscontinuedFrom(), attributeCollectionDTO.getDiscontinuedTo())) {
+            if(PlatformUtil.hasDiscontinued(attributeCollectionDTO.getDiscontinued(), attributeCollectionDTO.getDiscontinuedFrom(), attributeCollectionDTO.getDiscontinuedTo())) {
                 discontinued1[0]++;
-            } else if(PimUtil.isActive(attributeCollectionDTO.getActive(), attributeCollectionDTO.getActiveFrom(), attributeCollectionDTO.getActiveTo())) {
+            } else if(PlatformUtil.isActive(attributeCollectionDTO.getActive(), attributeCollectionDTO.getActiveFrom(), attributeCollectionDTO.getActiveTo())) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;

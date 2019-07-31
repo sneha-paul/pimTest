@@ -9,7 +9,7 @@ import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
@@ -336,11 +336,11 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         Optional<Product> _product = get(productId, false);
         if(_product.isPresent()) {
             Product product = _product.get();
-            Page<ProductCategory> productCategories = productCategoryDAO.findByProductIdAndActiveIn(product.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            Page<ProductCategory> productCategories = productCategoryDAO.findByProductIdAndActiveIn(product.getId(), PlatformUtil.getActiveOptions(activeRequired), pageable);
             List<ID<String>> categoryIds = new ArrayList<>();
             productCategories.forEach(pc -> categoryIds.add(ID.INTERNAL_ID(pc.getCategoryId())));
             if(categoryIds.size() > 0) {
-                Map<String, Category> categoriesMap = PimUtil.getIdedMap(categoryService.getAll(categoryIds, null, activeRequired), ID.Type.INTERNAL_ID);
+                Map<String, Category> categoriesMap = PlatformUtil.getIdedMap(categoryService.getAll(categoryIds, null, activeRequired), ID.Type.INTERNAL_ID);
                 productCategories.forEach(pc -> pc.init(product, categoriesMap.get(pc.getCategoryId())));
             }
             return productCategories;

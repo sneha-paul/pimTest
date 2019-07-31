@@ -7,7 +7,7 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
@@ -1384,7 +1384,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
         //Getting categories
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Category> result = categoryService.findAll(criteria);
         long size = categoriesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
@@ -1432,7 +1432,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
         //Getting category
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("categoryName", categoriesData.get(0).get("name")));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("categoryName", categoriesData.get(0).get("name")));
         Optional<Category> result = categoryService.findOne(criteria);
         Assert.assertEquals(categoriesData.get(0).get("name"), result.get().getCategoryName());
     }

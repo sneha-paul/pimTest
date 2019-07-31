@@ -12,7 +12,7 @@ import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
@@ -987,7 +987,7 @@ public class CatalogServiceImplTest {
         });
         //Getting catalogs
         long size = catalogsData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Catalog> result = catalogService.findAll(criteria);
         Assert.assertTrue(result.size() == size);
     }
@@ -1038,7 +1038,7 @@ public class CatalogServiceImplTest {
             catalogDAO.insert(catalogDTO);
         });
         //Getting catalog
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("catalogName", catalogsData.get(0).get("name")));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("catalogName", catalogsData.get(0).get("name")));
         Optional<Catalog> result = catalogService.findOne(criteria);
         Assert.assertEquals(catalogsData.get(0).get("name"), result.get().getCatalogName());
     }

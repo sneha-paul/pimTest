@@ -7,7 +7,7 @@ import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
@@ -2356,7 +2356,7 @@ public class FamilyServiceImplTest {
         });
 
         long size = familiesData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         //Getting Families
         List<Family> result = familyService.findAll(criteria);
         Assert.assertTrue(result.size() == size);
@@ -2471,7 +2471,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
         });
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
         //Getting Family
         Optional<Family> result = familyService.findOne(criteria);
         Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());

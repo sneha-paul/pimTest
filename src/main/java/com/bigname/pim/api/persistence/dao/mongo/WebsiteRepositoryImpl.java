@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -50,7 +50,7 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website, Criter
                 .as("websiteCatalog");
 
         Criteria criteria = new Criteria();
-        String[] activeOptions = PimUtil.getActiveOptions(activeRequired);
+        String[] activeOptions = PlatformUtil.getActiveOptions(activeRequired);
         Criteria activeCriteria = new Criteria();
         if(activeOptions.length == 2) {
             activeCriteria = Criteria.where("active").in(Arrays.asList(activeOptions));
@@ -77,7 +77,7 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website, Criter
             }
         }
 
-        boolean showDiscontinued = PimUtil.showDiscontinued(activeRequired);
+        boolean showDiscontinued = PlatformUtil.showDiscontinued(activeRequired);
         if(showDiscontinued) {
             //Discontinued
             // (start == null && end == null && disc = 'Y') or
@@ -155,7 +155,7 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website, Criter
         keyword = "(?i)" + keyword;
         Criteria searchCriteria = new Criteria();
         searchCriteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
-        searchCriteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+        searchCriteria.andOperator(Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired))));
 
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("websiteId").is(websiteId)),
@@ -188,7 +188,7 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website, Criter
     @Override
     public List<WebsiteCatalog> getAllWebsiteCatalogs(String websiteId, boolean... activeRequired) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("websiteId").is(websiteId).andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired)))));
+        query.addCriteria(Criteria.where("websiteId").is(websiteId).andOperator(Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired)))));
         return mongoTemplate.find(query, WebsiteCatalog.class);
     }
 
@@ -199,7 +199,7 @@ public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website, Criter
         keyword = "(?i)" + keyword;
         Criteria criteria = new Criteria();
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
-        criteria.andOperator(Criteria.where("_id").nin(excludeIds),Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+        criteria.andOperator(Criteria.where("_id").nin(excludeIds),Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired))));
         query.addCriteria(criteria).with(pageable);
         return PageableExecutionUtils.getPage(
                 mongoTemplate.find(query, Catalog.class),

@@ -10,7 +10,7 @@ import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.datatable.model.SortOrder;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
@@ -232,7 +232,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                                                            @PathVariable(value = "attributeId") String attributeId,
                                                            HttpServletRequest request) {
 
-        if(PimUtil.isDataTableRequest(request)) {   // Datatable
+        if(PlatformUtil.isDataTableRequest(request)) {   // Datatable
             Request dataTableRequest = new Request(request);
             Pagination pagination = dataTableRequest.getPagination();
             Result<Map<String, String>> result = new Result<>();

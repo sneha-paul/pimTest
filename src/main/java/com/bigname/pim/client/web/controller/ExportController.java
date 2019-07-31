@@ -6,7 +6,7 @@ import com.bigname.pim.data.exportor.CatalogExporter;
 import com.bigname.pim.data.exportor.CategoryExporter;
 import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.data.loader.exporter.WebsiteExporter;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,7 +95,7 @@ public class ExportController {
     @RequestMapping(value = "/pimData", method = RequestMethod.GET)
     public Map<String, Object> exportPIMJsonData(HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        productExporter.exportFullJsonData("/DevStudio/Docs/PIM_Feeds/PIMExport" + PimUtil.getTimestamp() + ".json");
+        productExporter.exportFullJsonData("/DevStudio/Docs/PIM_Feeds/PIMExport" + PlatformUtil.getTimestamp() + ".json");
         return model;
     }
 

@@ -5,7 +5,7 @@ import com.bigname.pim.api.persistence.dao.mongo.*;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.ID;
@@ -121,7 +121,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                     Map<String, RootCategory> rootCategoriesMap = rootCategoryDAO.findByCatalogIdOrderBySequenceNumAscSubSequenceNumDesc(catalog.getId()).stream().collect(CollectionsUtil.toLinkedMap(RootCategory::getRootCategoryId, e -> e));
 
                     //Unsorted relatedCategories
-                    List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+                    List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
 
                     Map<String, List<RelatedCategory>> parentCategoriesMap = new LinkedHashMap<>();
 

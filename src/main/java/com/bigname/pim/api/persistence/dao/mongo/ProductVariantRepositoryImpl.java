@@ -2,7 +2,7 @@ package com.bigname.pim.api.persistence.dao.mongo;
 
 import com.bigname.pim.api.domain.ProductVariant;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +39,7 @@ public class ProductVariantRepositoryImpl extends GenericRepositoryImpl<ProductV
         keyword = "(?i)" + keyword;
         Criteria criteria = new Criteria();
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
-        criteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))), Criteria.where("productId").regex(productId),Criteria.where("channelId").regex(channelId));
+        criteria.andOperator(Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired))), Criteria.where("productId").regex(productId),Criteria.where("channelId").regex(channelId));
         query.addCriteria(criteria).with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()));
         return PageableExecutionUtils.getPage(
                 mongoTemplate.find(query, ProductVariant.class),

@@ -8,7 +8,7 @@ import com.bigname.pim.util.ProductUtil;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
@@ -284,7 +284,7 @@ public class ProductController extends BaseController<Product, ProductService> {
 
         System.out.println("SearchList: "+criteriaMap);
 
-        GenericCriteria criteria = PimUtil.buildCriteria1(criteriaMap);
+        GenericCriteria criteria = PlatformUtil.buildCriteria1(criteriaMap);
 
         return new Result<Map<String, String>>().buildResult(new Request(request),
                 dataTableRequest -> productService.findAll(criteria, dataTableRequest.getPageRequest(defaultSort)),

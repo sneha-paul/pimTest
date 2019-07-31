@@ -9,7 +9,7 @@ import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.ID;
@@ -498,9 +498,9 @@ public class ProductRepositoryTest {
             productDTO.setActiveFrom((LocalDateTime) productData.get("activeFrom"));
             productDTO.setActiveTo((LocalDateTime) productData.get("activeTo"));
 
-            if(PimUtil.hasDiscontinued(productDTO.getDiscontinued(), productDTO.getDiscontinuedFrom(), productDTO.getDiscontinuedTo())) {
+            if(PlatformUtil.hasDiscontinued(productDTO.getDiscontinued(), productDTO.getDiscontinuedFrom(), productDTO.getDiscontinuedTo())) {
                 discontinued1[0]++;
-            } else if(PimUtil.isActive(productDTO.getActive(), productDTO.getActiveFrom(), productDTO.getActiveTo())) {
+            } else if(PlatformUtil.isActive(productDTO.getActive(), productDTO.getActiveFrom(), productDTO.getActiveTo())) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;

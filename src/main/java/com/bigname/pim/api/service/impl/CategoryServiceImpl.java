@@ -6,7 +6,7 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.PIMConstants;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.EntityAssociation;
 import com.m7.xtreme.xcore.domain.MongoEntity;
@@ -82,7 +82,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
         List<Map<String, Object>> hierarchy = new ArrayList<>();
         //Unsorted relatedCategories
-        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
 
         Map<String, List<RelatedCategory>> parentCategoriesMap = new LinkedHashMap<>();
 
@@ -155,7 +155,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     /*public List<Map<String, Object>> getCategoryHierarchy1(boolean... activeRequired) {
         Map<String, Map<String, Object>> nodes = new LinkedHashMap<>();
 
-        List<Category> categories = categoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        List<Category> categories = categoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
         for(Category category : categories) {
             Map<String, Object> node = new HashMap<>();
             node.put("id", category.getId());
@@ -171,7 +171,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         }
 
         Map<String, List<RelatedCategory>> childCategoriesMap = new LinkedHashMap<>();
-        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
         for (RelatedCategory relatedCategory : relatedCategories) {
             if(childCategoriesMap.containsKey(relatedCategory.getCategoryId())) {
                 childCategoriesMap.get(relatedCategory.getCategoryId()).add(relatedCategory);
@@ -464,11 +464,11 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         Optional<Category> _category = get(categoryId, false);
         if(_category.isPresent()) {
             Category category = _category.get();
-            Page<CategoryProduct> categoryProducts = categoryProductDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            Page<CategoryProduct> categoryProducts = categoryProductDAO.findByCategoryIdAndActiveIn(category.getId(), PlatformUtil.getActiveOptions(activeRequired), pageable);
             List<String> productIds = new ArrayList<>();
             categoryProducts.forEach(cp -> productIds.add(cp.getProductId()));
             if(productIds.size() > 0) {
-                Map<String, Product> productsMap = PimUtil.getIdedMap(productService.getAll(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), null, activeRequired), ID.Type.INTERNAL_ID);
+                Map<String, Product> productsMap = PlatformUtil.getIdedMap(productService.getAll(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), null, activeRequired), ID.Type.INTERNAL_ID);
                 categoryProducts.forEach(cp -> cp.init(category, productsMap.get(cp.getProductId())));
             }
             return categoryProducts;

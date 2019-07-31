@@ -9,7 +9,7 @@ import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import com.google.common.base.Preconditions;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
@@ -89,13 +89,13 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         if(productVariantId.isInternalId()) {
             return get(productVariantId, activeRequired);
         } else {
-            return productDAO.findById(productId).map(product -> productVariantDAO.findByProductIdAndChannelIdAndExternalIdAndActiveIn(product.getId(), channelId, productVariantId.getId(), PimUtil.getActiveOptions(activeRequired))).orElse(Optional.empty());
+            return productDAO.findById(productId).map(product -> productVariantDAO.findByProductIdAndChannelIdAndExternalIdAndActiveIn(product.getId(), channelId, productVariantId.getId(), PlatformUtil.getActiveOptions(activeRequired))).orElse(Optional.empty());
         }
     }
 
     @Override
     public Optional<ProductVariant> get(ID<String> productVariantId, String channelId, boolean... activeRequired) {
-        return productVariantId.isInternalId() ? productVariantDAO.findByIdAndChannelIdAndActiveIn(productVariantId.getId(), channelId, PimUtil.getActiveOptions(activeRequired)) : productVariantDAO.findByExternalIdAndChannelIdAndActiveIn(productVariantId.getId(), channelId, PimUtil.getActiveOptions(activeRequired));
+        return productVariantId.isInternalId() ? productVariantDAO.findByIdAndChannelIdAndActiveIn(productVariantId.getId(), channelId, PlatformUtil.getActiveOptions(activeRequired)) : productVariantDAO.findByExternalIdAndChannelIdAndActiveIn(productVariantId.getId(), channelId, PlatformUtil.getActiveOptions(activeRequired));
     }
 
     //Don't use this method when the variantId is of type EXTERNAL_ID. Use the below method with productId and channelId instead
@@ -143,7 +143,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         Sort finalSort = sort;
-        return productDAO.findById(productId).map(product -> productVariantDAO.findByProductIdAndChannelIdAndActiveIn(product.getId(), channelId, PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, finalSort))).orElse(null);
+        return productDAO.findById(productId).map(product -> productVariantDAO.findByProductIdAndChannelIdAndActiveIn(product.getId(), channelId, PlatformUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, finalSort))).orElse(null);
     }
 
     @Override
@@ -152,13 +152,13 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             return new ArrayList<>();
         }
         if(productIds.get(0).isExternalId()) {
-            List<Product> products = productDAO.findByExternalIdInAndActiveIn(productIds.stream().map(ID::getId).collect(Collectors.toList()), PimUtil.getActiveOptions(activeRequired));
+            List<Product> products = productDAO.findByExternalIdInAndActiveIn(productIds.stream().map(ID::getId).collect(Collectors.toList()), PlatformUtil.getActiveOptions(activeRequired));
             productIds = products.stream().map(product -> ID.INTERNAL_ID(product.getId())).collect(Collectors.toList());
             if(productIds.size() == 0) {
                 return new ArrayList<>();
             }
         }
-        return productVariantDAO.findByProductIdInAndChannelIdAndActiveIn(productIds.stream().map(ID::getId).collect(Collectors.toList()), channelId, PimUtil.getActiveOptions(activeRequired));
+        return productVariantDAO.findByProductIdInAndChannelIdAndActiveIn(productIds.stream().map(ID::getId).collect(Collectors.toList()), channelId, PlatformUtil.getActiveOptions(activeRequired));
     }
 
     //Don't use this method, use the below method with productId and channelId instead
@@ -181,7 +181,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
-        return productVariantIds.get(0).isInternalId() ? productVariantDAO.findByIdInAndActiveIn(productVariantIds.stream().map(e -> e.getId()).collect(Collectors.toList()), PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort)) : new PageImpl<>(new ArrayList<>());
+        return productVariantIds.get(0).isInternalId() ? productVariantDAO.findByIdInAndActiveIn(productVariantIds.stream().map(e -> e.getId()).collect(Collectors.toList()), PlatformUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort)) : new PageImpl<>(new ArrayList<>());
     }
 
     @Override
@@ -203,7 +203,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                     return new PageImpl<>(new ArrayList<>());
                 }
             }
-            return productVariantDAO.findByProductIdAndChannelIdAndExternalIdInAndActiveIn(productId.getId(), channelId, productVariantIds.stream().map(ID::getId).collect(Collectors.toList()), PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
+            return productVariantDAO.findByProductIdAndChannelIdAndExternalIdInAndActiveIn(productId.getId(), channelId, productVariantIds.stream().map(ID::getId).collect(Collectors.toList()), PlatformUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
         }
     }
 
@@ -246,7 +246,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                     return new PageImpl<>(new ArrayList<>());
                 }
             }
-            return productVariantDAO.findByProductIdAndChannelIdAndExternalIdNotInAndActiveIn(productId.getId(), channelId, excludedVariantIds.stream().map(ID::getId).collect(Collectors.toList()), PimUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
+            return productVariantDAO.findByProductIdAndChannelIdAndExternalIdNotInAndActiveIn(productId.getId(), channelId, excludedVariantIds.stream().map(ID::getId).collect(Collectors.toList()), PlatformUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort));
         }
     }
 
@@ -296,7 +296,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         Optional<ProductVariant> _productVariant = get(productId, channelId, productVariantId, false);
         if(_productVariant.isPresent()) {
             ProductVariant productVariant = _productVariant.get();
-            Page<ProductVariant> productVariants = productVariantDAO.findByProductIdAndChannelIdAndProductVariantIdAndActiveIn(productVariant.getProductId(), productVariant.getChannelId(), productVariant.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            Page<ProductVariant> productVariants = productVariantDAO.findByProductIdAndChannelIdAndProductVariantIdAndActiveIn(productVariant.getProductId(), productVariant.getChannelId(), productVariant.getId(), PlatformUtil.getActiveOptions(activeRequired), pageable);
 
             return productVariants;
         }

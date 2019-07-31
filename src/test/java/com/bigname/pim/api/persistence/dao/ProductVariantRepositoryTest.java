@@ -7,7 +7,7 @@ import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.ID;
@@ -434,9 +434,9 @@ public class ProductVariantRepositoryTest {
             productVariantDTO.setActiveFrom((LocalDateTime) productVariantData.get("activeFrom"));
             productVariantDTO.setActiveTo((LocalDateTime) productVariantData.get("activeTo"));
 
-            if(PimUtil.hasDiscontinued(productVariantDTO.getDiscontinued(), productVariantDTO.getDiscontinuedFrom(), productVariantDTO.getDiscontinuedTo())) {
+            if(PlatformUtil.hasDiscontinued(productVariantDTO.getDiscontinued(), productVariantDTO.getDiscontinuedFrom(), productVariantDTO.getDiscontinuedTo())) {
                 discontinued1[0]++;
-            } else if(PimUtil.isActive(productVariantDTO.getActive(), productVariantDTO.getActiveFrom(), productVariantDTO.getActiveTo())) {
+            } else if(PlatformUtil.isActive(productVariantDTO.getActive(), productVariantDTO.getActiveFrom(), productVariantDTO.getActiveTo())) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;

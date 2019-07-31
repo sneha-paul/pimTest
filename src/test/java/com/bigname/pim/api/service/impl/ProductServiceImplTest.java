@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.mongo.*;
 import com.bigname.pim.api.service.*;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
@@ -3659,7 +3659,7 @@ public class ProductServiceImplTest {
         });
         //Getting products
         long size = productsData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Product> result = productService.findAll(criteria);
         Assert.assertTrue(result.size() == size);
     }
@@ -3720,7 +3720,7 @@ public class ProductServiceImplTest {
             productService.create(productDTO);
         });
         //Getting product
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("productName", productsData.get(0).get("name")));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("productName", productsData.get(0).get("name")));
         Product result = productService.findOne(criteria).orElse(null);
         Assert.assertEquals(productsData.get(0).get("name"), result.getProductName());
     }

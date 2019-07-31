@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.persistence.dao.mongo.PricingAttributeDAO;
 import com.bigname.pim.api.service.PricingAttributeService;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
@@ -470,7 +470,7 @@ public class PricingAttributeServiceImplTest {
         });
 
         //Getting pricingAttributes
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<PricingAttribute> result = pricingAttributeService.findAll(criteria);
         Assert.assertTrue(result.size() == 1);
     }
@@ -512,7 +512,7 @@ public class PricingAttributeServiceImplTest {
             pricingAttributeDAO.insert(pricingAttributeDTO);
         });
         //Getting pricingAttribute
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name")));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name")));
         PricingAttribute result = pricingAttributeService.findOne(criteria).orElse(null);
         Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.getPricingAttributeName());
     }

@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductCategory;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,7 +51,7 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product, Criter
                 .as("productCategory");
 
         Criteria criteria = new Criteria();
-        String[] activeOptions = PimUtil.getActiveOptions(activeRequired);
+        String[] activeOptions = PlatformUtil.getActiveOptions(activeRequired);
         Criteria activeCriteria = new Criteria();
         if(activeOptions.length == 2) {
             activeCriteria = Criteria.where("active").in(Arrays.asList(activeOptions));
@@ -78,7 +78,7 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product, Criter
             }
         }
 
-        boolean showDiscontinued = PimUtil.showDiscontinued(activeRequired);
+        boolean showDiscontinued = PlatformUtil.showDiscontinued(activeRequired);
         if(showDiscontinued) {
             //Discontinued
             // (start == null && end == null && disc = 'Y') or
@@ -154,7 +154,7 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product, Criter
         keyword = "(?i)" + keyword;
         Criteria searchCriteria = new Criteria();
         searchCriteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
-        searchCriteria.andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+        searchCriteria.andOperator(Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired))));
 
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("productId").is(productId)),
@@ -187,7 +187,7 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product, Criter
     @Override
     public List<ProductCategory> getAllProductCategories(String productId, boolean... activeRequired) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("productId").is(productId).andOperator(Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired)))));
+        query.addCriteria(Criteria.where("productId").is(productId).andOperator(Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired)))));
         return mongoTemplate.find(query, ProductCategory.class);
     }
 
@@ -198,7 +198,7 @@ public class ProductRepositoryImpl extends GenericRepositoryImpl<Product, Criter
         keyword = "(?i)" + keyword;
         Criteria criteria = new Criteria();
         criteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
-        criteria.andOperator(Criteria.where("_id").nin(excludeIds),Criteria.where("active").in(Arrays.asList(PimUtil.getActiveOptions(activeRequired))));
+        criteria.andOperator(Criteria.where("_id").nin(excludeIds),Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired))));
         query.addCriteria(criteria).with(pageable);
         return PageableExecutionUtils.getPage(
                 mongoTemplate.find(query, Category.class),

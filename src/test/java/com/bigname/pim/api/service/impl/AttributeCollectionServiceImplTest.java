@@ -6,7 +6,7 @@ import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
 import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
@@ -1121,7 +1121,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionService.update(attributeList);
         });
         //Getting AttributeCollections
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<AttributeCollection> result = attributeCollectionService.findAll(criteria);
         long size = collectionsData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
@@ -1167,7 +1167,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionService.create(attributeCollectionDTO);
         });
         //Getting AttributeCollection
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("collectionName", collectionsData.get(0).get("name")));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("collectionName", collectionsData.get(0).get("name")));
         Optional<AttributeCollection> result = attributeCollectionService.findOne(criteria);
         Assert.assertEquals(collectionsData.get(0).get("name"), result.get().getCollectionName());
     }

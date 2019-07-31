@@ -1,6 +1,6 @@
 package com.bigname.pim.util;
 
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 
 /**
  * Created by Manu on 8/7/2018.
@@ -16,7 +16,7 @@ public class ConvertUtil {
 
     public static boolean toBoolean(String value, boolean... defaultValue) {
         if(value == null) {
-            return PimUtil.getValueOrDefault(BOOLEAN_DEFAULT, defaultValue);
+            return PlatformUtil.getValueOrDefault(BOOLEAN_DEFAULT, defaultValue);
         }
         return TRUE.equalsIgnoreCase(value) || YES.equalsIgnoreCase(value) || Y.equalsIgnoreCase(value);
     }

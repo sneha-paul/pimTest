@@ -10,7 +10,7 @@ import com.bigname.pim.api.persistence.dao.mongo.WebsiteDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
@@ -925,7 +925,7 @@ public class WebsiteServiceImplTest {
         });
         //Getting websites
         long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         List<Website> result = websiteService.findAll(criteria);
         Assert.assertTrue(result.size() == size);
     }
@@ -981,7 +981,7 @@ public class WebsiteServiceImplTest {
         });
 
         //Getting website
-        GenericCriteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
+        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
         Optional<Website> result = websiteService.findOne(criteria);
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }

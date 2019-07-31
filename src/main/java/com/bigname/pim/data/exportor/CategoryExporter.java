@@ -5,7 +5,7 @@ import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.util.POIUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ public class CategoryExporter implements BaseExporter<Category, CategoryService>
 
     @Override
     public String getFileName(Type fileType) {
-        return "CategoryExport" + PimUtil.getTimestamp() + fileType.getExt();
+        return "CategoryExport" + PlatformUtil.getTimestamp() + fileType.getExt();
     }
 
 

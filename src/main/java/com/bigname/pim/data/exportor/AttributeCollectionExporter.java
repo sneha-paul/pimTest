@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.util.POIUtil;
-import com.m7.xtreme.common.util.PimUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.util.ID;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ public class AttributeCollectionExporter implements BaseExporter<AttributeCollec
 
     @Override
     public String getFileName(Type fileType) {
-        return "AttributeCollectionExport" + PimUtil.getTimestamp() + fileType.getExt();
+        return "AttributeCollectionExport" + PlatformUtil.getTimestamp() + fileType.getExt();
     }
 
     public boolean exportAttributeData(String filePath, String attributeCollectionId) {
