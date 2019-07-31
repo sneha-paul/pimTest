@@ -1,8 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.VerificationToken;
-import com.bigname.pim.api.persistence.dao.mongo.VerificationTokenDAO;
 import com.bigname.pim.api.service.RegistrationService;
+import com.bigname.pim.api.service.VerificationTokenService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
@@ -36,15 +36,15 @@ public class RegistrationController extends BaseController<User, UserService> {
     private UserService userService;
     private RegistrationService registrationService;
 
-    private VerificationTokenDAO verificationTokenDAO;
+    private VerificationTokenService verificationTokenService;
 
     @Autowired
     public PasswordEncoder passwordEncoder;
 
-    public RegistrationController(UserService userService, RegistrationService registrationService, VerificationTokenDAO verificationTokenDAO) {
+    public RegistrationController(UserService userService, RegistrationService registrationService, VerificationTokenService verificationTokenService) {
         super(userService);
         this.userService = userService;
-        this.verificationTokenDAO = verificationTokenDAO;
+        this.verificationTokenService = verificationTokenService;
         this.registrationService = registrationService;
     }
 
@@ -60,7 +60,7 @@ public class RegistrationController extends BaseController<User, UserService> {
 
             final String token = UUID.randomUUID().toString();
             final VerificationToken myToken  = new VerificationToken(token,user);
-            verificationTokenDAO.save(myToken);
+            verificationTokenService.tokenSave(myToken);
 
             final String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getServletPath() ;
 
@@ -95,7 +95,7 @@ public class RegistrationController extends BaseController<User, UserService> {
     }
     @RequestMapping(value = {"/registrationConfirm"}, method = RequestMethod.GET)
     public ModelAndView confirmRegistration(final Model model, @RequestParam("token") final String token, final RedirectAttributes redirectAttributes){
-        final VerificationToken verificationToken = verificationTokenDAO.findByToken(token);
+        final VerificationToken verificationToken = verificationTokenService.findByToken(token);
         final User user = verificationToken.getUser();
         user.setActive("Y");
         user.setGroup("DETAILS");
