@@ -32,13 +32,6 @@ public class AssetFamily extends MongoEntity<AssetFamily> {
 
     public AssetFamily() { super(); }
 
-    public AssetFamily(Map<String, Object> properties) {
-        this.setAssetFamilyName((String) properties.get(WEBSITE_NAME.name()));
-        this.setAssetFamilyId((String) properties.get(WEBSITE_ID.name()));
-        this.setDescription((String) properties.get(URL.name()));
-        this.setActive((String) properties.get(ACTIVE.name()));
-    }
-
     public String getAssetFamilyId() {return getExternalId();}
 
     public void setAssetFamilyId(String assetFamilyId) {

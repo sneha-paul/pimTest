@@ -17,13 +17,13 @@ import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 public class CategoryProduct extends EntityAssociation<Category, Product> {
 
     /**
-     * Internal id of the Website document, not the externalId (websiteId) attribute
+     * Internal id of the Category document, not the externalId (categoryId) attribute
      */
     @Indexed
     private String categoryId;
 
     /**
-     * Internal id of the Catalog document, not the externalId (catalogId) attribute
+     * Internal id of the Product document, not the externalId (productId) attribute
      */
     @Indexed
     private String productId;
