@@ -152,7 +152,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             return new ArrayList<>();
         }
         if(productIds.get(0).isExternalId()) {
-            List<Product> products = productDAO.findByExternalIdInAndActiveIn(productIds.stream().map(ID::getId).collect(Collectors.toList()), PlatformUtil.getActiveOptions(activeRequired));
+            List<Product> products = productDAO.findByIdIn(productIds, activeRequired);
             productIds = products.stream().map(product -> ID.INTERNAL_ID(product.getId())).collect(Collectors.toList());
             if(productIds.size() == 0) {
                 return new ArrayList<>();
@@ -181,7 +181,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "externalId"));
         }
-        return productVariantIds.get(0).isInternalId() ? productVariantDAO.findByIdInAndActiveIn(productVariantIds.stream().map(e -> e.getId()).collect(Collectors.toList()), PlatformUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, sort)) : new PageImpl<>(new ArrayList<>());
+        return productVariantDAO.findByIdIn(productVariantIds, PageRequest.of(page, size, sort), activeRequired);
     }
 
     @Override
@@ -196,7 +196,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             return getAll(productVariantIds, page, size, sort, activeRequired);
         } else {
             if(productId.isExternalId()) {
-                Optional<Product> _product = productDAO.findByExternalId(productId);
+                Optional<Product> _product = productDAO.findById(productId);
                 if(_product.isPresent()) {
                     productId = ID.INTERNAL_ID(_product.get().getId());
                 } else {
@@ -239,7 +239,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                 excludedVariantIds = new ArrayList<>();
             }
             if(productId.isExternalId()) {
-                Optional<Product> _product = productDAO.findByExternalId(productId.getId());
+                Optional<Product> _product = productDAO.findById(productId);
                 if(_product.isPresent()) {
                     productId = ID.INTERNAL_ID(_product.get().getId());
                 } else {

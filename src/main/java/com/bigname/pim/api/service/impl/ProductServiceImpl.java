@@ -189,8 +189,8 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     @Override
-    public Page<Product> findAll(GenericCriteria criteria, Pageable pageable){
-        Page<Product> products = super.findAll(criteria, pageable);
+    public Page<Product> findAll(GenericCriteria criteria, Pageable pageable, boolean... activeRequired){
+        Page<Product> products = super.findAll(criteria, pageable, activeRequired);
         products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
     }

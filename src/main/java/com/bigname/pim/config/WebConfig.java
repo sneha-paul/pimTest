@@ -77,7 +77,7 @@ public class WebConfig implements WebMvcConfigurer {
         ecommerce.setChannelId("AMAZON");
         ecommerce.setActive("Y");
         dao.save(ecommerce);*/
-        if(dao.countByIdNotNull() == 0) {
+        if(dao.countById() == 0) {
             factory.setResources(new Resource[]{new ClassPathResource("data.json")});
         }
         return factory;
