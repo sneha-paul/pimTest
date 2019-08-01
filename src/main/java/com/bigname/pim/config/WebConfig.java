@@ -1,14 +1,8 @@
 package com.bigname.pim.config;
 
-import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.data.repository.init.Jackson2RepositoryPopulatorFactoryBean;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
@@ -69,19 +63,19 @@ public class WebConfig implements WebMvcConfigurer {
         return new LocalValidatorFactoryBean();
     }
 
-    @Bean
+    /*@Bean
     public Jackson2RepositoryPopulatorFactoryBean repositoryPopulator(ChannelDAO dao) { //TODO - change with a generic app config DAO
         Jackson2RepositoryPopulatorFactoryBean factory = new Jackson2RepositoryPopulatorFactoryBean();
-        /*Channel ecommerce = new Channel();
+        *//*Channel ecommerce = new Channel();
         ecommerce.setChannelName("Amazon");
         ecommerce.setChannelId("AMAZON");
         ecommerce.setActive("Y");
-        dao.save(ecommerce);*/
+        dao.save(ecommerce);*//*
         if(dao.countById() == 0) {
             factory.setResources(new Resource[]{new ClassPathResource("data.json")});
         }
         return factory;
-    }
+    }*/
 
 
     @Bean

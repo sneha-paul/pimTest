@@ -94,7 +94,7 @@ public class WebsiteRepositoryTest {
             websiteDTO.setUrl((String)websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
 
-            Optional<Website> website = websiteDAO.findByExternalId(websiteDTO.getWebsiteId());
+            Optional<Website> website = websiteDAO.findById(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false);
             Assert.assertTrue(website.isPresent());
             website = websiteDAO.findById(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()));
             Assert.assertTrue(website.isPresent());
@@ -118,13 +118,13 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
 
             //updating website
-            Website websiteDetails = websiteDAO.findByExternalId(websitesData.get(0).get("externalId").toString()).orElse(null);
+            Website websiteDetails = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId")), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDetails));
             websiteDetails.setUrl("www.newtest1.com");
             websiteDetails.setGroup("DETAILS");
             websiteDAO.save(websiteDetails);
 
-            Website website = websiteDAO.findByExternalId(websiteDetails.getWebsiteId()).orElse(null);
+            Website website = websiteDAO.findById(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(website));
             Map<String, Object> diff = websiteDTO.diff(website);
             Assert.assertEquals(diff.size(), 1);

@@ -93,7 +93,7 @@ public class CatalogRepositoryTest {
             catalogDTO.setDescription((String)catalogData.get("description"));
             catalogDAO.insert(catalogDTO);
 
-            Optional<Catalog> catalog = catalogDAO.findByExternalId(catalogsData.get(0).get("externalId").toString());
+            Optional<Catalog> catalog = catalogDAO.findById(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId")), false);
             Assert.assertTrue(catalog.isPresent());
             catalog = catalogDAO.findById(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()));
             Assert.assertTrue(catalog.isPresent());
@@ -115,13 +115,13 @@ public class CatalogRepositoryTest {
             catalogDTO.setDescription((String)catalogData.get("description"));
             catalogDAO.insert(catalogDTO);
 
-            Catalog catalogDetails = catalogDAO.findByExternalId(catalogsData.get(0).get("externalId").toString()).orElse(null);
+            Catalog catalogDetails = catalogDAO.findById(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId")), false).orElse(null);
             Assert.assertTrue(catalogDetails != null);
             catalogDetails.setDescription("Test1 catalog description");
             catalogDetails.setGroup("DETAILS");
             catalogDAO.save(catalogDetails);
 
-            Catalog catalog = catalogDAO.findByExternalId(catalogDetails.getCatalogId()).orElse(null);
+            Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID(catalogDetails.getCatalogId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(catalog));
             Map<String, Object> diff = catalogDTO.diff(catalog);
             Assert.assertEquals(diff.size(), 1);

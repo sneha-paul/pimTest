@@ -4,7 +4,6 @@ import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Employee;
 import com.bigname.pim.api.persistence.dao.jpa.EmployeeDAO;
 import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
@@ -68,7 +67,7 @@ public class EmployeeRepositoryImplTest {
             employeeDAO.create(employeeDTO);
 
             //findByExternalId
-            Optional<Employee> employee1 = employeeDAO.findByExternalId(employeeDTO.getEmployeeId());
+            Optional<Employee> employee1 = employeeDAO.findById(ID.EXTERNAL_ID(employeeDTO.getEmployeeId()), false);
             Assert.assertTrue(employee1.isPresent());
 
             //Getting employee by id
@@ -82,12 +81,12 @@ public class EmployeeRepositoryImplTest {
             Assert.assertEquals(result.getFirstName() , "joseph");
 
             //findByIdAndActiveIn
-            employee1  = employeeDAO.findByIdAndActiveIn(employeeDTO.getId(), PlatformUtil.getActiveOptions(false));
+            employee1  = employeeDAO.findById(ID.EXTERNAL_ID(employeeDTO.getId()), false);
             Assert.assertTrue(employee1.isPresent());
             Assert.assertEquals(employee1.orElse(null).getFirstName(), employeeDTO.getFirstName());
 
             //findByExternalIdAndActiveIn
-            employee1  = employeeDAO.findByExternalIdAndActiveIn(employeeDTO.getEmployeeId(), PlatformUtil.getActiveOptions(false));
+            employee1  = employeeDAO.findById(ID.EXTERNAL_ID(employeeDTO.getEmployeeId()), false);
             Assert.assertTrue(employee1.isPresent());
             Assert.assertEquals(employee1.orElse(null).getFirstName(), employeeDTO.getFirstName());
 
@@ -108,13 +107,13 @@ public class EmployeeRepositoryImplTest {
             employeeDAO.create(employeeDTO);
 
             //updating employee
-            Employee employeeDetails = employeeDAO.findByExternalId(employeesData.get(0).get("externalId").toString()).orElse(null);
+            Employee employeeDetails = employeeDAO.findById(ID.EXTERNAL_ID(employeesData.get(0).get("externalId")), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(employeeDetails));
             employeeDetails.setFirstName("thomas");
             employeeDetails.setGroup("DETAILS");
             employeeDAO.save(employeeDetails);
 
-            Employee employee = employeeDAO.findByExternalId(employeeDetails.getEmployeeId()).orElse(null);
+            Employee employee = employeeDAO.findById(ID.EXTERNAL_ID(employeeDetails.getEmployeeId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(employee));
             Map<String, Object> diff = employeeDTO.diff(employee);
             Assert.assertEquals(diff.get("firstName"), "thomas");
@@ -150,42 +149,42 @@ public class EmployeeRepositoryImplTest {
         Assert.assertEquals(employees.getContent().get(0).getLastName(), "C");
 
         //findByActiveIn
-        List<Employee> employeeList = employeeDAO.findByActiveIn(PlatformUtil.getActiveOptions(false));
+        List<Employee> employeeList = employeeDAO.findAll(false);
         Assert.assertEquals(employeeList.size(), employeesData.size());
 
         //findByActiveIn
-        Page<Employee> employeePage = employeeDAO.findByActiveIn(PlatformUtil.getActiveOptions(false), PageRequest.of(1, employeesData.size(), Sort.by("firstName")));
+        Page<Employee> employeePage = employeeDAO.findAll(PageRequest.of(1, employeesData.size(), Sort.by("firstName")), false);
         Assert.assertEquals(employeesData.size(), employeePage.getSize());
 
         //findByExternalIdStartingWith
-        List<Employee> employeeList1 = employeeDAO.findByExternalIdStartingWith(employeesData.get(0).get("externalId").toString());
+        List<Employee> employeeList1 = employeeDAO.findByExternalIdStartingWith(ID.EXTERNAL_ID(employeesData.get(0).get("externalId")), false);
         Assert.assertEquals(employeeList1.size(), 1);
         Assert.assertEquals(employeeList1.get(0).getEmployeeId(),employeesData.get(0).get("externalId") );
 
         //findByExternalIdInAndActiveIn return as list
         String[] externalIds = {employeesData.get(0).get("externalId").toString(), employeesData.get(1).get("externalId").toString(), employeesData.get(2).get("externalId").toString()};
-        employeeList1 = employeeDAO.findByExternalIdInAndActiveIn(Arrays.stream(externalIds).collect(Collectors.toList()), PlatformUtil.getActiveOptions(false));
+        employeeList1 = employeeDAO.findByIdIn(Arrays.stream(externalIds).map(ID::EXTERNAL_ID).collect(Collectors.toList()), false);
         Assert.assertEquals(employeeList1.size(), externalIds.length);
 
         //findByExternalIdInAndActiveIn return as Page
-        employeePage = employeeDAO.findByExternalIdInAndActiveIn(Arrays.stream(externalIds).collect(Collectors.toList()), PlatformUtil.getActiveOptions(false), PageRequest.of(0, employeesData.size()));
+        employeePage = employeeDAO.findByIdIn(Arrays.stream(externalIds).map(ID::EXTERNAL_ID).collect(Collectors.toList()), PageRequest.of(0, employeesData.size()), false);
         Assert.assertEquals(employeePage.getContent().size(), externalIds.length);
 
         //findByExternalIdNotInAndActiveIn
-        employeePage = employeeDAO.findByExternalIdNotInAndActiveIn(Arrays.stream(externalIds).collect(Collectors.toList()), PlatformUtil.getActiveOptions(false), PageRequest.of(0, employeesData.size()));
+        employeePage = employeeDAO.findByIdNotIn(Arrays.stream(externalIds).map(ID::EXTERNAL_ID).collect(Collectors.toList()), PageRequest.of(0, employeesData.size()), false);
         Assert.assertEquals(employeePage.getContent().size(), employeesData.size() - externalIds.length);
 
         //findByIdNotInAndActiveIn
         Long[] ids = {employeeList.get(0).getId(), employeeList.get(1).getId(), employeeList.get(2).getId()};
-        employeePage = employeeDAO.findByIdNotInAndActiveIn(Arrays.stream(ids).collect(Collectors.toList()),PlatformUtil.getActiveOptions(false),PageRequest.of(0, employeesData.size()));
+        employeePage = employeeDAO.findByIdNotIn(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()),PageRequest.of(0, employeesData.size()), false);
         Assert.assertEquals(employeePage.getContent().size(), employeesData.size() - ids.length);
 
         //findByIdInAndActiveIn return as page
-        employeePage = employeeDAO.findByIdInAndActiveIn(Arrays.stream(ids).collect(Collectors.toList()), PlatformUtil.getActiveOptions(false), PageRequest.of(0, employeesData.size()));
+        employeePage = employeeDAO.findByIdIn(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), PageRequest.of(0, employeesData.size()), false);
         Assert.assertEquals(employeePage.getContent().size(), ids.length);
 
         //findByIdInAndActiveIn return as list
-        employeeList1 = employeeDAO.findByIdInAndActiveIn(Arrays.stream(ids).collect(Collectors.toList()), PlatformUtil.getActiveOptions(false));
+        employeeList1 = employeeDAO.findByIdIn(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), false);
         Assert.assertEquals(employeeList1.size(), ids.length);
 
         Assert.assertEquals(employeeDAO.findAll(PageRequest.of(0, employeesData.size()), false).getTotalElements(), employeesData.size());

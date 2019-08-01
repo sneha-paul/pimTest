@@ -100,7 +100,7 @@ public class ProductVariantRepositoryTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
 
         List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -153,7 +153,7 @@ public class ProductVariantRepositoryTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -161,7 +161,7 @@ public class ProductVariantRepositoryTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -215,7 +215,7 @@ public class ProductVariantRepositoryTest {
 
         });
 
-        Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
+        Family familyDetails = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId")), false).orElse(null);
 
         //create Product instance
         Product productDTO = new Product();
@@ -274,7 +274,7 @@ public class ProductVariantRepositoryTest {
         productVariantDTO.setActive("Y");
         productVariantDTO.setChannelId("ECOMMERCE");
         productVariantDAO.insert(productVariantDTO);
-        Optional<ProductVariant> productVariant = productVariantDAO.findByExternalId(productVariantDTO.getProductVariantId());
+        Optional<ProductVariant> productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), false);
         Assert.assertTrue(productVariant.isPresent());
         productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()));
         Assert.assertTrue(productVariant.isPresent());
@@ -290,7 +290,7 @@ public class ProductVariantRepositoryTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyDAO.insert(familyDTO);
-        Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+        Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertTrue(family != null);
 
         Product productDTO = new Product();
@@ -298,7 +298,7 @@ public class ProductVariantRepositoryTest {
         productDTO.setProductId("TESTPRODUCT");
         productDTO.setProductFamilyId(family.getId());
         productDAO.insert(productDTO);
-        Product product = productDAO.findByExternalId(productDTO.getProductId()).orElse(null);
+        Product product = productDAO.findById(ID.EXTERNAL_ID(productDTO.getProductId()), false).orElse(null);
         Assert.assertTrue(family != null);
 
         ProductVariant productVariantDTO = new ProductVariant();
@@ -308,14 +308,14 @@ public class ProductVariantRepositoryTest {
         productVariantDTO.setActive("Y");
         productVariantDTO.setChannelId("ECOMMERCE");
         productVariantDAO.insert(productVariantDTO);
-        ProductVariant productVariantDetails = productVariantDAO.findByExternalId(productVariantDTO.getProductVariantId()).orElse(null);
+        ProductVariant productVariantDetails = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), false).orElse(null);
         Assert.assertTrue(productVariantDetails != null);
 
         productVariantDetails.setProductVariantName("Test1Name");
         productVariantDetails.setGroup("DETAILS");
         productVariantDAO.save(productVariantDetails);
 
-        Optional<ProductVariant> productVariant = productVariantDAO.findByExternalId(productVariantDetails.getProductVariantId());
+        Optional<ProductVariant> productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDetails.getProductVariantId()), false);
         Assert.assertTrue(productVariant.isPresent());
         productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDetails.getProductVariantId()));
         Assert.assertTrue(productVariant.isPresent());

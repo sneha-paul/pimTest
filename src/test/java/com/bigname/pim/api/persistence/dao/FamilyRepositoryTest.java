@@ -7,6 +7,7 @@ import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,7 +79,7 @@ public class FamilyRepositoryTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
+            Optional<Family> family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false);
             Assert.assertTrue(family.isPresent());
             Assert.assertTrue(family != null);
         });
@@ -95,7 +96,7 @@ public class FamilyRepositoryTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -107,7 +108,7 @@ public class FamilyRepositoryTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -124,7 +125,7 @@ public class FamilyRepositoryTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -132,7 +133,7 @@ public class FamilyRepositoryTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
+            Optional<Family> family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false);
             Assert.assertTrue(family.isPresent());
             Assert.assertTrue(family != null);
 
@@ -179,7 +180,7 @@ public class FamilyRepositoryTest {
 
         });
 
-        Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
+        Family familyDetails = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId")), false).orElse(null);
 
         Assert.assertTrue(ValidationUtil.isNotEmpty(familyDetails));
 
@@ -231,7 +232,7 @@ public class FamilyRepositoryTest {
         familyDTO.setDiscontinued("N");
         familyDTO.setAttributes(attributeGroupMap1);
         familyDAO.insert(familyDTO);
-        Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
+        Optional<Family> family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false);
         Assert.assertTrue(family.isPresent());
     }
 

@@ -92,7 +92,7 @@ public class CategoryRepositoryTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryDAO.insert(categoryDTO);
 
-            Optional<Category> category = categoryDAO.findByExternalId(categoryDTO.getCategoryId());
+            Optional<Category> category = categoryDAO.findById(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false);
             Assert.assertTrue(category.isPresent());
             category = categoryDAO.findById(ID.EXTERNAL_ID(categoryDTO.getCategoryId()));
             Assert.assertTrue(category.isPresent());
@@ -115,26 +115,26 @@ public class CategoryRepositoryTest {
             categoryDAO.insert(categoryDTO);
         });
 
-        Category category = categoryDAO.findByExternalId(categoriesData.get(0).get("externalId").toString()).orElse(null);
+        Category category = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId")), false).orElse(null);
 
-        Category categoryDetails = categoryDAO.findByExternalId(categoriesData.get(0).get("externalId").toString()).orElse(null);
+        Category categoryDetails = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId")), false).orElse(null);
         Assert.assertTrue(categoryDetails != null);
         categoryDetails.setDescription("Test1 catalog description");
         categoryDetails.setGroup("DETAILS");
         categoryDAO.save(categoryDetails);
 
-        Category updatedCategory = categoryDAO.findByExternalId(categoryDetails.getCategoryId()).orElse(null);
+        Category updatedCategory = categoryDAO.findById(ID.EXTERNAL_ID(categoryDetails.getCategoryId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategory));
         Map<String, Object> diff = category.diff(updatedCategory);
         Assert.assertEquals(diff.size(), 1);
         Assert.assertEquals(diff.get("description"), "Test1 catalog description");
 
-        Category categoryDetails1 = categoryDAO.findByExternalId(categoriesData.get(1).get("externalId").toString()).orElse(null);
+        Category categoryDetails1 = categoryDAO.findById(ID.EXTERNAL_ID(categoriesData.get(1).get("externalId").toString()), false).orElse(null);
         categoryDetails1.setMetaTitle("New Meta title");
         categoryDetails1.setGroup("SEO");
         categoryDAO.save(categoryDetails1);
 
-        Category updatedCategory1 = categoryDAO.findByExternalId(categoryDetails1.getCategoryId()).orElse(null);
+        Category updatedCategory1 = categoryDAO.findById(ID.EXTERNAL_ID(categoryDetails1.getCategoryId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCategory1));
 
     }
