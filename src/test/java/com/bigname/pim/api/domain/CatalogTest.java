@@ -132,7 +132,7 @@ public class CatalogTest {
     public void cloneInstance() throws Exception {
         //Create
         List<Map<String, Object>> catalogsData = new ArrayList<>();
-        catalogsData.add(CollectionsUtil.toMap("name", "Test", "externalId", "TEST_1", "discontinued", "Y", "description", "Test2","active", "Y"));
+        catalogsData.add(CollectionsUtil.toMap("name", "Test", "externalId", "TEST_1", "description", "Test2","active", "Y"));
 
         catalogsData.forEach(catalogData -> {
             Catalog catalogDTO = new Catalog();

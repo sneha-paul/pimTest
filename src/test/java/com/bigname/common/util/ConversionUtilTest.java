@@ -3,6 +3,7 @@ package com.bigname.common.util;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.service.WebsiteService;
 import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.xcore.util.Tenancy;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,7 @@ public class ConversionUtilTest {
         Website website = new Website();
         website.setWebsiteName("Envelope");
         website.setWebsiteId("ENVELOPE");
-        String actual = "{\"internalId\":null,\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
+        String actual = "{\"internalId\":null,\"tenantId\":\"SINGLE\",\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
         Assert.assertEquals(ConversionUtil.toJSONString(website),actual);
     }
 
@@ -172,6 +173,7 @@ public class ConversionUtilTest {
         websiteMap.put("lastModifiedUser", null);
         websiteMap.put("id", website.getId());
         websiteMap.put("createdUser", null);
+        websiteMap.put("tenantId", Tenancy.SINGLE.toString());
 
         Assert.assertEquals(ConversionUtil.toJSONMap(website),websiteMap);
         Assert.assertEquals(ConversionUtil.toJSONMap(null),null);

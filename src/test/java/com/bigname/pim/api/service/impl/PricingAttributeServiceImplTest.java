@@ -449,7 +449,7 @@ public class PricingAttributeServiceImplTest {
         });
 
         //Getting pricingAttributes
-        List<PricingAttribute> result = pricingAttributeService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<PricingAttribute> result = pricingAttributeService.findAll(CollectionsUtil.toMap("active", "N"), false);
         Assert.assertTrue(result.size() == 1);
     }
 
@@ -471,7 +471,7 @@ public class PricingAttributeServiceImplTest {
 
         //Getting pricingAttributes
         GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<PricingAttribute> result = pricingAttributeService.findAll(criteria);
+        List<PricingAttribute> result = pricingAttributeService.findAll(criteria, false);
         Assert.assertTrue(result.size() == 1);
     }
 

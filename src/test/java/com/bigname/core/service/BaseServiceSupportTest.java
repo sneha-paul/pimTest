@@ -519,7 +519,7 @@ public class BaseServiceSupportTest {
 
         long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
 
-        List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"), false);
         Assert.assertTrue(result.size() == size);
     }
 
@@ -548,7 +548,7 @@ public class BaseServiceSupportTest {
         long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
 
         GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<Website> result = websiteService.findAll(criteria);
+        List<Website> result = websiteService.findAll(criteria, false);
         Assert.assertTrue(result.size() == size);
     }
 

@@ -961,7 +961,7 @@ public class CatalogServiceImplTest {
         });
         //Getting catalogs
         long size = catalogsData.stream().filter(x -> x.get("active").equals("N")).count();
-        List<Catalog> result = catalogService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<Catalog> result = catalogService.findAll(CollectionsUtil.toMap("active", "N"), false);
         Assert.assertTrue(result.size() == size);
     }
 
@@ -988,7 +988,7 @@ public class CatalogServiceImplTest {
         //Getting catalogs
         long size = catalogsData.stream().filter(x -> x.get("active").equals("N")).count();
         GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<Catalog> result = catalogService.findAll(criteria);
+        List<Catalog> result = catalogService.findAll(criteria, false);
         Assert.assertTrue(result.size() == size);
     }
 

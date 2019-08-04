@@ -2203,9 +2203,9 @@ public class FamilyServiceImplTest {
     public void updateEntitiesTest(){
         //Creating Family
         List<Map<String, Object>> familiesData = new ArrayList<>();
-        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "Y"));
-        familiesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y", "discontinue", "Y"));
-        familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "Y"));
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y"));
+        familiesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y"));
+        familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y"));
 
         familiesData.forEach(familyData -> {
             Family familyDTO = new Family();

@@ -191,7 +191,7 @@ public class CatalogRepositoryTest {
             }
             catalogDAO.insert(catalogDTO);
 
-            Optional<Catalog> catalog = catalogDAO.findById(ID.INTERNAL_ID(catalogDTO.getId()));
+            Optional<Catalog> catalog = catalogDAO.findById(ID.INTERNAL_ID(catalogDTO.getId()), false);
             Assert.assertTrue(catalog.isPresent());
         });
 
@@ -373,7 +373,7 @@ public class CatalogRepositoryTest {
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryDAO.insert(categoryDTO);
 
-            Category category = categoryDAO.findById(ID.EXTERNAL_ID((String) categoryData.get("externalId"))).orElse(null);
+            Category category = categoryDAO.findById(ID.EXTERNAL_ID((String) categoryData.get("externalId")), false).orElse(null);
 
             RootCategory rootCategory = new RootCategory();
             rootCategory.setCatalogId(catalog.getId());

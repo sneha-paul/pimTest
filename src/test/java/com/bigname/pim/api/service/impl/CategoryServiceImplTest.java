@@ -1360,7 +1360,7 @@ public class CategoryServiceImplTest {
         });
 
         //Getting categories
-        List<Category> result = categoryService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<Category> result = categoryService.findAll(CollectionsUtil.toMap("active", "N"), false);
         long size = categoriesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
@@ -1385,7 +1385,7 @@ public class CategoryServiceImplTest {
         });
         //Getting categories
         GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<Category> result = categoryService.findAll(criteria);
+        List<Category> result = categoryService.findAll(criteria, false);
         long size = categoriesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
