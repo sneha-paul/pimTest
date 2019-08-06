@@ -9,7 +9,7 @@ import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
 import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

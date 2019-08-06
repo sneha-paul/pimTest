@@ -2,8 +2,8 @@ package com.bigname.pim.data.loader;
 
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.util.POIUtil;
 import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.POIUtil;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

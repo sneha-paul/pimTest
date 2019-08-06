@@ -3,7 +3,7 @@ package com.bigname.pim.data.loader;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.ID;

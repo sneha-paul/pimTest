@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,7 @@ package com.bigname.pim.data.exportor;
 
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import org.springframework.stereotype.Component;

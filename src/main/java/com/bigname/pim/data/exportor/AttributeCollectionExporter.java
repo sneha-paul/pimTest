@@ -3,7 +3,7 @@ package com.bigname.pim.data.exportor;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.util.ID;
