@@ -6,6 +6,8 @@ import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +32,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  */
 public class WebsiteRepositoryImpl extends GenericRepositoryImpl<Website, Criteria> implements WebsiteRepository {
 
-    public WebsiteRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate, Website.class);
+    public WebsiteRepositoryImpl() {
+        super(Website.class);
     }
 
     public Page<Map<String, Object>> getWebsiteCatalogs(String websiteId, Pageable pageable, boolean... activeRequired) {

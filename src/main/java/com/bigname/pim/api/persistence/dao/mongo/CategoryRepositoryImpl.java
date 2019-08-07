@@ -7,6 +7,7 @@ import com.bigname.pim.api.domain.RelatedCategory;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +31,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  * @since 1.0
  */
 public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category, Criteria> implements CategoryRepository {
-    public CategoryRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate, Category.class);
+    public CategoryRepositoryImpl() {
+        super(Category.class);
     }
 
     @Override

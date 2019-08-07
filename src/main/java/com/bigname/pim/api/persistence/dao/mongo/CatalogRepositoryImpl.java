@@ -6,6 +6,7 @@ import com.bigname.pim.api.domain.RootCategory;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +31,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  */
 public class CatalogRepositoryImpl extends GenericRepositoryImpl<Catalog, Criteria> implements CatalogRepository {
 
-    public CatalogRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate, Catalog.class);
+    public CatalogRepositoryImpl() {
+        super(Catalog.class);
     }
 
     @SuppressWarnings("unchecked")

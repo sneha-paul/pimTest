@@ -5,7 +5,7 @@ import com.bigname.pim.api.service.RegistrationService;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xplatform.domain.User;
-import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Before;

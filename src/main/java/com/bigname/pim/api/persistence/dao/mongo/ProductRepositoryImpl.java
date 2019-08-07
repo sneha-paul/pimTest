@@ -6,6 +6,7 @@ import com.bigname.pim.api.domain.ProductCategory;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +31,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  */
 public class ProductRepositoryImpl extends GenericRepositoryImpl<Product, Criteria> implements ProductRepository {
 
-    public ProductRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate, Product.class);
+    public ProductRepositoryImpl() {
+        super(Product.class);
     }
 
     @SuppressWarnings("unchecked")

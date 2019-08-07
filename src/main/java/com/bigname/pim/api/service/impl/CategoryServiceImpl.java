@@ -1,7 +1,11 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.mongo.*;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.PIMConstants;
@@ -9,7 +13,6 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.EntityAssociation;
-import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.ID;

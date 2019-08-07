@@ -2,6 +2,7 @@ package com.bigname.pim.api.persistence.dao.mongo;
 
 import com.bigname.pim.api.domain.Channel;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -10,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
  * @since 1.0
  */
 public class ChannelRepositoryImpl extends GenericRepositoryImpl<Channel, Criteria> implements ChannelRepository {
-    public ChannelRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate, Channel.class);
+    public ChannelRepositoryImpl() {
+        super(Channel.class);
     }
 }

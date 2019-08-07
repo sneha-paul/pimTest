@@ -3,6 +3,7 @@ package com.bigname.pim.api.persistence.dao.mongo;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -24,8 +25,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.newA
  * @since 1.0
  */
 public class VirtualFileRepositoryImpl extends GenericRepositoryImpl<VirtualFile, Criteria> implements VirtualFileRepository {
-    public VirtualFileRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate, VirtualFile.class);
+    public VirtualFileRepositoryImpl() {
+        super(VirtualFile.class);
     }
 
     //BUG in mongodb returning the proper graph lookup

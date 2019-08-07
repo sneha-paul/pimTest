@@ -4,7 +4,7 @@ import com.bigname.pim.PimApplication;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.User;
-import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;

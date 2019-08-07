@@ -3,6 +3,7 @@ package com.bigname.pim.api.persistence.dao.mongo;
 
 import com.bigname.pim.api.domain.Role;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -12,8 +13,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
  */
 
 public class RoleRepositoryImpl extends GenericRepositoryImpl<Role, Criteria> implements RoleRepository {
-    public RoleRepositoryImpl(MongoTemplate mongoTemplate) {
-        super(mongoTemplate, Role.class);
+    public RoleRepositoryImpl() {
+        super(Role.class);
     }
 }
 

@@ -2,7 +2,11 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.mongo.*;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
 import com.bigname.pim.api.service.*;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
