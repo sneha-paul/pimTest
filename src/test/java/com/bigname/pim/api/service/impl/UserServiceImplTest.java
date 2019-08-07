@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -56,12 +57,20 @@ public class UserServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userDAO.save(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) userDAO.getTemplate();
         }
-        mongoTemplate.dropCollection(User.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void loadUserByUsernameTest() throws Exception {
         List<Map<String, Object>> usersData = new ArrayList<>();
@@ -95,7 +104,7 @@ public class UserServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        mongoTemplate.dropCollection(User.class);
+        //mongoTemplate.dropCollection(User.class);
     }
 
 }

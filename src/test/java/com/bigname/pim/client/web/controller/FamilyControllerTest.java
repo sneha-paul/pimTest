@@ -174,6 +174,8 @@ public class FamilyControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void detailsTest() throws Exception {
+        //Add a family instance
+        List<Family> createdFamilyInstances = addFamilyInstances();
         //Create mode
         mockMvc.perform(
                 get("/pim/families/create"))
@@ -185,8 +187,7 @@ public class FamilyControllerTest {
 
         //Details mode, with non=existing familyID - TODO
 
-        //Add a family instance
-        List<Family> createdFamilyInstances = addFamilyInstances();
+
         Assert.assertFalse(createdFamilyInstances.isEmpty());
 
         //Details mode with valid familyID

@@ -83,10 +83,12 @@ public class AssetCollectionControllerTest {
         Assert.assertNotNull(assetCollectionDAO);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void all() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void all1() throws Exception {
     }
@@ -111,38 +113,47 @@ public class AssetCollectionControllerTest {
         result.andExpect(jsonPath("$.group.length()").value(1));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void update() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void details() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void assetDetails() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void assetBrowser() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAssetsData() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createAsset() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void uploadFile() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsHierarchy() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void downloadImage() throws Exception {
     }

@@ -158,6 +158,10 @@ public class WebsiteControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void detailsTest() throws Exception {
+        /*If nullPointer exception occur for getCurrentUser(), break the events into different functions*/
+        //Add a website instance
+        List<Website> createdWebsiteInstances = addWebsiteInstances();
+
         //Create mode
         mockMvc.perform(
                 get("/pim/websites/create"))
@@ -173,8 +177,6 @@ public class WebsiteControllerTest {
                 .andExpect(view().name("error"))
                 .andExpect(forwardedUrl("/error.jsp"));*/
 
-        //Add a website instance
-        List<Website> createdWebsiteInstances = addWebsiteInstances();
         Assert.assertFalse(createdWebsiteInstances.isEmpty());
 
         //Details mode with valid websiteID

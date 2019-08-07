@@ -94,6 +94,8 @@ public class AttributeCollectionControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void detailsTest() throws Exception {
+        //Add a attribute collection instance
+        List<AttributeCollection> createdAttributeCollectionInstances = addAttributeCollectionInstances();
         //Create mode
         mockMvc.perform(
                 get("/pim/attributeCollections/create"))
@@ -105,8 +107,7 @@ public class AttributeCollectionControllerTest {
 
         //Details mode, with non=existing collectionID - TODO
 
-        //Add a attribute collection instance
-        List<AttributeCollection> createdAttributeCollectionInstances = addAttributeCollectionInstances();
+
         Assert.assertFalse(createdAttributeCollectionInstances.isEmpty());
 
         //Details mode with valid collectionID

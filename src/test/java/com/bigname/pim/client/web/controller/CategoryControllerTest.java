@@ -113,7 +113,7 @@ public class CategoryControllerTest {
     }
 
     @WithUserDetails("manu@blacwood.com")
-@Test
+    @Test
     public void contexLoads() throws Exception {
         Assert.assertNotNull(categoryController);
     }
@@ -177,6 +177,8 @@ public class CategoryControllerTest {
     @Test
     public void detailsTest() throws Exception {
 
+        //Add a category instance
+        List<Category> createdCategoryInstances = addCategoryInstances();
         //Create mode
         mockMvc.perform(
                 get("/pim/categories/create"))
@@ -188,8 +190,6 @@ public class CategoryControllerTest {
 
         //Details mode, with non=existing categoryID - TODO
 
-        //Add a category instance
-        List<Category> createdCategoryInstances = addCategoryInstances();
         Assert.assertFalse(createdCategoryInstances.isEmpty());
 
         //Details mode with valid categoryID

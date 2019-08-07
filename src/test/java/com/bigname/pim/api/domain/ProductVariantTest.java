@@ -5,7 +5,7 @@ import com.bigname.pim.api.persistence.dao.mongo.ProductVariantDAO;
 import com.bigname.pim.api.service.ProductVariantService;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xplatform.domain.User;
-import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

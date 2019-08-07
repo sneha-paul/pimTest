@@ -175,6 +175,8 @@ public class CatalogControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void detailsTest() throws Exception {
+        //Add a catalog instance
+        List<Catalog> createdCatalogInstances = addCatalogInstances();
         //Create mode
         mockMvc.perform(
                 get("/pim/catalogs/create"))
@@ -186,8 +188,7 @@ public class CatalogControllerTest {
 
         //Details mode, with non=existing catalogID - TODO
 
-        //Add a catalog instance
-        List<Catalog> createdCatalogInstances = addCatalogInstances();
+
         Assert.assertFalse(createdCatalogInstances.isEmpty());
 
         //Details mode with valid catalogID
