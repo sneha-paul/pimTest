@@ -108,7 +108,8 @@ public class CategoryControllerTest {
         mongoTemplate.dropCollection(Family.class);
     }
 
-    @Test
+    @WithUserDetails("manu@blacwood.com")
+@Test
     public void contexLoads() throws Exception {
         Assert.assertNotNull(categoryController);
     }

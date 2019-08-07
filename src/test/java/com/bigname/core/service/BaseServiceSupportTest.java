@@ -12,6 +12,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,6 +44,9 @@ import java.util.stream.Collectors;
 public class BaseServiceSupportTest {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private WebsiteDAO websiteDAO;
 
     @Autowired
@@ -50,12 +56,21 @@ public class BaseServiceSupportTest {
     
     @Before
     public void setUp() {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
         }
         mongoTemplate.dropCollection(Website.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -78,6 +93,7 @@ public class BaseServiceSupportTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -106,6 +122,7 @@ public class BaseServiceSupportTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -131,6 +148,7 @@ public class BaseServiceSupportTest {
         Assert.assertEquals(diff.get("active"), "N");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -152,6 +170,7 @@ public class BaseServiceSupportTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -178,6 +197,7 @@ public class BaseServiceSupportTest {
         Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -235,6 +255,7 @@ public class BaseServiceSupportTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -264,6 +285,7 @@ public class BaseServiceSupportTest {
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -293,6 +315,7 @@ public class BaseServiceSupportTest {
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -322,6 +345,7 @@ public class BaseServiceSupportTest {
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -351,6 +375,7 @@ public class BaseServiceSupportTest {
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -377,6 +402,7 @@ public class BaseServiceSupportTest {
         Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -403,6 +429,7 @@ public class BaseServiceSupportTest {
         Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -432,6 +459,7 @@ public class BaseServiceSupportTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -473,6 +501,7 @@ public class BaseServiceSupportTest {
         Assert.assertFalse(websitesMap.size() == websitesData.size() && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -495,6 +524,7 @@ public class BaseServiceSupportTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -523,6 +553,7 @@ public class BaseServiceSupportTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -552,6 +583,7 @@ public class BaseServiceSupportTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -578,6 +610,7 @@ public class BaseServiceSupportTest {
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1() {
         List<Map<String, Object>> websitesData = new ArrayList<>();
@@ -605,14 +638,17 @@ public class BaseServiceSupportTest {
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getEntityName() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validate() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validate1() throws Exception {
         /* Create a valid new instance with id TEST */
@@ -665,34 +701,42 @@ public class BaseServiceSupportTest {
         Assert.assertEquals(website.getExternalId(), "TEST_1_1");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void paginate() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void sort() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void paginate1() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance1() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void proxy() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCurrentUser() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getExternalIdProperty() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getExternalIdPropertyLabel() throws Exception {
     }

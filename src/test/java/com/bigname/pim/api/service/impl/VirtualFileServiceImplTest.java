@@ -9,6 +9,8 @@ import com.bigname.pim.api.service.VirtualFileService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,6 +38,9 @@ import java.util.Map;
 @ContextConfiguration(classes={PimApplication.class})
 public class VirtualFileServiceImplTest {
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private AssetCollectionDAO assetCollectionDAO;
 
     @Autowired
@@ -47,20 +53,31 @@ public class VirtualFileServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) assetCollectionDAO.getTemplate();
         }
         mongoTemplate.dropCollection(AssetCollection.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createTest() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateTest() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFilesTest() throws Exception {
         List<Map<String, Object>> assetCollectionData = new ArrayList<>();
@@ -84,10 +101,12 @@ public class VirtualFileServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFileTest() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
     }

@@ -12,6 +12,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.javatuples.Pair;
 import org.junit.After;
 import org.junit.Assert;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,6 +44,9 @@ import java.util.stream.Collectors;
 @ContextConfiguration(classes={PimApplication.class})
 public class AttributeCollectionServiceImplTest {
     @Autowired
+    private UserService userService;
+
+    @Autowired
     AttributeCollectionService attributeCollectionService;
 
     @Autowired
@@ -53,6 +59,14 @@ public class AttributeCollectionServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) attributeCollectionDAO.getTemplate();
         }
@@ -60,6 +74,7 @@ public class AttributeCollectionServiceImplTest {
         mongoTemplate.dropCollection(Family.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllTest() throws Exception {
         //Creating AttributeCollections
@@ -81,6 +96,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), attributesCollectionData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void get1Test() throws Exception {
         //Creating AttributeCollections
@@ -104,6 +120,7 @@ public class AttributeCollectionServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributesTest() throws Exception {
         //Creating AttributeCollections
@@ -143,6 +160,7 @@ public class AttributeCollectionServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeGroupsIdNamePairTest() throws Exception {
         //Creating AttributeCollections
@@ -180,6 +198,7 @@ public class AttributeCollectionServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeOptionsTest() throws Exception {
         //Creating AttributeCollection
@@ -220,6 +239,7 @@ public class AttributeCollectionServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAttributeTest() throws Exception {
         //Creating AttributeCollection
@@ -258,6 +278,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(result.get().getName(), "Test_Attribute");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAttributeOptionTest() throws Exception {
         //Creating AttributeCollection
@@ -332,6 +353,7 @@ public class AttributeCollectionServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         //Creating AttributeCollection
@@ -381,6 +403,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(attributeOption1.getContent().get(0).getValue(),attributeOption.getValue());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //Creating AttributeCollections
@@ -401,6 +424,7 @@ public class AttributeCollectionServiceImplTest {
             Assert.assertEquals(attributeCollectionDAO.findAll(PageRequest.of(0, attributeCollectionDTOs.size()), false).getTotalElements(), collectionsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //Creating AttributeCollection
@@ -424,6 +448,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(updatedAttributeCollection1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         //Creating AttributeCollection
@@ -466,6 +491,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(collection.getAllAttributes().get(0).getOptions().size(),1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //Creating AttributeCollections
@@ -523,6 +549,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().get(0).getAllAttributes().get(0).getOptions().size(),3);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //Creating AttributeCollections
@@ -569,6 +596,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //Creating AttributeCollections
@@ -629,6 +657,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertTrue(collectionsMap.size() == ids.length && collectionsMap.containsKey(ids[0]) && collectionsMap.containsKey(ids[1]) && collectionsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //Creating AttributeCollections
@@ -688,6 +717,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertTrue(collectionsMap.size() == ids.length && collectionsMap.containsKey(ids[0]) && collectionsMap.containsKey(ids[1]) && collectionsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //Creating AttributeCollections
@@ -748,6 +778,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertTrue(collectionsMap.size() == (collectionsData.size() - ids.length) && !collectionsMap.containsKey(ids[0]) && !collectionsMap.containsKey(ids[1]) && !collectionsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //Creating AttributeCollections
@@ -807,6 +838,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertTrue(collectionsMap.size() == (collectionsData.size() - ids.length) && !collectionsMap.containsKey(ids[0]) && !collectionsMap.containsKey(ids[1]) && !collectionsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //Creating AttributeCollections
@@ -863,6 +895,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), collectionsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         //Creating AttributeCollections
@@ -885,6 +918,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), collectionsData.size());//size
     }
 
+    @WithUserDetails("manu@blacwood.com")
    @Test
     public void updateEntityTest() {
        //Creating AttributeCollection
@@ -938,7 +972,8 @@ public class AttributeCollectionServiceImplTest {
 
    }
 
-     @Test
+    @WithUserDetails("manu@blacwood.com")
+    @Test
     public void updateEntitiesTest(){
          //Creating AttributeCollections
          List<Map<String, Object>> collectionsData = new ArrayList<>();
@@ -1011,7 +1046,8 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertFalse(collectionsMap.size() == collectionsData.size() && collectionsMap.containsKey(ids[0]) && collectionsMap.containsKey(ids[1]) && collectionsMap.containsKey(ids[2]));
     }
 
-   @Test
+    @WithUserDetails("manu@blacwood.com")
+    @Test
     public void findAll1Test() {
        //Creating AttributeCollections
        List<Map<String, Object>> collectionsData = new ArrayList<>();
@@ -1069,6 +1105,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //Creating AttributeCollections
@@ -1127,7 +1164,8 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
-   @Test
+    @WithUserDetails("manu@blacwood.com")
+    @Test
     public void findOneTest() {
        //Creating AttributeCollections
        List<Map<String, Object>> collectionsData = new ArrayList<>();
@@ -1150,6 +1188,7 @@ public class AttributeCollectionServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //Creating AttributeCollections
@@ -1172,6 +1211,7 @@ public class AttributeCollectionServiceImplTest {
         Assert.assertEquals(collectionsData.get(0).get("name"), result.get().getCollectionName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
         /* Create a valid new instance with id TEST_ATTRIBUTECOLLECTION */

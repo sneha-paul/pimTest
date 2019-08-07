@@ -11,6 +11,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.javatuples.Triplet;
 import org.junit.After;
 import org.junit.Assert;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,6 +42,8 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class ProductServiceImplTest {
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private ProductDAO productDAO;
@@ -76,23 +81,31 @@ public class ProductServiceImplTest {
     private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
-		mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
-		mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
 
-		mongoTemplate.dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
 
-		mongoTemplate.dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Channel.class);
 
-		mongoTemplate.dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
 
-		mongoTemplate.dropCollection(ProductVariant.class);
+        mongoTemplate.dropCollection(ProductVariant.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllProductCategoriesTest() throws Exception {
         //creating channel
@@ -271,6 +284,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productCategory.getContent().size(),categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAvailableCategoriesForProductTest() throws Exception {
         //creating channel
@@ -448,6 +462,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productCategory.getContent().size(),categoriesData.size()-1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getProductVariantsTest() throws Exception {
         //creating channel
@@ -641,6 +656,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productVariants.getContent().size(),productsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getProductVariants1Test() throws Exception {
         //creating channel
@@ -818,6 +834,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productVariants.size(),productVariants.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getProductVariantTest() throws Exception {
         //creating channel
@@ -990,6 +1007,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productVariants.getProductVariantName(),productVariantDTO.getProductVariantName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createTest() throws Exception {
         //creating channel
@@ -1151,6 +1169,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(product.getProductName(),productsData.get(0).get("name"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTestTest() throws Exception {
         //creating channel
@@ -1312,6 +1331,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(product.getProductName(),productsData.get(0).get("name"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllTest() throws Exception {
         //creating channel
@@ -1475,6 +1495,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(products.getContent().size(),productsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() throws Exception {
         //creating channel
@@ -1639,6 +1660,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(products.getContent().size(),productsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1Test() throws Exception {
         //creating channel
@@ -1803,6 +1825,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(products.getContent().size(),productsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll1Test() throws Exception {
         //creating channel
@@ -1967,6 +1990,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(products.size(),productsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableVariantsTest() throws Exception {
         List<Map<String, Object>> channelsData = new ArrayList<>();
@@ -2138,11 +2162,13 @@ public class ProductServiceImplTest {
         //TODO MANU
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
         //TODO MANU
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getProductCategoriesTest() throws Exception {
         //creating channel
@@ -2323,6 +2349,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productCategory.getContent().size(),categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableCategoriesForProductTest() throws Exception {
         //creating channel
@@ -2503,6 +2530,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productCategory.getContent().size(),categoriesData.size()-1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addCategoryTest() throws Exception {
         //creating channel
@@ -2677,6 +2705,7 @@ public class ProductServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleProductCategoryTest() throws Exception {
         //Creating AttributeCollection
@@ -2743,6 +2772,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(updatedCategories.getContent().get(0).getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoriesTest() throws Exception {
         //creating AttributeCollection
@@ -2824,28 +2854,33 @@ public class ProductServiceImplTest {
         Assert.assertEquals(category.getContent().size(), categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addAssetsTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void deleteAssetTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void reorderAssetsTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setAsDefaultAssetTest() throws Exception {
         //TODO
     }
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
-       //creating channel
+        //creating channel
         List<Map<String, Object>> channelsData = new ArrayList<>();
         channelsData.add(CollectionsUtil.toMap("name", "Ecommerce", "externalId", "ECOMMERCE", "active", "Y"));
 
@@ -2966,17 +3001,18 @@ public class ProductServiceImplTest {
         Assert.assertEquals(variantGroups.size(),1);
         Assert.assertEquals(variantGroups.get(0).getValue0(), "TEST_1");
         //creating Products
-            Product productDTO = new Product();
-            productDTO.setProductName("Product Test 1");
-            productDTO.setProductId("PRODUCT_TEST_1");
-            productDTO.setProductFamilyId(family.getFamilyId());
-            productDTO.setActive("Y");
-            productService.create(productDTO);
+        Product productDTO = new Product();
+        productDTO.setProductName("Product Test 1");
+        productDTO.setProductId("PRODUCT_TEST_1");
+        productDTO.setProductFamilyId(family.getFamilyId());
+        productDTO.setActive("Y");
+        productService.create(productDTO);
 
         Product product = productService.get(ID.EXTERNAL_ID(productDTO.getProductId()), false).orElse(null);
         Assert.assertEquals(product.getProductName(),productDTO.getProductName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating channel
@@ -3082,6 +3118,7 @@ public class ProductServiceImplTest {
         productService.create(productDTOs);
         Assert.assertEquals(productService.findAll(PageRequest.of(0, productDTOs.size()), false).getTotalElements(), productsData.size());
     }
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //creating channel
@@ -3154,6 +3191,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(updatedProduct1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //creating channel
@@ -3221,6 +3259,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), productsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //creating family
@@ -3252,7 +3291,7 @@ public class ProductServiceImplTest {
         String[] expected = productsData.stream().map(productData -> (String)productData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
         Assert.assertArrayEquals(expected, actual);
 
-		mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
         // sorting : Descending
 
@@ -3275,6 +3314,7 @@ public class ProductServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //creating family
@@ -3308,6 +3348,7 @@ public class ProductServiceImplTest {
         Assert.assertTrue(productsMap.size() == ids.length && productsMap.containsKey(ids[0]) && productsMap.containsKey(ids[1]) && productsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //creating family
@@ -3341,6 +3382,7 @@ public class ProductServiceImplTest {
         Assert.assertTrue(productsMap.size() == ids.length && productsMap.containsKey(ids[0]) && productsMap.containsKey(ids[1]) && productsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //creating family
@@ -3375,6 +3417,7 @@ public class ProductServiceImplTest {
         Assert.assertTrue(productsMap.size() == (productsData.size() - ids.length) && !productsMap.containsKey(ids[0]) && !productsMap.containsKey(ids[1]) && !productsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //creating family
@@ -3409,6 +3452,7 @@ public class ProductServiceImplTest {
         Assert.assertTrue(productsMap.size() == (productsData.size() - ids.length) && !productsMap.containsKey(ids[0]) && !productsMap.containsKey(ids[1]) && !productsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //creating family
@@ -3440,6 +3484,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //creating family
@@ -3471,6 +3516,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         //creating AttributeCollection
@@ -3556,6 +3602,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(updatedProduct.getActive(), "N");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //creating family
@@ -3601,6 +3648,7 @@ public class ProductServiceImplTest {
         Assert.assertFalse(productsMap.size() == productsData.size() && productsMap.containsKey(ids[0]) && productsMap.containsKey(ids[1]) && productsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll3Test() {
         //creating family
@@ -3632,6 +3680,7 @@ public class ProductServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll4Test() {
         //creating family
@@ -3664,6 +3713,7 @@ public class ProductServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //creating family
@@ -3694,6 +3744,7 @@ public class ProductServiceImplTest {
         Assert.assertEquals(productsData.get(0).get("name"), result.get().getProductName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //creating family
@@ -3727,17 +3778,17 @@ public class ProductServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-		mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
-		mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
 
-		mongoTemplate.dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
 
-		mongoTemplate.dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Channel.class);
 
-		mongoTemplate.dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
 
-		mongoTemplate.dropCollection(ProductVariant.class);
+        mongoTemplate.dropCollection(ProductVariant.class);
     }
 
 }

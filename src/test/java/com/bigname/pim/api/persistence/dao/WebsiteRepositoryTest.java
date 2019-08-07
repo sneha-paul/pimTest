@@ -47,7 +47,9 @@ public class WebsiteRepositoryTest {
     private CatalogDAO catalogDAO;
     @Autowired
     private WebsiteCatalogDAO websiteCatalogDAO;
+
     private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() {
         if(ValidationUtil.isEmpty(mongoTemplate)) {

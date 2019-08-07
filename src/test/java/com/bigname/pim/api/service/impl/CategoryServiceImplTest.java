@@ -14,6 +14,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,6 +44,9 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class CategoryServiceImplTest {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CategoryService categoryService;
@@ -69,16 +75,25 @@ public class CategoryServiceImplTest {
     private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
-		mongoTemplate.dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
         categoryProductDAO.deleteAll();
-		mongoTemplate.dropCollection(Family.class);
-		mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Product.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllSubCategoriesTest() throws Exception {
         //Creating categories
@@ -123,6 +138,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(paginatedResult.getSize(), newRelatedCategories.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAvailableSubCategoriesForCategoryTest() throws Exception {
         //creating categories
@@ -167,6 +183,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(paginatedResult.getSize(), (categoriesData.size()-1) - newRelatedCategories.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoryHierarchyTest() throws Exception {
         //creating categories
@@ -211,6 +228,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(subCategories.get(1).get("parentChain"), categoriesData.get(1).get("parentChain"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableSubCategoriesForCategoryTest() throws Exception {
         //creating categories
@@ -255,6 +273,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(paginatedResult.getSize(), (categoriesData.size()-1) - newRelatedCategories.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getSubCategoriesTest() throws Exception {
         //creating categories
@@ -293,6 +312,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(subCategories.getSize(), newRelatedCategories.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setSubCategorySequenceTest() throws Exception {
         //creating categories
@@ -333,6 +353,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(success);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addSubCategoryTest() throws Exception {
         //creating categories
@@ -368,6 +389,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categories.size(), newRelatedCategories.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleSubCategoryTest() throws Exception {
         //creating categories
@@ -416,6 +438,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(relatedCategories1.get(0).getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAvailableProductsForCategoryTest() throws Exception {
         //creating families
@@ -472,6 +495,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(availableProducts.getContent().size(), 1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setProductSequenceTest() throws Exception {
         //creating families
@@ -540,6 +564,7 @@ public class CategoryServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleProductTest() throws Exception {
         //creating families
@@ -604,6 +629,7 @@ public class CategoryServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoryProductsTest() throws Exception {
         //creating families
@@ -659,6 +685,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categoryProductsList.getContent().size(), categoryProductList.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoryProducts1Test() throws Exception {
         //creating families
@@ -715,6 +742,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categoryProductsList.getContent().size(), categoryProductList.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableProductsForCategoryTest() throws Exception {
         //creating families
@@ -771,6 +799,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(availableProducts.getContent().size(), productsData.size()-1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addProductTest() throws Exception {
         //creating families
@@ -819,6 +848,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(ValidationUtil.isNotEmpty(categoryProductList));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllCategoryProductsTest() throws Exception {
         //creating Families
@@ -877,6 +907,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categoryProductMap.getContent().size(),size-1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllCategoryProductsTest() throws Exception {
         //creating families
@@ -931,6 +962,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categoryProductsList.size(),productsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         //creating categories
@@ -953,6 +985,7 @@ public class CategoryServiceImplTest {
             Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
         });
     }
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating categories
@@ -975,6 +1008,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categoryDAO.findAll(PageRequest.of(0, categoryDTOs.size()), false).getTotalElements(), categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //creating categories
@@ -1004,6 +1038,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(updatedCategory1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         //creating categories
@@ -1027,6 +1062,7 @@ public class CategoryServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //creating categories
@@ -1050,6 +1086,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //creating categories
@@ -1098,6 +1135,7 @@ public class CategoryServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //creating categories
@@ -1125,6 +1163,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(categoriesMap.size() == ids.length && categoriesMap.containsKey(ids[0]) && categoriesMap.containsKey(ids[1]) && categoriesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //creating categories
@@ -1151,6 +1190,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(categoriesMap.size() == ids.length && categoriesMap.containsKey(ids[0]) && categoriesMap.containsKey(ids[1]) && categoriesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //creating categories
@@ -1177,6 +1217,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(categoriesMap.size() == (categoriesData.size() - ids.length) && !categoriesMap.containsKey(ids[0]) && !categoriesMap.containsKey(ids[1]) && !categoriesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //creating categories
@@ -1203,6 +1244,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(categoriesMap.size() == (categoriesData.size() - ids.length) && !categoriesMap.containsKey(ids[0]) && !categoriesMap.containsKey(ids[1]) && !categoriesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //creating categories
@@ -1226,6 +1268,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         //creating categories
@@ -1249,6 +1292,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), categoriesData.size());//size
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         //creating categories
@@ -1279,6 +1323,7 @@ public class CategoryServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //creating categories
@@ -1317,6 +1362,7 @@ public class CategoryServiceImplTest {
         Assert.assertFalse(categoriesMap.size() == categoriesData.size() && categoriesMap.containsKey(ids[0]) && categoriesMap.containsKey(ids[1]) && categoriesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstanceTest() {
         //creating categories
@@ -1340,6 +1386,7 @@ public class CategoryServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1Test() {
         //creating categories
@@ -1365,6 +1412,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //creating categories
@@ -1390,6 +1438,7 @@ public class CategoryServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //creating categories
@@ -1413,6 +1462,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categoriesData.get(0).get("name"), result.get().getCategoryName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //creating categories
@@ -1437,6 +1487,7 @@ public class CategoryServiceImplTest {
         Assert.assertEquals(categoriesData.get(0).get("name"), result.get().getCategoryName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
         /* Create a valid new instance with id CATEGORY_TEST */
@@ -1491,11 +1542,11 @@ public class CategoryServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-		mongoTemplate.dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
         relatedCategoryDAO.deleteAll();
         categoryProductDAO.deleteAll();
-		mongoTemplate.dropCollection(Family.class);
-		mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Product.class);
     }
 
 }

@@ -93,6 +93,7 @@ public class WebsiteControllerTest {
         mongoTemplate.dropCollection(Catalog.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void contexLoads() throws Exception {
         Assert.assertNotNull(websiteController);
@@ -442,11 +443,6 @@ public class WebsiteControllerTest {
 
     }
 
-    @After
-    public void tearDown() throws Exception {
-        mongoTemplate.dropCollection(Website.class);
-        mongoTemplate.dropCollection(Catalog.class);
-    }
 
     private List<Website> addWebsiteInstances() {
         List<Website> createdWebsiteInstances = new ArrayList<>();
@@ -462,5 +458,13 @@ public class WebsiteControllerTest {
         });
         return createdWebsiteInstances;
     }
+
+    @After
+    public void tearDown() throws Exception {
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
+    }
+
+
 
 }

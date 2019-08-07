@@ -12,6 +12,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,6 +42,10 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class PricingAttributeServiceImplTest {
+
+    @Autowired
+    private UserService userService;
+
     @Autowired
     PricingAttributeService pricingAttributeService;
 
@@ -46,14 +53,24 @@ public class PricingAttributeServiceImplTest {
     PricingAttributeDAO pricingAttributeDAO;
 
     private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) pricingAttributeDAO.getTemplate();
         }
-		mongoTemplate.dropCollection(PricingAttribute.class);
+        mongoTemplate.dropCollection(PricingAttribute.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         //creating pricingAttribute
@@ -76,6 +93,7 @@ public class PricingAttributeServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating pricingAttributes
@@ -96,6 +114,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(pricingAttributeDAO.findAll(PageRequest.of(0, pricingAttributeDTOs.size()), false).getTotalElements(), pricingAttributesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //creating pricingAttributes
@@ -124,6 +143,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(updatedPricingAttribute1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         //creating pricingAttributes
@@ -148,6 +168,7 @@ public class PricingAttributeServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //creating pricingAttributes
@@ -169,6 +190,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), pricingAttributesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //creating pricingAttributes
@@ -190,7 +212,7 @@ public class PricingAttributeServiceImplTest {
         String[] expected = pricingAttributesData.stream().map(pricingAttributeData -> (String)pricingAttributeData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
         Assert.assertArrayEquals(expected, actual);
 
-		mongoTemplate.dropCollection(PricingAttribute.class);
+        mongoTemplate.dropCollection(PricingAttribute.class);
 
         // sorting : Descending
 
@@ -213,6 +235,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //creating pricingAttributes
@@ -237,6 +260,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //creating pricingAttributes
@@ -261,6 +285,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertTrue(pricingAttributesMap.size() == ids.length && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //creating pricingAttributes
@@ -285,6 +310,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertTrue(pricingAttributesMap.size() == (pricingAttributesData.size() - ids.length) && !pricingAttributesMap.containsKey(ids[0]) && !pricingAttributesMap.containsKey(ids[1]) && !pricingAttributesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //creating pricingAttributes
@@ -309,6 +335,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertTrue(pricingAttributesMap.size() == (pricingAttributesData.size() - ids.length) && !pricingAttributesMap.containsKey(ids[0]) && !pricingAttributesMap.containsKey(ids[1]) && !pricingAttributesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //creating pricingAttributes
@@ -329,6 +356,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), 3);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         //creating pricingAttributes
@@ -349,6 +377,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), 3);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         //creating pricingAttributes
@@ -375,6 +404,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(updatedPricingAttribute.getPricingAttributeName(), "Test");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //creating pricingAttributes
@@ -410,6 +440,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertFalse(pricingAttributesMap.size() == pricingAttributesData.size() && pricingAttributesMap.containsKey(ids[0]) && pricingAttributesMap.containsKey(ids[1]) && pricingAttributesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() {
         //creating pricingAttributes
@@ -432,6 +463,7 @@ public class PricingAttributeServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll() {
         //creating pricingAttributes
@@ -453,6 +485,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertTrue(result.size() == 1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1() {
         //creating pricingAttributes
@@ -475,6 +508,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertTrue(result.size() == 1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne() {
         //creating pricingAttributes
@@ -496,6 +530,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.getPricingAttributeName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1() {
         //creating pricingAttributes
@@ -517,6 +552,7 @@ public class PricingAttributeServiceImplTest {
         Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.getPricingAttributeName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validate1() throws Exception {
         /* Create a valid new instance with id TEST */
@@ -569,7 +605,7 @@ public class PricingAttributeServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-		mongoTemplate.dropCollection(PricingAttribute.class);
+        mongoTemplate.dropCollection(PricingAttribute.class);
 
     }
 

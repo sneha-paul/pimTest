@@ -13,6 +13,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.junit.After;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -42,6 +45,10 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class FamilyServiceImplTest {
+
+    @Autowired
+    private UserService userService;
+
     @Autowired
     AttributeCollectionService attributeCollectionService;
 
@@ -58,6 +65,14 @@ public class FamilyServiceImplTest {
     
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) familyDAO.getTemplate();
         }
@@ -65,6 +80,7 @@ public class FamilyServiceImplTest {
         mongoTemplate.dropCollection(Family.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void saveAllTest() throws Exception {
         //creating AttributeCollection
@@ -118,6 +134,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(familyDAO.findAll(PageRequest.of(0, familyDTOs.size()), false).getTotalElements(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFamilyAttributesTest() throws Exception {
         //creating AttributeCollection
@@ -198,6 +215,7 @@ public class FamilyServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getVariantGroupsTest() throws Exception {
         //creating AttributeCollection
@@ -294,6 +312,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeGroupsIdNamePairTest() throws Exception {
         //creating AttributeCollection
@@ -372,6 +391,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getParentAttributeGroupsIdNamePairTest() throws Exception {
         //creating AttributeCollection
@@ -450,6 +470,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFamilyAttributeOptionsTest() throws Exception {
         //creating AttributeCollection
@@ -539,6 +560,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getVariantAxisAttributesTest() throws Exception {
         //creating AttributeCollection
@@ -641,6 +663,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableVariantAxisAttributesTest() throws Exception {
         //TODO
@@ -759,6 +782,7 @@ public class FamilyServiceImplTest {
         });*/
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFamilyVariantGroupsTest() throws Exception {
         //creating AttributeCollection
@@ -855,6 +879,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest1() throws Exception {
         //creating AttributeCollection
@@ -911,6 +936,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllTest() throws Exception {
         //creating AttributeCollection
@@ -967,6 +993,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll1Test() throws Exception {
         //creating AttributeCollection
@@ -1028,6 +1055,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(ListedData.size(),familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleVariantGroupTest() throws Exception {
         //creating AttributeCollection
@@ -1122,6 +1150,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         //creating AttributeCollection
@@ -1232,6 +1261,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(variantGroups.get(0).getValue0(), "TEST_1");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating AttributeCollection
@@ -1285,6 +1315,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(familyDAO.findAll(PageRequest.of(0, familyDTOs.size()), false).getTotalElements(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //Creating Family
@@ -1308,6 +1339,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(updatedFamily1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         //Creating AttributeCollection
@@ -1404,6 +1436,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //Creating AttributeCollection
@@ -1499,6 +1532,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //creating Families
@@ -1546,6 +1580,7 @@ public class FamilyServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //Creating AttributeCollection
@@ -1645,6 +1680,7 @@ public class FamilyServiceImplTest {
         Assert.assertTrue(familiesMap.size() == ids.length && familiesMap.containsKey(ids[0]) && familiesMap.containsKey(ids[1]) && familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //Creating AttributeCollection
@@ -1743,6 +1779,7 @@ public class FamilyServiceImplTest {
         Assert.assertTrue(familiesMap.size() == ids.length && familiesMap.containsKey(ids[0]) && familiesMap.containsKey(ids[1]) && familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //Creating AttributeCollection
@@ -1841,6 +1878,7 @@ public class FamilyServiceImplTest {
         Assert.assertTrue(familiesMap.size() == (familiesData.size() - ids.length) && !familiesMap.containsKey(ids[0]) && !familiesMap.containsKey(ids[1]) && !familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //Creating AttributeCollection
@@ -1939,6 +1977,7 @@ public class FamilyServiceImplTest {
         Assert.assertTrue(familiesMap.size() == (familiesData.size() - ids.length) && !familiesMap.containsKey(ids[0]) && !familiesMap.containsKey(ids[1]) && !familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //Creating AttributeCollection
@@ -2035,6 +2074,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //Creating AttributeCollection
@@ -2131,6 +2171,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());//size
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         //creating AttributeCollection
@@ -2199,6 +2240,7 @@ public class FamilyServiceImplTest {
         //TODO Update  familyAttribute and familyOption is pending
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //Creating Family
@@ -2236,6 +2278,7 @@ public class FamilyServiceImplTest {
         //TODO Update  familyAttribute and familyOption is pending
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         //Creating AttributeCollection
@@ -2298,6 +2341,8 @@ public class FamilyServiceImplTest {
         long size = familiesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1Test() {
         //Creating AttributeCollection
@@ -2362,6 +2407,7 @@ public class FamilyServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //Creating AttributeCollection
@@ -2419,6 +2465,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //Creating AttributeCollection
@@ -2477,6 +2524,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
 

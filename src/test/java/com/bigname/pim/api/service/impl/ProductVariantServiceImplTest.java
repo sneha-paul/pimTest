@@ -11,6 +11,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,6 +41,10 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class ProductVariantServiceImplTest {
+
+    @Autowired
+    private UserService userService;
+
     @Autowired
     private ProductDAO productDAO;
 
@@ -75,7 +82,14 @@ public class ProductVariantServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
@@ -91,6 +105,7 @@ public class ProductVariantServiceImplTest {
         mongoTemplate.dropCollection(ProductVariant.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() throws Exception {
         //creating channel
@@ -267,6 +282,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.getContent().size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateTest() throws Exception {
         //creating channel
@@ -445,6 +461,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariant1.getActive(), "N");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() throws Exception {
         //creating channel
@@ -616,6 +633,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariant.getProductVariantName(), productVariantDTO.getProductVariantName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void get1Test() throws Exception {
         //creating channel
@@ -791,6 +809,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariant.getProductVariantName(), productVariantData.get(0).get("name"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void get2Test() throws Exception {
         //creating channel
@@ -963,6 +982,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariant1.getProductVariantName(), productVariantDTO.getProductVariantName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() throws Exception {
         //creating channel
@@ -1143,6 +1163,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(updatedProductVariant1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggle1Test() throws Exception {
         //creating channel
@@ -1323,17 +1344,20 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(updatedProductVariant1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstanceTest() throws Exception {
 
         //TODO check(method not used)
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance1Test() throws Exception {
         //TODO check(method not used)
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllTest() throws Exception {
         //creating channel
@@ -1510,6 +1534,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll1Test() throws Exception {
         //creating channel
@@ -1687,6 +1712,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll2Test() throws Exception {
         //creating channel
@@ -1863,6 +1889,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.getContent().size(), 0);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll3Test() throws Exception {
         //creating channel
@@ -2039,6 +2066,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll4Test() throws Exception {
         //creating channel
@@ -2215,6 +2243,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), 0);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll5Test() throws Exception {
         //creating channel
@@ -2391,6 +2420,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll6Test() throws Exception {
         //creating channel
@@ -2569,6 +2599,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll7Test() throws Exception {
         //creating channel
@@ -2747,6 +2778,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll8Test() throws Exception {
         //creating channel
@@ -2925,6 +2957,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsTest() throws Exception {
         //creating channel
@@ -3104,6 +3137,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusions1Test() throws Exception {
         //creating channel
@@ -3283,6 +3317,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusions2Test() throws Exception {
         //creating channel
@@ -3461,6 +3496,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusions3Test() throws Exception {
         //creating channel
@@ -3639,36 +3675,43 @@ public class ProductVariantServiceImplTest {
         Map<String, ProductVariant> productVariant = paginatedResult.stream().collect(Collectors.toMap(variant -> variant.getProductVariantId(), variant -> variant));
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));    }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
         //TODO MANU
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getProductVariantPricingTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addAssetsTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void deleteAssetTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void reorderAssetsTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setAsDefaultAssetTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll9Test() throws Exception {
         //creating channel
@@ -3847,6 +3890,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createTest() throws Exception {
         //creating channel
@@ -4022,11 +4066,13 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariant.size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setProductVariantsSequenceTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating channel
@@ -4153,6 +4199,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariantService.findAll(PageRequest.of(0, productDTOs.size()), false).getTotalElements(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //creating channel
@@ -4237,6 +4284,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //creating channel
@@ -4321,6 +4369,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //creating channel
@@ -4418,6 +4467,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertFalse(productVariantsMap.size() == productVariantData.size() && productVariantsMap.containsKey(ids[0]) && productVariantsMap.containsKey(ids[1]) );
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll3Test() {
         //creating channel
@@ -4502,6 +4552,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll4Test() {
         //creating channel
@@ -4587,6 +4638,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //creating channel
@@ -4670,6 +4722,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariantData.get(0).get("name"), result.getProductVariantName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //creating channel

@@ -1,13 +1,13 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.VerificationToken;
 import com.bigname.pim.api.service.RegistrationService;
-import com.bigname.pim.api.service.VerificationTokenService;
 import com.bigname.pim.client.model.Breadcrumbs;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.domain.VerificationToken;
 import com.m7.xtreme.xplatform.service.UserService;
+import com.m7.xtreme.xplatform.service.VerificationTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

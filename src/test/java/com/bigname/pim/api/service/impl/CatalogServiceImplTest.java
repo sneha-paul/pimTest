@@ -19,6 +19,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -46,6 +49,8 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class CatalogServiceImplTest {
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CatalogService catalogService;
@@ -69,6 +74,14 @@ public class CatalogServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) catalogDAO.getTemplate();
         }
@@ -78,6 +91,7 @@ public class CatalogServiceImplTest {
         relatedCategoryDAO.deleteAll();
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllRootCategoriesTest() throws Exception {
         //creating catalogs
@@ -121,6 +135,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(rootCategories.getSize(),categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllRootCategoriesTest() throws Exception {
         //creating catalogs
@@ -166,6 +181,7 @@ public class CatalogServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAvailableRootCategoriesForCatalogTest() throws Exception {
         //creating catalogs
@@ -209,6 +225,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(availableCategoriesPage.getContent().size(), categoriesData.size() - 1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableRootCategoriesForCatalogTest() throws Exception {
         //creating catalogs
@@ -254,6 +271,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(availableRootCategories.getContent().size(), categoriesData.size() - 1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleRootCategoryTest() throws Exception {
         //creating catalogs
@@ -294,7 +312,7 @@ public class CatalogServiceImplTest {
         rootCategoryDAO.insert(rootCategory);
         //Getting category by rootCategoryId
         RootCategory rootCategory1 = rootCategoryDAO.findById(rootCategory.getId()).orElse(null);
-       //toggle
+        //toggle
         catalogService.toggleRootCategory(ID.INTERNAL_ID(rootCategory1.getCatalogId()), ID.INTERNAL_ID(rootCategory1.getRootCategoryId()), Toggle.get(rootCategory1.getActive()));
 
         RootCategory updatedRootCategory = rootCategoryDAO.findById(rootCategory.getId()).orElse(null);
@@ -307,6 +325,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(updatedRootCategory1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getRootCategoriesTest() throws Exception {
         //creating catalogs
@@ -350,6 +369,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(rootCategoriesMap.getSize(), categoriesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoryHierarchyTest() throws Exception {
         //creating catalogs
@@ -409,6 +429,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(categoryHierarchy.get(2).get("parent").toString(), categoriesData.get(2).get("parent").toString());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setRootCategorySequenceTest() throws Exception {
         //creating catalogs
@@ -469,6 +490,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(rootCategoryList.get(1).getSubSequenceNum(), 1);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addRootCategoryTest() throws Exception {
         //creating catalogs
@@ -502,6 +524,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(rootCategory.getRootCategoryId(), rootCategory1.getRootCategoryId());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         //creating catalogs
@@ -524,6 +547,7 @@ public class CatalogServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating catalogs
@@ -551,6 +575,7 @@ public class CatalogServiceImplTest {
     }
 
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //creating catalogs
@@ -581,6 +606,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(updatedCatalog1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         //creating catalogs
@@ -604,6 +630,7 @@ public class CatalogServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //creating catalogs
@@ -629,6 +656,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), catalogsData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //creating catalogs
@@ -681,6 +709,7 @@ public class CatalogServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //creating catalogs
@@ -709,6 +738,7 @@ public class CatalogServiceImplTest {
         Assert.assertTrue(catalogsMap.size() == ids.length && catalogsMap.containsKey(ids[0]) && catalogsMap.containsKey(ids[1]) && catalogsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //creating catalogs
@@ -737,6 +767,7 @@ public class CatalogServiceImplTest {
         Assert.assertTrue(catalogsMap.size() == ids.length && catalogsMap.containsKey(ids[0]) && catalogsMap.containsKey(ids[1]) && catalogsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //creating catalogs
@@ -765,6 +796,7 @@ public class CatalogServiceImplTest {
         Assert.assertTrue(catalogsMap.size() == (catalogsData.size() - ids.length) && !catalogsMap.containsKey(ids[0]) && !catalogsMap.containsKey(ids[1]) && !catalogsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //creating catalogs
@@ -793,6 +825,7 @@ public class CatalogServiceImplTest {
         Assert.assertTrue(catalogssMap.size() == (catalogsData.size() - ids.length) && !catalogssMap.containsKey(ids[0]) && !catalogssMap.containsKey(ids[1]) && !catalogssMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //creating catalogs
@@ -819,6 +852,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1Test() {
         //creating catalogs
@@ -845,6 +879,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         //creating catalogs
@@ -876,6 +911,7 @@ public class CatalogServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //creating catalogs
@@ -907,15 +943,16 @@ public class CatalogServiceImplTest {
             result1.setActive("N");
             return result1;
         }).collect(Collectors.toList());
-       catalogService.update(catalogs);
+        catalogService.update(catalogs);
 
         //Getting updated catalogs
-       result = catalogService.getAll(Sort.by("catalogName").descending(), true);
-       catalogsMap = result.stream().collect(Collectors.toMap(catalog -> catalog.getCatalogId(), catalog -> catalog));
-       Assert.assertTrue(catalogsMap.size() == (catalogsData.size() - ids.length) && !catalogsMap.containsKey(ids[0]) && !catalogsMap.containsKey(ids[1]) && !catalogsMap.containsKey(ids[2]));
-       Assert.assertFalse(catalogsMap.size() == catalogsData.size() && catalogsMap.containsKey(ids[0]) && catalogsMap.containsKey(ids[1]) && catalogsMap.containsKey(ids[2]));
+        result = catalogService.getAll(Sort.by("catalogName").descending(), true);
+        catalogsMap = result.stream().collect(Collectors.toMap(catalog -> catalog.getCatalogId(), catalog -> catalog));
+        Assert.assertTrue(catalogsMap.size() == (catalogsData.size() - ids.length) && !catalogsMap.containsKey(ids[0]) && !catalogsMap.containsKey(ids[1]) && !catalogsMap.containsKey(ids[2]));
+        Assert.assertFalse(catalogsMap.size() == catalogsData.size() && catalogsMap.containsKey(ids[0]) && catalogsMap.containsKey(ids[1]) && catalogsMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstanceTest() {
         //creating catalogs
@@ -939,6 +976,7 @@ public class CatalogServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         //creating catalogs
@@ -965,6 +1003,7 @@ public class CatalogServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //creating catalogs
@@ -992,6 +1031,7 @@ public class CatalogServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //creating catalogs
@@ -1017,6 +1057,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(catalogsData.get(0).get("name"), result.get().getCatalogName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //creating catalogs
@@ -1043,6 +1084,7 @@ public class CatalogServiceImplTest {
         Assert.assertEquals(catalogsData.get(0).get("name"), result.get().getCatalogName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validate1Test() throws Exception {
         /* Create a valid new instance with id CATALOG_TEST */

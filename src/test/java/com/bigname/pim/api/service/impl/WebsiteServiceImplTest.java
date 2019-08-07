@@ -17,6 +17,8 @@ import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -46,6 +49,8 @@ import java.util.stream.Collectors;
 public class WebsiteServiceImplTest {
 
     @Autowired
+    private UserService userService;
+    @Autowired
     WebsiteService websiteService;
     @Autowired
     CatalogService catalogService;
@@ -59,6 +64,14 @@ public class WebsiteServiceImplTest {
 
     @Before
     public void setUp() {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COm");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
         }
@@ -67,6 +80,7 @@ public class WebsiteServiceImplTest {
         websiteCatalogDAO.deleteAll();
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllWebsiteCatalogsTest() throws Exception {
         //creating websites
@@ -114,6 +128,7 @@ public class WebsiteServiceImplTest {
                 });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWebsiteCatalogsTest() throws Exception {
         //creating websites
@@ -163,6 +178,7 @@ public class WebsiteServiceImplTest {
                 });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAvailableCatalogsForWebsiteTest() throws Exception {
         //creating websites
@@ -216,6 +232,7 @@ public class WebsiteServiceImplTest {
                 });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableCatalogsForWebsiteTest() throws Exception {
         //creating websites
@@ -267,6 +284,7 @@ public class WebsiteServiceImplTest {
                 });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getWebsiteCatalogsTest() throws Exception {
         //creating websites
@@ -316,6 +334,7 @@ public class WebsiteServiceImplTest {
                 });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addCatalogTest() throws Exception {
         //creating websites
@@ -352,6 +371,7 @@ public class WebsiteServiceImplTest {
                 );
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getWebsiteByNameTest() throws Exception {
         //creating websites
@@ -375,6 +395,7 @@ public class WebsiteServiceImplTest {
                 );
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getWebsiteByUrlTest() throws Exception {
         //creating websites
@@ -398,6 +419,7 @@ public class WebsiteServiceImplTest {
                 );
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         //creating websites
@@ -424,6 +446,7 @@ public class WebsiteServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating websites
@@ -453,6 +476,7 @@ public class WebsiteServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //creating websites
@@ -486,6 +510,7 @@ public class WebsiteServiceImplTest {
         Assert.assertEquals(updatedWebsite1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         //creating websites
@@ -509,6 +534,7 @@ public class WebsiteServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //creating websites
@@ -537,6 +563,7 @@ public class WebsiteServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), websitesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //creating websites
@@ -597,6 +624,7 @@ public class WebsiteServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //creating websites
@@ -627,6 +655,7 @@ public class WebsiteServiceImplTest {
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //creating websites
@@ -657,6 +686,7 @@ public class WebsiteServiceImplTest {
         Assert.assertTrue(websitesMap.size() == ids.length && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //creating websites
@@ -687,6 +717,7 @@ public class WebsiteServiceImplTest {
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //creating websites
@@ -717,6 +748,7 @@ public class WebsiteServiceImplTest {
         Assert.assertTrue(websitesMap.size() == (websitesData.size() - ids.length) && !websitesMap.containsKey(ids[0]) && !websitesMap.containsKey(ids[1]) && !websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //creating websites
@@ -745,6 +777,7 @@ public class WebsiteServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         //creating websites
@@ -774,6 +807,7 @@ public class WebsiteServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         //creating websites
@@ -806,6 +840,7 @@ public class WebsiteServiceImplTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //creating websites
@@ -849,6 +884,7 @@ public class WebsiteServiceImplTest {
         Assert.assertFalse(websitesMap.size() == websitesData.size() && websitesMap.containsKey(ids[0]) && websitesMap.containsKey(ids[1]) && websitesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstanceTest() {
         //creating websites
@@ -873,6 +909,7 @@ public class WebsiteServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //creating websites
@@ -901,6 +938,7 @@ public class WebsiteServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1Test() {
         //creating websites
@@ -930,6 +968,7 @@ public class WebsiteServiceImplTest {
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //creating websites
@@ -957,6 +996,7 @@ public class WebsiteServiceImplTest {
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //creating websites
@@ -986,7 +1026,7 @@ public class WebsiteServiceImplTest {
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }
 
-
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
         /* Create a valid new instance with id TEST */
