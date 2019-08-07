@@ -6,6 +6,8 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,22 +31,50 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes={PimApplication.class})
 public class WebsiteCatalogTest {
     @Autowired
-    WebsiteService websiteService;
+    private WebsiteService websiteService;
     @Autowired
-    CatalogService catalogService;
+    private CatalogService catalogService;
     @Autowired
-    CatalogDAO catalogDAO;
+    private CatalogDAO catalogDAO;
     @Autowired
-    WebsiteDAO websiteDAO;
+    private WebsiteDAO websiteDAO;
+    @Autowired
+    private UserDAO userDAO;
+
     private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
         }
-		mongoTemplate.dropCollection(Website.class);
-		mongoTemplate.dropCollection(Catalog.class);
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create Catalog
@@ -69,20 +100,24 @@ public class WebsiteCatalogTest {
         Assert.assertEquals(websiteCatalog.getWebsiteId(), websiteDTO.getId());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void init() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void equals() throws Exception {
     }
+
     @After
     public void tearDown() throws Exception {
-		mongoTemplate.dropCollection(Website.class);
-		mongoTemplate.dropCollection(Catalog.class);
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
 }

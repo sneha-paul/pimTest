@@ -5,6 +5,8 @@ import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,17 +33,47 @@ import java.util.Map;
 @ContextConfiguration(classes={PimApplication.class})
 public class AttributeCollectionTest {
     @Autowired
-    AttributeCollectionService attributeCollectionService;
+    private AttributeCollectionService attributeCollectionService;
     @Autowired
-    AttributeCollectionDAO attributeCollectionDAO;
+    private AttributeCollectionDAO attributeCollectionDAO;
+    @Autowired
+    private UserDAO userDAO;
+
     private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) attributeCollectionDAO.getTemplate();
         }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+
+
         mongoTemplate.dropCollection(AttributeCollection.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create New Instance attributeCollection
@@ -80,50 +113,62 @@ public class AttributeCollectionTest {
         Assert.assertEquals(newAttributeCollection2.getAllAttributes().get(0).getActive(), attributeDTO.getActive());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateAttribute() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addAttributeOption() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateAttributeOption() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeFullId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeOptionFullId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeFullId1() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttribute() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeOption() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setAllAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setExternalId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create Attribute collection original instance
@@ -176,6 +221,7 @@ public class AttributeCollectionTest {
         Assert.assertEquals(original1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create new instance
@@ -196,6 +242,7 @@ public class AttributeCollectionTest {
         Assert.assertEquals(map1.get("active"), map.get("active"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create First Instance
@@ -218,9 +265,11 @@ public class AttributeCollectionTest {
         Assert.assertEquals(diff1.get("collectionName"), "test.com");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableParentAttributes() throws Exception {
     }
+
     @After
     public void tearDown() throws Exception {
         mongoTemplate.dropCollection(AttributeCollection.class);

@@ -2,7 +2,6 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
@@ -15,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,9 +32,10 @@ import java.util.Map;
 @ContextConfiguration(classes={PimApplication.class})
 public class UserTest {
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    UserDAO userDAO;
+    private UserDAO userDAO;
+
     private MongoTemplate mongoTemplate;
 
     @Before
@@ -42,8 +43,31 @@ public class UserTest {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) userDAO.getTemplate();
         }
-        mongoTemplate.dropCollection(User.class);
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create new instance
@@ -73,6 +97,8 @@ public class UserTest {
         Assert.assertEquals(newUser.getPassword(), userDTO.getPassword());
         Assert.assertEquals(newUser.getStatus(), userDTO.getStatus());
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create new Instance
@@ -98,6 +124,8 @@ public class UserTest {
         Assert.assertEquals(map1.get("status"), map.get("status"));
         Assert.assertEquals(map1.get("active"), map.get("active"));
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create first instance
@@ -126,9 +154,10 @@ public class UserTest {
         Assert.assertEquals(diff1.size(), 1);
         Assert.assertEquals(diff1.get("password"), "test2");
     }
+
     @After
     public void tearDown() throws Exception {
-        mongoTemplate.dropCollection(User.class);
+        //mongoTemplate.dropCollection(User.class);
     }
 
 

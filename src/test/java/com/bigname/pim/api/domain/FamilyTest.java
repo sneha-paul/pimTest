@@ -7,6 +7,8 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,17 +37,45 @@ import java.util.Map;
 @ContextConfiguration(classes={PimApplication.class})
 public class FamilyTest {
     @Autowired
-    FamilyService familyService;
+    private FamilyService familyService;
     @Autowired
-    FamilyDAO familyDAO;
+    private FamilyDAO familyDAO;
+    @Autowired
+    private UserDAO userDAO;
+
     private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) familyDAO.getTemplate();
         }
-		mongoTemplate.dropCollection(Family.class);
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(Family.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create Family Instance
@@ -66,22 +97,28 @@ public class FamilyTest {
         Assert.assertEquals(newFamily.getActive(), familyDTO.getActive());
 
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addAttribute() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateAttribute() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addAttributeOption() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setExternalId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create Family Original Instance
@@ -148,6 +185,7 @@ public class FamilyTest {
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() throws Exception {
         //Adding website
@@ -170,6 +208,8 @@ public class FamilyTest {
             Assert.assertTrue(familyClone.getFamilyId() .equals(newFamily.getFamilyId() + "_COPY") && familyClone.getFamilyName().equals(newFamily.getFamilyName() + "_COPY") && familyClone.getActive() != newFamily.getActive());
         });
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create new instance
@@ -189,42 +229,53 @@ public class FamilyTest {
         Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
         Assert.assertEquals(map1.get("active"), map.get("active"));
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAddonMasterGroups() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getDetailsMasterGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFeaturesMasterGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getMasterGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addVariantGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getVariantGroupAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getVariantGroupAxisAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateVariantGroupAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateVariantGroupAxisAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create first Instance
@@ -250,9 +301,10 @@ public class FamilyTest {
         Assert.assertEquals(diff1.get("familyName"), "test.com");
 
     }
+
     @After
     public void tearDown() throws Exception {
-		mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
 }

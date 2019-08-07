@@ -8,6 +8,8 @@ import com.bigname.pim.api.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,25 +38,53 @@ import java.util.Map;
 @ContextConfiguration(classes={PimApplication.class})
 public class ProductTest {
     @Autowired
-    ProductService productService;
+    private ProductService productService;
     @Autowired
-    ProductDAO productDAO;
+    private ProductDAO productDAO;
     @Autowired
-    FamilyService familyService;
+    private FamilyService familyService;
     @Autowired
-    FamilyDAO familyDAO;
+    private FamilyDAO familyDAO;
+    @Autowired
+    private UserDAO userDAO;
+
     private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) productDAO.getTemplate();
         }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
         mongoTemplate.dropCollection(Product.class);
         mongoTemplate.dropCollection(Family.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
-       //Create Family
+        //Create Family
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "TEST", "externalId", "TEST", "active", "Y", "discontinue", "N"));
 
@@ -95,6 +126,7 @@ public class ProductTest {
         Assert.assertEquals(product.getProductFamilyId(), familyDetails.getId());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void orchestrate() throws Exception {
         //Create id
@@ -107,6 +139,7 @@ public class ProductTest {
         Assert.assertEquals(productDTO.getProductId(), "TEST");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //create Original instance
@@ -139,11 +172,12 @@ public class ProductTest {
         Assert.assertEquals(original.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() throws Exception {
-
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create New Instance
@@ -160,10 +194,12 @@ public class ProductTest {
         Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setAttributeValues() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create New Instance
@@ -191,6 +227,7 @@ public class ProductTest {
         Assert.assertEquals(diff1.get("productName"), "test11.com");
 
     }
+
     @After
     public void tearDown() throws Exception {
         mongoTemplate.dropCollection(Product.class);

@@ -2,10 +2,11 @@ package com.bigname.pim.api.domain;
 
 import com.bigname.pim.PimApplication;
 import com.m7.xtreme.common.util.ValidationUtil;
-import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.Event;
+import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.persistence.dao.mongo.EventDAO;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
 import com.m7.xtreme.xplatform.service.EventService;
 import org.junit.After;
 import org.junit.Assert;
@@ -15,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -29,9 +31,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes={PimApplication.class})
 public class EventTest {
     @Autowired
-    EventService eventService;
+    private EventService eventService;
     @Autowired
-    EventDAO eventDAO;
+    private EventDAO eventDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     private MongoTemplate mongoTemplate;
 
@@ -40,8 +44,32 @@ public class EventTest {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) eventDAO.getTemplate();
         }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
         mongoTemplate.dropCollection(Event.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create new instance
@@ -69,13 +97,17 @@ public class EventTest {
         Assert.assertEquals(newEvent.getActive(), eventDTO.getActive());
 
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
     }
+
     @After
     public void tearDown() throws Exception {
         mongoTemplate.dropCollection(Event.class);

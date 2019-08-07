@@ -7,6 +7,8 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,9 +38,11 @@ import java.util.Map;
 public class WebsiteTest {
 
     @Autowired
-    WebsiteService websiteService;
+    private WebsiteService websiteService;
     @Autowired
-    WebsiteDAO websiteDAO;
+    private WebsiteDAO websiteDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     private MongoTemplate mongoTemplate;
 
@@ -46,8 +51,32 @@ public class WebsiteTest {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
         }
-		mongoTemplate.dropCollection(Website.class);
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(Website.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest(){
         //Create new instance
@@ -77,6 +106,7 @@ public class WebsiteTest {
         Assert.assertEquals(newWebsite.getActive(), websiteDTO.getActive());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() throws Exception {
         //Adding website
@@ -101,6 +131,7 @@ public class WebsiteTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create Website Original
@@ -138,6 +169,7 @@ public class WebsiteTest {
         Assert.assertEquals(original.getUrl(), "www.one.com");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create new Instance
@@ -157,10 +189,12 @@ public class WebsiteTest {
         Assert.assertEquals(map1.get("url"), map.get("url"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void equals() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void orchestrate() throws Exception {
         //Create id
@@ -172,6 +206,8 @@ public class WebsiteTest {
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
         Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create first instance
@@ -198,8 +234,9 @@ public class WebsiteTest {
         Assert.assertEquals(diff1.size(), 1);
         Assert.assertEquals(diff1.get("websiteName"), "test.com2");
     }
+
     @After
     public void tearDown() throws Exception {
-		mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Website.class);
     }
 }

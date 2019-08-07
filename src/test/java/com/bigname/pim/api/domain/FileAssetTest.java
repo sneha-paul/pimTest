@@ -5,6 +5,8 @@ import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.FamilyService;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -27,19 +30,47 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class FileAssetTest {
 
     @Autowired
-    AssetCollectionService assetCollectionService;
+    private AssetCollectionService assetCollectionService;
     @Autowired
-    AssetCollectionDAO assetCollectionDAO;
+    private AssetCollectionDAO assetCollectionDAO;
     @Autowired
-    FamilyService familyService;
+    private FamilyService familyService;
+    @Autowired
+    private UserDAO userDAO;
+
     private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) assetCollectionDAO.getTemplate();
         }
-		mongoTemplate.dropCollection(FileAsset.class);
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+
+        mongoTemplate.dropCollection(FileAsset.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create new instance
@@ -57,13 +88,16 @@ public class FileAssetTest {
 
         //create
         //assetCollectionService.create(fileAssetDTO);
-       //ToDO
+        //ToDO
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
     }
+
     @After
     public void tearDown() throws Exception {
-		mongoTemplate.dropCollection(FileAsset.class);
+        mongoTemplate.dropCollection(FileAsset.class);
     }
 }
