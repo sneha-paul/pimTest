@@ -9,6 +9,7 @@ import com.bigname.pim.data.exportor.CatalogExporter;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
@@ -185,6 +186,14 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
                                                   @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", catalogService.toggleCatalog(ID.EXTERNAL_ID(catalogId), Toggle.get(active)));
+        return model;
+    }
+
+    @RequestMapping(value = "/{catalogId}/catalogs/archive/{archived}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> archive(@PathVariable(value = "catalogId") String catalogId, @PathVariable(value = "archived") String archived) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", catalogService.archive(ID.EXTERNAL_ID(catalogId), Archive.get(archived)));
         return model;
     }
 }

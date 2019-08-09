@@ -432,7 +432,7 @@
 
                     let activeButton = $('<button class="btn btn-sm btn-success js-active-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Active Filter"><i class="icon-check"></i></button>')
                         .click(function() {
-                            if($.getDataTableStatusOptions(options.selector) === '100') {
+                            if($.getDataTableStatusOptions(options.selector) === '1000') {
                                 toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
                             } else {
                                 $(this).toggleClass(['btn-outline-secondary', 'btn-success', 'js-active-on']);
@@ -442,7 +442,7 @@
                     toolbar.push(activeButton);
                     let inactiveButton = $('<button class="btn btn-sm btn-danger js-inactive-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Inactive Filter"><i class="icon-close"></i></button>')
                         .click(function() {
-                            if($.getDataTableStatusOptions(options.selector) === '010') {
+                            if($.getDataTableStatusOptions(options.selector) === '0100') {
                                 toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
                             } else {
                                 $(this).toggleClass(['btn-outline-secondary', 'btn-danger', 'js-inactive-on']);
@@ -452,7 +452,7 @@
                     toolbar.push(inactiveButton);
                     let discontinuedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
                         .click(function() {
-                            if($.getDataTableStatusOptions(options.selector) === '001') {
+                            if($.getDataTableStatusOptions(options.selector) === '0010') {
                                 toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
                             } else {
                                 $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-discontinued-on']);
@@ -460,6 +460,18 @@
                             }
                         });
                     toolbar.push(discontinuedButton);
+
+                    let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="icon-ban"></i></button>')
+                        .click(function() {
+                            if($.getDataTableStatusOptions(options.selector) === '0001') {
+                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                            } else {
+                                $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-archived-on']);
+                                $searchButton.click();
+                            }
+                        });
+                    toolbar.push(archivedButton);
+
                     $(options.selector + '_wrapper').find('.dt-buttons').append(toolbar);
                     $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' , trigger : 'hover'});
                 },
@@ -630,6 +642,7 @@
                 statusOption += $(selector + '_wrapper .dt-buttons').find('.js-active-on').length;
                 statusOption += $(selector + '_wrapper .dt-buttons').find('.js-inactive-on').length;
                 statusOption += $(selector + '_wrapper .dt-buttons').find('.js-discontinued-on').length;
+                statusOption += $(selector + '_wrapper .dt-buttons').find('.js-archived-on').length;
             }
             return statusOption;
 
@@ -1093,6 +1106,18 @@
                 }
             });
 
+        },
+
+        archiveStatus: function(url, entityName, callback, isArchive) {
+            $.confirmedAJAXRequest({
+                url: url,
+                method: 'PUT',
+                text: 'This will ' + (isArchive === 'Y' ? 'unarchive' : 'archive') + ' the ' + entityName + "!",
+                confirmButtonText: 'Yes, ' + (isArchive === 'Y' ? 'unarchive' : 'archive') +' it!',
+                confirmButtonColor: isArchive === 'Y' ? '#dc3545' : '#28a745',
+                successTitle: isArchive === 'Y' ? 'Unarchived!' : 'Archived!',
+                successText: 'The ' + entityName + ' has been ' + (isArchive === 'Y' ? 'unarchived.' : 'archived.')
+            }, callback);
         },
 
         toggleStatus: function(url, entityName, callback, isActive) {

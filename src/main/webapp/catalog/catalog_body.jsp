@@ -55,6 +55,11 @@
                                                                    <c:if test="${catalog.active eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Active</span>
                                                         </label>
+                                                        <label for="archived" class="fancy-checkbox">
+                                                            <input type="checkbox" id="archived" name="archived" value="Y"
+                                                                   <c:if test="${catalog.archived eq 'Y'}">checked="checked"</c:if>>
+                                                            <span>Archived</span>
+                                                        </label>
                                                          <%-- discontinued commented as per client request --%>
 
                                                         <%--<label for="discontinued" class="fancy-checkbox">

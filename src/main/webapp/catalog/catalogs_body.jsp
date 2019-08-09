@@ -31,6 +31,7 @@
             toolbar: [{name: 'EXPORT', actionUrl: '/pim/catalogs/export'}, {name: 'IMPORT'}],
             dataUrl: '/pim/catalogs/data',
             toggleUrl: '/pim/catalogs/{externalId}/catalogs/active/{active}',
+            archiveUrl:'/pim/catalogs/{externalId}/catalogs/archive/{archived}',
             columns: [
                 { data: 'catalogName', name : 'catalogName' , title : 'Catalog Name'},
                 { data: 'externalId', name : 'externalId', title : 'Catalog ID' }

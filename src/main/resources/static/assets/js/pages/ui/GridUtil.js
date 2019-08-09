@@ -86,6 +86,24 @@
             };
         },
 
+        archivedStatusButton: function(options) {
+            return {
+                name: 'ARCHIVE_STATUS',
+                style: 'success',
+                title: 'Disable',
+                icon: 'fa-archive',
+                click: function(row){
+                    $.archiveStatus(
+                        $.getURL((typeof options.archiveUrl === 'undefined' || options.archiveUrl === '' ? options.pageUrl + '{externalId}/archive/{archived}' : options.archiveUrl), {
+                            externalId: row.externalId,
+                            archived: row.archived
+                        }),
+                        options.names[1],
+                        $.refreshDataTable.bind(this, options.names[0]), row.archived);
+                }
+            };
+        },
+
         showModalButton: function(options) {
             let buttons = options.buttons ? options.buttons : [];
             buttons[buttons.length] = {text: 'CLOSE', style: 'danger', close: true, click: function(){}};
@@ -181,7 +199,9 @@
 
         /** Renderers **/
         renderStatusColumn: function(data) {
-            if (data.discontinued === 'Y') {
+            if(data.archived === 'Y') {
+                return '<span class="badge badge-warning">Archived</span>';
+            } else if (data.discontinued === 'Y') {
                 return '<span class="badge badge-warning">Discontinued</span>';
             } else {
                 if (data.active === 'Y') {
@@ -277,6 +297,9 @@
                             case 'CHANGE_PASSWORD':
                                 buttons[i] = $.changePasswordButton(options);
                                 break;
+                            case 'ARCHIVED':
+                                buttons[i] = $.archivedStatusButton(options);
+                                break;
                         }
                     }
                 });
@@ -302,7 +325,8 @@
                 buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
                     $.cloneButton(options),
-                    $.toggleStatusButton(options)
+                    $.toggleStatusButton(options),
+                    $.archivedStatusButton(options)
                 ]
             }));
         },
