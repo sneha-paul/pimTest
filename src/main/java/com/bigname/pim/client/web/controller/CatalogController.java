@@ -8,6 +8,7 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.data.exportor.CatalogExporter;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
@@ -63,6 +64,9 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     public Map<String, Object> update(@PathVariable(value = "id") String catalogId, Catalog catalog) {
         //updating websiteCatalog
         Catalog catalog1 = catalogService.get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
+        if(isEmpty(catalog1)) {
+            catalog1 = catalogService.get(ID.EXTERNAL_ID(catalogId), false, false, false, true).orElse(null);
+        }
         List<WebsiteCatalog> websiteCatalogs = catalogService.getAllWebsiteCatalogsWithCatalogId(catalog1.getId());
         websiteCatalogs.forEach(websiteCatalog -> {
             websiteCatalog.setActive(catalog.getActive());
@@ -82,11 +86,21 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
         model.put("active", "CATALOGS");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "catalog/catalog"  + (reload ? "_body" : ""));
-        return id == null ? super.details(model) : catalogService.get(ID.EXTERNAL_ID(id), false)
-                .map(catalog -> {
-                    model.put("catalog", catalog);
-                    return super.details(id, parameterMap, request, model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Catalog with Id: " + id));
+        if(id == null) {
+            return super.details(model);
+        } else {
+            Catalog catalog = catalogService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            if(ValidationUtil.isEmpty(catalog)) {
+                catalog = catalogService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
+                model.put("catalog", catalog);
+            } else if(ValidationUtil.isNotEmpty(catalog)) {
+                model.put("catalog", catalog);
+            } else {
+                throw new EntityNotFoundException("Unable to find Catalog with Id: " + id);
+            }
+
+            return super.details(id, parameterMap, request, model);
+        }
     }
 
     @RequestMapping()
@@ -166,8 +180,8 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @RequestMapping(value = "/{id}/rootCategories/{rootCategoryId}/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> toggleRootCategory(@PathVariable(value = "id") String catalogId,
-                                             @PathVariable(value = "rootCategoryId") String rootCategoryId,
-                                             @PathVariable(value = "active") String active) {
+                                                  @PathVariable(value = "rootCategoryId") String rootCategoryId,
+                                                  @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", catalogService.toggleRootCategory(ID.EXTERNAL_ID(catalogId), ID.EXTERNAL_ID(rootCategoryId), Toggle.get(active)));
         return model;
@@ -183,7 +197,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @RequestMapping(value = "/{catalogId}/catalogs/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> toggleCatalogs(@PathVariable(value = "catalogId") String catalogId,
-                                                  @PathVariable(value = "active") String active) {
+                                              @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", catalogService.toggleCatalog(ID.EXTERNAL_ID(catalogId), Toggle.get(active)));
         return model;
