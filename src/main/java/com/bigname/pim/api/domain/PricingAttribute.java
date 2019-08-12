@@ -67,6 +67,7 @@ public class PricingAttribute extends MongoEntity<PricingAttribute> {
                     this.setExternalId(pricingAttribute.getExternalId());
                     this.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
                     this.setActive(pricingAttribute.getActive());
+                    mergeBaseProperties(pricingAttribute);
                     break;
             }
         }
@@ -79,6 +80,7 @@ public class PricingAttribute extends MongoEntity<PricingAttribute> {
         map.put("externalId", getExternalId());
         map.put("pricingAttributeName", getPricingAttributeName());
         map.put("active", getActive());
+        map.putAll(getBasePropertiesMap());
         return map;
     }
 

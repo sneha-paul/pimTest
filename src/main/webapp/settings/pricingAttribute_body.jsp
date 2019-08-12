@@ -35,6 +35,11 @@
                                                             <input type="checkbox" id="active" name="active" value="Y" <c:if test="${pricingAttribute.active eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Active</span>
                                                         </label>
+                                                        <label for="archived" class="fancy-checkbox">
+                                                            <input type="checkbox" id="archived" name="archived" value="Y"
+                                                                   <c:if test="${pricingAttribute.archived eq 'Y'}">checked="checked"</c:if>>
+                                                            <span>Archived</span>
+                                                        </label>
                                                     </div>
                                                     <%--<div class="js-dateRange">
                                                         <div class="form-group">

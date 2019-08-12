@@ -29,6 +29,7 @@
             names: ['pricingAttributes','pricingAttribute'],
             pageUrl: '/pim/pricingAttributes/',
             dataUrl: '/pim/pricingAttributes/data',
+            archiveUrl:'/pim/pricingAttributes/{externalId}/pricingAttributes/archive/{archived}',
             columns: [
                 { data: 'pricingAttributeName', name : 'pricingAttributeName' , title : 'Pricing Attribute Name'},
                 { data: 'externalId', name : 'externalId', title : 'Pricing Attribute ID' }
