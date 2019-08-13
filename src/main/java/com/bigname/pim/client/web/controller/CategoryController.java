@@ -10,6 +10,7 @@ import com.bigname.pim.data.exportor.CategoryExporter;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**
@@ -59,6 +61,9 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
         Category category1 = categoryService.get(ID.EXTERNAL_ID(categoryId), false).orElse(null);
+        if(isEmpty(category1)) {
+            category1 = categoryService.get(ID.EXTERNAL_ID(categoryId), false, false, false, true).orElse(null);
+        }
         categoryService.getAllRootCategoriesWithCategoryId(ID.INTERNAL_ID(category1.getId()))
                 .forEach(rootCategory -> {
                     rootCategory.setActive(category.getActive());
@@ -88,14 +93,27 @@ public class CategoryController extends BaseController<Category, CategoryService
         model.put("active", "CATEGORIES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "category/category"  + (reload ? "_body" : ""));
-        return id == null ? super.details(model) : categoryService.get(ID.EXTERNAL_ID(id), false)
-                .map(category -> {
-                    if(parameterMap.containsKey("parentId")) {
-                        model.put("parentId", parameterMap.get("parentId"));
-                    }
-                    model.put("category", category);
-                    return super.details(id, parameterMap, request, model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Category with Id: " + id));
+
+        if(id == null) {
+            return super.details(model);
+        } else {
+            Category category = categoryService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            if(isNotEmpty(category)) {
+                if(parameterMap.containsKey("parentId")) {
+                    model.put("parentId", parameterMap.get("parentId"));
+                }
+                model.put("category", category);
+            } else if(isEmpty(category)) {
+                category = categoryService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
+                if(parameterMap.containsKey("parentId")) {
+                    model.put("parentId", parameterMap.get("parentId"));
+                }
+                model.put("category", category);
+            } else {
+                throw new EntityNotFoundException("Unable to find Category with Id: " + id);
+            }
+            return super.details(id, parameterMap, request, model);
+        }
     }
 
     @RequestMapping()
@@ -203,8 +221,8 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{id}/subCategories/{subCategoryId}/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> toggleSubCategory(@PathVariable(value = "id") String categoryId,
-                                      @PathVariable(value = "subCategoryId") String subCategoryId,
-                                      @PathVariable(value = "active") String active) {
+                                                 @PathVariable(value = "subCategoryId") String subCategoryId,
+                                                 @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", categoryService.toggleSubCategory(ID.EXTERNAL_ID(categoryId), ID.EXTERNAL_ID(subCategoryId), Toggle.get(active)));
         return model;
@@ -248,8 +266,8 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{id}/products/{productId}/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> toggleProduct(@PathVariable(value = "id") String categoryId,
-                                                 @PathVariable(value = "productId") String productId,
-                                                 @PathVariable(value = "active") String active) {
+                                             @PathVariable(value = "productId") String productId,
+                                             @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", categoryService.toggleProduct(ID.EXTERNAL_ID(categoryId), ID.EXTERNAL_ID(productId), Toggle.get(active)));
         return model;
@@ -261,6 +279,14 @@ public class CategoryController extends BaseController<Category, CategoryService
                                               @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", categoryService.toggleCategory(ID.EXTERNAL_ID(categoryId), Toggle.get(active)));
+        return model;
+    }
+
+    @RequestMapping(value = "/{categoryId}/categories/archive/{archived}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> archive(@PathVariable(value = "categoryId") String categoryId, @PathVariable(value = "archived") String archived) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", categoryService.archive(ID.EXTERNAL_ID(categoryId), Archive.get(archived)));
         return model;
     }
 

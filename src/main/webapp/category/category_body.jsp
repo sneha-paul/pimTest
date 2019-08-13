@@ -54,6 +54,10 @@
                                                             <input type="checkbox" id="discontinued" name="discontinued" value="Y" <c:if test="${category.discontinued eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Discontinued</span>
                                                         </label>
+                                                        <label for="archived" class="fancy-checkbox">
+                                                            <input type="checkbox" id="archived" name="archived" value="Y" <c:if test="${category.archived eq 'Y'}">checked="checked"</c:if>>
+                                                            <span>Archived</span>
+                                                        </label>
                                                     </div>
                                                     <div class="js-dateRange">
                                                         <div class="form-group">
