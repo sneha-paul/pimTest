@@ -54,10 +54,6 @@
                                                             <input type="checkbox" id="discontinued" name="discontinued" value="Y" <c:if test="${category.discontinued eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Discontinued</span>
                                                         </label>
-                                                        <label for="archived" class="fancy-checkbox">
-                                                            <input type="checkbox" id="archived" name="archived" value="Y" <c:if test="${category.archived eq 'Y'}">checked="checked"</c:if>>
-                                                            <span>Archived</span>
-                                                        </label>
                                                     </div>
                                                     <div class="js-dateRange">
                                                         <div class="form-group">
@@ -83,7 +79,9 @@
                                             </div>
                                             <br>
                                             <input type="hidden" name="group" value="DETAILS"/>
+                                            <c:if test="${category.archived eq 'N'}">
                                             <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
+                                            </c:if>
                                             <a href="${breadcrumbs.backURL}"><button type="button" class="btn btn-danger">Cancel</button></a>
                                         </form>
                                     </div>

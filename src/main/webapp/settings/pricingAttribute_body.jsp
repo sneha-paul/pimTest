@@ -35,11 +35,6 @@
                                                             <input type="checkbox" id="active" name="active" value="Y" <c:if test="${pricingAttribute.active eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Active</span>
                                                         </label>
-                                                        <label for="archived" class="fancy-checkbox">
-                                                            <input type="checkbox" id="archived" name="archived" value="Y"
-                                                                   <c:if test="${pricingAttribute.archived eq 'Y'}">checked="checked"</c:if>>
-                                                            <span>Archived</span>
-                                                        </label>
                                                     </div>
                                                     <%--<div class="js-dateRange">
                                                         <div class="form-group">
@@ -55,7 +50,9 @@
                                             </div>
                                             <br>
                                             <input type="hidden" name="group" value="DETAILS"/>
+                                            <c:if test="${pricingAttribute.archived eq 'N'}">
                                             <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
+                                            </c:if>
                                             <a href="/pim/pricingAttributes"><button type="button" class="btn btn-danger">Cancel</button></a>
                                         </form>
                                     </div>

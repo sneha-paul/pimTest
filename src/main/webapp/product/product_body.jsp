@@ -325,7 +325,9 @@
                                             </c:forEach>
                                             <div class="form-button-group pull-right">
                                                 <input type="hidden" name="group" value="DETAILS"/>
+                                                <c:if test="${product.archived eq 'N'}">
                                                 <button type="submit" class="btn btn-primary" onclick="$.submitAction(event, this)">Save</button>
+                                                </c:if>
                                                 <a href="${breadcrumbs.backURL}"><button type="button" class="btn btn-danger">Cancel</button></a>
                                             </div>
                                         </form>

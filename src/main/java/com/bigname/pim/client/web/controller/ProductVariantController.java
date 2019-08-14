@@ -15,6 +15,7 @@ import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.apache.commons.collections4.MapUtils;
@@ -378,9 +379,9 @@ public class ProductVariantController extends ControllerSupport {
 
     @RequestMapping(value = {"/{productId}/variants/{variantId}/pricingDetails/{pricingAttributeId}", "/{productId}/variants/{variantId}/pricingDetails"})
     public ModelAndView variantPricingDetails(@PathVariable(value = "productId") String productId,
-                                       @PathVariable(value = "variantId") String variantId,
-                                       @PathVariable(value = "pricingAttributeId", required = false) String pricingAttributeId,
-                                       @RequestParam(name = "channelId") String channelId) {
+                                              @PathVariable(value = "variantId") String variantId,
+                                              @PathVariable(value = "pricingAttributeId", required = false) String pricingAttributeId,
+                                              @RequestParam(name = "channelId") String channelId) {
         Map<String, Object> model = new HashMap<>();
         model.put("active", "PRODUCTS");
         Optional<Product> _product = productService.get(ID.EXTERNAL_ID(productId), false);
@@ -588,6 +589,22 @@ public class ProductVariantController extends ControllerSupport {
 
         VirtualFile asset = assetService.get(ID.INTERNAL_ID(fileId), false).orElse(null);
         return downloadAsset(asset.getInternalFileName(), request);
-}
+    }
+
+    @RequestMapping(value = "/{productId}/channels/{channelId}/variants/{variantId}/archive/{archived}", method = RequestMethod.PUT)
+
+    @ResponseBody
+    public Map<String, Object> archive(@PathVariable(value = "productId") String productId,
+                                       @PathVariable(value = "channelId") String channelId,
+                                       @PathVariable(value = "variantId") String variantId,
+                                       @PathVariable(value = "archived") String archived) {
+        Map<String, Object> model = new HashMap<>();
+        ProductVariant variant = productVariantService.get(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), false).orElse(null);
+        if(isEmpty(variant)) {
+            variant = productVariantService.get(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), false, false, false, true).orElse(null);
+        }
+        model.put("success", productVariantService.archive(ID.EXTERNAL_ID(variant.getProductVariantId()), Archive.get(archived)));
+        return model;
+    }
 
 }

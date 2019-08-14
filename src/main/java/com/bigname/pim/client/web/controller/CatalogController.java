@@ -8,7 +8,6 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.data.exportor.CatalogExporter;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
-import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
@@ -26,7 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.*;
+
 
 /**
  *
@@ -64,9 +64,6 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     public Map<String, Object> update(@PathVariable(value = "id") String catalogId, Catalog catalog) {
         //updating websiteCatalog
         Catalog catalog1 = catalogService.get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
-        if(isEmpty(catalog1)) {
-            catalog1 = catalogService.get(ID.EXTERNAL_ID(catalogId), false, false, false, true).orElse(null);
-        }
         List<WebsiteCatalog> websiteCatalogs = catalogService.getAllWebsiteCatalogsWithCatalogId(catalog1.getId());
         websiteCatalogs.forEach(websiteCatalog -> {
             websiteCatalog.setActive(catalog.getActive());
@@ -90,10 +87,10 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
             return super.details(model);
         } else {
             Catalog catalog = catalogService.get(ID.EXTERNAL_ID(id), false).orElse(null);
-            if(ValidationUtil.isEmpty(catalog)) {
+            if(isEmpty(catalog)) {
                 catalog = catalogService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
                 model.put("catalog", catalog);
-            } else if(ValidationUtil.isNotEmpty(catalog)) {
+            } else if(isNotEmpty(catalog)) {
                 model.put("catalog", catalog);
             } else {
                 throw new EntityNotFoundException("Unable to find Catalog with Id: " + id);

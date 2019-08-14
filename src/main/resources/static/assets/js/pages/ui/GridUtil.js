@@ -342,6 +342,9 @@
                             case 'TOGGLE_STATUS':
                                 buttons[i] = $.toggleStatusButton(options);
                                 break;
+                            case 'ARCHIVED':
+                                buttons[i] = $.archivedStatusButton(options);
+                                break;
                         }
                     }
                 });
@@ -353,7 +356,8 @@
                 columns: columns,
                 buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
-                    $.toggleStatusButton(options)
+                    $.toggleStatusButton(options),
+                    $.archivedStatusButton(options)
                 ]
             }));
         }

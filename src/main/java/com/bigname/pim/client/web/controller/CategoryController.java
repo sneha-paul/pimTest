@@ -61,9 +61,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
         Category category1 = categoryService.get(ID.EXTERNAL_ID(categoryId), false).orElse(null);
-        if(isEmpty(category1)) {
-            category1 = categoryService.get(ID.EXTERNAL_ID(categoryId), false, false, false, true).orElse(null);
-        }
+
         categoryService.getAllRootCategoriesWithCategoryId(ID.INTERNAL_ID(category1.getId()))
                 .forEach(rootCategory -> {
                     rootCategory.setActive(category.getActive());

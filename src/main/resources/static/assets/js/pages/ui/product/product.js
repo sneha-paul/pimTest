@@ -79,6 +79,7 @@ $( document ).ready(function() {
             pageUrl: $.getURL('/pim/products/{productId}/variants/'),
             dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
             toggleUrl: '/pim/products/{productId}/channels/{channelId}/variants/{externalId}/active/{active}',
+            archiveUrl:'/pim/products/{productId}/channels/{channelId}/variants/{externalId}/archive/{archived}',
             urlParams: urlParams,
             reordering: false,
             columns: [

@@ -7,11 +7,11 @@ import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
-import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +28,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**
@@ -150,12 +149,24 @@ public class ProductController extends BaseController<Product, ProductService> {
         model.put("view", "product/product" + (reload ? "_body" : ""));
         model.put("productFamilies", productFamilyService.getAll(Sort.by(new Sort.Order(Sort.Direction.ASC, "familyName"))));
         model.put("channels", channelService.getAll(0, 100, null).stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))); //TODO - replace with a separate service method
-        return id == null ? super.details(model) : productService.get(ID.EXTERNAL_ID(id), false)
-                .map(product -> {
-                    product.setChannelId(channelId);
-                    model.put("product", product);
-                    return super.details(id, parameterMap, request, model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Product with Id: " + id));
+
+        if(id == null) {
+            return super.details(model);
+        } else {
+            Product product = productService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            if(isNotEmpty(product)) {
+                product.setChannelId(channelId);
+                model.put("product", product);
+
+            } else if(isEmpty(product)) {
+                product = productService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
+                product.setChannelId(channelId);
+                model.put("product", product);
+            } else {
+                throw new EntityNotFoundException("Unable to find Product with Id: " + id);
+            }
+        }
+        return super.details(id, parameterMap, request, model);
     }
 
     @RequestMapping()
@@ -303,5 +314,13 @@ public class ProductController extends BaseController<Product, ProductService> {
                     });
                     return dataObjects;
                 });
+    }
+
+    @RequestMapping(value = "/{productId}/products/archive/{archived}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> archive(@PathVariable(value = "productId") String productId, @PathVariable(value = "archived") String archived) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", productService.archive(ID.EXTERNAL_ID(productId), Archive.get(archived)));
+        return model;
     }
 }

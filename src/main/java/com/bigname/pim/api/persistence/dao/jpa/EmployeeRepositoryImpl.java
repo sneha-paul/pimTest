@@ -11,9 +11,4 @@ public class EmployeeRepositoryImpl extends GenericRepositoryImpl<Employee, Crit
     public EmployeeRepositoryImpl(JdbcTemplate jdbcTemplate, EntityManager entityManager) {
         super(jdbcTemplate, Employee.class, entityManager);
     }
-
-    @Override
-    public Employee saveData(Employee employee) {
-        return null;
-    }
 }
