@@ -26,6 +26,7 @@
             names: ['families','family'],
             pageUrl: '/pim/families/',
             dataUrl: '/pim/families/data',
+            archiveUrl:'/pim/families/{externalId}/families/archive/{archived}',
             columns: [
                 { data: 'externalId', name : 'externalId', title : 'Product Type ID' },
                 { data: 'familyName', name : 'familyName' , title : 'Product Type Name'}

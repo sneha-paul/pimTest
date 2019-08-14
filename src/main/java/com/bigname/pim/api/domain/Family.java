@@ -242,6 +242,7 @@ public class Family extends MongoEntity<Family> {
         map.put("externalId", getExternalId());
         map.put("familyName", getFamilyName());
         map.put("active", getActive());
+        map.put("archived", getArchived());
         return map;
     }
 

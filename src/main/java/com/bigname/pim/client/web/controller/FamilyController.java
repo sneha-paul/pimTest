@@ -14,6 +14,7 @@ import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
@@ -71,12 +73,29 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         model.put("active", "FAMILIES");
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/family"  + (reload ? "_body" : ""));
-        return id == null ? super.details(model) : familyService.get(ID.EXTERNAL_ID(id), false)
+
+        if(id == null) {
+            return super.details(model);
+        } else {
+            Family family = familyService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            if(isNotEmpty(family)) {
+                model.put("family", family);
+            } else if(isEmpty(family)) {
+                family = familyService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
+                model.put("family", family);
+            } else {
+                throw new EntityNotFoundException("Unable to find Family with Id: " + id);
+            }
+            model.put("channels", ConversionUtil.toJSONString(channelService.getAll(0, 100, null).getContent().stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))));
+            return super.details(id, model);
+        }
+
+        /*return id == null ? super.details(model) : familyService.get(ID.EXTERNAL_ID(id), false)
                 .map(family -> {
                     model.put("family", family);
                     model.put("channels", ConversionUtil.toJSONString(channelService.getAll(0, 100, null).getContent().stream().collect(Collectors.toMap(Channel::getChannelId, Channel::getChannelName))));
                     return super.details(id, model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Family with Id: " + id));
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Family with Id: " + id));*/
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -548,5 +567,13 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
         return result;
+    }
+
+    @RequestMapping(value = "/{familyId}/families/archive/{archived}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> archive(@PathVariable(value = "familyId") String familyId, @PathVariable(value = "archived") String archived) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", familyService.archive(ID.EXTERNAL_ID(familyId), Archive.get(archived)));
+        return model;
     }
 }

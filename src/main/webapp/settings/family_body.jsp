@@ -68,9 +68,11 @@
                                             </div>
                                             <br>
                                             <input type="hidden" name="group" value="DETAILS"/>
+                                            <c:if test="${family.archived eq 'N'}">
                                             <button type="submit" class="btn btn-primary"
                                                     onclick="$.submitAction(event, this)">Save
                                             </button>
+                                            </c:if>
                                             <a href="/pim/families">
                                                 <button type="button" class="btn btn-danger">Cancel</button>
                                             </a>
