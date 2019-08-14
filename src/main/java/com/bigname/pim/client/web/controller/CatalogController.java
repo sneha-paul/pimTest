@@ -204,6 +204,11 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     @ResponseBody
     public Map<String, Object> archive(@PathVariable(value = "catalogId") String catalogId, @PathVariable(value = "archived") String archived) {
         Map<String, Object> model = new HashMap<>();
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
+        if(isEmpty(catalog)) {
+            catalog = catalogService.get(ID.EXTERNAL_ID(catalogId), false, false, false, true).orElse(null);
+        }
+        //catalogService.archiveCatalogAssociations(ID.EXTERNAL_ID(catalogId), Archive.get(archived), catalog);
         model.put("success", catalogService.archive(ID.EXTERNAL_ID(catalogId), Archive.get(archived)));
         return model;
     }

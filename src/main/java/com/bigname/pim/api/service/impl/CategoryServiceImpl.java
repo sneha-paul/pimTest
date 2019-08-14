@@ -15,6 +15,7 @@ import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.EntityAssociation;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -601,5 +602,19 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public void updateProductCategory(ProductCategory productCategory) {
         productCategoryDAO.save(productCategory);
+    }
+
+    @Override
+    public void archiveCategoryAssociations(ID<String> categoryId, Archive archived, Category category) {
+        if(archived == Archive.NO) {
+            List<RelatedCategory> relatedCategories = getAllRelatedCategoriesWithSubCategoryId(categoryId);
+            relatedCategories.forEach(relatedCategory -> categoryDAO.archiveAssociationById(ID.INTERNAL_ID(relatedCategory.getId()), archived, RelatedCategory.class));
+
+            List<CategoryProduct> categoryProducts = getAllCategoryProducts(categoryId);
+            categoryProducts.forEach(categoryProduct -> categoryDAO.archiveAssociationById(ID.INTERNAL_ID(categoryProduct.getId()), archived, CategoryProduct.class));
+        } else {
+            List<CategoryProduct> categoryProducts = getAllCategoryProducts(categoryId);
+            categoryProducts.forEach(categoryProduct -> categoryDAO.archiveAssociationById(ID.INTERNAL_ID(categoryProduct.getId()), archived, CategoryProduct.class));
+        }
     }
 }

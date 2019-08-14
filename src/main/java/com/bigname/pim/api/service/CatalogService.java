@@ -6,6 +6,7 @@ import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.persistence.dao.mongo.CatalogDAO;
 import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
@@ -74,4 +75,6 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
     boolean toggleCatalog(ID<String> catalogId, Toggle toggle);
 
     void updateWebsiteCatalog(WebsiteCatalog websiteCatalog);
+
+    void archiveCatalogAssociations(ID<String> catalogId, Archive archived, Catalog catalog);
 }

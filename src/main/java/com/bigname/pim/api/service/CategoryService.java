@@ -3,6 +3,7 @@ package com.bigname.pim.api.service;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
 import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
@@ -127,5 +128,7 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
     void updateRelatedCategory(RelatedCategory relatedCategory);
 
     void updateProductCategory(ProductCategory productCategory);
+
+    void archiveCategoryAssociations(ID<String> categoryId, Archive archived, Category category);
 }
 

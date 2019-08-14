@@ -68,6 +68,8 @@ public class WebsiteCatalog extends EntityAssociation<Website, Catalog> {
         map.put("active", attributeMap.get("active"));
         map.put("sequenceNum", attributeMap.get("sequenceNum"));
         map.put("subSequenceNum", attributeMap.get("subSequenceNum"));
+        map.put("discontinued", attributeMap.get("discontinued"));
+        map.put("archived", attributeMap.get("archived"));
         return map;
     }
 

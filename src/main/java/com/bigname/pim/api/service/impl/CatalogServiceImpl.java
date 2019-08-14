@@ -1,17 +1,14 @@
 package com.bigname.pim.api.service.impl;
 
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.mongo.CatalogDAO;
-import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
-import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
-import com.bigname.pim.api.persistence.dao.mongo.WebsiteCatalogDAO;
-import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.*;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -311,5 +308,24 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     @Override
     public void updateWebsiteCatalog(WebsiteCatalog websiteCatalog) {
         websiteCatalogDAO.save(websiteCatalog);
+    }
+
+    @Override
+    public void archiveCatalogAssociations(ID<String> catalogId, Archive archived, Catalog catalog) {
+        /*Catalog catalog = get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
+        if(isEmpty(catalog)) {
+            catalog = get(ID.EXTERNAL_ID(catalogId), false, false, false, true).orElse(null);
+        }*/
+
+        if(archived == Archive.NO) {
+            List<WebsiteCatalog> websiteCatalogs = getAllWebsiteCatalogsWithCatalogId(catalog.getId());
+            websiteCatalogs.forEach(websiteCatalog -> catalogDAO.archiveAssociationById(ID.INTERNAL_ID(websiteCatalog.getId()), archived, WebsiteCatalog.class));
+
+            List<RootCategory> rootCategories = getAllRootCategories(catalog.getId());
+            rootCategories.forEach(rootCategory -> catalogDAO.archiveAssociationById(ID.INTERNAL_ID(rootCategory.getId()), archived, RootCategory.class));
+        } else {
+            List<RootCategory> rootCategories = getAllRootCategories(catalog.getId());
+            rootCategories.forEach(rootCategory -> catalogDAO.archiveAssociationById(ID.INTERNAL_ID(rootCategory.getId()), archived, RootCategory.class));
+        }
     }
 }

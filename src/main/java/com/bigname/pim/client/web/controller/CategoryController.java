@@ -284,6 +284,11 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> archive(@PathVariable(value = "categoryId") String categoryId, @PathVariable(value = "archived") String archived) {
         Map<String, Object> model = new HashMap<>();
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoryId), false).orElse(null);
+        if(isEmpty(category)) {
+            category = categoryService.get(ID.EXTERNAL_ID(categoryId), false, false, false, true).orElse(null);
+        }
+        //categoryService.archiveCategoryAssociations(ID.EXTERNAL_ID(categoryId), Archive.get(archived), category);
         model.put("success", categoryService.archive(ID.EXTERNAL_ID(categoryId), Archive.get(archived)));
         return model;
     }
