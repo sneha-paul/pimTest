@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.client.model.Breadcrumbs;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;

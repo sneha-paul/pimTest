@@ -1,7 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.service.RegistrationService;
-import com.bigname.pim.client.model.Breadcrumbs;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.domain.User;

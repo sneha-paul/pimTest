@@ -1,3 +1,4 @@
+/*
 package com.bigname.pim.client.web.controller;
 
 import com.m7.xtreme.xplatform.service.EventService;
@@ -12,3 +13,4 @@ public class EventController extends com.m7.xtreme.xplatform.web.controller.Even
         super(eventService, userService);
     }
 }
+*/

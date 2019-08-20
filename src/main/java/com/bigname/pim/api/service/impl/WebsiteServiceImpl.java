@@ -126,7 +126,7 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, Website website, String group) {
         Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, website, group);
-        Website existing = ValidationUtil.isNotEmpty(context.get("id")) ? get(ID.EXTERNAL_ID(context.get("id")), false).orElse(null) : null;
+        Website existing = ValidationUtil.isNotEmpty(context.get("id")) ? self.get(ID.EXTERNAL_ID(context.get("id")), false).orElse(null) : null;
 
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getWebsiteName().equals(website.getWebsiteName()))) {
             findOne(CollectionsUtil.toMap("websiteName", website.getWebsiteName()))

@@ -4,7 +4,7 @@ import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
-import com.bigname.pim.client.model.Breadcrumbs;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;

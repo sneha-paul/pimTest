@@ -2,7 +2,6 @@ package com.bigname.pim.client.util;
 
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
-import com.bigname.pim.client.model.Breadcrumbs;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.common.util.URLUtil;
@@ -11,8 +10,10 @@ import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.Event;
 import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.xplatform.service.EventService;
 import com.m7.xtreme.xplatform.service.UserService;
+import com.m7.xtreme.xplatform.util.BaseBreadcrumbsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -21,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bigname.pim.util.PIMConstants.Character.EQUALS;
 import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -29,7 +29,7 @@ import static org.springframework.util.StringUtils.isEmpty;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class BreadcrumbsBuilder {
+public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
     private Map<String, BaseService> services = new HashMap<>();
     private HttpServletRequest request = null;
     private Map<String, Object> parameterMap = new HashMap<>();
@@ -38,16 +38,15 @@ public class BreadcrumbsBuilder {
     private Class<?> entity;
 
     public BreadcrumbsBuilder(String id, Class<?> entity, BaseService... services) {
-        this(id, entity, null, null, services);
+        super(id, entity, null, null, services);
     }
 
     public BreadcrumbsBuilder(String id, Class<?> entity, HttpServletRequest request, Map<String, Object> parameterMap, BaseService... services) {
-        this.id = id;
-        this.entity = entity;
-        this.request = request;
-        if(parameterMap != null) {
-            this.parameterMap = parameterMap;
-        }
+        super(id, entity, request, parameterMap, services);
+    }
+
+    @Override
+    protected void parseServices(BaseService... services) {
         ConversionUtil.toList(services).forEach(baseService -> {
             if(baseService instanceof WebsiteService) {
                 this.services.put("websiteService", baseService);
@@ -80,10 +79,6 @@ public class BreadcrumbsBuilder {
         });
     }
 
-    private String getParameter(String name) {
-        return parameterMap.containsKey(name) ? (String) parameterMap.get(name) : "";
-    }
-
     public Breadcrumbs build() {
         breadcrumbs = new Breadcrumbs(getNames(entity)[0]);
 
@@ -113,7 +108,7 @@ public class BreadcrumbsBuilder {
         return breadcrumbs;
     }
 
-    private String[] getUrls(String id, Class<?> entity) {
+    protected String[] getUrls(String id, Class<?> entity) {
 
 
         String url1 = "/pim/" + getNames(entity)[1];
@@ -219,7 +214,7 @@ public class BreadcrumbsBuilder {
         return new String[] {url1, url2};
     }
 
-    private String[] getNames(Class<?> entity) {
+    protected String[] getNames(Class<?> entity) {
         switch(entity.getCanonicalName()) {
             case "com.bigname.pim.api.domain.Website":
                 return new String[] {"Websites", "websites"};
@@ -251,7 +246,7 @@ public class BreadcrumbsBuilder {
         return new String[] {"", "", "", ""};
     }
 
-    private String getCrumbName(String id, Class<?> entity) {
+    protected String getCrumbName(String id, Class<?> entity) {
         switch(entity.getCanonicalName()) {
             case "com.bigname.pim.api.domain.Website":
                 return ((WebsiteService)services.get("websiteService")).get(ID.EXTERNAL_ID(id), false).map(Website::getWebsiteName).orElse("");
@@ -283,7 +278,7 @@ public class BreadcrumbsBuilder {
         return "";
     }
 
-    private void addCrumbs(String id, Class<?> entity, boolean... endNode) {
+    protected void addCrumbs(String id, Class<?> entity, boolean... endNode) {
         if(!id.isEmpty()) {
             String[] names = getNames(entity);
             String[] urls = getUrls(id, entity);
@@ -303,7 +298,7 @@ public class BreadcrumbsBuilder {
         }
     }
 
-    private void addParentCrumbs() {
+    protected void addParentCrumbs() {
         if(isNotEmpty(getParameter("parentId"))) {
             String parentId = getParameter("parentId");
             String[] parentIds = StringUtil.splitPipeDelimited(parentId);
@@ -333,23 +328,4 @@ public class BreadcrumbsBuilder {
             }
         }
     }
-
-    private String buildURL(String baseURL, String hash, Map<String, Object> parameters) {
-        StringBuilder url = new StringBuilder(baseURL);
-        if(!parameters.isEmpty()) {
-            if(!baseURL.contains("?")) {
-                url.append("?");
-            } else {
-                url.append("&");
-            }
-
-            boolean[] first = {true};
-            parameters.forEach((name, value) -> {
-                url.append(first[0] ? "" : "&").append(name).append(EQUALS).append(value);
-                first[0] = false;
-            });
-        }
-        return isEmpty(hash) ? url.toString() : url.append(hash).toString();
-    }
-
 }
