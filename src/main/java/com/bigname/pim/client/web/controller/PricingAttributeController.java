@@ -2,6 +2,7 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.service.PricingAttributeService;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
@@ -28,7 +29,7 @@ public class PricingAttributeController extends BaseController<PricingAttribute,
     private PricingAttributeService pricingAttributeService;
 
     public PricingAttributeController(PricingAttributeService pricingAttributeService) {
-        super(pricingAttributeService, PricingAttribute.class);
+        super(pricingAttributeService, PricingAttribute.class, new BreadcrumbsBuilder());
         this.pricingAttributeService = pricingAttributeService;
     }
 

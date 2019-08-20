@@ -476,7 +476,7 @@ public class ProductVariantController extends ControllerSupport {
                     model.put("productVariant", productVariant);
                     model.put("productFamily", productVariant.getProduct().getProductFamily());
                     model.put("pricingGridColumns", ConversionUtil.toJSONString(getPricingGridColumns(productVariant.getPricingDetails())));
-                    model.put("breadcrumbs", new BreadcrumbsBuilder(variantId, ProductVariant.class, request, parameterMap, new BaseService[] {websiteService, catalogService, categoryService, productService, productVariantService}).build());
+                    model.put("breadcrumbs", new BreadcrumbsBuilder().init(variantId, ProductVariant.class, request, parameterMap, new BaseService[] {websiteService, catalogService, categoryService, productService, productVariantService}).build());
 
                 } else {
                     throw new EntityNotFoundException("Unable to find ProductVariant with Id: " + variantId);

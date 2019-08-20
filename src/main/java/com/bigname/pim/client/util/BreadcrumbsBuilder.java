@@ -15,9 +15,7 @@ import com.m7.xtreme.xplatform.service.EventService;
 import com.m7.xtreme.xplatform.service.UserService;
 import com.m7.xtreme.xplatform.util.BaseBreadcrumbsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,19 +28,9 @@ import static org.springframework.util.StringUtils.isEmpty;
  * @since 1.0
  */
 public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
-    private Map<String, BaseService> services = new HashMap<>();
-    private HttpServletRequest request = null;
-    private Map<String, Object> parameterMap = new HashMap<>();
-    private Breadcrumbs breadcrumbs;
-    private String id;
-    private Class<?> entity;
 
-    public BreadcrumbsBuilder(String id, Class<?> entity, BaseService... services) {
-        super(id, entity, null, null, services);
-    }
+    public BreadcrumbsBuilder(){
 
-    public BreadcrumbsBuilder(String id, Class<?> entity, HttpServletRequest request, Map<String, Object> parameterMap, BaseService... services) {
-        super(id, entity, request, parameterMap, services);
     }
 
     @Override

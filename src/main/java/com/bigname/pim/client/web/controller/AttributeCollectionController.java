@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
@@ -40,7 +41,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     private AttributeCollectionService attributeCollectionService;
 
     public AttributeCollectionController(AttributeCollectionService attributeCollectionService) {
-        super(attributeCollectionService, AttributeCollection.class);
+        super(attributeCollectionService, AttributeCollection.class, new BreadcrumbsBuilder());
         this.attributeCollectionService = attributeCollectionService;
     }
 

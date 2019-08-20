@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
@@ -46,7 +47,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     private ChannelService channelService;
 
     public FamilyController(FamilyService familyService, AttributeCollectionService collectionService, ChannelService channelService) {
-        super(familyService, Family.class, collectionService, channelService);
+        super(familyService, Family.class, new BreadcrumbsBuilder(), collectionService, channelService);
         this.familyService = familyService;
         this.collectionService = collectionService;
         this.channelService = channelService;

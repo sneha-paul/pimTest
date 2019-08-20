@@ -2,6 +2,7 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.data.exportor.ProductExporter;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
@@ -48,7 +49,7 @@ public class ProductController extends BaseController<Product, ProductService> {
     private ChannelService channelService;
 
     public ProductController(ProductService productService, @Lazy ProductExporter productExporter, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
-        super(productService, Product.class, productExporter, websiteService, categoryService, catalogService);
+        super(productService, Product.class, new BreadcrumbsBuilder(), productExporter, websiteService, categoryService, catalogService);
         this.productService = productService;
         this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;

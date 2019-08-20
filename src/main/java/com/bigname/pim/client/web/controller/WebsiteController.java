@@ -3,6 +3,7 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.service.WebsiteService;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
@@ -36,7 +37,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     private WebsiteService websiteService;
 
     public WebsiteController(WebsiteService websiteService) {
-        super(websiteService, Website.class);
+        super(websiteService, Website.class, new BreadcrumbsBuilder());
         this.websiteService = websiteService;
     }
 

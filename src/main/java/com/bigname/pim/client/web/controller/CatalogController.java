@@ -5,6 +5,7 @@ import com.bigname.pim.api.domain.RootCategory;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.data.exportor.CatalogExporter;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
@@ -41,7 +42,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     private WebsiteService websiteService;
 
     public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService) {
-        super(catalogService, Catalog.class, catalogExporter, websiteService);
+        super(catalogService, Catalog.class, new BreadcrumbsBuilder(), catalogExporter, websiteService);
         this.catalogService = catalogService;
         this.websiteService = websiteService;
     }

@@ -2,6 +2,7 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.domain.AssetFamily;
 import com.bigname.pim.api.service.AssetFamilyService;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
@@ -24,7 +25,7 @@ public class AssetFamilyController extends BaseController<AssetFamily ,AssetFami
     private AssetFamilyService assetFamilyService;
 
     public AssetFamilyController(AssetFamilyService assetFamilyService) {
-        super(assetFamilyService, AssetFamily.class);
+        super(assetFamilyService, AssetFamily.class, new BreadcrumbsBuilder());
         this.assetFamilyService = assetFamilyService;
     }
 

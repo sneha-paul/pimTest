@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
@@ -47,7 +48,7 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
     private VirtualFileService assetService;
 
     public AssetCollectionController(AssetCollectionService assetCollectionService, VirtualFileService assetService) {
-        super(assetCollectionService, AssetCollection.class);
+        super(assetCollectionService, AssetCollection.class, new BreadcrumbsBuilder());
         this.assetCollectionService = assetCollectionService;
         this.assetService = assetService;
     }

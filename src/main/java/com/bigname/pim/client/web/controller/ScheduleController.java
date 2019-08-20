@@ -1,6 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.persistence.dao.mongo.SimpleJob;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.util.JobUtil;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.domain.CronDetails;
@@ -30,7 +31,7 @@ public class ScheduleController extends BaseController<JobInstance, JobInstanceS
     private CronJobService cronJobService;
 
     public ScheduleController(JobInstanceService jobInstanceService, CronJobService cronJobService) {
-        super(jobInstanceService, JobInstance.class);
+        super(jobInstanceService, JobInstance.class, new BreadcrumbsBuilder());
         this.jobInstanceService = jobInstanceService;
         this.cronJobService = cronJobService;
     }
