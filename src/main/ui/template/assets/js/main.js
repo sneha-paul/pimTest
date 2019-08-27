@@ -30,22 +30,27 @@
         var menuTrigger = $('button.sidebar-trigger'),
             endTrigger = $('button.op-sidebar-close'),
             container = $('.sidebar-cart'),
-            wrapper = $('.wrapper');
+            wrapper = $('.wrapper'),
+            body = $('body');
 
         wrapper.prepend('<div class="body-overlay"></div>');
+        body.removeClass('no-scroll');
         menuTrigger.on('click', function () {
             container.addClass('inside');
             wrapper.addClass('overlay-active');
+            body.addClass('no-scroll');
         });
 
         endTrigger.on('click', function () {
             container.removeClass('inside');
             wrapper.removeClass('overlay-active');
+            body.removeClass('no-scroll');
         });
 
         $('.body-overlay').on('click', function () {
             container.removeClass('inside');
             wrapper.removeClass('overlay-active');
+            body.removeClass('no-scroll');
         });
     };
     sidebarCart();
