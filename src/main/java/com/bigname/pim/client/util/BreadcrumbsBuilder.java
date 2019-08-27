@@ -9,9 +9,11 @@ import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.Event;
+import com.m7.xtreme.xplatform.domain.JobInstance;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.xplatform.service.EventService;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
 import com.m7.xtreme.xplatform.service.UserService;
 import com.m7.xtreme.xplatform.util.BaseBreadcrumbsBuilder;
 
@@ -62,6 +64,8 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 this.services.put("configService", baseService);
             } else if(baseService instanceof AssetFamilyService) {
                 this.services.put("assetFamilyService", baseService);
+            } else if(baseService instanceof JobInstanceService) {
+                this.services.put("jobInstanceService", baseService);
             }
 
         });
@@ -230,6 +234,8 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 return new String[] {"Config", "configs"};
             case "com.bigname.pim.api.domain.AssetFamily":
                 return new String[] {"AssetFamily", "assetFamilies"};
+            case "com.m7.xtreme.xcore.domain.JobInstance":
+                return new String[] {"Jobs", "jobs"};
         }
         return new String[] {"", "", "", ""};
     }
@@ -262,6 +268,8 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 return ((ConfigService)services.get("configService")).get(ID.EXTERNAL_ID(id), false).map(Config::getConfigName).orElse("");
             case "com.bigname.pim.api.domain.AssetFamily":
                 return ((AssetFamilyService)services.get("assetFamilyService")).get(ID.EXTERNAL_ID(id), false).map(AssetFamily::getAssetFamilyName).orElse("");
+            case "com.m7.xtreme.xcore.domain.JobInstance":
+                return ((JobInstanceService)services.get("jobInstanceService")).get(ID.EXTERNAL_ID(id), false).map(JobInstance::getJobName).orElse("");
         }
         return "";
     }
