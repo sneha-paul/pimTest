@@ -5,8 +5,8 @@ $(function(){
         urlParams['jobInstanceId'] = '{jobInstanceId}';
     }
 
-    /*$('.js-logs-tab').on('shown.bs.tab.logs', function (e) {
-        $.initAssociationsGrid({
+    $('.js-logs-tab').on('shown.bs.tab.logs', function (e) {
+        $.initEntitiesGrid({
             selector: '#paginatedLogsTable',
             names: ['logs', 'log'],
             pageUrl: $.getURL('/pim/jobs/'),
@@ -18,7 +18,7 @@ $(function(){
             buttons: []
         });
         $(this).removeClass('js-logs-tab').off('shown.bs.tab.logs');
-    });*/
+    });
 
 
 });

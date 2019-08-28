@@ -5,6 +5,7 @@ import com.bigname.pim.api.service.CatalogService;
 import com.m7.xtreme.common.util.BlackBox;
 import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.JobInstance;
@@ -55,16 +56,18 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         BlackBox logger = new BlackBox();
+        boolean success = false;
         String fileName = getFileName(BaseExporter.Type.XLSX);
         String fileLocation = "/usr/local/pim/uploads/data/export/";
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
         String jobInstanceId = jobExecutionContext.getJobDetail().getKey().getName();
         JobInstanceService jobInstanceService = (JobInstanceService) jobDataMap.get("jobInstanceService");
         JobInstance jobInstance = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
-        logger.info("Job " + jobInstance.getJobName() + " started");
-        jobInstance.setLogs(Collections.singletonList(logger.extract(BlackBox.Level.INFO).entries()));
-        jobInstanceService.updateJobsDetails(jobInstance);
-
+        if(ValidationUtil.isNotEmpty(jobInstance)) {
+            logger.info("Job " + jobInstance.getJobName() + " started");
+            jobInstance.setLogs(logger.toLogMessage());
+            jobInstanceService.updateJobsDetails(jobInstance);
+        }
         CatalogService catalogService = (CatalogService) jobDataMap.get("catalogService");
         List<Catalog> catalogData = catalogService.getAll(null,true);
 
@@ -79,7 +82,7 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
         }
 
         POIUtil.writeData(fileLocation + fileName, "Catalog", data);
-
+        success = true;
 
         System.out.println("============== : "+jobExecutionContext.getJobDetail().getJobDataMap().getString("jobService"));
 
@@ -94,5 +97,14 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
         System.out.println("End Time : " + endTime);
         Instant startDateInstant = Instant.ofEpochMilli(jobExecutionContext.getTrigger().getStartTime().getTime());
         LocalDateTime startDateTime = LocalDateTime.ofInstant(startDateInstant, ZoneId.systemDefault());
+
+        if(success) {
+            JobInstance jobInstance1 = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
+            jobInstance.setLogs(logger.toLogMessage());
+            jobInstance1.setStatus("Completed");
+            jobInstance1.setCompletedTime(endTime);
+            jobInstance1.setActualStartTime(startDateTime);
+            jobInstanceService.updateJobsDetails(jobInstance1);
+        }
     }
 }
