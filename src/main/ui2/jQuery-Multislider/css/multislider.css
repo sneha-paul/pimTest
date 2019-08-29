@@ -1,0 +1,123 @@
+.mixedSlider {
+    position: relative;
+}
+
+.mixedSlider .MS-content {
+    white-space: nowrap;
+    overflow: hidden;
+    /* margin: 0 5%; */
+}
+
+.mixedSlider .MS-content .item {
+    display: inline-flex;
+    position: relative;
+    vertical-align: top;
+    overflow: hidden;
+    width: 100%;
+    white-space: normal;
+}
+
+/* @media (min-width: 991px) {
+    .mixedSlider .MS-content .item {
+        width: 50%;
+    }
+}
+
+@media (min-width: 767px) {
+    .mixedSlider .MS-content .item {
+        width: 100%;
+    }
+} */
+
+.mixedSlider .MS-content .item .imgTitle {
+    position: relative;
+}
+
+.mixedSlider .MS-content .item .imgTitle .blogTitle {
+    margin: 0;
+    text-align: left;
+    letter-spacing: 2px;
+    color: #252525;
+    font-style: italic;
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    bottom: 0;
+    font-weight: bold;
+    padding: 0 0 2px 10px;
+}
+
+.mixedSlider .MS-content .item .imgTitle img {
+    height: auto;
+    /* width: 100%; */
+}
+
+.mixedSlider .MS-content .item p {
+    font-size: 16px;
+    margin: 2px 10px 0 5px;
+    text-indent: 15px;
+}
+
+.mixedSlider .MS-content .item {
+    margin-left: 0px !important;
+}
+
+.mixedSlider .MS-content .item a {
+    font-size: 16px;
+    color: rgba(173, 0, 0, 0.82);
+    transition: linear 0.1s;
+}
+
+.mixedSlider .MS-content .item a:hover {
+    text-shadow: 0 0 1px grey;
+}
+
+.mixedSlider .MS-controls button {
+    position: absolute;
+    border: none;
+    background-color: transparent;
+    outline: 0;
+    font-size: 32px;
+    top: 40%;
+    transform: translateY(-50%);
+    color: rgba(0, 0, 0, 0.4);
+    transition: 0.15s linear;
+    cursor: pointer;
+}
+
+.mixedSlider .MS-controls button:hover {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 992px) {
+    .mixedSlider .MS-controls button {
+        font-size: 30px;
+    }
+}
+
+@media (max-width: 767px) {
+    .mixedSlider .MS-controls button {
+        font-size: 20px;
+    }
+}
+
+.mixedSlider .MS-controls .MS-left {
+    left: -30px;
+}
+
+@media (max-width: 767px) {
+    .mixedSlider .MS-controls .MS-left {
+        left: -10px;
+    }
+}
+
+.mixedSlider .MS-controls .MS-right {
+    right: -30px;
+}
+
+@media (max-width: 767px) {
+    .mixedSlider .MS-controls .MS-right {
+        right: -10px;
+    }
+}
+

@@ -1,0 +1,71 @@
+.logo img, .footer-logo img{
+    width: 160px;
+}
+.register-box input.email {
+    background: #f2f2f2 none repeat scroll 0 0;
+    border: medium none;
+    box-shadow: none;
+    color: #626262;
+    font-size: 14px;
+    height: 45px;
+    padding-left: 25px;
+    padding-right: 25px;
+    width: 60%;
+}
+.clear-2 a:hover {
+    background: #ee3333 none repeat scroll 0 0;
+    border: medium none;
+    box-shadow: none;
+}
+.clear-2 a {
+    background: #333 none repeat scroll 0 0;
+    border: medium none;
+    box-shadow: none;
+    color: #fff;
+    font-size: 14px;
+    height: inherit;
+    padding: 13px 35px;
+    width: inherit;
+}
+.box-body  {
+   
+    padding: 20px 40px;
+}
+.box-head {
+    padding: 30px 40px;
+    background: #f2f2f2 none repeat scroll 0 0;
+}
+.confirm-box {
+    border: 1px solid #f2f2f2;
+    height: 100%;
+    position: relative;
+}
+a.button {
+    background: #464646 none repeat scroll 0 0;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 20px 0 0;
+    -webkit-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+    min-width: 120px;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+a.button:hover {
+    background: #ee3333;
+    border: 1px solid #ee3333;
+    color: #fff;
+}
+.box-body ul li{
+    list-style-type: square;
+}
+.next-step {
+    position: absolute;
+    bottom: 4em;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.footer-logo{
+    margin-bottom: 0px;
+}
