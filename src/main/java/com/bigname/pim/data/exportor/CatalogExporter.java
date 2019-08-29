@@ -20,7 +20,10 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by sruthi on 25-01-2019.
@@ -60,7 +63,8 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
         String fileName = getFileName(BaseExporter.Type.XLSX);
         String fileLocation = "/usr/local/pim/uploads/data/export/";
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
-        String jobInstanceId = jobExecutionContext.getJobDetail().getKey().getName();
+        //String jobInstanceId = jobExecutionContext.getJobDetail().getKey().getName();
+        String jobInstanceId = jobDataMap.getString("jobId");
         JobInstanceService jobInstanceService = (JobInstanceService) jobDataMap.get("jobInstanceService");
         JobInstance jobInstance = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
         if(ValidationUtil.isNotEmpty(jobInstance)) {
@@ -68,7 +72,7 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
             jobInstance.setLogs(logger.toLogMessage());
             jobInstanceService.updateJobsDetails(jobInstance);
         }
-        CatalogService catalogService = (CatalogService) jobDataMap.get("catalogService");
+        CatalogService catalogService = (CatalogService) jobDataMap.get("service");
         List<Catalog> catalogData = catalogService.getAll(null,true);
 
         Map<String, Object[]> data = new TreeMap<>();
@@ -83,7 +87,7 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
 
         POIUtil.writeData(fileLocation + fileName, "Catalog", data);
         success = true;
-
+        logger.info("Job completed");
         System.out.println("============== : "+jobExecutionContext.getJobDetail().getJobDataMap().getString("jobService"));
 
         System.out.println("Job Executed");
@@ -97,10 +101,9 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
         System.out.println("End Time : " + endTime);
         Instant startDateInstant = Instant.ofEpochMilli(jobExecutionContext.getTrigger().getStartTime().getTime());
         LocalDateTime startDateTime = LocalDateTime.ofInstant(startDateInstant, ZoneId.systemDefault());
-
         if(success) {
             JobInstance jobInstance1 = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
-            jobInstance.setLogs(logger.toLogMessage());
+            jobInstance1.setLogs(logger.toLogMessage());
             jobInstance1.setStatus("Completed");
             jobInstance1.setCompletedTime(endTime);
             jobInstance1.setActualStartTime(startDateTime);

@@ -51,7 +51,7 @@ public class ScheduleController extends BaseController<JobInstance, JobInstanceS
     public Map<String, Object> create( JobInstance jobInstance) throws SchedulerException {
         Map<String, Object> model = new HashMap<>();
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("catalogService", catalogService);
+        jobDataMap.put("service", catalogService);
         jobDataMap.put("eventService", eventService);
         jobDataMap.put("jobInstanceService", jobInstanceService);
         // Date date1 = new SimpleDateFormat("MM-dd-yyyy'T'HH:mm:ss").parse(String.valueOf(jobInstance.getScheduledStartTime()));

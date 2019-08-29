@@ -14,6 +14,7 @@ import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -26,7 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.m7.xtreme.common.util.ValidationUtil.*;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**
@@ -41,8 +43,8 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     private CatalogService catalogService;
     private WebsiteService websiteService;
 
-    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService) {
-        super(catalogService, Catalog.class, new BreadcrumbsBuilder(), catalogExporter, websiteService);
+    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService, JobInstanceService jobInstanceService) {
+        super(catalogService, Catalog.class, new BreadcrumbsBuilder(), catalogExporter, jobInstanceService, websiteService);
         this.catalogService = catalogService;
         this.websiteService = websiteService;
     }

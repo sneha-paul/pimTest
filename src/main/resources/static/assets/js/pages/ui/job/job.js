@@ -15,7 +15,7 @@ $(function(){
             columns: [
                 { data: 'logs', name : 'logs' , title : 'Logs'}
             ],
-            buttons: []
+            buttons: ['']
         });
         $(this).removeClass('js-logs-tab').off('shown.bs.tab.logs');
     });
