@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.HashMap;
@@ -21,15 +22,18 @@ public class Website extends MongoEntity<Website> {
     @Transient
     @NotEmpty(message = "Website Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "website.websiteId.invalid")
+    @NotBlank(message = "Website Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String websiteId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Website name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "website.websiteName.invalid")
+    @NotBlank(message = "Website name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String websiteName;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Website URL cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Website URL cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String url;
 
     @Transient

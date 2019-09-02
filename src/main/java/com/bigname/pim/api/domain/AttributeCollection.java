@@ -7,6 +7,7 @@ import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,10 +20,12 @@ public class AttributeCollection extends MongoEntity<AttributeCollection> {
 
     @Transient
     @NotEmpty(message = "Collection Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Collection Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String collectionId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Collection Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Collection Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String collectionName;
 
     private Map<String, AttributeGroup> attributes = new LinkedHashMap<>();

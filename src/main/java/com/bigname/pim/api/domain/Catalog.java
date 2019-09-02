@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,10 +23,12 @@ public class Catalog extends MongoEntity<Catalog> {
 
     @Transient
     @NotEmpty(message = "Catalog Id cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Catalog Id cannot be BLANK",groups = {CreateGroup.class, DetailsGroup.class})
     String catalogId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Catalog Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Catalog Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String catalogName;
 
     private String description;

@@ -11,6 +11,7 @@ import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,10 +27,12 @@ public class Product extends MongoEntity<Product> {
 
     @Transient
     @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Product Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     String productId;
 
     //    @Indexed(unique = true)
     @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Product Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String productName;
 
     @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})

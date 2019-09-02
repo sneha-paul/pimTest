@@ -4,6 +4,7 @@ import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,10 +17,12 @@ public class PricingAttribute extends MongoEntity<PricingAttribute> {
 
     @Transient
     @NotEmpty(message = "Pricing Attribute Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Pricing Attribute Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pricingAttributeId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Pricing Attribute Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Pricing Attribute Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pricingAttributeName;
 
 

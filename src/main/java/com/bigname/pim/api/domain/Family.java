@@ -6,6 +6,7 @@ import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,10 +18,12 @@ public class Family extends MongoEntity<Family> {
 
     @Transient
     @NotEmpty(message = "Family Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Family Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     String familyId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Family Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Family Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String familyName;
 
     private Map<String, FamilyAttributeGroup> attributes = new LinkedHashMap<>();

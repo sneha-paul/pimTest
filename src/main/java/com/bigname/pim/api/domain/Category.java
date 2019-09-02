@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,9 +24,11 @@ public class Category extends MongoEntity<Category> {
 
     @Transient
     @NotEmpty(message = "Category Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Category Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String categoryId;
 
     @NotEmpty(message = "Category Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Category Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String categoryName;
 
     private String description;
