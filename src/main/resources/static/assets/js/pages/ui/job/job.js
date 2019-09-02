@@ -12,10 +12,12 @@ $(function(){
             pageUrl: $.getURL('/pim/jobs/'),
             dataUrl: $.getURL('/pim/jobs/{jobInstanceId}/logs/data'),
             urlParams: urlParams,
+            hideStatus:'true',
+            hideActions:'true',
             columns: [
-                { data: 'logs', name : 'logs' , title : 'Logs'}
+                { data: 'logs', name : 'logs', title : 'Logs', orderable: false},
+                { data: 'level', name : 'level', title : 'Level', orderable: false},
             ],
-            buttons: ['']
         });
         $(this).removeClass('js-logs-tab').off('shown.bs.tab.logs');
     });
