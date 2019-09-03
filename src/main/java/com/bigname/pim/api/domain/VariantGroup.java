@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ public class VariantGroup extends ValidatableEntity {
 
 
     @NotEmpty(message = "Group name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Group name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String name;
     private String id;
     private String active;
