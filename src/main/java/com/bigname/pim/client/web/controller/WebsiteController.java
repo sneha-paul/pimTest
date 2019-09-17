@@ -109,6 +109,15 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + id));
     }
 
+    @RequestMapping(value = {"/search"})
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "WEBSITES");
+        model.put("view", "search");
+        model.put("title", "Websites");
+        return super.details(model);
+    }
+
     /**
      * Handler method to load the list websites page
      *

@@ -1,6 +1,7 @@
 package com.bigname.pim.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
@@ -9,9 +10,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.bigname.pim.api.domain.Website.Property.*;
 import static com.m7.xtreme.common.util.RegExBuilder.*;

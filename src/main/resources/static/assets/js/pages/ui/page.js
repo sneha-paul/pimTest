@@ -461,7 +461,7 @@
                         });
                     toolbar.push(discontinuedButton);
 
-                    let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="icon-ban"></i></button>')
+                    let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="fa fa-file-archive-o"></i></button>')
                         .click(function() {
                             if($.getDataTableStatusOptions(options.selector) === '0001') {
                                 toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
@@ -479,6 +479,7 @@
                     url: options.url,
                     data: function ( data ) {
                         data.statusOptions = $.getDataTableStatusOptions(options.selector);
+                        data.advancedSearch = $('#jqs-adv-search-query').val();
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
