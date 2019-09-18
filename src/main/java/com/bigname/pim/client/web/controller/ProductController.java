@@ -283,7 +283,16 @@ public class ProductController extends BaseController<Product, ProductService> {
         return model;
     }
 
-    @RequestMapping(value =  {"/search"})           //TODO - frontend pending
+    @RequestMapping(value = {"/search"})
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "PRODUCTS");
+        model.put("view", "search");
+        model.put("title", "Products");
+        return super.details(model);
+    }
+
+    @RequestMapping(value =  {"/search1"})           //TODO - frontend pending
     @ResponseBody
     @SuppressWarnings("unchecked")
     public Result<Map<String, String>> search(HttpServletRequest request) {
