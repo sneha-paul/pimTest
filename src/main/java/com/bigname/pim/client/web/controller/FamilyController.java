@@ -455,7 +455,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
                                             @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         familyService.get(ID.EXTERNAL_ID(familyId), false).ifPresent(family ->
-                model.put("success", familyService.toggleVariantGroup(ID.EXTERNAL_ID(family.getId()), variantGroupId, Toggle.get(active))));
+                model.put("success", familyService.toggleVariantGroup(ID.EXTERNAL_ID(family.getFamilyId()), variantGroupId, Toggle.get(active))));
         return model;
     }
 
