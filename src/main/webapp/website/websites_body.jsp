@@ -52,7 +52,7 @@
             name:'advanced-search',
             title:'Advanced Search',
             buttons: [
-                {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('websites');$.closeModal();});}},
+                {text: 'SEARCH', style: 'primary', close: false, click: function(){$.getDataTable('websites').search('').draw();$.closeModal();}},
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });

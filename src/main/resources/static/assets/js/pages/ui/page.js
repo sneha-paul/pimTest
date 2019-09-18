@@ -477,9 +477,26 @@
                 },
                 ajax: {
                     url: options.url,
+                    method: 'post',
                     data: function ( data ) {
+                        var testAdvSearch = {
+                            "conditions": [
+                                {
+                                    "field": "field1",
+                                    "operator": "operator1",
+                                    "value": "value1",
+                                    "logical":"OR"
+                                },
+                                {
+                                    "field": "field2",
+                                    "operator": "operator2",
+                                    "value": "value2"
+                                }
+                            ]
+                        };
                         data.statusOptions = $.getDataTableStatusOptions(options.selector);
-                        data.advancedSearch = $('#jqs-adv-search-query').val();
+                        // data.advancedSearch = JSON.stringify($('#jqs-adv-search-query').val());
+                        data.advancedSearch = JSON.stringify({"name":"Manu"});
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
