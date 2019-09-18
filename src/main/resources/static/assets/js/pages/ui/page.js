@@ -496,7 +496,8 @@
                         };
                         data.statusOptions = $.getDataTableStatusOptions(options.selector);
                         // data.advancedSearch = JSON.stringify($('#jqs-adv-search-query').val());
-                        data.advancedSearch = JSON.stringify({"name":"Manu"});
+                        // data.advancedSearch = JSON.stringify(btoa({"name":"Manu"}));
+                        data.advancedSearch = JSON.stringify(testAdvSearch);
                     },
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
