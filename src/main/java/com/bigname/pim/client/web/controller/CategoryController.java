@@ -124,6 +124,15 @@ public class CategoryController extends BaseController<Category, CategoryService
         return all(model);
     }
 
+    @RequestMapping("/search")
+    public ModelAndView search(@RequestParam(name = "reload", required = false) boolean reload){
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "CATEGORIES");
+        model.put("view", "search");
+        model.put("title", "Categories");
+        return all(model);
+    }
+
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     public Result<Map<String, String>> all(HttpServletRequest request) {

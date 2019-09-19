@@ -39,6 +39,14 @@ public class PricingAttributeController extends BaseController<PricingAttribute,
         model.put("active", "PRICING_ATTRIBUTES");
         return new ModelAndView("settings/pricingAttributes", model);
     }
+
+    @RequestMapping("/search")
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "PRICING_ATTRIBUTES");
+        return new ModelAndView("search", model);
+    }
+
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")

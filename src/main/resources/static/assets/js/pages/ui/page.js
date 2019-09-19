@@ -423,7 +423,65 @@
                             case 'EXPORT':
                                 toolbar.push($('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
                                     .click(function() {
-                                        window.location.href = button.actionUrl;
+                                        var testAdvSearch = {
+                                            "conditions":[
+                                                {
+                                                    "conditions":[
+                                                        {
+                                                            "field": "productName",
+                                                            "operator": "EQUAL",
+                                                            "value": "#0 Bubble Mailers w/ Tear Strip",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N",
+                                                            "logical":"AND"
+                                                        },
+                                                        {
+                                                            "field": "externalId",
+                                                            "operator": "EQUAL",
+                                                            "value": "6_X_10_BUBBLE_MAILER_TS",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N"
+                                                        }
+                                                    ],
+                                                    "logical":"OR"
+                                                },
+                                                {
+                                                    "conditions":[
+                                                        {
+                                                            "field": "productName",
+                                                            "operator": "EQUAL",
+                                                            "value": "Gift Boxes (6 x 6 x 6)",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N",
+                                                            "logical":"AND"
+                                                        },
+                                                        {
+                                                            "field": "externalId",
+                                                            "operator": "EQUAL",
+                                                            "value": "6_BY_6_BY_6_GIFT_BOX",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        };
+                                        //window.location.href = button.actionUrl + '?filterCriteria=' + JSON.stringify(testAdvSearch);
+                                        $.ajax({
+                                            url: button.actionUrl,
+                                            data: {
+                                                filterCriteria:JSON.stringify(testAdvSearch)
+                                            },
+                                            method: 'POST',
+                                            success: function (data) {
+
+                                                console.log(data);
+                                            }
+                                        });
                                     }));
                                 break;
                         }
@@ -477,7 +535,237 @@
                 },
                 ajax: {
                     data: function ( data ) {
+
+                        //pricing attribute json
+                        /*var testAdvSearch = {
+                            "conditions": [
+                                {
+                                    "conditions": [
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "PLAIN",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "pricingAttributeName",
+                                            "operator": "EQUAL",
+                                            "value": "Plain",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ],
+                                    "logical": "OR"
+                                },
+                                {
+                                    "conditions": [
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "1_COLOR",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "pricingAttributeName",
+                                            "operator": "EQUAL",
+                                            "value": "1 Color",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ]
+                                }
+                            ]
+                        };*/
+
+
+                        //category json
+                        /*var testAdvSearch = {
+                            "conditions": [
+                                {
+                                    "field": "categoryName",
+                                    "operator": "EQUAL",
+                                    "value": "Accessories",
+                                    "dataType": "STRING",
+                                    "regex": "N",
+                                    "ignoreCase": "N",
+                                    "logical":"AND"
+                                },
+                                {
+                                    "field": "externalId",
+                                    "operator": "EQUAL",
+                                    "value": "ACCESSORIES",
+                                    "dataType": "STRING",
+                                    "regex": "N",
+                                    "ignoreCase": "N",
+                                    "logical":"AND"
+                                },
+                                {
+                                    "field": "description",
+                                    "operator": "EQUAL",
+                                    "value": "Accessories",
+                                    "dataType": "STRING",
+                                    "regex": "N",
+                                    "ignoreCase": "N"
+                                }
+                            ]
+                        };*/
+
+                        //Catalog json
+                        /*var testAdvSearch = {
+                            "conditions": [
+                                {
+                                    "conditions": [
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "DEFAULT_ENVELOPES",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "catalogName",
+                                            "operator": "EQUAL",
+                                            "value": "Envelopes Catalog",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ],
+                                    "logical": "OR"
+                                },
+                                {
+                                    "conditions": [
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "DEFAULT_FOLDERS",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "catalogName",
+                                            "operator": "EQUAL",
+                                            "value": "Folders Catalog",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ]
+                                }
+                            ]
+                        };*/
+
+                        //product and product variant test not success
+                        /*var testAdvSearch = {
+                            "conditions":[
+                                {
+                                    "conditions":[
+                                        {
+                                            "field": "productName",
+                                            "operator": "EQUAL",
+                                            "value": "#0 Bubble Mailers w/ Tear Strip",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "6_X_10_BUBBLE_MAILER_TS",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ],
+                                    "logical":"OR"
+                                },
+                                {
+                                    "conditions": [
+                                        {
+                                            "field": "productVariantName",
+                                            "operator": "EQUAL",
+                                            "value": "#0 Bubble Mailers w/ Tear Strip - Brown Kraft",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "BM6X10TSBK",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ]
+                                }
+                            ]
+                        };*/
+
+                        //2 product json
                         var testAdvSearch = {
+                            "conditions":[
+                                {
+                                    "conditions":[
+                                        {
+                                            "field": "productName",
+                                            "operator": "EQUAL",
+                                            "value": "#0 Bubble Mailers w/ Tear Strip",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "6_X_10_BUBBLE_MAILER_TS",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ],
+                                    "logical":"OR"
+                                },
+                                {
+                                    "conditions":[
+                                        {
+                                            "field": "productName",
+                                            "operator": "EQUAL",
+                                            "value": "Gift Boxes (6 x 6 x 6)",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "6_BY_6_BY_6_GIFT_BOX",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ]
+                                }
+                            ]
+                        };
+
+                        /*var testAdvSearch = {
                             "conditions": [
                                 {
                                     "conditions": [
@@ -523,7 +811,7 @@
                                     ]
                                 }
                         ]
-                    };
+                    };*/
                         /*var testAdvSearch = {
                             "conditions": [
                                 {

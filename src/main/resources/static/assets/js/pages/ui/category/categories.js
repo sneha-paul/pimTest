@@ -57,4 +57,15 @@ $(function(){
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });
+
+    $.addModal({
+        selector: '#js-advanced-search',
+        url: $.getURL('/pim/categories/search'),
+        name:'advanced-search',
+        title:'Advanced Search',
+        buttons: [
+            {text: 'SEARCH', style: 'primary', close: false, click: function(){$.getDataTable('categories').search('').draw();$.closeModal();}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
 });

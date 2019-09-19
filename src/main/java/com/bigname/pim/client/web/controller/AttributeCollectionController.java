@@ -131,6 +131,13 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return new ModelAndView("settings/attributeCollections", model);
     }
 
+    @RequestMapping("/search")
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "ATTRIBUTE_COLLECTIONS");
+        return new ModelAndView("search", model);
+    }
+
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")

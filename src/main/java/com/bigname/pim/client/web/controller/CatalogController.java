@@ -112,6 +112,15 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
         return all(model);
     }
 
+    @RequestMapping("/search")
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "CATALOGS");
+        model.put("view", "search");
+        model.put("title", "Catalogs");
+        return all(model);
+    }
+
 
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody

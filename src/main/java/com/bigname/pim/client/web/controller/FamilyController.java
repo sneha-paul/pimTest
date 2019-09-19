@@ -60,6 +60,13 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         return new ModelAndView("settings/families", model);
     }
 
+    @RequestMapping("/search")
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "FAMILIES");
+        return new ModelAndView("search", model);
+    }
+
     @RequestMapping(value =  {"/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")

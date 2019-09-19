@@ -7,6 +7,7 @@ import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
+import com.m7.xtreme.common.criteria.model.SimpleCriteria;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
@@ -168,6 +169,13 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public Page<Product> getAll(int page, int size, Sort sort, boolean... activeRequired) {
         Page<Product> products = super.getAll(page, size, sort, activeRequired);
+        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
+        return products;
+    }
+
+    @Override
+    public Page<Product> findAll(SimpleCriteria criteria, Pageable pageable, boolean... activeRequired){
+        Page<Product> products = super.findAll(criteria, pageable, activeRequired);
         products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
     }

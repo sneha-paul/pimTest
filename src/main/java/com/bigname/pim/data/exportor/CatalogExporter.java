@@ -2,6 +2,7 @@ package com.bigname.pim.data.exportor;
 
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.service.CatalogService;
+import com.m7.xtreme.common.criteria.model.SimpleCriteria;
 import com.m7.xtreme.common.util.BlackBox;
 import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
@@ -73,7 +74,9 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
             jobInstanceService.updateJobsDetails(jobInstance);
         }
         CatalogService catalogService = (CatalogService) jobDataMap.get("service");
-        List<Catalog> catalogData = catalogService.getAll(null,true);
+        //List<Catalog> catalogData = catalogService.getAll(null,true);
+        SimpleCriteria criteria = (SimpleCriteria) jobDataMap.get("searchCriteria");
+        List<Catalog> catalogData = catalogService.findAll(criteria,true);
 
         Map<String, Object[]> data = new TreeMap<>();
 
