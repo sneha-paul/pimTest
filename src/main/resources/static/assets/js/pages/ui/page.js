@@ -476,29 +476,102 @@
                     $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' , trigger : 'hover'});
                 },
                 ajax: {
-                    url: options.url,
-                    method: 'post',
                     data: function ( data ) {
                         var testAdvSearch = {
                             "conditions": [
                                 {
-                                    "field": "field1",
-                                    "operator": "operator1",
-                                    "value": "value1",
-                                    "logical":"OR"
+                                    "conditions": [
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "FOLDERS",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "websiteName",
+                                            "operator": "EQUAL",
+                                            "value": "Folders.com",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ],
+                                    "logical": "OR"
                                 },
                                 {
-                                    "field": "field2",
-                                    "operator": "operator2",
-                                    "value": "value2"
+                                    "conditions": [
+                                        {
+                                            "field": "externalId",
+                                            "operator": "EQUAL",
+                                            "value": "ENVELOPES",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N",
+                                            "logical":"AND"
+                                        },
+                                        {
+                                            "field": "websiteName",
+                                            "operator": "EQUAL",
+                                            "value": "Envelopes.com",
+                                            "dataType": "STRING",
+                                            "regex": "N",
+                                            "ignoreCase": "N"
+                                        }
+                                    ]
+                                }
+                        ]
+                    };
+                        /*var testAdvSearch = {
+                            "conditions": [
+                                {
+                                    "field": "externalId",
+                                    "operator": "EQUAL",
+                                    "value": "ENVELOPES",
+                                    "dataType": "STRING",
+                                    "regex": "N",
+                                    "ignoreCase": "N",
+                                    "logical":"AND"
+                                },
+                                {
+                                    "field": "websiteName",
+                                    "operator": "EQUAL",
+                                    "value": "Envelopes.com",
+                                    "dataType": "STRING",
+                                    "regex": "N",
+                                    "ignoreCase": "N"
                                 }
                             ]
-                        };
+                        };*/
+                        /*var testAdvSearch = {
+                            "conditions": [
+                                {
+                                    "field": "externalId",
+                                    "operator": "EQUAL",
+                                    "value": "FOLDERS",
+                                    "dataType": "STRING",
+                                    "regex": "N",
+                                    "ignoreCase": "N",
+                                    "logical":"AND"
+                                },
+                                {
+                                    "field": "websiteName",
+                                    "operator": "EQUAL",
+                                    "value": "Folders.com",
+                                    "dataType": "STRING",
+                                    "regex": "N",
+                                    "ignoreCase": "N"
+                                }
+                            ]
+                        };*/
                         data.statusOptions = $.getDataTableStatusOptions(options.selector);
                         // data.advancedSearch = JSON.stringify($('#jqs-adv-search-query').val());
-                        // data.advancedSearch = JSON.stringify(btoa({"name":"Manu"}));
                         data.advancedSearch = JSON.stringify(testAdvSearch);
                     },
+                    url: options.url,
+                    method: 'post',
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
 
