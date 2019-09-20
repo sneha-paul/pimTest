@@ -21,10 +21,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by sruthi on 25-01-2019.
@@ -80,13 +77,13 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
 
         List<Catalog> catalogData = catalogService.findAll(criteria,true);
 
-        Map<String, Object[]> data = new TreeMap<>();
 
-        data.put("1", new Object[]{"CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID" });
+        List<List<Object>> data = new ArrayList<>();
+        data.add(Arrays.asList("CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID"));
         int i=2;
         for (Iterator<Catalog> iter = catalogData.iterator(); iter.hasNext(); ) {
             Catalog element = iter.next();
-            data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getActive(), element.getDiscontinued(), element.getId() });
+            data.add(Arrays.asList(element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getActive(), element.getDiscontinued(), element.getId()));
             i++;
         }
 
