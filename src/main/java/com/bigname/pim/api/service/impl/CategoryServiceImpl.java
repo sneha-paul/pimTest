@@ -617,4 +617,9 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             categoryProducts.forEach(categoryProduct -> categoryDAO.archiveAssociationById(ID.INTERNAL_ID(categoryProduct.getId()), archived, CategoryProduct.class));
         }
     }
+
+    @Override
+    public List<RelatedCategory> getAll() {
+        return relatedCategoryDAO.findAll();
+    }
 }

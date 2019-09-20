@@ -3,16 +3,24 @@ package com.bigname.pim.data.exportor;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
-import com.m7.xtreme.common.util.CollectionsUtil;
-import com.m7.xtreme.common.util.ConversionUtil;
-import com.m7.xtreme.common.util.POIUtil;
-import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.common.criteria.model.SimpleCriteria;
+import com.m7.xtreme.common.util.*;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.JobInstance;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +31,7 @@ import static com.m7.xtreme.common.util.StringUtil.getSimpleId;
  * Created by sruthi on 31-01-2019.
  */
 @Component
-public class ProductExporter implements BaseExporter<Product, ProductService> {
+public class ProductExporter implements BaseExporter<Product, ProductService>, Job {
 
     @Autowired
     private ProductVariantService productVariantService;
@@ -396,6 +404,128 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
 
         POIUtil.writeData(filePath, "Child Products", data);
         return true;
+    }
+
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        BlackBox logger = new BlackBox();
+        boolean success = false;
+
+        String fileName = getFileName(BaseExporter.Type.XLSX);
+        String fileLocation = "/usr/local/pim/uploads/data/export/";
+        JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
+
+        //job instance updation
+        String jobInstanceId = jobDataMap.getString("jobId");
+        JobInstanceService jobInstanceService = (JobInstanceService) jobDataMap.get("jobInstanceService");
+        JobInstance jobInstance = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
+        logger.info("Job " + jobInstance.getJobName() + " started");
+        jobInstance.setLogs(logger.toLogMessage());
+        jobInstanceService.updateJobsDetails(jobInstance);
+
+        ProductVariantService productVariantService = null;
+        FamilyService familyService = null;
+        ProductService productService = null;
+        Set<BaseService> services = (Set<BaseService>) jobDataMap.get("services");
+        for(Iterator<BaseService> iter = services.iterator(); iter.hasNext(); ) {
+            BaseService bs = iter.next();
+            if(bs.getEntityName().equals("productVariant")) {
+                productVariantService = (ProductVariantService) bs;
+            } else if(bs.getEntityName().equals("family")){
+                familyService = (FamilyService) bs;
+            } else if(bs.getEntityName().equals("product")){
+                productService = (ProductService) bs;
+            }
+        }
+
+        SimpleCriteria criteria = new SimpleCriteria(jobDataMap.get("searchCriteria").toString());
+        List<Product> productData = productService.findAll(criteria,true);
+        List<String> idList = new ArrayList<>();
+        productData.forEach(product -> idList.add(product.getId()));
+
+        List<Map<String, Object>> productVariantData = productVariantService.getAll();
+        Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
+
+        List<Map<String, Object>> variantsAttributes = new ArrayList<>();
+        Set<String> header = new HashSet<>();
+        productVariantData.forEach(variant -> {
+            if(idList.contains(variant.get("productId"))) {
+                Map<String, Object> variantAttributesMap = new HashMap<>();
+                variant.forEach((key, value) -> {
+
+                    if (value instanceof String) {
+                        variantAttributesMap.put(key, value);
+                    }
+
+                    String productFamilyId = (String) variant.get("productFamilyId");
+                    String familyId = null;
+                    if (productFamilyId != null && familyLookup.containsKey(productFamilyId)) {
+                        familyId = familyLookup.get(productFamilyId).getFamilyId();
+                    }
+
+                    Map<String, Object> scopedProductAttributes = (Map<String, Object>) ((Map<String, Object>) variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
+                    Map<String, Object> pricingDetails = (Map<String, Object>) variant.get("pricingDetails");
+                    Map<String, Object> variantAttributes = (Map<String, Object>) variant.get("variantAttributes");
+                    if (scopedProductAttributes != null) {
+                        variantAttributesMap.putAll(scopedProductAttributes);
+                    } else {
+                        System.out.println(variant);
+                    }
+                    variantAttributesMap.put("PRICING_DETAILS", CollectionsUtil.buildMapString(pricingDetails, 0).toString());
+                    if (variantAttributes != null) {
+                        variantAttributesMap.putAll(variantAttributes);
+                    } else {
+                        System.out.println(variant);
+                    }
+                    variantAttributesMap.replace("productFamilyId", familyId);
+                    variantAttributesMap.remove("createdUser");
+                    variantAttributesMap.remove("lastModifiedUser");
+
+                });
+                header.addAll(variantAttributesMap.keySet());
+                variantsAttributes.add(variantAttributesMap);
+            }
+        });
+
+        List<List<Object>> data = new ArrayList<>();
+        List<Object> headerColumns = new ArrayList<>(header);
+        data.add(headerColumns);
+        for (Map<String, Object> variantAttributes : variantsAttributes) {
+            List<Object> variantData = new ArrayList<>();
+            for(int i = 0; i < headerColumns.size(); i++){
+                String key = (String)headerColumns.get(i);
+                variantData.add(variantAttributes.get(key));
+            }
+            data.add(variantData);
+
+        }
+        POIUtil.writeData(fileLocation + fileName, "Product", data);
+
+        success = true;
+
+
+        logger.info("Job completed");
+        System.out.println("============== : "+jobExecutionContext.getJobDetail().getJobDataMap().getString("jobService"));
+
+        System.out.println("Job Executed");
+        String jobName = jobExecutionContext.getJobDetail().getKey().getName();
+        String jobType = jobExecutionContext.getJobDetail().getKey().getGroup();
+        System.out.println("JobType : " + jobType);
+        System.out.println("========" + jobExecutionContext.getFireInstanceId());
+        System.out.println(jobExecutionContext.getTrigger().getStartTime());
+        Instant endDateInstant = Instant.ofEpochMilli(jobExecutionContext.getScheduledFireTime().getTime());
+        LocalDateTime endTime = LocalDateTime.ofInstant(endDateInstant, ZoneId.systemDefault());
+        System.out.println("End Time : " + endTime);
+        Instant startDateInstant = Instant.ofEpochMilli(jobExecutionContext.getTrigger().getStartTime().getTime());
+        LocalDateTime startDateTime = LocalDateTime.ofInstant(startDateInstant, ZoneId.systemDefault());
+        if(success) {
+            JobInstance jobInstance1 = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
+            jobInstance1.setLogs(logger.toLogMessage());
+            jobInstance1.setStatus("Completed");
+            jobInstance1.setCompletedTime(endTime);
+            jobInstance1.setActualStartTime(startDateTime);
+            jobInstanceService.updateJobsDetails(jobInstance1);
+        }
     }
 }
 

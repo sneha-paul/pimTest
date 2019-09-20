@@ -71,7 +71,6 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
             jobInstanceService.updateJobsDetails(jobInstance);
         }
         CatalogService catalogService = (CatalogService) jobDataMap.get("service");
-        //List<Catalog> catalogData = catalogService.getAll(null,true);
 
         SimpleCriteria criteria = new SimpleCriteria(jobDataMap.get("searchCriteria").toString());
 
@@ -80,11 +79,10 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
 
         List<List<Object>> data = new ArrayList<>();
         data.add(Arrays.asList("CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID"));
-        int i=2;
+
         for (Iterator<Catalog> iter = catalogData.iterator(); iter.hasNext(); ) {
             Catalog element = iter.next();
             data.add(Arrays.asList(element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getActive(), element.getDiscontinued(), element.getId()));
-            i++;
         }
 
         POIUtil.writeData(fileLocation + fileName, "Catalog", data);

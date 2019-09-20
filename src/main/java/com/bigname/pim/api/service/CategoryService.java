@@ -130,5 +130,7 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
     void updateProductCategory(ProductCategory productCategory);
 
     void archiveCategoryAssociations(ID<String> categoryId, Archive archived, Category category);
+
+    List<RelatedCategory> getAll();
 }
 

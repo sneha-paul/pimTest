@@ -17,6 +17,7 @@ import com.m7.xtreme.xcore.util.GenericCriteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
 import org.javatuples.Pair;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
@@ -48,8 +49,8 @@ public class ProductController extends BaseController<Product, ProductService> {
     private FamilyService productFamilyService;
     private ChannelService channelService;
 
-    public ProductController(ProductService productService, @Lazy ProductExporter productExporter, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
-        super(productService, Product.class, new BreadcrumbsBuilder(), productExporter, websiteService, categoryService, catalogService);
+    public ProductController(ProductService productService, @Lazy ProductExporter productExporter, JobInstanceService jobInstanceService, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
+        super(productService, Product.class, new BreadcrumbsBuilder(), productExporter, jobInstanceService, websiteService, categoryService, catalogService, productVariantService, productFamilyService, productService);
         this.productService = productService;
         this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;

@@ -15,6 +15,7 @@ import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -40,8 +41,8 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     private CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, CatalogService catalogService, WebsiteService websiteService){
-        super(categoryService, Category.class, new BreadcrumbsBuilder(), categoryExporter, websiteService, catalogService);
+    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, JobInstanceService jobInstanceService, CatalogService catalogService, WebsiteService websiteService){
+        super(categoryService, Category.class, new BreadcrumbsBuilder(), categoryExporter, jobInstanceService, websiteService, catalogService);
         this.categoryService = categoryService;
     }
 
