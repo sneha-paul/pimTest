@@ -297,40 +297,6 @@ public class ProductController extends BaseController<Product, ProductService> {
         return super.details(model);
     }
 
-    @RequestMapping(value =  {"/search1"})           //TODO - frontend pending
-    @ResponseBody
-    @SuppressWarnings("unchecked")
-    public Result<Map<String, String>> search(HttpServletRequest request) {
-
-        Optional<Family> family = productFamilyService.get(ID.EXTERNAL_ID("ENVELOPE"), false);
-
-        Map<String, Pair<String, Object>> criteriaMap = new HashMap<>();
-        criteriaMap.put("productFamilyId", Pair.with("equals", family.get().getId()));
-        criteriaMap.put("productName", Pair.with("startsWith", "10 x 12 x 2"));
-
-        System.out.println("SearchList: "+criteriaMap);
-
-        GenericCriteria criteria = PlatformUtil.buildCriteria1(criteriaMap);
-
-        return new Result<Map<String, String>>().buildResult(new Request(request),
-                dataTableRequest -> productService.findAll(criteria, dataTableRequest.getPageRequest(defaultSort)),
-                paginatedResult -> {
-                    List<String> productIds = paginatedResult.stream().map(Entity::getId).collect(Collectors.toList());
-                    List<ProductVariant> productVariants = productVariantService.getAll(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), PIMConstants.DEFAULT_CHANNEL_ID, false);
-                    Map<String, Map<String, Object>> productsVariantsInfo = ProductUtil.getVariantDetailsForProducts(productIds, productVariants, 4);
-
-                    List<Map<String, String>> dataObjects = new ArrayList<>();
-                    paginatedResult.forEach(e -> {
-                        Map<String, String> map = e.toMap();
-                        Map<String, Object> productVariantsInfo = productsVariantsInfo.get(e.getId());
-                        map.put("variantCount", Integer.toString((int)productVariantsInfo.get("totalVariants")));
-                        map.put("variantImages", StringUtil.concatinate((List<String>)productVariantsInfo.get("variantImages"), "|"));
-                        dataObjects.add(map);
-                    });
-                    return dataObjects;
-                });
-    }
-
     @RequestMapping(value = "/{productId}/products/archive/{archived}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> archive(@PathVariable(value = "productId") String productId, @PathVariable(value = "archived") String archived) {
