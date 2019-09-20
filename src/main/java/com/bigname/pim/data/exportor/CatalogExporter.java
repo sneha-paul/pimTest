@@ -75,7 +75,9 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
         }
         CatalogService catalogService = (CatalogService) jobDataMap.get("service");
         //List<Catalog> catalogData = catalogService.getAll(null,true);
-        SimpleCriteria criteria = (SimpleCriteria) jobDataMap.get("searchCriteria");
+
+        SimpleCriteria criteria = new SimpleCriteria(jobDataMap.get("searchCriteria").toString());
+
         List<Catalog> catalogData = catalogService.findAll(criteria,true);
 
         Map<String, Object[]> data = new TreeMap<>();

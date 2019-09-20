@@ -423,7 +423,7 @@
                             case 'EXPORT':
                                 toolbar.push($('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
                                     .click(function() {
-                                        var testAdvSearch = {
+                                        /*var testAdvSearch = {
                                             "conditions":[
                                                 {
                                                     "conditions":[
@@ -469,7 +469,56 @@
                                                     ]
                                                 }
                                             ]
+                                        };*/
+
+                                        var testAdvSearch = {
+                                            "conditions": [
+                                                {
+                                                    "conditions": [
+                                                        {
+                                                            "field": "externalId",
+                                                            "operator": "EQUAL",
+                                                            "value": "ENVELOPES",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N",
+                                                            "logical":"AND"
+                                                        },
+                                                        {
+                                                            "field": "catalogName",
+                                                            "operator": "EQUAL",
+                                                            "value": "Envelopes Catalog",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N"
+                                                        }
+                                                    ],
+                                                    "logical": "OR"
+                                                },
+                                                {
+                                                    "conditions": [
+                                                        {
+                                                            "field": "externalId",
+                                                            "operator": "EQUAL",
+                                                            "value": "FOLDERS",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N",
+                                                            "logical":"AND"
+                                                        },
+                                                        {
+                                                            "field": "catalogName",
+                                                            "operator": "EQUAL",
+                                                            "value": "Folders Catalog",
+                                                            "dataType": "STRING",
+                                                            "regex": "N",
+                                                            "ignoreCase": "N"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
                                         };
+
                                         //window.location.href = button.actionUrl + '?filterCriteria=' + JSON.stringify(testAdvSearch);
                                         $.ajax({
                                             url: button.actionUrl,
