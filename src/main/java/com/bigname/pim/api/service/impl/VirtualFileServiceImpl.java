@@ -7,6 +7,7 @@ import com.bigname.pim.api.service.VirtualFileService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class VirtualFileServiceImpl extends BaseServiceSupport<VirtualFile, Virt
         Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, virtualFile, group);
         VirtualFile existing = ValidationUtil.isNotEmpty(context.get("id")) ? get(ID.EXTERNAL_ID(context.get("id")), false).orElse(null) : null;
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getFileName().equals(virtualFile.getFileName()))) {
-            findOne(CollectionsUtil.toMap("parentDirectoryId", virtualFile.getParentDirectoryId(), "fileName", virtualFile.getFileName().trim(), "isDirectory", virtualFile.getIsDirectory()))
+            findOne(Criteria.where("parentDirectoryId").eq(virtualFile.getParentDirectoryId()).and("fileName").eq(virtualFile.getFileName().trim()).and("isDirectory").eq(virtualFile.getIsDirectory()))
                     .ifPresent(virtualFile1 -> fieldErrors.put("fileName", Pair.with("A " + (virtualFile.getIsDirectory().equals("Y") ? "directory" : "file") + " with the given name already exists", virtualFile.getFileName())));
         }
         return _fieldErrors;

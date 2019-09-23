@@ -7,7 +7,6 @@ import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
-import com.m7.xtreme.common.criteria.model.SimpleCriteria;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
@@ -15,7 +14,7 @@ import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.exception.GenericEntityException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.javatuples.Pair;
@@ -174,7 +173,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     @Override
-    public Page<Product> findAll(SimpleCriteria criteria, Pageable pageable, boolean... activeRequired){
+    public Page<Product> findAll(Criteria criteria, Pageable pageable, boolean... activeRequired){
         Page<Product> products = super.findAll(criteria, pageable, activeRequired);
         products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
@@ -190,13 +189,6 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public Page<Product> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
         Page<Product> products = super.findAll(searchField, keyword, pageable, activeRequired);
-        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
-        return products;
-    }
-
-    @Override
-    public Page<Product> findAll(GenericCriteria criteria, Pageable pageable, boolean... activeRequired){
-        Page<Product> products = super.findAll(criteria, pageable, activeRequired);
         products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
         return products;
     }

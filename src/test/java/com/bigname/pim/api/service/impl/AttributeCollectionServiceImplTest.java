@@ -9,7 +9,7 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xplatform.domain.User;
@@ -1100,7 +1100,7 @@ public class AttributeCollectionServiceImplTest {
        });
 
        //Getting AttributeCollections
-        List<AttributeCollection> result = attributeCollectionService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<AttributeCollection> result = attributeCollectionService.findAll(Criteria.where("active").eq("N"));
         long size = collectionsData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
@@ -1158,8 +1158,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionService.update(attributeList);
         });
         //Getting AttributeCollections
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<AttributeCollection> result = attributeCollectionService.findAll(criteria);
+        List<AttributeCollection> result = attributeCollectionService.findAll(Criteria.where("active").eq("N"));
         long size = collectionsData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
@@ -1183,7 +1182,7 @@ public class AttributeCollectionServiceImplTest {
        });
 
        //Getting AttributeCollection
-       Optional<AttributeCollection> result = attributeCollectionService.findOne(CollectionsUtil.toMap("collectionName", collectionsData.get(0).get("name")));
+       Optional<AttributeCollection> result = attributeCollectionService.findOne(Criteria.where("collectionName").eq(collectionsData.get(0).get("name")));
        Assert.assertEquals(collectionsData.get(0).get("name"), result.get().getCollectionName());
 
     }
@@ -1206,7 +1205,7 @@ public class AttributeCollectionServiceImplTest {
             attributeCollectionService.create(attributeCollectionDTO);
         });
         //Getting AttributeCollection
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("collectionName", collectionsData.get(0).get("name")));
+        Criteria criteria = Criteria.where("collectionName").eq(collectionsData.get(0).get("name"));
         Optional<AttributeCollection> result = attributeCollectionService.findOne(criteria);
         Assert.assertEquals(collectionsData.get(0).get("name"), result.get().getCollectionName());
     }

@@ -3,11 +3,12 @@ package com.bigname.pim.data.exportor;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.service.CatalogService;
 import com.m7.xtreme.common.criteria.model.SimpleCriteria;
-import com.m7.xtreme.common.util.BlackBox;
+import com.m7.xtreme.xcore.util.BlackBox;
 import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.JobInstance;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
@@ -72,7 +73,7 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
         }
         CatalogService catalogService = (CatalogService) jobDataMap.get("service");
 
-        SimpleCriteria criteria = new SimpleCriteria(jobDataMap.get("searchCriteria").toString());
+        Criteria criteria = Criteria.fromJson(jobDataMap.get("searchCriteria").toString());
 
         List<Catalog> catalogData = catalogService.findAll(criteria,true);
 

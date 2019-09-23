@@ -9,7 +9,7 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xplatform.domain.User;
@@ -3677,7 +3677,7 @@ public class ProductServiceImplTest {
         });
         //Getting products
         long size = productsData.stream().filter(x -> x.get("active").equals("N")).count();
-        List<Product> result = productService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<Product> result = productService.findAll(Criteria.where("active").eq("N"));
         Assert.assertTrue(result.size() == size);
     }
 
@@ -3709,8 +3709,7 @@ public class ProductServiceImplTest {
         });
         //Getting products
         long size = productsData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<Product> result = productService.findAll(criteria);
+        List<Product> result = productService.findAll(Criteria.where("active").eq("N"));
         Assert.assertTrue(result.size() == size);
     }
 
@@ -3741,7 +3740,7 @@ public class ProductServiceImplTest {
             productService.create(productDTO);
         });
         //Getting product
-        Optional<Product> result = productService.findOne(CollectionsUtil.toMap("productName", productsData.get(0).get("name")));
+        Optional<Product> result = productService.findOne(Criteria.where("productName").eq(productsData.get(0).get("name")));
         Assert.assertEquals(productsData.get(0).get("name"), result.get().getProductName());
     }
 
@@ -3772,7 +3771,7 @@ public class ProductServiceImplTest {
             productService.create(productDTO);
         });
         //Getting product
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("productName", productsData.get(0).get("name")));
+        Criteria criteria = Criteria.where("productName").eq(productsData.get(0).get("name"));
         Product result = productService.findOne(criteria).orElse(null);
         Assert.assertEquals(productsData.get(0).get("name"), result.getProductName());
     }

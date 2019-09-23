@@ -16,7 +16,7 @@ import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xplatform.domain.User;
@@ -999,7 +999,7 @@ public class CatalogServiceImplTest {
         });
         //Getting catalogs
         long size = catalogsData.stream().filter(x -> x.get("active").equals("N")).count();
-        List<Catalog> result = catalogService.findAll(CollectionsUtil.toMap("active", "N"), false);
+        List<Catalog> result = catalogService.findAll(Criteria.where("active").eq("N"), false);
         Assert.assertTrue(result.size() == size);
     }
 
@@ -1026,8 +1026,7 @@ public class CatalogServiceImplTest {
         });
         //Getting catalogs
         long size = catalogsData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<Catalog> result = catalogService.findAll(criteria, false);
+        List<Catalog> result = catalogService.findAll(Criteria.where("active").eq("N"), false);
         Assert.assertTrue(result.size() == size);
     }
 
@@ -1053,7 +1052,7 @@ public class CatalogServiceImplTest {
             catalogDAO.insert(catalogDTO);
         });
         //Getting catalog
-        Optional<Catalog> result = catalogService.findOne(CollectionsUtil.toMap("catalogName", catalogsData.get(0).get("name")));
+        Optional<Catalog> result = catalogService.findOne(Criteria.where("catalogName").eq(catalogsData.get(0).get("name")));
         Assert.assertEquals(catalogsData.get(0).get("name"), result.get().getCatalogName());
     }
 
@@ -1079,7 +1078,7 @@ public class CatalogServiceImplTest {
             catalogDAO.insert(catalogDTO);
         });
         //Getting catalog
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("catalogName", catalogsData.get(0).get("name")));
+        Criteria criteria = Criteria.where("catalogName").eq(catalogsData.get(0).get("name"));
         Optional<Catalog> result = catalogService.findOne(criteria);
         Assert.assertEquals(catalogsData.get(0).get("name"), result.get().getCatalogName());
     }

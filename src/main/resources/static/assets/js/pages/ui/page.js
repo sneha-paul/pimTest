@@ -850,6 +850,48 @@
 
                         //2 product json
                         var testAdvSearch = {
+                            "condition": "OR",
+                            "not": false,
+                            "rules":[
+                                {
+                                    "condition": "AND",
+                                    "not": false,
+                                    "rules" : [
+                                        {
+                                            "field": "productName",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "#0 Bubble Mailers w/ Tear Strip"
+                                        },
+                                        {
+                                            "field": "externalId",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "6_X_10_BUBBLE_MAILER_TS"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "condition": "AND",
+                                    "not": false,
+                                    "rules" : [
+                                        {
+                                            "field": "productName",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "Gift Boxes (6 x 6 x 6)"
+                                        },
+                                        {
+                                            "field": "externalId",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "6_BY_6_BY_6_GIFT_BOX"
+                                        }
+                                    ]
+                                }
+                            ]
+                        };
+                        /*var testAdvSearchOld = {
                             "conditions":[
                                 {
                                     "conditions":[
@@ -895,9 +937,68 @@
                                     ]
                                 }
                             ]
+                        };*/
+                        var testAdvSearch1 = {
+                            "condition": "OR",
+                            "not": false,
+                            "rules":[
+                                {
+                                    "condition": "AND",
+                                    "not": false,
+                                    "rules" : [
+                                        {
+                                            "field": "externalId",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "FOLDERS"
+                                        },
+                                        {
+                                            "field": "websiteName",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "Folders.com"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "condition": "AND",
+                                    "not": false,
+                                    "rules" : [
+                                        {
+                                            "field": "externalId",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "ENVELOPES"
+                                        },
+                                        {
+                                            "field": "websiteName",
+                                            "type": "STRING",
+                                            "operator": "EQUAL",
+                                            "value": "Envelopes.com"
+                                        }
+                                    ]
+                                }
+                            ]
                         };
-
-                        /*var testAdvSearch = {
+                        var testAdvSearch0 = {
+                            "condition": "AND",
+                            "not": false,
+                            "rules" : [
+                                {
+                                    "field": "externalId",
+                                    "type": "STRING",
+                                    "operator": "EQUAL",
+                                    "value": "FOLDERS"
+                                },
+                                {
+                                    "field": "websiteName",
+                                    "type": "STRING",
+                                    "operator": "EQUAL",
+                                    "value": "Folders.com"
+                                }
+                            ]
+                        };
+                        /*var testAdvSearchOld = {
                             "conditions": [
                                 {
                                     "conditions": [

@@ -10,7 +10,7 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xplatform.domain.User;
@@ -2337,7 +2337,7 @@ public class FamilyServiceImplTest {
             family.addAttribute(familyAttributeDTO);
         });
         //Getting AttributeCollections
-        List<AttributeCollection> result = attributeCollectionService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<AttributeCollection> result = attributeCollectionService.findAll(Criteria.where("active").eq("N"));
         long size = familiesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
@@ -2401,9 +2401,8 @@ public class FamilyServiceImplTest {
         });
 
         long size = familiesData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         //Getting Families
-        List<Family> result = familyService.findAll(criteria);
+        List<Family> result = familyService.findAll(Criteria.where("active").eq("N"));
         Assert.assertTrue(result.size() == size);
     }
 
@@ -2461,7 +2460,7 @@ public class FamilyServiceImplTest {
         });
 
         //Getting Family
-        Optional<Family> result = familyService.findOne(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
+        Optional<Family> result = familyService.findOne(Criteria.where("familyName").eq(familiesData.get(0).get("name")));
         Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());
     }
 
@@ -2518,7 +2517,7 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
         });
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
+        Criteria criteria = Criteria.where("familyName").eq(familiesData.get(0).get("name"));
         //Getting Family
         Optional<Family> result = familyService.findOne(criteria);
         Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());

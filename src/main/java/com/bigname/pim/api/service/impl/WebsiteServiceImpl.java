@@ -10,6 +10,7 @@ import com.bigname.pim.api.service.WebsiteService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,12 +130,12 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
         Website existing = ValidationUtil.isNotEmpty(context.get("id")) ? self.get(ID.EXTERNAL_ID(context.get("id")), false).orElse(null) : null;
 
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getWebsiteName().equals(website.getWebsiteName()))) {
-            findOne(CollectionsUtil.toMap("websiteName", website.getWebsiteName()))
+            findOne(Criteria.where("websiteName").eq(website.getWebsiteName()))
                     .ifPresent(website1 -> fieldErrors.put("websiteName", Pair.with("Website name must be unique, but already exists", website.getWebsiteName())));
         }
 
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getUrl().equals(website.getUrl()))) {
-            findOne(CollectionsUtil.toMap("url", website.getUrl()))
+            findOne(Criteria.where("url").eq(website.getUrl()))
                     .ifPresent(website1 -> fieldErrors.put("url", Pair.with("Website url must be unique, but already exists", website.getUrl())));
         }
 

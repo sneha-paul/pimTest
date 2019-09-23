@@ -5,6 +5,7 @@ import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
@@ -186,12 +187,12 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
 
 
             if(!directory.getParentIds().isEmpty()) {
-                list.add(assetCollectionService.findOne(CollectionsUtil.toMap("rootId", directory.getParentIds().remove(0))).map(AssetCollection::toMap1)); // Root Directory, so add the associated asset collection
+                list.add(assetCollectionService.findOne(Criteria.where("rootId").eq(directory.getParentIds().remove(0))).map(AssetCollection::toMap1)); // Root Directory, so add the associated asset collection
                 List<String> parentChain = directory.getParentIds();
                 parentChain.add(directory.getId());
                 list.addAll(assetService.getAll(parentChain.stream().map(e -> ID.INTERNAL_ID(e)).collect(Collectors.toList()), null, false).stream().map(VirtualFile::toMap).collect(Collectors.toList()));
             } else {
-                list.add(assetCollectionService.findOne(CollectionsUtil.toMap("rootId", directory.getId())).map(AssetCollection::toMap1));
+                list.add(assetCollectionService.findOne(Criteria.where("rootId").eq(directory.getId())).map(AssetCollection::toMap1));
             }
             model.put("parentChain", list);
         }

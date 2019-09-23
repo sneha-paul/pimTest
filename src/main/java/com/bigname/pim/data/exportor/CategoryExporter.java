@@ -5,10 +5,11 @@ import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.m7.xtreme.common.criteria.model.SimpleCriteria;
-import com.m7.xtreme.common.util.BlackBox;
+import com.m7.xtreme.xcore.util.BlackBox;
 import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.JobInstance;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
@@ -86,7 +87,7 @@ public class CategoryExporter implements BaseExporter<Category, CategoryService>
         jobInstanceService.updateJobsDetails(jobInstance);
 
         CategoryService categoryService = (CategoryService) jobDataMap.get("service");
-        SimpleCriteria criteria = new SimpleCriteria(jobDataMap.get("searchCriteria").toString());
+        Criteria criteria = Criteria.fromJson(jobDataMap.get("searchCriteria").toString());
 
         Map<String, Category> categoriesLookupMap = categoryService.findAll(criteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
         Map<String, RelatedCategory> relatedCategoriesLookupMap = categoryService.getAll().stream().collect(Collectors.toMap(e -> e.getSubCategoryId(), e -> e));

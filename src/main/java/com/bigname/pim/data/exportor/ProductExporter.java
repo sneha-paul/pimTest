@@ -8,6 +8,8 @@ import com.m7.xtreme.common.util.*;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.BlackBox;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xplatform.domain.JobInstance;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
@@ -438,7 +440,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
             }
         }
 
-        SimpleCriteria criteria = new SimpleCriteria(jobDataMap.get("searchCriteria").toString());
+        Criteria criteria = Criteria.fromJson(jobDataMap.get("searchCriteria").toString());
         List<Product> productData = productService.findAll(criteria,true);
         List<String> idList = new ArrayList<>();
         productData.forEach(product -> idList.add(product.getId()));

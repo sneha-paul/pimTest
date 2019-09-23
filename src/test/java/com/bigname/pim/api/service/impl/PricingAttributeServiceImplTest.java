@@ -9,7 +9,7 @@ import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xplatform.domain.User;
@@ -481,7 +481,7 @@ public class PricingAttributeServiceImplTest {
         });
 
         //Getting pricingAttributes
-        List<PricingAttribute> result = pricingAttributeService.findAll(CollectionsUtil.toMap("active", "N"), false);
+        List<PricingAttribute> result = pricingAttributeService.findAll(Criteria.where("active").eq("N"), false);
         Assert.assertTrue(result.size() == 1);
     }
 
@@ -503,8 +503,7 @@ public class PricingAttributeServiceImplTest {
         });
 
         //Getting pricingAttributes
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<PricingAttribute> result = pricingAttributeService.findAll(criteria, false);
+        List<PricingAttribute> result = pricingAttributeService.findAll(Criteria.where("active").eq("N"), false);
         Assert.assertTrue(result.size() == 1);
     }
 
@@ -526,7 +525,7 @@ public class PricingAttributeServiceImplTest {
         });
 
         //Getting pricingAttribute
-        PricingAttribute result = pricingAttributeService.findOne(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name"))).orElse(null);
+        PricingAttribute result = pricingAttributeService.findOne(Criteria.where("pricingAttributeName").eq(pricingAttributesData.get(0).get("name"))).orElse(null);
         Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.getPricingAttributeName());
     }
 
@@ -547,7 +546,7 @@ public class PricingAttributeServiceImplTest {
             pricingAttributeDAO.insert(pricingAttributeDTO);
         });
         //Getting pricingAttribute
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("pricingAttributeName", pricingAttributesData.get(0).get("name")));
+        Criteria criteria = Criteria.where("pricingAttributeName").eq(pricingAttributesData.get(0).get("name"));
         PricingAttribute result = pricingAttributeService.findOne(criteria).orElse(null);
         Assert.assertEquals(pricingAttributesData.get(0).get("name"), result.getPricingAttributeName());
     }

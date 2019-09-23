@@ -5,6 +5,7 @@ import com.bigname.pim.api.domain.Employee;
 import com.bigname.pim.api.persistence.dao.jpa.EmployeeDAO;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
@@ -77,7 +78,7 @@ public class EmployeeRepositoryImplTest {
             Assert.assertTrue(employee1.isPresent());
 
             //Getting employee by externalId
-            Employee result = employeeDAO.findOne(CollectionsUtil.toMap("externalId", employeesData.get(0).get("externalId"))).orElse(null);
+            Employee result = employeeDAO.findOne(Criteria.where("externalId").eq(employeesData.get(0).get("externalId"))).orElse(null);
             Assert.assertEquals(result.getFirstName() , "joseph");
 
             //findByIdAndActiveIn
@@ -138,8 +139,7 @@ public class EmployeeRepositoryImplTest {
         });
 
         //Getting employees as list
-        Map<String, Object> conditions = CollectionsUtil.toMap("active", "Y", "lastName", "C", "firstName", "sruthi");
-        List<Employee> result = employeeDAO.findAll(conditions);
+        List<Employee> result = employeeDAO.findAll(Criteria.where("active").eq("Y").and("lastName").eq("C").and("firstName").eq("sruthi"));
         Assert.assertEquals(result.size(), 2);
         Assert.assertEquals(result.get(0).getFirstName() , "sruthi");
 

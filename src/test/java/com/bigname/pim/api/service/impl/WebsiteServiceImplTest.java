@@ -14,7 +14,7 @@ import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xplatform.domain.User;
@@ -934,7 +934,7 @@ public class WebsiteServiceImplTest {
         });
         //Getting websites
         long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
-        List<Website> result = websiteService.findAll(CollectionsUtil.toMap("active", "N"), false);
+        List<Website> result = websiteService.findAll(Criteria.where("active").eq("N"), false);
         Assert.assertTrue(result.size() == size);
     }
 
@@ -963,8 +963,7 @@ public class WebsiteServiceImplTest {
         });
         //Getting websites
         long size = websitesData.stream().filter(x -> x.get("active").equals("N")).count();
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<Website> result = websiteService.findAll(criteria, false);
+        List<Website> result = websiteService.findAll(Criteria.where("active").eq("N"), false);
         Assert.assertTrue(result.size() == size);
     }
 
@@ -992,7 +991,7 @@ public class WebsiteServiceImplTest {
             websiteDAO.insert(websiteDTO);
         });
         //Getting website
-        Optional<Website> result = websiteService.findOne(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
+        Optional<Website> result = websiteService.findOne(Criteria.where("websiteName").eq(websitesData.get(0).get("name")));
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }
 
@@ -1021,7 +1020,7 @@ public class WebsiteServiceImplTest {
         });
 
         //Getting website
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("websiteName", websitesData.get(0).get("name")));
+        Criteria criteria = Criteria.where("websiteName").eq(websitesData.get(0).get("name"));
         Optional<Website> result = websiteService.findOne(criteria);
         Assert.assertEquals(websitesData.get(0).get("name"), result.get().getWebsiteName());
     }

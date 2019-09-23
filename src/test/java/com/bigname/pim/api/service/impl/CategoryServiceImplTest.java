@@ -15,7 +15,7 @@ import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
-import com.m7.xtreme.xcore.util.GenericCriteria;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xplatform.domain.User;
@@ -1411,7 +1411,7 @@ public class CategoryServiceImplTest {
         });
 
         //Getting categories
-        List<Category> result = categoryService.findAll(CollectionsUtil.toMap("active", "N"), false);
+        List<Category> result = categoryService.findAll(Criteria.where("active").eq("N"), false);
         long size = categoriesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
@@ -1436,8 +1436,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
         //Getting categories
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
-        List<Category> result = categoryService.findAll(criteria, false);
+        List<Category> result = categoryService.findAll(Criteria.where("active").eq("N"), false);
         long size = categoriesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
@@ -1462,7 +1461,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
         //Getting category
-        Optional<Category> result = categoryService.findOne(CollectionsUtil.toMap("categoryName", categoriesData.get(0).get("name")));
+        Optional<Category> result = categoryService.findOne(Criteria.where("categoryName").eq(categoriesData.get(0).get("name")));
         Assert.assertEquals(categoriesData.get(0).get("name"), result.get().getCategoryName());
     }
 
@@ -1486,7 +1485,7 @@ public class CategoryServiceImplTest {
             categoryDAO.insert(categoryDTO);
         });
         //Getting category
-        GenericCriteria criteria = PlatformUtil.buildCriteria(CollectionsUtil.toMap("categoryName", categoriesData.get(0).get("name")));
+        Criteria criteria = Criteria.where("categoryName").eq(categoriesData.get(0).get("name"));
         Optional<Category> result = categoryService.findOne(criteria);
         Assert.assertEquals(categoriesData.get(0).get("name"), result.get().getCategoryName());
     }

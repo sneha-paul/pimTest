@@ -3,7 +3,6 @@ package com.bigname.pim.util;
 import com.bigname.pim.api.domain.Website;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
-import com.m7.xtreme.xcore.util.FindBy;
 import com.m7.xtreme.xcore.util.ID;
 import org.junit.Assert;
 import org.junit.Test;
