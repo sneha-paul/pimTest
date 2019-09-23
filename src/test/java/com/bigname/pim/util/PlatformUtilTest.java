@@ -200,8 +200,8 @@ public class PlatformUtilTest {
 
     @Test
     public void getStatusOptions() throws Exception {
-        Assert.assertArrayEquals(PlatformUtil.getStatusOptions("Active"), new boolean[] {false, false, false});
-        Assert.assertArrayEquals(PlatformUtil.getStatusOptions(""), new boolean[] {true,true,false});
+        Assert.assertArrayEquals(PlatformUtil.getStatusOptions("Active"), new boolean[] {false, false, false, false});
+        Assert.assertArrayEquals(PlatformUtil.getStatusOptions(""), new boolean[] {true,true,false, false});
     }
 
     @Test

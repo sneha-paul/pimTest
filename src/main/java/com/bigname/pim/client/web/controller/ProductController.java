@@ -184,7 +184,7 @@ public class ProductController extends BaseController<Product, ProductService> {
         return new Result<Map<String, String>>().buildResult(new Request(request),
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
-                        if(!dataTableRequest.getAdvancedSearch().isEmpty()) {
+                        if(!isEmpty(dataTableRequest.getAdvancedSearch()) && !dataTableRequest.getAdvancedSearch().isEmpty()) {
                             return productService.findAll(dataTableRequest.getAdvancedSearch(), dataTableRequest.getPageRequest(defaultSort), dataTableRequest.getStatusOptions());
                         } else {
                             return productService.findAll(dataTableRequest.getPageRequest(defaultSort), dataTableRequest.getStatusOptions());
