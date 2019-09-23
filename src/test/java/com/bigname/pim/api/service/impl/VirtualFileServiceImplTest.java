@@ -55,7 +55,7 @@ public class VirtualFileServiceImplTest {
     public void setUp() throws Exception {
         if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
-            user.setUserName("MANU@BLACWOOD.COm");
+            user.setUserName("MANU@BLACWOOD.COM");
             user.setPassword("temppass");
             user.setEmail("manu@blacwood.com");
             user.setActive("Y");

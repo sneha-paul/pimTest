@@ -1,3 +1,4 @@
+/*
 package com.bigname.pim.api.persistence.dao;
 
 import com.bigname.pim.PimApplication;
@@ -228,4 +229,4 @@ public class EmployeeRepositoryImplTest {
     public void tearDown() throws Exception {
         employeeDAO.deleteAll();
     }
-}
+}*/
