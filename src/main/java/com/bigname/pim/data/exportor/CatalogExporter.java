@@ -39,7 +39,7 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
     }
 
     @Override
-    public boolean exportData(String filePath) {
+    public boolean exportData(String filePath, String criteria) {
         List<Catalog> catalogData = catalogService.getAll(null,true);
 
         Map<String, Object[]> data = new TreeMap<>();

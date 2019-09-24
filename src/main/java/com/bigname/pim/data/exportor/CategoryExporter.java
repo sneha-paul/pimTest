@@ -42,16 +42,16 @@ public class CategoryExporter implements BaseExporter<Category, CategoryService>
         return "CategoryExport" + PlatformUtil.getTimestamp() + fileType.getExt();
     }
 
+    public boolean exportData(String filePath, String criteria) {
 
-    public boolean exportData(String filePath) {
-
-        Map<String, Category> categoriesLookupMap = categoryService.getAll(null, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
+        Criteria mongoCriteria = Criteria.fromJson(criteria);
+        Map<String, Category> categoriesLookupMap = categoryService.findAll(mongoCriteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
         Map<String, RelatedCategory> relatedCategoriesLookupMap = relatedCategoryDAO.findAll().stream().collect(Collectors.toMap(e -> e.getSubCategoryId(), e -> e));
 
         List<Map<String, Object>> hierarchy =  categoryService.getCategoryHierarchy(true);
-        Map<String, Object[]> data = new TreeMap<>();
-        data.put("1", new Object[]{ "CATEGORY_ID", "NAME", "PARENT_ID", "DESCRIPTION" });
-        int i=2;
+        List<List<Object>> data = new ArrayList<>();
+        data.add(Arrays.asList("CATEGORY_ID", "NAME", "PARENT_ID", "DESCRIPTION"));
+
         for (Iterator<Map.Entry<String,Category>> iter = categoriesLookupMap.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry<String, Category> element = iter.next();
             String categoryKey = element.getKey();
@@ -60,12 +60,11 @@ public class CategoryExporter implements BaseExporter<Category, CategoryService>
                 String parentId = relatedCategoriesLookupMap.get(categoryKey).getCategoryId();
                 Category parentData = categoriesLookupMap.get(parentId);
                 String parentCategoryName = parentData.getExternalId();
-                data.put(Integer.toString(i), new Object[]{categoryData.getExternalId(),categoryData.getCategoryName(),parentCategoryName,categoryData.getDescription()});
+                data.add(Arrays.asList(categoryData.getExternalId(),categoryData.getCategoryName(),parentCategoryName,categoryData.getDescription()));
 
             } else {
-                data.put(Integer.toString(i), new Object[]{categoryData.getExternalId(),categoryData.getCategoryName(),null,categoryData.getDescription()});
+                data.add(Arrays.asList(categoryData.getExternalId(),categoryData.getCategoryName(),null,categoryData.getDescription()));
             }
-            i++;
         }
         POIUtil.writeData(filePath,"Category", data);
         return  true;

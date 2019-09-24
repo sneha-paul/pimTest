@@ -23,7 +23,7 @@ public class AttributeCollectionExporter implements BaseExporter<AttributeCollec
     }
 
     @Override
-    public boolean exportData(String filePath) {
+    public boolean exportData(String filePath, String criteria) {
         return false;
     }
 

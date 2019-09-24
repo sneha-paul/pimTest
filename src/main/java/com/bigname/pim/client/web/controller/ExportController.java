@@ -1,3 +1,4 @@
+/*
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.api.service.ProductVariantService;
@@ -17,9 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
+*/
 /**
  * Created by sruthi on 25-01-2019.
- */
+ *//*
+
 @Controller
 @RequestMapping("pim/export")
 public class ExportController {
@@ -115,3 +118,4 @@ public class ExportController {
         return model;
     }
 }
+*/

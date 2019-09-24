@@ -56,7 +56,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
     @Autowired
     private CategoryService categoryService;
 
-    public boolean exportData(String filePath) {
+    public boolean exportData(String filePath, String criteria) {
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
         Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
 
