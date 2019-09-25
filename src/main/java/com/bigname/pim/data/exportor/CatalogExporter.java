@@ -40,16 +40,15 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
 
     @Override
     public boolean exportData(String filePath, String criteria) {
-        List<Catalog> catalogData = catalogService.getAll(null,true);
+        Criteria mongoCriteria = Criteria.fromJson(criteria);
+        List<Catalog> catalogData = catalogService.findAll(mongoCriteria,true);
 
-        Map<String, Object[]> data = new TreeMap<>();
+        List<List<Object>> data = new ArrayList<>();
+        data.add(Arrays.asList("CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID"));
 
-        data.put("1", new Object[]{"CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID" });
-        int i=2;
         for (Iterator<Catalog> iter = catalogData.iterator(); iter.hasNext(); ) {
             Catalog element = iter.next();
-            data.put(Integer.toString(i), new Object[]{element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getActive(), element.getDiscontinued(), element.getId() });
-            i++;
+            data.add(Arrays.asList(element.getExternalId(), element.getCatalogName(), element.getDescription(), element.getActive(), element.getDiscontinued(), element.getId()));
         }
         POIUtil.writeData(filePath, "Catalog", data);
         return true;

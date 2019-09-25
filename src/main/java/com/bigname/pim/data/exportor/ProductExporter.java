@@ -56,46 +56,53 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
     @Autowired
     private CategoryService categoryService;
 
-    public boolean exportData(String filePath, String criteria) {
+    public boolean exportData(String filePath, String criteriaJson) {
+        Criteria criteria = Criteria.fromJson(criteriaJson);
+        List<Product> productData = productService.findAll(criteria,true);
+        List<String> idList = new ArrayList<>();
+        productData.forEach(product -> idList.add(product.getId()));
+
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
         Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
 
         List<Map<String, Object>> variantsAttributes = new ArrayList<>();
         Set<String> header = new HashSet<>();
         productVariantData.forEach(variant -> {
-            Map<String, Object> variantAttributesMap = new HashMap<>();
-            variant.forEach((key, value) -> {
-                if(value instanceof String) {
-                    variantAttributesMap.put(key, value);
-                }
+            if(idList.contains(variant.get("productId"))) {
+                Map<String, Object> variantAttributesMap = new HashMap<>();
+                variant.forEach((key, value) -> {
+                    if (value instanceof String) {
+                        variantAttributesMap.put(key, value);
+                    }
 
-                String productFamilyId = (String) variant.get("productFamilyId");
-                String familyId = null;
-                if(productFamilyId != null && familyLookup.containsKey(productFamilyId)){
-                    familyId = familyLookup.get(productFamilyId).getFamilyId();
-                }
+                    String productFamilyId = (String) variant.get("productFamilyId");
+                    String familyId = null;
+                    if (productFamilyId != null && familyLookup.containsKey(productFamilyId)) {
+                        familyId = familyLookup.get(productFamilyId).getFamilyId();
+                    }
 
-                Map<String, Object> scopedProductAttributes = (Map<String, Object>)((Map<String, Object>)variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
-                Map<String, Object> pricingDetails = (Map<String, Object>)variant.get("pricingDetails");
-                Map<String, Object> variantAttributes = (Map<String, Object>)variant.get("variantAttributes");
-                if(scopedProductAttributes != null) {
-                    variantAttributesMap.putAll(scopedProductAttributes);
-                } else {
-                    System.out.println(variant);
-                }
-                variantAttributesMap.put("PRICING_DETAILS", CollectionsUtil.buildMapString(pricingDetails,0).toString());
-                if(variantAttributes != null) {
-                    variantAttributesMap.putAll(variantAttributes);
-                } else {
-                    System.out.println(variant);
-                }
-                variantAttributesMap.replace("productFamilyId", familyId);
-                variantAttributesMap.remove("createdUser");
-                variantAttributesMap.remove("lastModifiedUser");
+                    Map<String, Object> scopedProductAttributes = (Map<String, Object>) ((Map<String, Object>) variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
+                    Map<String, Object> pricingDetails = (Map<String, Object>) variant.get("pricingDetails");
+                    Map<String, Object> variantAttributes = (Map<String, Object>) variant.get("variantAttributes");
+                    if (scopedProductAttributes != null) {
+                        variantAttributesMap.putAll(scopedProductAttributes);
+                    } else {
+                        System.out.println(variant);
+                    }
+                    variantAttributesMap.put("PRICING_DETAILS", CollectionsUtil.buildMapString(pricingDetails, 0).toString());
+                    if (variantAttributes != null) {
+                        variantAttributesMap.putAll(variantAttributes);
+                    } else {
+                        System.out.println(variant);
+                    }
+                    variantAttributesMap.replace("productFamilyId", familyId);
+                    variantAttributesMap.remove("createdUser");
+                    variantAttributesMap.remove("lastModifiedUser");
 
-            });
-            header.addAll(variantAttributesMap.keySet());
-            variantsAttributes.add(variantAttributesMap);
+                });
+                header.addAll(variantAttributesMap.keySet());
+                variantsAttributes.add(variantAttributesMap);
+            }
         });
 
         List<List<Object>> data = new ArrayList<>();

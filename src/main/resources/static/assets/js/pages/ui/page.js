@@ -423,8 +423,8 @@
                             case 'EXPORT':
                                 toolbar.push($('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
                                     .click(function() {
-
-                                        var testAdvSearch = {
+                                        //category json
+                                        var testAdvSearch1 = {
                                             "condition": "AND",
                                             "not": false,
                                             "rules" : [
@@ -444,6 +444,71 @@
                                             ]
                                         };
 
+                                        //catalog json
+                                        var testAdvSearch2 = {
+                                            "condition": "AND",
+                                            "not": false,
+                                            "rules" : [
+                                                {
+                                                    "field": "catalogName",
+                                                    "type": "STRING",
+                                                    "operator": "EQUAL",
+                                                    "value": "Envelopes Catalog"
+
+                                                },
+                                                {
+                                                    "field": "externalId",
+                                                    "type": "STRING",
+                                                    "operator": "EQUAL",
+                                                    "value": "ENVELOPES"
+                                                }
+                                            ]
+                                        };
+
+                                        //product json
+                                        var testAdvSearch = {
+                                            "condition": "OR",
+                                            "not": false,
+                                            "rules":[
+                                                {
+                                                    "condition": "AND",
+                                                    "not": false,
+                                                    "rules" : [
+                                                        {
+                                                            "field": "productName",
+                                                            "type": "STRING",
+                                                            "operator": "EQUAL",
+                                                            "value": "#0 Bubble Mailers w/ Tear Strip"
+                                                        },
+                                                        {
+                                                            "field": "externalId",
+                                                            "type": "STRING",
+                                                            "operator": "EQUAL",
+                                                            "value": "6_X_10_BUBBLE_MAILER_TS"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "condition": "AND",
+                                                    "not": false,
+                                                    "rules" : [
+                                                        {
+                                                            "field": "productName",
+                                                            "type": "STRING",
+                                                            "operator": "EQUAL",
+                                                            "value": "Gift Boxes (6 x 6 x 6)"
+                                                        },
+                                                        {
+                                                            "field": "externalId",
+                                                            "type": "STRING",
+                                                            "operator": "EQUAL",
+                                                            "value": "6_BY_6_BY_6_GIFT_BOX"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        };
+
                                         //window.location.href = button.actionUrl + '?filterCriteria=' + JSON.stringify(testAdvSearch);
                                         $.ajax({
                                             url: button.actionUrl,
@@ -452,8 +517,12 @@
                                             },
                                             method: 'POST',
                                             success: function (data) {
-
                                                 console.log(data);
+                                                if(typeof data.fileLocation !== 'undefined') {
+                                                    window.location.href = $(location).attr("href") + '/download/' + window.btoa(data.fileLocation) + '/' + data.fileName;
+                                                } else {
+                                                    alert("Exporting have been scheduled");
+                                                }
                                             }
                                         });
                                     }));
