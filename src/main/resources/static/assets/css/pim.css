@@ -673,3 +673,60 @@ table#paginatedPricingTable tbody td:first-child {
 div#main-content {
     min-height:calc(100vh - 67px);
 }
+.overlay{
+    opacity: .32;
+    transition: all .4s;
+    background: black;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    visibility: hidden;
+    z-index: 99;
+}
+.overlay-sheet{
+    transition: transform .4s;
+    background: #ffffff;
+    bottom: 0;
+    right: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: fixed;
+    top: 5px;
+    width: 80%;
+    z-index: 998;
+    min-width: 85%;
+    transform : translate(100%, 0%);
+}
+.overlay-open .overlay-sheet{
+    transform : translate(0px, 0px);
+}
+.overlay-open .overlay{
+    opacity: .32;
+    visibility: visible;
+}
+body.overlay-open{
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+.overlay-holder .sheet-header{
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+.overlay-holder .sheet-header h4{
+    margin-bottom: 0;
+}
+.sheet-body{
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1rem;
+}

@@ -1,4 +1,64 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<style>
+    .overlay{
+        opacity: .32;
+        transition: all .4s;
+        background: black;
+        bottom: 0;
+        left: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
+        visibility: hidden;
+        z-index: 99;
+    }
+    .overlay-sheet{
+        transition: transform .4s;
+        background: #ffffff;
+        bottom: 0;
+        right: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        position: fixed;
+        top: 5px;
+        width: 80%;
+        z-index: 998;
+        min-width: 85%;
+        transform : translate(100%, 0%);
+    }
+    .overlay-open .overlay-sheet{
+        transform : translate(0px, 0px);
+    }
+    .overlay-open .overlay{
+        opacity: .32;
+        visibility: visible;
+    }
+    body.overlay-open{
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+    .overlay-holder .sheet-header{
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: start;
+        align-items: flex-start;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .overlay-holder .sheet-header h4{
+        margin-bottom: 0;
+    }
+    .sheet-body{
+        position: relative;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: 1rem;
+    }
+
+</style>
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12">
         <div class="card">
@@ -9,6 +69,7 @@
                         <div class="pull-right">
                             <button id="js-create-website" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Website</span></button>
                             <button id="js-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>
+                            <button id="ui-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Search</span></button>
                         </div>
                     </div>
                 </div>
@@ -23,6 +84,34 @@
         </div>
     </div>
 </div>
+
+<div class="overlay-holder">
+    <div class="overlay"></div>
+    <div class="overlay-sheet">
+        <div class="sheet-header">
+            <h4>Advanced Search</h4>
+            <div class="sheet-btns">
+                <button class="btn btn-primary" style="primary">SEARCH</button>
+                <button class="btn btn-danger overlay-close" style="danger" >CLOSE</button>
+            </div>
+        </div>
+        <div class="sheet-body">
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                    <textarea id="jqs-adv-search-query" name="criteria" rows="5" cols="30" class="form-control" >
+
+
+                    </textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $( document).ready(function() {
         $.initEntitiesGrid({
@@ -56,6 +145,15 @@
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });
+
+        $('button#ui-advanced-search').click(function(){
+            $('body').addClass('overlay-open');
+        });
+        $('button.overlay-close').click(function(){
+            $('body').removeClass('overlay-open');
+        });
+
+
     });
 
 </script>
