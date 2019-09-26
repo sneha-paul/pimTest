@@ -61,14 +61,18 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
         List<Product> productData = productService.findAll(criteria,true);
         List<String> idList = new ArrayList<>();
         productData.forEach(product -> idList.add(product.getId()));
+        /*Criteria criteria1 = Criteria.where("productId", "String").in(idList);
+        productVariantService.findAll(criteria1, true);*/
+
+        List<Map<String, Object>> proVariants = productService.findAllVariants(idList, true);
 
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
         Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
 
         List<Map<String, Object>> variantsAttributes = new ArrayList<>();
         Set<String> header = new HashSet<>();
-        productVariantData.forEach(variant -> {
-            if(idList.contains(variant.get("productId"))) {
+        proVariants.forEach(variant -> {
+            //if(idList.contains(variant.get("productId"))) {
                 Map<String, Object> variantAttributesMap = new HashMap<>();
                 variant.forEach((key, value) -> {
                     if (value instanceof String) {
@@ -102,7 +106,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
                 });
                 header.addAll(variantAttributesMap.keySet());
                 variantsAttributes.add(variantAttributesMap);
-            }
+            //}
         });
 
         List<List<Object>> data = new ArrayList<>();

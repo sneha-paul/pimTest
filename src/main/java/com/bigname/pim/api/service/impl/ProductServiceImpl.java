@@ -4,6 +4,7 @@ import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.mongo.CategoryProductDAO;
 import com.bigname.pim.api.persistence.dao.mongo.ProductCategoryDAO;
 import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductVariantDAO;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
@@ -40,10 +41,11 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     private CategoryService categoryService;
     private FamilyService familyService;
     private ProductDAO productDAO;
+    private ProductVariantDAO productVariantDAO;
 
 
     @Autowired
-    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, VirtualFileService assetService, ProductCategoryDAO productCategoryDAO, CategoryProductDAO categoryProductDAO, @Lazy CategoryService categoryService) {
+    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, VirtualFileService assetService, ProductCategoryDAO productCategoryDAO, CategoryProductDAO categoryProductDAO, ProductVariantDAO productVariantDAO, @Lazy CategoryService categoryService) {
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
         this.productVariantService = productVariantService;
@@ -52,6 +54,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         this.productCategoryDAO = productCategoryDAO;
         this.categoryProductDAO = categoryProductDAO;
         this.categoryService = categoryService;
+        this.productVariantDAO = productVariantDAO;
     }
 
     @Override
@@ -568,5 +571,33 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public void updateCategoryProduct(CategoryProduct categoryProduct) {
         categoryProductDAO.save(categoryProduct);
+    }
+
+    @Override
+    public List<Map<String, Object>> findAllVariants(List<String> productIds, boolean... activeRequired) {
+        List<Map<String, Object>> variantsList = new ArrayList<>();
+        productIds.forEach(productId -> {
+            //List<ProductVariant> productVariantList1 = productVariantDAO.findAllProductVariants(criteria, true);
+            List<ProductVariant> productVariantList = getProductVariants(ID.INTERNAL_ID(productId), "ECOMMERCE", null, activeRequired);
+            productVariantList.forEach(productVariant -> {
+                Product product = productDAO.findById(ID.INTERNAL_ID(productId), true).orElse(null);
+                Map<String, Object> variantMap = new HashMap<>();
+                variantMap.put("variantAttributes", productVariant.getVariantAttributes());
+                variantMap.put("pricingDetails", productVariant.getPricingDetails());
+                variantMap.put("productFamilyId", product.getProductFamilyId());
+                variantMap.put("productName", product.getProductName());
+                variantMap.put("tenantId", product.getTenantId());
+                variantMap.put("scopedFamilyAttributes", product.getScopedFamilyAttributes());
+                variantMap.put("externalId", productVariant.getExternalId());
+                variantMap.put("channelId", productVariant.getChannelId());
+                variantMap.put("active", productVariant.getActive());
+                variantMap.put("discontinued", productVariant.getDiscontinued());
+                variantMap.put("archived", productVariant.getArchived());
+                variantMap.put("id", productVariant.getId());
+                variantMap.put("productVariantName", productVariant.getProductVariantName());
+                variantsList.add(variantMap);
+            });
+        });
+        return variantsList;
     }
 }

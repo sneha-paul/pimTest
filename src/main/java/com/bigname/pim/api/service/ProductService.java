@@ -3,6 +3,7 @@ package com.bigname.pim.api.service;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
@@ -125,4 +126,6 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
     List<CategoryProduct> getAllCategoryProductsWithProductId(ID<String> productId);
 
     void updateCategoryProduct(CategoryProduct categoryProduct);
+
+    List<Map<String, Object>> findAllVariants(List<String> productIds, boolean... activeRequired);
 }
