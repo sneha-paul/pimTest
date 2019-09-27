@@ -574,13 +574,11 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     }
 
     @Override
-    public List<Map<String, Object>> findAllVariants(List<String> productIds, boolean... activeRequired) {
+    public List<Map<String, Object>> findAllVariants(Criteria criteria, boolean... activeRequired) {
         List<Map<String, Object>> variantsList = new ArrayList<>();
-        productIds.forEach(productId -> {
-            //List<ProductVariant> productVariantList1 = productVariantDAO.findAllProductVariants(criteria, true);
-            List<ProductVariant> productVariantList = getProductVariants(ID.INTERNAL_ID(productId), "ECOMMERCE", null, activeRequired);
+            List<ProductVariant> productVariantList = productVariantService.findAll(criteria, true);
             productVariantList.forEach(productVariant -> {
-                Product product = productDAO.findById(ID.INTERNAL_ID(productId), true).orElse(null);
+                Product product = productDAO.findById(ID.INTERNAL_ID(productVariant.getProductId()), true).orElse(null);
                 Map<String, Object> variantMap = new HashMap<>();
                 variantMap.put("variantAttributes", productVariant.getVariantAttributes());
                 variantMap.put("pricingDetails", productVariant.getPricingDetails());
@@ -597,7 +595,6 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                 variantMap.put("productVariantName", productVariant.getProductVariantName());
                 variantsList.add(variantMap);
             });
-        });
         return variantsList;
     }
 }

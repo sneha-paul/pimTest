@@ -127,5 +127,5 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
 
     void updateCategoryProduct(CategoryProduct categoryProduct);
 
-    List<Map<String, Object>> findAllVariants(List<String> productIds, boolean... activeRequired);
+    List<Map<String, Object>> findAllVariants(Criteria criteria, boolean... activeRequired);
 }

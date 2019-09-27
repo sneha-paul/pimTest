@@ -505,6 +505,18 @@
                                                             "value": "6_BY_6_BY_6_GIFT_BOX"
                                                         }
                                                     ]
+                                                },
+                                                {
+                                                    "condition": "AND",
+                                                    "not": false,
+                                                    "rules" : [
+                                                        {
+                                                            "field": "variant.externalId",
+                                                            "type": "STRING",
+                                                            "operator": "EQUAL",
+                                                            "value": "BM6X10TSBK"
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         };
