@@ -39,9 +39,8 @@ public class CatalogExporter implements BaseExporter<Catalog, CatalogService>, J
     }
 
     @Override
-    public boolean exportData(String filePath, String criteria) {
-        Criteria mongoCriteria = Criteria.fromJson(criteria);
-        List<Catalog> catalogData = catalogService.findAll(mongoCriteria,true);
+    public boolean exportData(String filePath, Criteria criteria) {
+        List<Catalog> catalogData = catalogService.findAll(criteria,true);
 
         List<List<Object>> data = new ArrayList<>();
         data.add(Arrays.asList("CATALOG_ID", "CATALOG_NAME", "DESCRIPTION", "ACTIVE", "DISCONTINUED", "ID"));

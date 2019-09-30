@@ -515,7 +515,26 @@
                                                             "type": "STRING",
                                                             "operator": "EQUAL",
                                                             "value": "BM6X10TSBK"
+                                                        },
+                                                        {
+                                                            "field": "variant.productVariantName",
+                                                            "type": "STRING",
+                                                            "operator": "EQUAL",
+                                                            "value": "#0 Bubble Mailers w/ Tear Strip - Brown Kraft"
                                                         }
+                                                    ]
+                                                },
+                                                {
+                                                    "condition": "AND",
+                                                    "not": false,
+                                                    "rules" : [
+                                                        {
+                                                            "field": "variant.productVariantName",
+                                                            "type": "STRING",
+                                                            "operator": "EQUAL",
+                                                            "value": "9 x 12 Booklet Envelopes - Nude"
+                                                        },
+
                                                     ]
                                                 }
                                             ]

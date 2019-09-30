@@ -42,10 +42,9 @@ public class CategoryExporter implements BaseExporter<Category, CategoryService>
         return "CategoryExport" + PlatformUtil.getTimestamp() + fileType.getExt();
     }
 
-    public boolean exportData(String filePath, String criteria) {
+    public boolean exportData(String filePath, Criteria criteria) {
 
-        Criteria mongoCriteria = Criteria.fromJson(criteria);
-        Map<String, Category> categoriesLookupMap = categoryService.findAll(mongoCriteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
+        Map<String, Category> categoriesLookupMap = categoryService.findAll(criteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
         Map<String, RelatedCategory> relatedCategoriesLookupMap = relatedCategoryDAO.findAll().stream().collect(Collectors.toMap(e -> e.getSubCategoryId(), e -> e));
 
         List<Map<String, Object>> hierarchy =  categoryService.getCategoryHierarchy(true);

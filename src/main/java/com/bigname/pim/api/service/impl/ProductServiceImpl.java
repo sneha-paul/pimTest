@@ -584,6 +584,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                 variantMap.put("pricingDetails", productVariant.getPricingDetails());
                 variantMap.put("productFamilyId", product.getProductFamilyId());
                 variantMap.put("productName", product.getProductName());
+                variantMap.put("productId", product.getId());
                 variantMap.put("tenantId", product.getTenantId());
                 variantMap.put("scopedFamilyAttributes", product.getScopedFamilyAttributes());
                 variantMap.put("externalId", productVariant.getExternalId());
@@ -591,7 +592,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                 variantMap.put("active", productVariant.getActive());
                 variantMap.put("discontinued", productVariant.getDiscontinued());
                 variantMap.put("archived", productVariant.getArchived());
-                variantMap.put("id", productVariant.getId());
+                variantMap.put("_id", productVariant.getId());
                 variantMap.put("productVariantName", productVariant.getProductVariantName());
                 variantsList.add(variantMap);
             });

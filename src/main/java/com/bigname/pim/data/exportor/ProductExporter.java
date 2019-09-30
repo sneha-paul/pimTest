@@ -20,6 +20,7 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.naming.event.ObjectChangeListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.StringUtil.getSimpleId;
 import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.xcore.util.Criteria.FieldType.STRING;
 
 
 /**
@@ -57,29 +59,43 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
     @Autowired
     private CategoryService categoryService;
 
-    public boolean exportData(String filePath, String criteriaJson) {
-        Criteria criteria = Criteria.fromJson(criteriaJson);
+    public boolean exportData(String filePath, Criteria criteria) {
         Map<String, Object> productCriteriaMap = criteria.toMap();
         Map<String, Object> variantCriteriaMap = new HashMap<>();
         variantCriteriaMap.put("condition", productCriteriaMap.get("condition"));
         variantCriteriaMap.put("not", productCriteriaMap.get("not"));
         List<Map<String, Object>> variantsList = new ArrayList<>();
         List<Map<String, Object>> mainRules = (List<Map<String, Object>>)productCriteriaMap.get("rules");
+        boolean isVariants = false;
         if(isNotEmpty(mainRules)) {
             Iterator<Map<String, Object>> rulesIterator = mainRules.iterator();
             while (rulesIterator.hasNext()) {
+                int count = 0;
                 Map<String, Object> rules = (Map<String, Object>)rulesIterator.next();
+                List<Map<String, Object>> variantsConditionList = new ArrayList<>();
+                Map<String, Object> variantConditionMap = new HashMap<>();
                 List<Map<String, Object>> rulesList = (List<Map<String, Object>>)rules.get("rules");
                 Iterator<Map<String, Object>> ruleIterator = rulesList.iterator();
                 while(ruleIterator.hasNext()) {
                     Map<String, Object> innerRule = ruleIterator.next();
                     String field = (String) innerRule.get("field");
                     if(field.contains("variant.")) {
+                        isVariants = true;
+                        if(count == 0) {
+                            variantConditionMap.put("condition", rules.get("condition"));
+                            variantConditionMap.put("not", rules.get("not"));
+                            variantsList.add(variantConditionMap);
+                            count = 1;
+                        }
                         String[] fieldName = field.split("\\.");
                         innerRule.put("field", fieldName[1]);
-                        variantsList.add(innerRule);
-                        rulesIterator.remove();
+                        variantsConditionList.add(innerRule);
+                        ruleIterator.remove();
                     }
+                }
+                if(isVariants) {
+                    variantConditionMap.put("rules", variantsConditionList);
+                    rulesIterator.remove();
                 }
             }
             variantCriteriaMap.put("rules", variantsList);
@@ -89,14 +105,13 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
         List<Product> productData = productService.findAll(productCriteria,true);
         List<String> idList = new ArrayList<>();
         productData.forEach(product -> idList.add(product.getId()));
-        //Criteria criteria1 = Criteria.where("productId", "STRING").in(idList);
+
+        //Criteria _criteria1 = Criteria.where("productId", STRING).in(idList.toArray());
+        //productVariantService.findAll(_criteria1, true);
         Criteria criteria1 = Criteria.where("productId", "STRING").eq("9fd5acc9-1960-4f72-b2c8-d7523da945ee");//33e77864-3b65-4213-a6f9-dc25de0dc8ef
-        /*productVariantService.findAll(criteria1, true);*/
 
         Criteria variantCriteria = Criteria.fromMap(variantCriteriaMap);
         variantCriteria.and(criteria1);
-
-        productVariantService.findAll(variantCriteria, true);
 
         List<Map<String, Object>> proVariants = productService.findAllVariants(variantCriteria, true);
 

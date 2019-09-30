@@ -6,6 +6,7 @@ import com.bigname.pim.api.service.AttributeCollectionService;
 import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.data.exporter.BaseExporter;
+import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class AttributeCollectionExporter implements BaseExporter<AttributeCollec
     }
 
     @Override
-    public boolean exportData(String filePath, String criteria) {
+    public boolean exportData(String filePath, Criteria criteria) {
         return false;
     }
 
