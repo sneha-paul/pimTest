@@ -48,7 +48,7 @@ body.dragging, body.dragging * {
     overflow: hidden;
     width:80px;
     margin-right: 10px;
-    background: url(/assets/img/transparent_bg.png);
+    background-image: url(/assets/img/transparent_bg.png);
     background-repeat: repeat;
     background-size: 30px 30px;
 }
@@ -59,7 +59,7 @@ body.dragging, body.dragging * {
     line-height: 39px;
     overflow: hidden;
     width:40px;
-    background: url(/assets/img/transparent_bg.png);
+    background-image: url(/assets/img/transparent_bg.png);
     background-repeat: repeat;
     background-size: 30px 30px;
     border-radius: 50%;
@@ -692,7 +692,7 @@ div#main-content {
     right: 0;
     max-width: 100%;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
     position: fixed;
     top: 5px;
     width: 80%;
@@ -720,6 +720,10 @@ body.overlay-open{
     justify-content: space-between;
     padding: 1rem;
     border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    background: #fff;
 }
 .overlay-holder .sheet-header h4{
     margin-bottom: 0;
@@ -729,29 +733,12 @@ body.overlay-open{
     -ms-flex: 1 1 auto;
     flex: 1 1 auto;
     padding: 1rem;
+    z-index: 99;
+    padding-right: 6px;
 }
 
-#left-sidebar{
-    width: auto;
-    background-color: #449cff;
-    box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.4);
-}
-.user-account {
-    margin: 10px 0px 10px 10px;
-}
-.user-account .dropdown, .sidebar-nav .metismenu ul a span{
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease-in-out;
-    color: #FFFFFF;
-}
-.sidebar-nav .metismenu ul a span, .sidebar-nav .metismenu ul a i {
-    color: #ded3d3 !important;
-}
-.sidebar-nav .metismenu ul a:hover span,
-.sidebar-nav .metismenu ul a:hover i{
-    color: #fff !important;
+.navbar-fixed-top .navbar-btn button i{
+    margin-left: 15px;
 }
 #main-content{
     width: calc(100% - 60px);
@@ -759,67 +746,83 @@ body.overlay-open{
 .offcanvas-active #main-content{
     width: 100%;
 }
-.sidebar-nav .metismenu>li a span{
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    padding-right: 10px;
-    min-width: 25px;
-    color: #FFFFFF;
-    transition: all 0.3s ease-in-out;
+#left-sidebar{
+    width: auto;
+    background-color: #449cff;
+    box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.4);
 }
-
-.theme-blue .sidebar-nav .metismenu>li i{
-    font-size: 20px;
-    color: #FFFFFF;
-}
-.sidebar-nav .metismenu a{
-    padding-right: 0;
-}
-.sidebar-nav .metismenu a:hover, .sidebar-nav .metismenu a:focus, .sidebar-nav .metismenu a:active,.sidebar-nav .metismenu>li.active>a {
-    background: #3888e2cc;
-}
-.theme-blue .sidebar-nav .metismenu>li.active>a,
-.theme-blue .sidebar-nav .metismenu>li ul.collapse li.active>a{
-    border-left-color: #fff;
-}
-#left-sidebar:hover .metismenu>li a span,
 #left-sidebar:hover .user-account .dropdown,
-#left-sidebar:hover .metismenu>li.active ul.collapse.in> li a{
+#left-sidebar:hover .sidebar-nav .metismenu>li a span,
+#left-sidebar:hover .sidebar-nav .metismenu>li.active ul.collapse.in> li a{
     display: inline-block;
     opacity: 1;
     visibility: visible;
 }
-#left-sidebar:hover ul.metismenu{
+#left-sidebar:hover .sidebar-nav .metismenu{
     width: 250px;
 }
-.metismenu>li ul{
-    background: #3888e2cc;
-}
-ul.collapse.in> li a{
-    width: 100%;
-}
-ul.collapse.in> li a:hover,
-ul.collapse.in> li a:focus,
-ul.collapse.in> li a:active{
-    border-color: #fff;
-}
-.sidebar-nav .metismenu ul a::before{
-    content: none;
-}
-.sidebar-nav .metismenu ul a{
-    padding: 10px 0px 10px 25px;
-}
-.sidebar-nav .metismenu ul a i {
-    font-size: 14px !important;
-}
-.navbar-fixed-top .navbar-btn button i{
-    margin-left: 15px;
-}
-.metismenu .has-arrow:after{
-    right: 10px;
-}
-
+    #left-sidebar .user-account {
+        margin: 10px 0px 10px 10px;
+    }
+        #left-sidebar .user-account .dropdown,
+        #left-sidebar .sidebar-nav .metismenu ul.collapse.in> a span,
+        #left-sidebar .sidebar-nav .metismenu>li a span{
+            display: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            color: #FFFFFF;
+        }
+            #left-sidebar .sidebar-nav .metismenu>li a{
+                padding-right: 0;
+            }
+            #left-sidebar .sidebar-nav .metismenu>li a:hover,
+            #left-sidebar .sidebar-nav .metismenu>li a:focus,
+            #left-sidebar .sidebar-nav .metismenu>li a:active,
+            #left-sidebar .sidebar-nav .metismenu>li.active>a {
+                background: #3888e2cc;
+            }
+            #left-sidebar .sidebar-nav .metismenu>li.active>a,
+            #left-sidebar .sidebar-nav .metismenu>li ul.collapse li.active>a{
+                border-left-color: #fff;
+            }
+            #left-sidebar .sidebar-nav .metismenu>li a.has-arrow:after{
+                right: 10px;
+            }
+                #left-sidebar .sidebar-nav .metismenu>li a span{
+                    padding-right: 10px;
+                    min-width: 25px;
+                }
+                #left-sidebar .sidebar-nav .metismenu>li a i{
+                    font-size: 20px;
+                    color: #FFFFFF;
+                }
+                #left-sidebar .sidebar-nav .metismenu>li ul{
+                    background: #3888e2cc;
+                }
+                    #left-sidebar .sidebar-nav .metismenu>li ul a{
+                        width: 100%;
+                        padding: 10px 0px 10px 25px;
+                    }
+                        #left-sidebar .sidebar-nav .metismenu ul a span,
+                        #left-sidebar .sidebar-nav .metismenu ul a i {
+                            color: #ded3d3 !important;
+                        }
+                        #left-sidebar .sidebar-nav .metismenu>li ul a i{
+                            font-size: 14px !important;
+                        }
+                    #left-sidebar .sidebar-nav .metismenu>li ul a:hover span,
+                    #left-sidebar .sidebar-nav .metismenu>li ul a:hover i{
+                        color: #fff !important;
+                    }
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a::before{
+                        content: none;
+                    }
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a:hover,
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a:focus,
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a:active{
+                        border-color: #fff;
+                    }
 
 @media screen and (max-width: 3000px){
     #main-content{

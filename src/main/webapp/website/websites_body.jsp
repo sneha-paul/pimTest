@@ -36,14 +36,16 @@
             </div>
         </div>
         <div class="sheet-body">
-            <div class="row clearfix">
-                <div class="col-lg-12 col-md-12">
-                    <div class="row">
-                        <div class="col-md-6 col-sm-12">
-                    <textarea id="jqs-adv-search-query" name="criteria" rows="5" cols="30" class="form-control" >
+            <div class="sidebar-scroll">
+                <div class="row clearfix">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                        <textarea id="jqs-adv-search-query" name="criteria" rows="5" cols="30" class="form-control" >
 
 
-                    </textarea>
+                        </textarea>
+                            </div>
                         </div>
                     </div>
                 </div>

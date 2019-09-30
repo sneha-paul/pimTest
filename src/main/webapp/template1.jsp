@@ -146,12 +146,19 @@
     $(function(){
             $('a.nav-link[href*="' + window.location.hash + '"]').trigger('click');
     });
-    // $('.main-menu li a').mouseenter( function(){
-    //     $(this).closest('#left-sidebar').addClass('expanded-bar');
-    // });
-    // $('.main-menu li a').mouseleave( function(){
-    //     $(this).closest('#left-sidebar').removeClass('expanded-bar');
-    // });
+
+    $(document).ready(function(){
+        $(".sheet-body .sidebar-scroll").slimScroll({
+            height: "calc(100vh - 65px)",
+            wheelStep: 10,
+            touchScrollStep: 50,
+            color: "#8b193c",
+            size: "2px",
+            borderRadius: "3px",
+            alwaysVisible: !1,
+            position: "right"
+        })
+    });
 
 </script>
 </html>
