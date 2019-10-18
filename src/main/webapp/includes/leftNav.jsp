@@ -3,7 +3,7 @@
     <nav class="sidebar-nav">
         <ul class="main-menu metismenu">
             <li><a href="/pim/dashboard"><i class="icon-speedometer"></i><span>PIM Dashboard</span></a></li>
-            <li><a href="/pim/scheduler"><i class="icon-speedometer"></i><span>PIM Scheduler</span></a></li>
+            <li <c:if test="${active eq 'SCHEDULER'}">class="active"</c:if>><a href="/pim/scheduler"><i class="icon-clock"></i><span>PIM Scheduler</span></a></li>
             <li <c:if test="${active eq 'PRODUCTS'}">class="active"</c:if>><a href="/pim/products"><i class="icon-present"></i><span>Parent Products</span></a></li>
             <li <c:if test="${active eq 'CATEGORIES'}">class="active"</c:if>><a href="/pim/categories"><i class="icon-list"></i><span>All Categories</span></a></li>
             <li <c:if test="${active eq 'CATALOGS'}">class="active"</c:if>><a href="/pim/catalogs"><i class="icon-grid"></i><span>Catalogs</span></a></li>
