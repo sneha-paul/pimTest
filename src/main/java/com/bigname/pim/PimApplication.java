@@ -19,7 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 
-@SpringBootApplication(scanBasePackages = {"com.m7.xtreme.xcore", "com.m7.xtreme.xplatform", "com.m7.xtreme.common", "com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor"})
+@SpringBootApplication(scanBasePackages = {"com.m7.xtreme.xcore", "com.m7.xtreme.xplatform", "com.m7.xtreme.common", "com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor", "com.bigname.pim.job", "com.bigname.pim.step"})
 //@EnableMongoRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.dao.mongo", "com.m7.xtreme.xplatform.persistence.dao.primary.mongo", "com.bigname.pim.api.persistence.dao.mongo"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.dao.mongo.GenericDAO"})})
 @EnableMongoRepositories(basePackages = {"com.m7.xtreme.xplatform.persistence.dao.primary.mongo", "com.bigname.pim.api.persistence.dao.mongo"}, mongoTemplateRef = "primaryMongoTemplate")
 @EnableJpaRepositories(basePackages = {"com.m7.xtreme.xplatform.persistence.dao.primary.jpa", "com.bigname.pim.api.persistence.dao.jpa"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.dao.jpa.GenericDAO"})})
