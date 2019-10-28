@@ -3,6 +3,7 @@ package com.bigname.pim.api.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.domain.MongoEntity;
+import com.m7.xtreme.xplatform.domain.Version;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.bigname.pim.api.domain.Website.Property.*;
@@ -97,6 +99,7 @@ public class Website extends MongoEntity<Website> {
                     this.setExternalId(website.getExternalId());
                     this.setWebsiteName(website.getWebsiteName());
                     this.setUrl(website.getUrl());
+                    //this.setVersions(website.getVersions());
                     mergeBaseProperties(website);
                     break;
             }
@@ -151,8 +154,20 @@ public class Website extends MongoEntity<Website> {
             diff.put("active", website.getActive());
         }
 
-
-
         return diff;
+    }
+
+    @Override
+    public Website getCopy(Website website) {
+        Website _website = new Website();
+        _website.setWebsiteName(website.getWebsiteName());
+        _website.setWebsiteId(website.getWebsiteId());
+        _website.setUrl(website.getUrl());
+        _website.setActive(website.getActive());
+        _website.setDiscontinued(website.getDiscontinued());
+        _website.setArchived(website.getArchived());
+        _website.setVersionId(website.getVersionId());
+        _website.setId(website.getId());
+        return _website;
     }
 }

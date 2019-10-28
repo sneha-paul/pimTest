@@ -403,4 +403,20 @@ public class Family extends MongoEntity<Family> {
         }
         return diff;
     }
+
+    @Override
+    public Object getCopy(Family family) {
+        Family _family = new Family();
+        _family.setFamilyName(family.getFamilyName());
+        _family.setFamilyId(family.getFamilyId());
+        _family.setAttributes(family.getAttributes());
+        _family.setChannelVariantGroups(family.getChannelVariantGroups());
+        _family.setVariantGroups(family.getVariantGroups());
+        _family.setActive(family.getActive());
+        _family.setArchived(family.getArchived());
+        _family.setDiscontinued(family.getDiscontinued());
+        _family.setVersionId(family.getVersionId());
+        _family.setId(family.getId());
+        return _family;
+    }
 }

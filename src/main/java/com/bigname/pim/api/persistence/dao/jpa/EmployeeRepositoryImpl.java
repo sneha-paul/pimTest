@@ -1,3 +1,4 @@
+/*
 package com.bigname.pim.api.persistence.dao.jpa;
 
 import com.bigname.pim.api.domain.Employee;
@@ -12,3 +13,4 @@ public class EmployeeRepositoryImpl extends GenericRepositoryImpl<Employee, Crit
         super(jdbcTemplate, Employee.class, entityManager);
     }
 }
+*/

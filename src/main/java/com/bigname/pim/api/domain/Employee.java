@@ -1,3 +1,4 @@
+/*
 package com.bigname.pim.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -98,3 +99,4 @@ public class Employee extends JpaEntity<Employee> {
         return diff;
     }
 }
+*/

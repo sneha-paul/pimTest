@@ -111,4 +111,18 @@ public class AssetCollection extends MongoEntity<AssetCollection> {
         }
         return diff;
     }
+
+    @Override
+    public Object getCopy(AssetCollection assetCollection) {
+        AssetCollection _assetCollection = new AssetCollection();
+        _assetCollection.setCollectionName(assetCollection.getCollectionName());
+        _assetCollection.setCollectionId(assetCollection.getCollectionId());
+        _assetCollection.setRootId(assetCollection.getRootId());
+        _assetCollection.setActive(assetCollection.getActive());
+        _assetCollection.setArchived(assetCollection.getArchived());
+        _assetCollection.setDiscontinued(assetCollection.getDiscontinued());
+        _assetCollection.setVersionId(assetCollection.getVersionId());
+        _assetCollection.setId(assetCollection.getId());
+        return _assetCollection;
+    }
 }

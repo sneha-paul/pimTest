@@ -23,7 +23,7 @@ public class Catalog extends MongoEntity<Catalog> {
 
     @Transient
     @NotEmpty(message = "Catalog Id cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
-    @NotBlank(message = "Catalog Id cannot be BLANK",groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Catalog Id cannot be blank",groups = {CreateGroup.class, DetailsGroup.class})
     String catalogId;
 
     @Indexed(unique = true)
@@ -170,5 +170,19 @@ public class Catalog extends MongoEntity<Catalog> {
 
 
         return diff;
+    }
+
+    @Override
+    public Object getCopy(Catalog catalog) {
+        Catalog _catalog = new Catalog();
+        _catalog.setCatalogName(catalog.getCatalogName());
+        _catalog.setCatalogId(catalog.getCatalogId());
+        _catalog.setDescription(catalog.getDescription());
+        _catalog.setVersionId(catalog.getVersionId());
+        _catalog.setActive(catalog.getActive());
+        _catalog.setArchived(catalog.getArchived());
+        _catalog.setDiscontinued(catalog.getDiscontinued());
+        _catalog.setId(catalog.getId());
+        return _catalog;
     }
 }

@@ -273,5 +273,26 @@ public class ProductVariant extends MongoEntity<ProductVariant> {
         return diff;
     }
 
+    @Override
+    public Object getCopy(ProductVariant productVariant) {
+        ProductVariant _productVariant = new ProductVariant();
+        _productVariant.setProductVariantName(productVariant.getProductVariantName());
+        _productVariant.setProductVariantId(productVariant.getProductVariantId());
+        _productVariant.setProductId(productVariant.getProductId());
+        _productVariant.setAxisAttributes(productVariant.getAxisAttributes());
+        _productVariant.setVariantAttributes(productVariant.getVariantAttributes());
+        _productVariant.setVariantAssets(productVariant.getVariantAssets());
+        _productVariant.setPricingDetails(productVariant.getPricingDetails());
+        _productVariant.setChannelId(productVariant.getChannelId());
+        _productVariant.setSubSequenceNum(productVariant.getSubSequenceNum());
+        _productVariant.setSequenceNum(productVariant.getSequenceNum());
+        _productVariant.setActive(productVariant.getActive());
+        _productVariant.setArchived(productVariant.getArchived());
+        _productVariant.setDiscontinued(productVariant.getDiscontinued());
+        _productVariant.setVersionId(productVariant.getVersionId());
+        _productVariant.setId(productVariant.getId());
+        return _productVariant;
+    }
+
     public interface SeoGroup {}
 }

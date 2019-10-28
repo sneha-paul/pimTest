@@ -22,7 +22,7 @@ public class LoadController {
     @Autowired
     private JobConfigurer jobConfigurer;
 
-    @GetMapping
+    @GetMapping("/job")
     public BatchStatus load() throws Exception {
         Map<String, JobParameter> maps = new HashMap<>();
         maps.put("time", new JobParameter(System.currentTimeMillis()));

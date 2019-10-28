@@ -6,6 +6,7 @@ import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.w3c.dom.Attr;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -294,5 +295,19 @@ public class AttributeCollection extends MongoEntity<AttributeCollection> {
         }
         // Only multi-select attributes can be used as parents
         return getAllAttributes().stream().filter(attribute -> "Y".equals(attribute.getUiType().isSelectable()) && !excludedAttributeIds.contains(attribute.getId())).sorted(Comparator.comparing(Attribute::getName)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Object getCopy(AttributeCollection attributeCollection) {
+        AttributeCollection _attributeCollection = new AttributeCollection();
+        _attributeCollection.setCollectionName(attributeCollection.getCollectionName());
+        _attributeCollection.setCollectionId(attributeCollection.getCollectionId());
+        _attributeCollection.setAttributes(attributeCollection.getAttributes());
+        _attributeCollection.setActive(attributeCollection.getActive());
+        _attributeCollection.setArchived(attributeCollection.getArchived());
+        _attributeCollection.setDiscontinued(attributeCollection.getDiscontinued());
+        _attributeCollection.setVersionId(attributeCollection.getVersionId());
+        _attributeCollection.setId(attributeCollection.getId());
+        return _attributeCollection;
     }
 }

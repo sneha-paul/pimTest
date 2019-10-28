@@ -1,3 +1,4 @@
+/*
 package com.bigname.pim.api.persistence.dao.jpa;
 
 import com.bigname.pim.api.domain.Employee;
@@ -6,3 +7,4 @@ import org.hibernate.Criteria;
 
 public interface EmployeeRepository extends GenericRepository<Employee, Criteria> {
 }
+*/

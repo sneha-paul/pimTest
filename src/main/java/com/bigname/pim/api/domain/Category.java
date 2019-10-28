@@ -235,5 +235,22 @@ public class Category extends MongoEntity<Category> {
 
             return diff;
         }
+
+    @Override
+    public Object getCopy(Category category) {
+        Category _category = new Category();
+        _category.setCategoryName(category.getCategoryName());
+        _category.setDescription(category.getDescription());
+        _category.setCategoryId(category.getCategoryId());
+        _category.setLongDescription(category.getLongDescription());
+        _category.setMetaTitle(category.getMetaTitle());
+        _category.setMetaDescription(category.getMetaDescription());
+        _category.setMetaKeywords(category.getMetaKeywords());
+        _category.setActive(category.getActive());
+        _category.setArchived(category.getArchived());
+        _category.setDiscontinued(category.getDiscontinued());
+        _category.setId(category.getId());
+        return _category;
     }
+}
 

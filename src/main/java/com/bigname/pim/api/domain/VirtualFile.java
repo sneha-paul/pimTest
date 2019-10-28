@@ -202,4 +202,22 @@ public class VirtualFile extends MongoEntity<VirtualFile> {
         map.put("active", getActive());
         return map;
     }
+
+    @Override
+    public Object getCopy(VirtualFile virtualFile) {
+        VirtualFile _virtualFile = new VirtualFile();
+        _virtualFile.setFileName(virtualFile.getFileName());
+        _virtualFile.setIsDirectory(virtualFile.getIsDirectory());
+        _virtualFile.setParentDirectoryId(virtualFile.getParentDirectoryId());
+        _virtualFile.setParentIds(virtualFile.getParentIds());
+        _virtualFile.setRootDirectoryId(virtualFile.getRootDirectoryId());
+        _virtualFile.setSize(virtualFile.getSize());
+        _virtualFile.setFileId(virtualFile.getFileId());
+        _virtualFile.setActive(virtualFile.getActive());
+        _virtualFile.setArchived(virtualFile.getArchived());
+        _virtualFile.setDiscontinued(virtualFile.getDiscontinued());
+        _virtualFile.setVersionId(virtualFile.getVersionId());
+        _virtualFile.setId(virtualFile.getId());
+        return _virtualFile;
+    }
 }

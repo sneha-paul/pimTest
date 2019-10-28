@@ -266,4 +266,23 @@ public class Product extends MongoEntity<Product> {
 
         return diff;
     }
+
+    @Override
+    public Object getCopy(Product product) {
+        Product _product = new Product();
+        _product.setProductName(product.getProductName());
+        _product.setProductFamilyId(product.getProductFamilyId());
+        _product.setProductId(product.getProductId());
+        _product.setScopedFamilyAttributes(product.getScopedFamilyAttributes());
+        _product.setActive(product.getActive());
+        _product.setArchived(product.getArchived());
+        _product.setDiscontinued(product.getDiscontinued());
+        _product.setVersionId(product.getVersionId());
+        _product.setId(product.getId());
+        return _product;
+    }
+
+    private void setScopedFamilyAttributes(Map<String, Map<String, Object>> scopedFamilyAttributes) {
+        this.scopedFamilyAttributes = scopedFamilyAttributes;
+    }
 }
