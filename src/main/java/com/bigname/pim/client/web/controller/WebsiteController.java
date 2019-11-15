@@ -4,13 +4,24 @@ import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.datatable.model.SortOrder;
 import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.domain.Version;
+import com.m7.xtreme.xplatform.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 
@@ -35,10 +47,13 @@ import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 public class WebsiteController extends BaseController<Website, WebsiteService> {
 
     private WebsiteService websiteService;
+    private UserService userService;
 
-    public WebsiteController(WebsiteService websiteService) {
+
+    public WebsiteController(WebsiteService websiteService, UserService userService) {
         super(websiteService, Website.class, new BreadcrumbsBuilder());
         this.websiteService = websiteService;
+        this.userService = userService;
     }
 
 
@@ -214,5 +229,56 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         boolean success = websiteService.addCatalog(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(catalogId)) != null;
         model.put("success", success);
         return model;
+    }
+
+    @RequestMapping("/{websiteId}/history")
+    @ResponseBody
+    public Result<Map<String, String>> getHistory(@PathVariable(value = "websiteId") String id, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        Map<String, User> usersLookup = userService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, u -> u));
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Website websiteData = websiteService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+        final Page<Version> paginatedResult = new PageImpl<>(websiteData.getVersions());
+        paginatedResult.getContent().forEach(e -> {
+            Website website = (Website) e.getState();
+            Map<String, String> data = website.toMap();
+            /*String userName = userService.get(ID.INTERNAL_ID(e.getUserId()), false).orElse(null).getUserName();
+            data.put("userName", userName);*/
+            if(usersLookup.containsKey(e.getUserId())) {
+                data.put("userName", usersLookup.get(e.getUserId()).getUserName());
+            }
+            data.put("timeStamp", String.valueOf(e.getTimeStamp()));
+            data.put("userId", String.valueOf(e.getUserId()));
+            dataObjects.add(data);
+        });
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
+    @RequestMapping(value = {"/{websiteId}/history/{time}"})
+    public ModelAndView details(@PathVariable(value = "websiteId") String websiteId,
+                                @PathVariable(name = "time") String time) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "WEBSITES");
+        model.put("mode", "HISTORY");
+        model.put("view", "website/website");
+        Website website = websiteService.get(ID.EXTERNAL_ID(websiteId), false).orElse(null);
+        website.getVersions().forEach(version -> {
+            String timeStamp = String.valueOf(version.getTimeStamp());
+            if(timeStamp.equalsIgnoreCase(time)) {
+                Website website1 = (Website) version.getState();
+                model.put("website", website1);
+            }
+        });
+        return super.details(websiteId, model);
     }
 }

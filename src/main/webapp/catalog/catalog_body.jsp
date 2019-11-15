@@ -13,6 +13,7 @@
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
                     <li class="nav-item"><a class="nav-link js-rootCategories-tab" data-toggle="tab" href="#rootCategories">Categories</a></li>
                     <li class="nav-item"><a class="nav-link js-hierarchy-tab" data-toggle="tab" href="#hierarchy">Hierarchy</a></li>
+                    <li class="nav-item"><a class="nav-link js-catalogHistory-tab" data-toggle="tab" href="#catalogHistory">History</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">
@@ -55,7 +56,7 @@
                                                                    <c:if test="${catalog.active eq 'Y'}">checked="checked"</c:if>>
                                                             <span>Active</span>
                                                         </label>
-                                                         <%-- discontinued commented as per client request --%>
+                                                        <%-- discontinued commented as per client request --%>
 
                                                         <%--<label for="discontinued" class="fancy-checkbox">
                                                             <input type="checkbox" id="discontinued" name="discontinued" value="Y"
@@ -78,9 +79,9 @@
                                             <br>
                                             <input type="hidden" name="group" value="DETAILS"/>
                                             <c:if test="${catalog.archived eq 'N'}">
-                                            <button type="submit" class="btn btn-primary"
-                                                    onclick="$.submitAction(event, this)">Save
-                                            </button>
+                                                <button type="submit" class="btn btn-primary"
+                                                        onclick="$.submitAction(event, this)">Save
+                                                </button>
                                             </c:if>
                                             <a href="${breadcrumbs.backURL}">
                                                 <button type="button" class="btn btn-danger">Cancel</button>
@@ -139,6 +140,24 @@
                                             <table id="categoriesHierarchy" class="table table-hover dataTable treeDataTable table-custom m-b-0" style="width: 100% !important">
                                                 <thead class="thead-dark">
                                                 </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="catalogHistory">
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card">
+                                    <div class="body">
+                                        <div class="table-responsive">
+                                            <table id="paginatedCatalogHistoryTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                <thead class="thead-dark">
+
+                                                </thead>
+
                                             </table>
                                         </div>
                                     </div>

@@ -7,6 +7,12 @@
             <tiles:putAttribute name="body" value="/website/website_body.jsp"/>
         </tiles:insertDefinition>
     </c:when>
+    <c:when test="${mode eq 'HISTORY'}">
+        <tiles:insertDefinition name="mainLayout">
+            <tiles:putAttribute name="title" value="PIM - Websites"/>
+            <tiles:putAttribute name="body" value="/website/website_history.jsp"/>
+        </tiles:insertDefinition>
+    </c:when>
     <c:otherwise>
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">

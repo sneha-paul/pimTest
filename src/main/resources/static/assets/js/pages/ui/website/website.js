@@ -38,4 +38,20 @@ $(function(){
         };
         eModal.ajax(options);
     });
+
+    $('.js-websiteHistory-tab').on('shown.bs.tab.websiteHistory', function (e) {
+        $.initGrid({
+            selector: '#paginatedWebsiteHistoryTable',
+            names: ['versions','version'],
+            dataUrl: $.getURL('/pim/websites/{websiteId}/history'),
+            hideStatus:'true',
+            columns: [
+                { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
+                { data: 'userName', name : 'userName' , title : 'User', orderable: false},
+                { data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+            ],
+            buttons: [$.detailsButton({pageUrl: $.getURL('/pim/websites/{websiteId}/history/')})]
+        });
+        $(this).removeClass('js-websiteHistory-tab').off('shown.bs.tab.websiteHistory');
+    });
 });

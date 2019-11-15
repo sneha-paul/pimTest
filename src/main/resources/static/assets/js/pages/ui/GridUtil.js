@@ -30,7 +30,7 @@
                 title: 'Details',
                 icon: 'icon-eye',
                 click: function (row) {
-                    window.location.href = $.getURLWithRequestParams(options.pageUrl + row.externalId, options.urlParams || {});
+                    window.location.href = $.getURLWithRequestParams(options.pageUrl.includes('history') === true ? (options.pageUrl + row.timeStamp) : options.pageUrl + row.externalId, options.urlParams || {});
                 }
             };
         },

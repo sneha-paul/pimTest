@@ -11,6 +11,7 @@
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#seo">SEO</a></li>
                     <li class="nav-item"><a class="nav-link js-subCategories-tab" data-toggle="tab" href="#subCategories">SubCategories</a></li>
                     <li class="nav-item"><a class="nav-link js-products-tab" data-toggle="tab" href="#products">Parent Products</a></li>
+                    <li class="nav-item"><a class="nav-link js-categoryHistory-tab" data-toggle="tab" href="#categoryHistory">History</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">
@@ -186,6 +187,24 @@
                                         <div class="table-responsive scrollable-dt no-filter">
                                             <table id="paginatedProductsReorderableTable" class="table table-hover dataTable table-custom m-b-0" style="width: 100% !important">
                                                 <thead class="thead-dark"></thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="categoryHistory">
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card">
+                                    <div class="body">
+                                        <div class="table-responsive">
+                                            <table id="paginatedCategoryHistoryTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                <thead class="thead-dark">
+
+                                                </thead>
+
                                             </table>
                                         </div>
                                     </div>

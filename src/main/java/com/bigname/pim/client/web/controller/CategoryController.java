@@ -8,16 +8,25 @@ import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.data.exportor.CategoryExporter;
+import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.domain.Version;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
@@ -40,10 +50,12 @@ import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 public class CategoryController extends BaseController<Category, CategoryService> {
 
     private CategoryService categoryService;
+    private UserService userService;
 
-    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, JobInstanceService jobInstanceService, CatalogService catalogService, WebsiteService websiteService){
+    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, JobInstanceService jobInstanceService, CatalogService catalogService, WebsiteService websiteService, UserService userService){
         super(categoryService, Category.class, new BreadcrumbsBuilder(), categoryExporter, jobInstanceService, websiteService, catalogService);
         this.categoryService = categoryService;
+        this.userService = userService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -302,6 +314,55 @@ public class CategoryController extends BaseController<Category, CategoryService
         //categoryService.archiveCategoryAssociations(ID.EXTERNAL_ID(categoryId), Archive.get(archived), category);
         model.put("success", categoryService.archive(ID.EXTERNAL_ID(categoryId), Archive.get(archived)));
         return model;
+    }
+
+    @RequestMapping("/{categoryId}/history")
+    @ResponseBody
+    public Result<Map<String, String>> getHistory(@PathVariable(value = "categoryId") String id, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        Map<String, User> usersLookup = userService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, u -> u));
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Category categoryData = categoryService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+        final Page<Version> paginatedResult = new PageImpl<>(categoryData.getVersions());
+        paginatedResult.getContent().forEach(e -> {
+            Category category = (Category) e.getState();
+            Map<String, String> data = category.toMap();
+            if(usersLookup.containsKey(e.getUserId())) {
+                data.put("userName", usersLookup.get(e.getUserId()).getUserName());
+            }
+            data.put("timeStamp", String.valueOf(e.getTimeStamp()));
+            data.put("userId", String.valueOf(e.getUserId()));
+            dataObjects.add(data);
+        });
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
+    @RequestMapping(value = {"/{categoryId}/history/{time}"})
+    public ModelAndView details(@PathVariable(value = "categoryId") String categoryId,
+                                @PathVariable(name = "time") String time) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "CATEGORIES");
+        model.put("mode", "HISTORY");
+        model.put("view", "category/category");
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoryId), false).orElse(null);
+        category.getVersions().forEach(version -> {
+            String timeStamp = String.valueOf(version.getTimeStamp());
+            if(timeStamp.equalsIgnoreCase(time)) {
+                Category category1 = (Category) version.getState();
+                model.put("category", category1);
+            }
+        });
+        return super.details(categoryId, model);
     }
 
 }

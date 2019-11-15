@@ -7,16 +7,25 @@ import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.WebsiteService;
 import com.bigname.pim.client.util.BreadcrumbsBuilder;
 import com.bigname.pim.data.exportor.CatalogExporter;
+import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.domain.Version;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
@@ -42,11 +52,13 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
 
     private CatalogService catalogService;
     private WebsiteService websiteService;
+    private UserService userService;
 
-    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService, JobInstanceService jobInstanceService) {
+    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService, JobInstanceService jobInstanceService, UserService userService) {
         super(catalogService, Catalog.class, new BreadcrumbsBuilder(), catalogExporter, jobInstanceService, websiteService);
         this.catalogService = catalogService;
         this.websiteService = websiteService;
+        this.userService = userService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -223,5 +235,54 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
         //catalogService.archiveCatalogAssociations(ID.EXTERNAL_ID(catalogId), Archive.get(archived), catalog);
         model.put("success", catalogService.archive(ID.EXTERNAL_ID(catalogId), Archive.get(archived)));
         return model;
+    }
+
+    @RequestMapping("/{catalogId}/history")
+    @ResponseBody
+    public Result<Map<String, String>> getHistory(@PathVariable(value = "catalogId") String id, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        Map<String, User> usersLookup = userService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, u -> u));
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Catalog catalogData = catalogService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+        final Page<Version> paginatedResult = new PageImpl<>(catalogData.getVersions());
+        paginatedResult.getContent().forEach(e -> {
+            Catalog catalog = (Catalog) e.getState();
+            Map<String, String> data = catalog.toMap();
+            if(usersLookup.containsKey(e.getUserId())) {
+                data.put("userName", usersLookup.get(e.getUserId()).getUserName());
+            }
+            data.put("timeStamp", String.valueOf(e.getTimeStamp()));
+            data.put("userId", String.valueOf(e.getUserId()));
+            dataObjects.add(data);
+        });
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
+    @RequestMapping(value = {"/{catalogId}/history/{time}"})
+    public ModelAndView details(@PathVariable(value = "catalogId") String catalogId,
+                                @PathVariable(name = "time") String time) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "CATALOGS");
+        model.put("mode", "HISTORY");
+        model.put("view", "catalog/catalog");
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
+        catalog.getVersions().forEach(version -> {
+            String timeStamp = String.valueOf(version.getTimeStamp());
+            if(timeStamp.equalsIgnoreCase(time)) {
+                Catalog catalog1 = (Catalog) version.getState();
+                model.put("catalog", catalog1);
+            }
+        });
+        return super.details(catalogId, model);
     }
 }
