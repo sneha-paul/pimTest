@@ -99,7 +99,7 @@ public class PricingAttribute extends MongoEntity<PricingAttribute> {
         return diff;
     }
 
-    @Override
+    /*@Override
     public Object getCopy(PricingAttribute pricingAttribute) {
         PricingAttribute _pricingAttribute = new PricingAttribute();
         _pricingAttribute.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
@@ -110,5 +110,5 @@ public class PricingAttribute extends MongoEntity<PricingAttribute> {
         _pricingAttribute.setVersionId(pricingAttribute.getVersionId());
         _pricingAttribute.setId(pricingAttribute.getId());
         return _pricingAttribute;
-    }
+    }*/
 }

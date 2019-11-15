@@ -99,7 +99,6 @@ public class Website extends MongoEntity<Website> {
                     this.setExternalId(website.getExternalId());
                     this.setWebsiteName(website.getWebsiteName());
                     this.setUrl(website.getUrl());
-                    //this.setVersions(website.getVersions());
                     mergeBaseProperties(website);
                     break;
             }
@@ -157,7 +156,7 @@ public class Website extends MongoEntity<Website> {
         return diff;
     }
 
-    @Override
+    /*@Override
     public Website getCopy(Website website) {
         Website _website = new Website();
         _website.setWebsiteName(website.getWebsiteName());
@@ -169,5 +168,5 @@ public class Website extends MongoEntity<Website> {
         _website.setVersionId(website.getVersionId());
         _website.setId(website.getId());
         return _website;
-    }
+    }*/
 }

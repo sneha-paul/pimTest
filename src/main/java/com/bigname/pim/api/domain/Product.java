@@ -267,7 +267,7 @@ public class Product extends MongoEntity<Product> {
         return diff;
     }
 
-    @Override
+    /*@Override
     public Object getCopy(Product product) {
         Product _product = new Product();
         _product.setProductName(product.getProductName());
@@ -280,7 +280,7 @@ public class Product extends MongoEntity<Product> {
         _product.setVersionId(product.getVersionId());
         _product.setId(product.getId());
         return _product;
-    }
+    }*/
 
     private void setScopedFamilyAttributes(Map<String, Map<String, Object>> scopedFamilyAttributes) {
         this.scopedFamilyAttributes = scopedFamilyAttributes;

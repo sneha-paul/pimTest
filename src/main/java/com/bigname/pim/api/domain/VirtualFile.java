@@ -203,7 +203,7 @@ public class VirtualFile extends MongoEntity<VirtualFile> {
         return map;
     }
 
-    @Override
+    /*@Override
     public Object getCopy(VirtualFile virtualFile) {
         VirtualFile _virtualFile = new VirtualFile();
         _virtualFile.setFileName(virtualFile.getFileName());
@@ -219,5 +219,5 @@ public class VirtualFile extends MongoEntity<VirtualFile> {
         _virtualFile.setVersionId(virtualFile.getVersionId());
         _virtualFile.setId(virtualFile.getId());
         return _virtualFile;
-    }
+    }*/
 }

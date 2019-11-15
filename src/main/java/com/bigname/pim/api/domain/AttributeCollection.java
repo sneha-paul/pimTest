@@ -297,7 +297,7 @@ public class AttributeCollection extends MongoEntity<AttributeCollection> {
         return getAllAttributes().stream().filter(attribute -> "Y".equals(attribute.getUiType().isSelectable()) && !excludedAttributeIds.contains(attribute.getId())).sorted(Comparator.comparing(Attribute::getName)).collect(Collectors.toList());
     }
 
-    @Override
+    /*@Override
     public Object getCopy(AttributeCollection attributeCollection) {
         AttributeCollection _attributeCollection = new AttributeCollection();
         _attributeCollection.setCollectionName(attributeCollection.getCollectionName());
@@ -309,5 +309,5 @@ public class AttributeCollection extends MongoEntity<AttributeCollection> {
         _attributeCollection.setVersionId(attributeCollection.getVersionId());
         _attributeCollection.setId(attributeCollection.getId());
         return _attributeCollection;
-    }
+    }*/
 }

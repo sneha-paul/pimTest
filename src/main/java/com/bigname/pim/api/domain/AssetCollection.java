@@ -112,7 +112,7 @@ public class AssetCollection extends MongoEntity<AssetCollection> {
         return diff;
     }
 
-    @Override
+    /*@Override
     public Object getCopy(AssetCollection assetCollection) {
         AssetCollection _assetCollection = new AssetCollection();
         _assetCollection.setCollectionName(assetCollection.getCollectionName());
@@ -124,5 +124,5 @@ public class AssetCollection extends MongoEntity<AssetCollection> {
         _assetCollection.setVersionId(assetCollection.getVersionId());
         _assetCollection.setId(assetCollection.getId());
         return _assetCollection;
-    }
+    }*/
 }

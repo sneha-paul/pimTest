@@ -404,7 +404,7 @@ public class Family extends MongoEntity<Family> {
         return diff;
     }
 
-    @Override
+    /*@Override
     public Object getCopy(Family family) {
         Family _family = new Family();
         _family.setFamilyName(family.getFamilyName());
@@ -418,5 +418,5 @@ public class Family extends MongoEntity<Family> {
         _family.setVersionId(family.getVersionId());
         _family.setId(family.getId());
         return _family;
-    }
+    }*/
 }

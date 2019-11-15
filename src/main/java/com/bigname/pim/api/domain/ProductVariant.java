@@ -273,7 +273,7 @@ public class ProductVariant extends MongoEntity<ProductVariant> {
         return diff;
     }
 
-    @Override
+    /*@Override
     public Object getCopy(ProductVariant productVariant) {
         ProductVariant _productVariant = new ProductVariant();
         _productVariant.setProductVariantName(productVariant.getProductVariantName());
@@ -292,7 +292,7 @@ public class ProductVariant extends MongoEntity<ProductVariant> {
         _productVariant.setVersionId(productVariant.getVersionId());
         _productVariant.setId(productVariant.getId());
         return _productVariant;
-    }
+    }*/
 
     public interface SeoGroup {}
 }

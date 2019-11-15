@@ -236,7 +236,7 @@ public class Category extends MongoEntity<Category> {
             return diff;
         }
 
-    @Override
+    /*@Override
     public Object getCopy(Category category) {
         Category _category = new Category();
         _category.setCategoryName(category.getCategoryName());
@@ -251,6 +251,6 @@ public class Category extends MongoEntity<Category> {
         _category.setDiscontinued(category.getDiscontinued());
         _category.setId(category.getId());
         return _category;
-    }
+    }*/
 }
 

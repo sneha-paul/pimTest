@@ -172,7 +172,7 @@ public class Catalog extends MongoEntity<Catalog> {
         return diff;
     }
 
-    @Override
+    /*@Override
     public Object getCopy(Catalog catalog) {
         Catalog _catalog = new Catalog();
         _catalog.setCatalogName(catalog.getCatalogName());
@@ -184,5 +184,5 @@ public class Catalog extends MongoEntity<Catalog> {
         _catalog.setDiscontinued(catalog.getDiscontinued());
         _catalog.setId(catalog.getId());
         return _catalog;
-    }
+    }*/
 }
