@@ -26,8 +26,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.m7.xtream</groupId>
-			<artifactId>xcore </artifactId>
+			<groupId>com.m7.xtreme</groupId>
+			<artifactId>xcore</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
 			<systemPath>
