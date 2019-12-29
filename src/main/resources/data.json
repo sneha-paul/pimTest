@@ -1,5 +1,5 @@
 [
-  {"id":"a56442d0-f7e8-41d7-aa74-4229867ede59","channelName":"Ecommerce","externalId":"ECOMMERCE","active":"Y","_class":"com.bigname.pim.api.domain.Channel"},
+  {"id":"a56442d0-f7e8-41d7-aa74-4229867ede59","channelName":"Ecommerce","externalId":"ECOMMERCE","active":"Y","_class":"com.bigname.pim.core.domain.Channel"},
 
   {"id":"8f9eef8e-9bf2-437b-9d34-2109607f1dc6","email":"manu@blacwood.com","userName":"Manu Prasad","password":"$2a$10$M7/ONda3/I3sQiS.OwKi1O97fKKFzAZUEzsDY.STju4XCHOA934Ni","avathar":"avatar.png","externalId":"manu@blacwood.com","active":"Y","_class":"com.m7.xtreme.xplatform.domain.User"}
  ]
