@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-@Configuration
 @EnableWebSecurity
 @ComponentScan
 public class PIMSecurityConfig extends BaseSecurityConfig {

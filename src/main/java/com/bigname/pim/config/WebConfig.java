@@ -2,7 +2,6 @@ package com.bigname.pim.config;
 
 import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -10,13 +9,10 @@ import org.springframework.data.repository.init.Jackson2RepositoryPopulatorFacto
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.sql.DataSource;
 
 /**
  * Created by Manu on 8/3/2018.
@@ -24,19 +20,6 @@ import javax.sql.DataSource;
 public class WebConfig implements WebMvcConfigurer {
     @Value("${upload.file.path}")
     private String filePath;
-
-    @Value("${spring.datasource.username}")
-    private  String userName;
-
-    @Value("${spring.datasource.password}")
-    private String passWord;
-
-    @Value("${spring.datasource.url}")
-    private String url;
-
-    @Value("${spring.datasource.driver-class-name}")
-    private String driverClassName;
-
 
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
@@ -120,19 +103,4 @@ public class WebConfig implements WebMvcConfigurer {
 
         return exceptionResolver;
     }*/
-
-    @Bean
-    public DataSource getDataSource() {
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.driverClassName(driverClassName);
-        dataSourceBuilder.url(url);
-        dataSourceBuilder.username(userName);
-        dataSourceBuilder.password(passWord);
-        return dataSourceBuilder.build();
-    }
-
-    @Bean
-    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
 }
