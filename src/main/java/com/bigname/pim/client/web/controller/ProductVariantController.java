@@ -138,8 +138,7 @@ public class ProductVariantController extends ControllerSupport {
                     productVariant.setChannelId(channelId);
                     productVariant.setAxisAttributes(axisAttributes);
                     productVariant.setActive("N");
-                    ProductVariant productVariant1 = productVariantService.create(productVariant);
-                    productVariantService.createVariantByElastic(productVariant1);
+                    productVariantService.create(productVariant);
                     success[0] = true;
                 }
             });
@@ -166,8 +165,6 @@ public class ProductVariantController extends ControllerSupport {
             productVariantService.update(ID.EXTERNAL_ID(productVariantId), productVariantDTO);
             model.put("success", true);
         }
-        productVariantDTO.setProduct(null);
-        productVariantService.updateVariantByElastic(productVariantDTO.getExternalId(), productVariantDTO);
         return model;
     }
 

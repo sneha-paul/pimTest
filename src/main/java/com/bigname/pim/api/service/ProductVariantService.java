@@ -58,7 +58,4 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     boolean setProductVariantsSequence(ID<String> productId, ID<String> channelId, ID<String> sourceId, ID<String> destinationId);
 
-    void createVariantByElastic(ProductVariant productVariant);
-
-    void updateVariantByElastic(String id, ProductVariant productVariant);
 }

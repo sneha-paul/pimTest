@@ -495,15 +495,4 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         return adjustedProductVariants;
     }
 
-    @Override
-    public void createVariantByElastic(ProductVariant productVariant) {
-        ProductVariant productVariant1 = productVariantDAO.findById(ID.EXTERNAL_ID(productVariant.getExternalId()), false).orElse(null);
-        productVariantDAO.createVariantByElastic(productVariant1);
-    }
-
-    public void updateVariantByElastic(String id, ProductVariant productVariant) {
-        ProductVariant productVariant1 = productVariantDAO.findById(ID.EXTERNAL_ID(id), false).orElse(null);
-        productVariantDAO.updateVariantByElastic(productVariant1.getId(), productVariant);
-    }
-
 }

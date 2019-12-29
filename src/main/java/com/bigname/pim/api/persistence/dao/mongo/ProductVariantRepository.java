@@ -17,9 +17,4 @@ public interface ProductVariantRepository extends GenericRepository<ProductVaria
     Page<ProductVariant> findAll(String searchField, String keyword, String productId, String channelId, Pageable pageable, boolean... activeRequired);
 
     List<Map<String, Object>> getAll();
-
-    void createVariantByElastic(ProductVariant productVariant);
-
-    void updateVariantByElastic(String id, ProductVariant productVariant);
-
 }
