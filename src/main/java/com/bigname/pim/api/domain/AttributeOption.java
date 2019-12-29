@@ -1,8 +1,10 @@
 package com.bigname.pim.api.domain;
-import com.bigname.core.domain.ValidatableEntity;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,6 +17,7 @@ import java.util.Map;
  */
 public class AttributeOption extends ValidatableEntity {
     @NotEmpty(message = "Option value cannot be empty")
+    @NotBlank(message = "Option value cannot be blank")
     private String value;
 
     @Transient
@@ -22,6 +25,7 @@ public class AttributeOption extends ValidatableEntity {
     private String id;
 
     @NotEmpty(message = "Option fullId cannot be empty")
+    @NotBlank(message = "Option fullId cannot be blank")
     private String fullId;
 
     private String parentOptionFullId;

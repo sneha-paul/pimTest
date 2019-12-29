@@ -1,19 +1,20 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
-import com.bigname.pim.api.persistence.dao.ChannelDAO;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.ChannelService;
 import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.api.service.UserService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -80,19 +82,24 @@ public class FamilyControllerTest {
     @Autowired
     private ChannelDAO channelDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
-            user.setUserName("MANU@BLACWOOD.COm");
+            user.setUserName("MANU@BLACWOOD.COM");
             user.setPassword("temppass");
             user.setEmail("manu@blacwood.com");
             user.setActive("Y");
             userService.create(user);
         }
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) channelDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(Channel.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
     @Test
@@ -167,6 +174,8 @@ public class FamilyControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void detailsTest() throws Exception {
+        //Add a family instance
+        List<Family> createdFamilyInstances = addFamilyInstances();
         //Create mode
         mockMvc.perform(
                 get("/pim/families/create"))
@@ -178,8 +187,7 @@ public class FamilyControllerTest {
 
         //Details mode, with non=existing familyID - TODO
 
-        //Add a family instance
-        List<Family> createdFamilyInstances = addFamilyInstances();
+
         Assert.assertFalse(createdFamilyInstances.isEmpty());
 
         //Details mode with valid familyID
@@ -279,7 +287,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -289,7 +297,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -317,7 +325,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -342,7 +350,7 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -350,7 +358,7 @@ public class FamilyControllerTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -409,7 +417,7 @@ public class FamilyControllerTest {
                 .andExpect(model().attribute("mode", is("CREATE")));
 
         //Details mode
-        List<FamilyAttribute> familyAttributeList = familyService.getFamilyAttributes(familyId, FindBy.EXTERNAL_ID, 0, 10, null).getContent();
+        List<FamilyAttribute> familyAttributeList = familyService.getFamilyAttributes(ID.EXTERNAL_ID(familyId), 0, 10, null).getContent();
         String attributeId = familyAttributeList.get(0).getId();
 
         mockMvc.perform(
@@ -437,7 +445,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -447,7 +455,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -475,7 +483,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -541,7 +549,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -551,7 +559,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -579,7 +587,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -604,14 +612,14 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -638,7 +646,7 @@ public class FamilyControllerTest {
         });
 
 
-        List<FamilyAttribute> familyAttributes = familyService.getFamilyAttributes(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, 3, null).getContent();
+        List<FamilyAttribute> familyAttributes = familyService.getFamilyAttributes(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), 0, 3, null).getContent();
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.put("name", ConversionUtil.toList("New Color"));
@@ -672,7 +680,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -682,7 +690,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -710,7 +718,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -735,14 +743,14 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -817,7 +825,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -827,7 +835,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -855,7 +863,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -880,7 +888,7 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -888,7 +896,7 @@ public class FamilyControllerTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -913,7 +921,7 @@ public class FamilyControllerTest {
             familyService.update(ConversionUtil.toList(family));
         });
 
-        List<FamilyAttribute> familyAttributes = familyService.getFamilyAttributes(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, 0, 3, null).getContent();
+        List<FamilyAttribute> familyAttributes = familyService.getFamilyAttributes(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), 0, 3, null).getContent();
 
         //AvailableCategories with valid productID
         String attributeId = familyAttributes.get(0).getId();
@@ -939,7 +947,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -949,7 +957,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -977,7 +985,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1002,14 +1010,14 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1060,9 +1068,9 @@ public class FamilyControllerTest {
         Assert.assertFalse(createdFamilyAttributeInstances.isEmpty());
 
         String familyId = createdFamilyAttributeInstances.get(0).getFamilyId();
-        List<FamilyAttribute> familyAttributeList = familyService.getFamilyAttributes(familyId, FindBy.EXTERNAL_ID, 0, 10, null).getContent();
+        List<FamilyAttribute> familyAttributeList = familyService.getFamilyAttributes(ID.EXTERNAL_ID(familyId), 0, 10, null).getContent();
         String attributeId = familyAttributeList.get(0).getId();
-        List<FamilyAttributeOption> familyAttributeOptionsList = familyService.getFamilyAttributeOptions(familyId, FindBy.EXTERNAL_ID, attributeId, 0, 10, null).getContent();
+        List<FamilyAttributeOption> familyAttributeOptionsList = familyService.getFamilyAttributeOptions(ID.EXTERNAL_ID(familyId), attributeId, 0, 10, null).getContent();
         String attributeOptionId = familyAttributeOptionsList.get(0).getId();
 
         mockMvc.perform(
@@ -1088,7 +1096,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -1098,7 +1106,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -1126,7 +1134,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1151,14 +1159,14 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1233,9 +1241,9 @@ public class FamilyControllerTest {
                 .andExpect(model().attribute("active", is("FAMILIES")));
 
 
-        List<VariantGroup> variantGroups = familyService.getVariantGroups(familyId, FindBy.EXTERNAL_ID, 0, 1, null).getContent();
+        List<VariantGroup> variantGroups = familyService.getVariantGroups(ID.EXTERNAL_ID(familyId), 0, 1, null).getContent();
         String variantGroupId = variantGroups.get(0).getId();
-        Optional<Family> family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+        Optional<Family> family = familyService.get(ID.EXTERNAL_ID(familyId), false);
         Map<String, List<FamilyAttribute>> variantGroupAttribute = family.get().getVariantGroupAttributes(variantGroupId);
         Map<String, List<FamilyAttribute>> variantGroupAxisAttribute = family.get().getVariantGroupAxisAttributes(variantGroupId);
 
@@ -1292,7 +1300,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -1302,7 +1310,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -1330,7 +1338,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1355,14 +1363,14 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1443,7 +1451,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -1453,7 +1461,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -1481,7 +1489,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1506,14 +1514,14 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1554,7 +1562,7 @@ public class FamilyControllerTest {
             familyService.update(ConversionUtil.toList(family));
         });
 
-        Family family = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         //Creating variant group
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -1585,7 +1593,7 @@ public class FamilyControllerTest {
 
         //attributeOptions with valid familyID and attributeID
         String familyId = createdFamilyAttributeInstances.get(0).getFamilyId();
-        List<FamilyAttribute> family = familyService.getFamilyAttributes(familyId, FindBy.EXTERNAL_ID, 0, 1, null).getContent();
+        List<FamilyAttribute> family = familyService.getFamilyAttributes(ID.EXTERNAL_ID(familyId), 0, 1, null).getContent();
         String attributeId = family.get(0).getId();
         mockMvc.perform(
                 get("/pim/families/" + familyId + "/attributes/" + attributeId + "/options"))
@@ -1620,7 +1628,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -1630,7 +1638,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -1658,7 +1666,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1683,14 +1691,14 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
             familyDTO.setActive((String)familyData.get("active"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1741,7 +1749,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -1751,7 +1759,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -1779,7 +1787,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1804,7 +1812,7 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1812,7 +1820,7 @@ public class FamilyControllerTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1899,9 +1907,9 @@ public class FamilyControllerTest {
 
     @After
     public void tearDown() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Channel.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 
     private List<Family> addFamilyInstances() {
@@ -1932,7 +1940,7 @@ public class FamilyControllerTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -1942,7 +1950,7 @@ public class FamilyControllerTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
 
@@ -1970,7 +1978,7 @@ public class FamilyControllerTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1995,7 +2003,7 @@ public class FamilyControllerTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -2003,7 +2011,7 @@ public class FamilyControllerTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2052,7 +2060,7 @@ public class FamilyControllerTest {
             family.addVariantGroup(variantGroup);
             family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
             familyService.update(ConversionUtil.toList(family));
-            Family family1 = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family1 = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
             createdFamilyAttributeInstances.add(family1);
         });
         return createdFamilyAttributeInstances;

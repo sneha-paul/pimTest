@@ -1,15 +1,18 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.service.AssetCollectionService;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.util.PimUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -51,15 +55,22 @@ public class ProductRepositoryTest {
     @Autowired
     private AttributeCollectionService attributeCollectionService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) productDAO.getTemplate();
+        }
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Product.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Family.class);
+
+        mongoTemplate.dropCollection(AttributeCollection.class);
+
+        mongoTemplate.dropCollection(Channel.class);
     }
 
     @Test
@@ -75,7 +86,7 @@ public class ProductRepositoryTest {
             channelDAO.insert(channel);
         });
 
-        Channel channel = channelDAO.findById(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Channel channel = channelDAO.findById(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString())).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -85,7 +96,7 @@ public class ProductRepositoryTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
 
         List<Map<String, Object>> attributesData = new ArrayList<>();
@@ -112,7 +123,7 @@ public class ProductRepositoryTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -138,7 +149,7 @@ public class ProductRepositoryTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -146,7 +157,7 @@ public class ProductRepositoryTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -200,7 +211,7 @@ public class ProductRepositoryTest {
 
         });
 
-        Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
+        Family familyDetails = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId")), false).orElse(null);
 
         //create Product instance
         Product productDTO = new Product();
@@ -237,11 +248,11 @@ public class ProductRepositoryTest {
         productDTO.setChannelId("AMAZON");
         productDTO.setActive("Y");
         productDAO.insert(productDTO);
-        Optional<Product> product = productDAO.findByExternalId(productDTO.getProductId());
+        Optional<Product> product = productDAO.findById(ID.EXTERNAL_ID(productDTO.getProductId()), false);
         Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDTO.getProductId(), FindBy.EXTERNAL_ID);
+        product = productDAO.findById(ID.EXTERNAL_ID(productDTO.getProductId()));
         Assert.assertTrue(product.isPresent());
-        product = productDAO.findById(productDTO.getId(), FindBy.INTERNAL_ID);
+        product = productDAO.findById(ID.INTERNAL_ID(productDTO.getId()));
         Assert.assertTrue(product.isPresent());
     }
 
@@ -255,7 +266,7 @@ public class ProductRepositoryTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -267,7 +278,7 @@ public class ProductRepositoryTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -284,7 +295,7 @@ public class ProductRepositoryTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -292,7 +303,7 @@ public class ProductRepositoryTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Optional<Family> family = familyDAO.findByExternalId(familyDTO.getFamilyId());
+            Optional<Family> family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false);
             Assert.assertTrue(family.isPresent());
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
@@ -339,7 +350,7 @@ public class ProductRepositoryTest {
 
         });
 
-        Family familyDetails = familyDAO.findByExternalId(familiesData.get(0).get("externalId").toString()).orElse(null);
+        Family familyDetails = familyDAO.findById(ID.EXTERNAL_ID(familiesData.get(0).get("externalId")), false).orElse(null);
 
 
         //create Product instance
@@ -354,7 +365,7 @@ public class ProductRepositoryTest {
         Assert.assertTrue(product.diff(productDTO).isEmpty());
 
 
-        Product productDetails = productDAO.findByExternalId(productDTO.getProductId()).orElse(null);
+        Product productDetails = productDAO.findById(ID.EXTERNAL_ID(productDTO.getProductId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(productDetails));
 
         Map<String, Object> attributes = new HashMap<>();
@@ -374,11 +385,11 @@ public class ProductRepositoryTest {
         productDetails.setGroup("DETAILS");
         productDAO.save(productDetails);
 
-        Optional<Product> product1 = productDAO.findByExternalId(productDetails.getProductId());
+        Optional<Product> product1 = productDAO.findById(ID.EXTERNAL_ID(productDetails.getProductId()), false);
         Assert.assertTrue(product1.isPresent());
-        product1 = productDAO.findById(productDetails.getProductId(), FindBy.EXTERNAL_ID);
+        product1 = productDAO.findById(ID.EXTERNAL_ID(productDetails.getProductId()));
         Assert.assertTrue(product1.isPresent());
-        product1 = productDAO.findById(productDetails.getId(), FindBy.INTERNAL_ID);
+        product1 = productDAO.findById(ID.INTERNAL_ID(productDetails.getId()));
         Assert.assertTrue(product1.isPresent());
 
     }
@@ -416,7 +427,7 @@ public class ProductRepositoryTest {
         Assert.assertEquals(productDAO.findAll(PageRequest.of(1, productDTOs.size() - 1), false).getContent().size(), 1);
         Assert.assertEquals(productDAO.findAll(PageRequest.of(0, productDTOs.size() - 1), false).getTotalPages(), 2);
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
         productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "productFamilyId", "7abf9064-aba5-4573-9557-e1d83547e771", "active", "N", "discontinued", "N"));
@@ -456,7 +467,7 @@ public class ProductRepositoryTest {
         Assert.assertEquals(productDAO.findAll(PageRequest.of(0, productDTOs.size()), false, true, true).getTotalElements(), inactiveCount[0] + discontinued[0]);
         Assert.assertEquals(productDAO.findAll(PageRequest.of(0, productDTOs.size()), true, true, true).getTotalElements(), activeCount[0] + inactiveCount[0] + discontinued[0]);
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
@@ -487,9 +498,9 @@ public class ProductRepositoryTest {
             productDTO.setActiveFrom((LocalDateTime) productData.get("activeFrom"));
             productDTO.setActiveTo((LocalDateTime) productData.get("activeTo"));
 
-            if(PimUtil.hasDiscontinued(productDTO.getDiscontinued(), productDTO.getDiscontinuedFrom(), productDTO.getDiscontinuedTo())) {
+            if(PlatformUtil.hasDiscontinued(productDTO.getDiscontinued(), productDTO.getDiscontinuedFrom(), productDTO.getDiscontinuedTo())) {
                 discontinued1[0]++;
-            } else if(PimUtil.isActive(productDTO.getActive(), productDTO.getActiveFrom(), productDTO.getActiveTo())) {
+            } else if(PlatformUtil.isActive(productDTO.getActive(), productDTO.getActiveFrom(), productDTO.getActiveTo())) {
                 activeCount1[0] ++;
             } else {
                 inactiveCount1[0] ++;
@@ -512,13 +523,13 @@ public class ProductRepositoryTest {
 
     @After
     public void tearDown() {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Channel.class);
     }
 
 }

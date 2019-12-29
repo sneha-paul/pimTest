@@ -1,12 +1,12 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.ID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.m7.xtreme.common.util.ValidationUtil.*;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -79,7 +79,7 @@ public class ProductLoader {
         LOGGER.info("size-------------->"+data.get(0).size());
 
         Map<String, Set<String>> familyVariantGroups = new LinkedHashMap<>();
-        if(!attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).isPresent()) {
+        if(!attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId),false).isPresent()) {
             AttributeCollection attributeCollection = new AttributeCollection();
             attributeCollection.setCollectionId(attributeCollectionId);
             attributeCollection.setCollectionName("Envelopes Attributes Collection");
@@ -88,7 +88,7 @@ public class ProductLoader {
         }
 
         //Load the attributeCollection from the database for the given collectionId
-        attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).ifPresent(attributeCollection -> {
+        attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false).ifPresent(attributeCollection -> {
 
             attributeCollection.setGroup("ATTRIBUTES");
 
@@ -126,11 +126,11 @@ public class ProductLoader {
                     continue;
                 }
                 resetLookupMap();
-                familyService.getAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
-                familyService.getParentAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
+                familyService.getAttributeGroupsIdNamePair(ID.EXTERNAL_ID(familyId), null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
+                familyService.getParentAttributeGroupsIdNamePair(ID.EXTERNAL_ID(familyId), null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
 
 
-                /*if(isNotEmpty(categoryId) && !categoryService.get(categoryId, FindBy.EXTERNAL_ID, false).isPresent()) {
+                /*if(isNotEmpty(categoryId) && !categoryService.get(categoryId, false).isPresent()) {
                     Category categoryDTO = new Category();
                     categoryDTO.setActive("Y");
                     categoryDTO.setCategoryId(categoryId);
@@ -140,7 +140,7 @@ public class ProductLoader {
                     LOGGER.info("======>" + categoryId);
                 }*/
 
-                if(isNotEmpty(style) && !categoryService.get(style, FindBy.EXTERNAL_ID, false).isPresent()) {
+                if(isNotEmpty(style) && !categoryService.get(ID.EXTERNAL_ID(style), false).isPresent()) {
                     Category categoryDTO = new Category();
                     categoryDTO.setActive("Y");
                     categoryDTO.setCategoryId(style);
@@ -156,7 +156,7 @@ public class ProductLoader {
 
                 //Get the family in stance, if one exists. Otherwise create a new one
 
-                Optional<Family> _family = familyService.get(familyId, FindBy.EXTERNAL_ID, false);
+                Optional<Family> _family = familyService.get(ID.EXTERNAL_ID(familyId), false);
 
                 if (!_family.isPresent()) {
                     family = new Family();
@@ -244,16 +244,16 @@ public class ProductLoader {
                             familyAttributeDTO.getScope().put(channelId, FamilyAttribute.Scope.OPTIONAL);
                             familyAttributeDTO.setAttributeGroup(familyAttributeGroup);
 
-//                            Attribute attribute = attributeCollectionService.findAttribute(familyAttribute.getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.getAttributeId()).get();
+//                            Attribute attribute = attributeCollectionService.findAttribute(familyAttribute.getCollectionId(), familyAttribute.getAttributeId()).get();
                             family.setGroup("ATTRIBUTES");
                             familyAttributeDTO.setAttribute(attribute);
                             family.addAttribute(familyAttributeDTO);
-                            familyService.update(familyId, FindBy.EXTERNAL_ID, family);
-                            family = familyService.get(familyId, FindBy.EXTERNAL_ID, false).get();
+                            familyService.update(ID.EXTERNAL_ID(familyId), family);
+                            family = familyService.get(ID.EXTERNAL_ID(familyId), false).get();
                             if(updateLookup) {//TODO
                                 resetLookupMap();
-                                familyService.getAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
-                                familyService.getParentAttributeGroupsIdNamePair(familyId, FindBy.EXTERNAL_ID, null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
+                                familyService.getAttributeGroupsIdNamePair(ID.EXTERNAL_ID(familyId), null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1(), k.getValue0()));
+                                familyService.getParentAttributeGroupsIdNamePair(ID.EXTERNAL_ID(familyId), null).forEach(k -> familyAttributeGroupLookUp.put(k.getValue1() + "^", k.getValue0()));
                             }
                         }
 
@@ -293,8 +293,8 @@ public class ProductLoader {
                                     familyAttributeOption.setFamilyAttributeId(familyAttribute.getId());
                                     familyAttribute.getOptions().put(attributeOption.getId(), familyAttributeOption);
                                     family.setGroup("ATTRIBUTES");
-                                    familyService.update(familyId, FindBy.EXTERNAL_ID, family);
-                                    family = familyService.get(familyId, FindBy.EXTERNAL_ID, false).get();
+                                    familyService.update(ID.EXTERNAL_ID(familyId), family);
+                                    family = familyService.get(ID.EXTERNAL_ID(familyId), false).get();
                                 }
                             }
                         }
@@ -303,12 +303,12 @@ public class ProductLoader {
                 }
             }
             //Update attribute collection with the newly added attributes and corresponding attribute options
-            attributeCollectionService.update(attributeCollectionId, FindBy.EXTERNAL_ID, attributeCollection);
+            attributeCollectionService.update(ID.EXTERNAL_ID(attributeCollectionId), attributeCollection);
 
             //Attribute Collection updated with the new attributes and new options
 
             familyVariantGroups.forEach((_familyId, variantAttributeIds) ->
-                    familyService.get(_familyId, FindBy.EXTERNAL_ID, false).ifPresent(family1 -> {
+                    familyService.get(ID.EXTERNAL_ID(_familyId), false).ifPresent(family1 -> {
                         VariantGroup variantGroup = null;
                         if(!family1.getVariantGroups().isEmpty() && family1.getVariantGroups().containsKey(channelId)) {
                             variantGroup = family1.getVariantGroups().get(family1.getChannelVariantGroups().get(channelId));
@@ -325,7 +325,7 @@ public class ProductLoader {
                         family1.getVariantGroups().put(variantGroup.getId(), variantGroup);
                         family1.getChannelVariantGroups().put(channelId, variantGroup.getId());
                         family1.setGroup("VARIANT_GROUPS");
-                        familyService.update(family1.getFamilyId(), FindBy.EXTERNAL_ID, family1);
+                        familyService.update(ID.EXTERNAL_ID(family1.getFamilyId()), family1);
                     })
             );
 
@@ -343,7 +343,7 @@ public class ProductLoader {
                 if(isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId)) {
                     continue;
                 }
-                Optional<Product> _product = productService.get(productId, FindBy.EXTERNAL_ID, false);
+                Optional<Product> _product = productService.get(ID.EXTERNAL_ID(productId), false);
 
 
                 Map<String, Object> productAttributesMap = new HashMap<>();
@@ -384,14 +384,14 @@ public class ProductLoader {
                     productDTO.setProductName(productName);
                     productDTO.setProductFamilyId(familyId);
                     productService.create(productDTO);
-                    product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                    product = productService.get(ID.EXTERNAL_ID(productId), false).get();
                     product.setProductId(productId);
                     product.setChannelId(channelId);
                     product.setGroup("DETAILS");
                     product.setAttributeValues(productAttributesMap);
                     if(productService.validate(product, new HashMap<>(), Product.DetailsGroup.class).isEmpty()) {
-                        productService.update(productId, FindBy.EXTERNAL_ID, product);
-                        product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                        productService.update(ID.EXTERNAL_ID(productId), product);
+                        product = productService.get(ID.EXTERNAL_ID(productId), false).get();
                         product.setProductId(productId);
                     }
                 } else {
@@ -399,14 +399,14 @@ public class ProductLoader {
                     product.setChannelId(channelId);
                 }
                 String idOfProduct = product.getId();
-//                Category category = categoryService.get(categoryId, FindBy.EXTERNAL_ID, false).get();
-                Category category = categoryService.get(style, FindBy.EXTERNAL_ID, false).get();
-                List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 300, null, false).getContent();
+//                Category category = categoryService.get(categoryId, false).get();
+                Category category = categoryService.get(ID.EXTERNAL_ID(style), false).get();
+                List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(ID.EXTERNAL_ID(category.getCategoryId()), 0, 300, null, false).getContent();
                 CategoryProduct categoryProduct = categoryProducts.stream().filter(categoryProduct1 -> categoryProduct1.getProductId().equals(idOfProduct)).findFirst().orElse(null);
                 if(isNull(categoryProduct)) {
 //                    CategoryProduct categoryProduct1 = new CategoryProduct(category.getId(), product.getId(), 0);
-                    categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
-//                    productService.addCategory(product.getProductId(), FindBy.EXTERNAL_ID, category.getCategoryId(), FindBy.EXTERNAL_ID);
+                    categoryService.addProduct(ID.EXTERNAL_ID(category.getCategoryId()), ID.EXTERNAL_ID(product.getProductId()));
+//                    productService.addCategory(product.getProductId(), category.getCategoryId());
 
                 }
                 String variantIdentifier = "COLOR_NAME|" + (String)variantAttributesMap.get("COLOR_NAME"); //TODO - change this to support multiple axis atribute values
@@ -437,13 +437,13 @@ public class ProductLoader {
                     setVariantAttributeValues(productVariant, variantAttributesMap);
                     if(productVariantService.validate(productVariant, new HashMap<>(), ProductVariant.DetailsGroup.class).isEmpty()) {
                         productVariant.setGroup("DETAILS");
-                        productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+                        productVariantService.update(ID.EXTERNAL_ID(variantId), productVariant);
                     }
                     if(isNotEmpty(pricing)) {
                         try {
                             productVariant.setGroup("PRICING_DETAILS");
                             setPricingDetails(productVariant, pricing);
-                            productVariantService.update(variantId, FindBy.EXTERNAL_ID, productVariant);
+                            productVariantService.update(ID.EXTERNAL_ID(variantId), productVariant);
                         } catch (Exception e) {
                             LOGGER.info(pricing);
                             LOGGER.info(productVariant.getProductVariantId());
@@ -466,7 +466,7 @@ public class ProductLoader {
     }
 
     private void setVariantAttributeValues(ProductVariant productVariantDTO, Map<String, Object> attributesMap) {
-        productService.get(productVariantDTO.getProduct().getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+        productService.get(ID.EXTERNAL_ID(productVariantDTO.getProduct().getProductId()), false).ifPresent(product -> {
             product.setChannelId(productVariantDTO.getChannelId());
             productVariantDTO.setProduct(product);
             Family productFamily = product.getProductFamily();

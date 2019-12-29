@@ -1,11 +1,12 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -17,15 +18,17 @@ import static com.bigname.pim.api.domain.Catalog.Property.*;
  * Created by Manu on 8/9/2018.
  */
 @Document
-public class Catalog extends Entity<Catalog> {
+public class Catalog extends MongoEntity<Catalog> {
 
 
     @Transient
     @NotEmpty(message = "Catalog Id cannot be empty",groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Catalog Id cannot be blank",groups = {CreateGroup.class, DetailsGroup.class})
     String catalogId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Catalog Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Catalog Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String catalogName;
 
     private String description;
@@ -168,4 +171,18 @@ public class Catalog extends Entity<Catalog> {
 
         return diff;
     }
+
+    /*@Override
+    public Object getCopy(Catalog catalog) {
+        Catalog _catalog = new Catalog();
+        _catalog.setCatalogName(catalog.getCatalogName());
+        _catalog.setCatalogId(catalog.getCatalogId());
+        _catalog.setDescription(catalog.getDescription());
+        _catalog.setVersionId(catalog.getVersionId());
+        _catalog.setActive(catalog.getActive());
+        _catalog.setArchived(catalog.getArchived());
+        _catalog.setDiscontinued(catalog.getDiscontinued());
+        _catalog.setId(catalog.getId());
+        return _catalog;
+    }*/
 }

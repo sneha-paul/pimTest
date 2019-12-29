@@ -1,20 +1,16 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
-import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.VirtualFileDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.ID;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -34,9 +30,9 @@ public class AssetCollectionServiceImpl extends BaseServiceSupport<AssetCollecti
     }
 
     @Override
-    public List<Map<String, Object>> getAssetsHierarchy(String collectionId, FindBy findBy, String nodeId,  boolean... activeRequired) {
+    public List<Map<String, Object>> getAssetsHierarchy(ID<String> id, String nodeId, boolean... activeRequired) {
         List<Map<String, Object>> hierarchy = new ArrayList<>();
-        get(collectionId, findBy, activeRequired)
+        get(id, activeRequired)
                 .ifPresent(assetCollection -> {
                     List<VirtualFile> assets = assetDAO.getHierarchy(assetCollection.getRootId(), nodeId);
                     Map<String, String> lookUpMap = new HashMap<>();

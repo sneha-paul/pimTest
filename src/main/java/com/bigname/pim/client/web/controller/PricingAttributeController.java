@@ -1,30 +1,22 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Pagination;
-import com.bigname.common.datatable.model.Request;
-import com.bigname.common.datatable.model.Result;
-import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.PricingAttribute;
 import com.bigname.pim.api.service.PricingAttributeService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.Archive;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
 
 /**
  * Created by dona on 08-11-2018.
@@ -37,7 +29,7 @@ public class PricingAttributeController extends BaseController<PricingAttribute,
     private PricingAttributeService pricingAttributeService;
 
     public PricingAttributeController(PricingAttributeService pricingAttributeService) {
-        super(pricingAttributeService, PricingAttribute.class);
+        super(pricingAttributeService, PricingAttribute.class, new BreadcrumbsBuilder());
         this.pricingAttributeService = pricingAttributeService;
     }
 
@@ -47,6 +39,14 @@ public class PricingAttributeController extends BaseController<PricingAttribute,
         model.put("active", "PRICING_ATTRIBUTES");
         return new ModelAndView("settings/pricingAttributes", model);
     }
+
+    @RequestMapping("/search")
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "PRICING_ATTRIBUTES");
+        return new ModelAndView("search", model);
+    }
+
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")
@@ -106,10 +106,33 @@ public class PricingAttributeController extends BaseController<PricingAttribute,
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/pricingAttribute"  + (reload ? "_body" : ""));
 
-        return id == null ? super.details(model) : pricingAttributeService.get(id, FindBy.EXTERNAL_ID, false)
+        if(id == null) {
+            return super.details(model);
+        } else {
+            PricingAttribute pricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            if(ValidationUtil.isNotEmpty(pricingAttribute)) {
+                model.put("pricingAttribute", pricingAttribute);
+            } else if(ValidationUtil.isEmpty(pricingAttribute)) {
+                pricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
+                model.put("pricingAttribute", pricingAttribute);
+            } else {
+                 throw new EntityNotFoundException("Unable to find PricingAttribute with Id: " + id);
+            }
+            return super.details(id, model);
+        }
+
+        /*return id == null ? super.details(model) : pricingAttributeService.get(ID.EXTERNAL_ID(id), false)
                 .map(pricingAttribute -> {
                     model.put("pricingAttribute", pricingAttribute);
                     return super.details(id, model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find PricingAttribute with Id: " + id));
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find PricingAttribute with Id: " + id));*/
+    }
+
+    @RequestMapping(value = "/{pricingAttributeId}/pricingAttributes/archive/{archived}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> archive(@PathVariable(value = "pricingAttributeId") String pricingAttributeId, @PathVariable(value = "archived") String archived) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", pricingAttributeService.archive(ID.EXTERNAL_ID(pricingAttributeId), Archive.get(archived)));
+        return model;
     }
 }

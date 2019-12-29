@@ -1,9 +1,10 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,14 +14,16 @@ import java.util.Map;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class AssetCollection extends Entity<AssetCollection> {
+public class AssetCollection extends MongoEntity<AssetCollection> {
 
     @Transient
     @NotEmpty(message = "Collection Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Collection Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String collectionId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Collection Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Collection Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String collectionName;
 
     private String rootId;
@@ -108,4 +111,18 @@ public class AssetCollection extends Entity<AssetCollection> {
         }
         return diff;
     }
+
+    /*@Override
+    public Object getCopy(AssetCollection assetCollection) {
+        AssetCollection _assetCollection = new AssetCollection();
+        _assetCollection.setCollectionName(assetCollection.getCollectionName());
+        _assetCollection.setCollectionId(assetCollection.getCollectionId());
+        _assetCollection.setRootId(assetCollection.getRootId());
+        _assetCollection.setActive(assetCollection.getActive());
+        _assetCollection.setArchived(assetCollection.getArchived());
+        _assetCollection.setDiscontinued(assetCollection.getDiscontinued());
+        _assetCollection.setVersionId(assetCollection.getVersionId());
+        _assetCollection.setId(assetCollection.getId());
+        return _assetCollection;
+    }*/
 }

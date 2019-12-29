@@ -1,34 +1,34 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.datatable.model.Pagination;
-import com.bigname.common.datatable.model.Request;
-import com.bigname.common.datatable.model.Result;
-import com.bigname.common.datatable.model.SortOrder;
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.web.controller.BaseController;
 import com.bigname.pim.api.domain.Attribute;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.client.model.Breadcrumbs;
-import com.bigname.pim.util.PimUtil;
+import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
+import com.m7.xtreme.common.datatable.model.Pagination;
+import com.m7.xtreme.common.datatable.model.Request;
+import com.m7.xtreme.common.datatable.model.Result;
+import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.util.Archive;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
-import static com.bigname.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
+
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -41,7 +41,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     private AttributeCollectionService attributeCollectionService;
 
     public AttributeCollectionController(AttributeCollectionService attributeCollectionService) {
-        super(attributeCollectionService, AttributeCollection.class);
+        super(attributeCollectionService, AttributeCollection.class, new BreadcrumbsBuilder());
         this.attributeCollectionService = attributeCollectionService;
     }
 
@@ -62,11 +62,26 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/attributeCollection" + (reload ? "_body" : ""));
 
-        return id == null ? super.details(model) : attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false)
+        if(id == null) {
+            return super.details(model);
+        } else {
+            AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            if(isNotEmpty(attributeCollection)) {
+                model.put("attributeCollection", attributeCollection);
+            } else if(isEmpty(attributeCollection)) {
+                attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
+                model.put("attributeCollection", attributeCollection);
+            } else {
+                throw new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id);
+            }
+            return super.details(id, model);
+        }
+
+        /*return id == null ? super.details(model) : attributeCollectionService.get(ID.EXTERNAL_ID(id), false)
                 .map(attributeCollection -> {
                     model.put("attributeCollection", attributeCollection);
                     return super.details(id, model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));*/
     }
 
     /**
@@ -116,6 +131,13 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         return new ModelAndView("settings/attributeCollections", model);
     }
 
+    @RequestMapping("/search")
+    public ModelAndView search() {
+        Map<String, Object> model = new HashMap<>();
+        model.put("active", "ATTRIBUTE_COLLECTIONS");
+        return new ModelAndView("search", model);
+    }
+
     @RequestMapping(value =  {"/list", "/data"})
     @ResponseBody
     @SuppressWarnings("unchecked")
@@ -126,7 +148,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @RequestMapping(value= {"/{collectionId}/attributes/{attributeId}", "/{collectionId}/attributes/create"})
     public ModelAndView attributeDetails(@PathVariable(value = "collectionId") String collectionId,
                                          @PathVariable(value = "attributeId", required = false) String attributeId) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     Attribute attribute;
@@ -148,7 +170,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                     } else {
                         attribute = new Attribute();
                         mode = "CREATE";
-                        model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(collectionId, FindBy.EXTERNAL_ID, null));
+                        model.put("attributeGroups", attributeCollectionService.getAttributeGroupsIdNamePair(ID.EXTERNAL_ID(collectionId), null));
 
                     }
                     model.put("attribute", attribute);
@@ -164,12 +186,12 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> createAttribute(@PathVariable(value = "collectionId") String id, Attribute attribute) {
         Map<String, Object> model = new HashMap<>();
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(id, FindBy.EXTERNAL_ID, false);
+        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(id), false);
         // TODO - cross field validation to see if one of attributeGroup ID and attributeGroup name is not empty
         if(attributeCollection.isPresent() && isValid(attribute, model)) {
             attributeCollection.get().setGroup("ATTRIBUTES");
             attributeCollection.get().addAttribute(attribute);
-            attributeCollectionService.update(id, FindBy.EXTERNAL_ID, attributeCollection.get());
+            attributeCollectionService.update(ID.EXTERNAL_ID(id), attributeCollection.get());
             model.put("success", true);
         }
         return model;
@@ -181,7 +203,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     public Map<String, Object> updateAttribute(@PathVariable(value = "collectionId") String collectionId,
                                                @PathVariable(value = "attributeId") String attributeId,
                                                @RequestParam Map<String, Object> parameterMap) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     String attributeFullId = (String)parameterMap.get("fullId");
@@ -197,7 +219,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                                 if(isValid(attribute, model)) {
                                     attributeCollection.setGroup("ATTRIBUTES");
                                     attributeCollection.updateAttribute(attribute);
-                                    attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                                    attributeCollectionService.update(ID.EXTERNAL_ID(collectionId), attributeCollection);
                                     model.put("success", true);
                                 }
                                 return model;
@@ -221,7 +243,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        Page<Attribute> paginatedResult = attributeCollectionService.getAttributes(id, FindBy.EXTERNAL_ID, pagination.getPageNumber(), pagination.getPageSize(), sort);
+        Page<Attribute> paginatedResult = attributeCollectionService.getAttributes(ID.EXTERNAL_ID(id), pagination.getPageNumber(), pagination.getPageSize(), sort);
         paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -235,7 +257,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                                                            @PathVariable(value = "attributeId") String attributeId,
                                                            HttpServletRequest request) {
 
-        if(PimUtil.isDataTableRequest(request)) {   // Datatable
+        if(PlatformUtil.isDataTableRequest(request)) {   // Datatable
             Request dataTableRequest = new Request(request);
             Pagination pagination = dataTableRequest.getPagination();
             Result<Map<String, String>> result = new Result<>();
@@ -245,7 +267,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                 sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
             }
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
+            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(ID.EXTERNAL_ID(collectionId), attributeId, pagination.getPageNumber(), pagination.getPageSize(), sort);
             paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -254,7 +276,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         } else {    // Handsontable
             Result<Map<String, String>> result = new Result<>();
             List<Map<String, String>> dataObjects = new ArrayList<>();
-            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(collectionId, FindBy.EXTERNAL_ID, attributeId, 0, 300, null);
+            Page<AttributeOption> paginatedResult = attributeCollectionService.getAttributeOptions(ID.EXTERNAL_ID(collectionId), attributeId, 0, 300, null);
             paginatedResult.getContent().forEach(e -> dataObjects.add(e.toMap()));
             result.setDataObjects(dataObjects);
             result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
@@ -267,7 +289,7 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                                          @PathVariable(value = "attributeId") String attributeId,
                                          @PathVariable(value = "attributeOptionId", required = false) String attributeOptionId) {
 
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
             .map(attributeCollection -> {
                 Map<String, Object> model = new HashMap<>();
                 Attribute attribute = attributeCollection.getAllAttributes().stream()
@@ -304,13 +326,13 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> createAttributeOption(@PathVariable(value = "collectionId") String collectionId,
                                                     AttributeOption attributeOptionDTO) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     if(isValid(attributeOptionDTO, model)) {
                         attributeCollection.setGroup("ATTRIBUTES");
                         attributeCollection.addAttributeOption(attributeOptionDTO);
-                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                        attributeCollectionService.update(ID.EXTERNAL_ID(collectionId), attributeCollection);
                         model.put("success", true);
                     }
                     return model;
@@ -321,16 +343,24 @@ public class AttributeCollectionController extends BaseController<AttributeColle
     @ResponseBody
     public Map<String, Object> updateAttributeOption(@PathVariable(value = "collectionId") String collectionId,
                                                     AttributeOption attributeOptionDTO) {
-        return attributeCollectionService.get(collectionId, FindBy.EXTERNAL_ID, false)
+        return attributeCollectionService.get(ID.EXTERNAL_ID(collectionId), false)
                 .map(attributeCollection -> {
                     Map<String, Object> model = new HashMap<>();
                     if(isValid(attributeOptionDTO, model)) {
                         attributeCollection.setGroup("ATTRIBUTES");
                         attributeCollection.updateAttributeOption(attributeOptionDTO);
-                        attributeCollectionService.update(collectionId, FindBy.EXTERNAL_ID, attributeCollection);
+                        attributeCollectionService.update(ID.EXTERNAL_ID(collectionId), attributeCollection);
                         model.put("success", true);
                     }
                     return model;
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
+    }
+
+    @RequestMapping(value = "/{collectionId}/attributeCollections/archive/{archived}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> archive(@PathVariable(value = "collectionId") String collectionId, @PathVariable(value = "archived") String archived) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", attributeCollectionService.archive(ID.EXTERNAL_ID(collectionId), Archive.get(archived)));
+        return model;
     }
 }

@@ -14,17 +14,10 @@ public class PIMConstants {
     public static final int MAX_FETCH_SIZE = 300;
     public static int ID_MAX_LENGTH = 20;
 
-    public static class Character {
-        public static final String EQUALS = "=";
-    }
 
-    public static class EncodedCharater {
-        public static final String PIPE = "%7C";
-    }
 
     public static Set<Integer> DEFAULT_QUANTITY_BREAKS = new TreeSet<>(Arrays.asList(50, 100, 250, 500, 1000));
 
     public enum ReorderingDirection {UP, DOWN}
 
-    public static String DEFAULT_GRID_STATUS_OPTIONS = "110"; // ACTIVE - 1 (TRUE), INACTIVE - 1 (TRUE), DISCONTINUED - 0 (FALSE)
 }

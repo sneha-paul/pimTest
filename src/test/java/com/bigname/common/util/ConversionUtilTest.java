@@ -2,13 +2,18 @@ package com.bigname.common.util;
 
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.service.WebsiteService;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.xcore.util.Tenancy;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by dona on 26-02-2019.
@@ -141,8 +146,7 @@ public class ConversionUtilTest {
         Website website = new Website();
         website.setWebsiteName("Envelope");
         website.setWebsiteId("ENVELOPE");
-
-        String actual = "{\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
+        String actual = "{\"internalId\":null,\"tenantId\":\"SINGLE\",\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"archived\":\"N\",\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
         Assert.assertEquals(ConversionUtil.toJSONString(website),actual);
     }
 
@@ -158,16 +162,19 @@ public class ConversionUtilTest {
         websiteMap.put("discontinuedToDate", null);
         websiteMap.put("lastModifiedDateTime", null);
         websiteMap.put("externalId", "ENVELOPE");
-        websiteMap.put("active","N");
+        websiteMap.put("active", "N");
         websiteMap.put("createdDateTime", null);
         websiteMap.put("discontinued", "N");
         websiteMap.put("discontinuedFromDate", null);
         websiteMap.put("url", null);
+        websiteMap.put("internalId", null);
+        websiteMap.put("archived", "N");
         websiteMap.put("websiteName", "Envelope");
         websiteMap.put("websiteId", "ENVELOPE");
         websiteMap.put("lastModifiedUser", null);
         websiteMap.put("id", website.getId());
         websiteMap.put("createdUser", null);
+        websiteMap.put("tenantId", Tenancy.SINGLE.toString());
 
         Assert.assertEquals(ConversionUtil.toJSONMap(website),websiteMap);
         Assert.assertEquals(ConversionUtil.toJSONMap(null),null);

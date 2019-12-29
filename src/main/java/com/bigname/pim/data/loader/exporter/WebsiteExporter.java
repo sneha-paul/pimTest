@@ -1,9 +1,9 @@
 package com.bigname.pim.data.loader.exporter;
 
 import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
+import com.bigname.pim.api.persistence.dao.mongo.WebsiteDAO;
 import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

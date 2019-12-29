@@ -1,7 +1,7 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.EntityAssociation;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.EntityAssociation;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.LinkedHashMap;

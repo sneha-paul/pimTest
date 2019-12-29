@@ -1,24 +1,28 @@
 package com.bigname.pim;
 
-import com.bigname.core.config.ConfigProperties;
-import com.bigname.core.config.EmailConfig;
-import com.bigname.core.config.TilesConfig;
-import com.bigname.pim.config.CacheConfig;
-import com.bigname.pim.config.SecurityConfig;
+import com.bigname.pim.config.PIMSecurityConfig;
+import com.bigname.pim.config.TilesConfig;
 import com.bigname.pim.config.WebConfig;
+import com.m7.xtreme.xcore.XcoreApplication;
+import com.m7.xtreme.xcore.config.CacheConfig;
+import com.m7.xtreme.xcore.config.ConfigProperties;
+import com.m7.xtreme.xcore.config.EmailConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication(scanBasePackages = {"com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor"})
-@EnableMongoRepositories(basePackages = {"com.bigname.pim.api.persistence"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern="com.bigname.core.persistence.dao.GenericDAO")})
+
+@SpringBootApplication(scanBasePackages = {"com.m7.xtreme.xcore", "com.m7.xtreme.xplatform", "com.m7.xtreme.common", "com.bigname.pim.api", "com.bigname.pim.client", "com.bigname.pim.data.loader", "com.bigname.pim.data.exportor", "com.bigname.pim.job", "com.bigname.pim.step"})
+//@EnableMongoRepositories(basePackages = {"com.m7.xtreme.xcore.persistence.dao.mongo", "com.m7.xtreme.xplatform.persistence.dao.primary.mongo", "com.bigname.pim.api.persistence.dao.mongo"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.dao.mongo.GenericDAO"})})
+@EnableMongoRepositories(basePackages = {"com.m7.xtreme.xplatform.persistence.dao.primary.mongo", "com.bigname.pim.api.persistence.dao.mongo"}, mongoTemplateRef = "primaryMongoTemplate")
+@EnableJpaRepositories(basePackages = {"com.m7.xtreme.xplatform.persistence.dao.primary.jpa", "com.bigname.pim.api.persistence.dao.jpa"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.REGEX, pattern={"com.m7.xtreme.xcore.persistence.dao.jpa.GenericDAO"})})
 @EnableAspectJAutoProxy(exposeProxy = true, proxyTargetClass = true)
 @EnableConfigurationProperties(ConfigProperties.class)
 //@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.ENABLED)
@@ -33,21 +37,15 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 		WebConfig.class,
 		CacheConfig.class,
 		TilesConfig.class,
-		SecurityConfig.class,
+		PIMSecurityConfig.class,
 		EmailConfig.class
 })
-public class PimApplication extends SpringBootServletInitializer {
+public class PimApplication extends XcoreApplication {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 		return builder.sources(PimApplication.class);
 	}
-
-	/*@Bean
-	public InstrumentationLoadTimeWeaver loadTimeWeaver()  throws Throwable {
-		InstrumentationLoadTimeWeaver loadTimeWeaver = new InstrumentationLoadTimeWeaver();
-		return loadTimeWeaver;
-	}*/
 
 	public static void main(String[] args) {
 		SpringApplication.run(PimApplication.class, args);

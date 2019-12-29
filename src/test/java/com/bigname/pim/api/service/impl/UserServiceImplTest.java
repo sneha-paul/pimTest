@@ -1,10 +1,13 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.persistence.dao.UserDAO;
-import com.bigname.pim.api.service.UserService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,9 +16,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -24,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -49,11 +53,24 @@ public class UserServiceImplTest {
     @Autowired
     public PasswordEncoder passwordEncoder;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userDAO.save(user);
+        }
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) userDAO.getTemplate();
+        }
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void loadUserByUsernameTest() throws Exception {
         List<Map<String, Object>> usersData = new ArrayList<>();
@@ -71,7 +88,7 @@ public class UserServiceImplTest {
             userDTO.setGroup("CREATE");
             userService.create(userDTO);
 
-            User newUser = userService.get(userDTO.getEmail(), EXTERNAL_ID, false).orElse(null);
+            User newUser = userService.get(ID.EXTERNAL_ID(userDTO.getEmail()), false).orElse(null);
             Assert.assertTrue(newUser != null);
             Assert.assertTrue(newUser.diff(userDTO).isEmpty());
 
@@ -87,7 +104,7 @@ public class UserServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        //mongoTemplate.dropCollection(User.class);
     }
 
 }

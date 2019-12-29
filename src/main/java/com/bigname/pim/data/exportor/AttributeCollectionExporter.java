@@ -1,12 +1,13 @@
 package com.bigname.pim.data.exportor;
 
-import com.bigname.core.data.exporter.BaseExporter;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.AttributeCollection;
 import com.bigname.pim.api.domain.AttributeOption;
 import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.util.POIUtil;
-import com.bigname.pim.util.PimUtil;
+import com.m7.xtreme.common.util.POIUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.xcore.data.exporter.BaseExporter;
+import com.m7.xtreme.xcore.util.Criteria;
+import com.m7.xtreme.xcore.util.ID;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -15,7 +16,7 @@ import java.util.*;
  * Created by sanoop on 13/02/2019.
  */
 @Component
-public class AttributeCollectionExporter implements BaseExporter<AttributeCollection, AttributeCollectionService>{
+public class AttributeCollectionExporter implements BaseExporter<AttributeCollection, AttributeCollectionService> {
     private AttributeCollectionService attributeCollectionService;
 
     public AttributeCollectionExporter(AttributeCollectionService attributeCollectionService) {
@@ -23,18 +24,18 @@ public class AttributeCollectionExporter implements BaseExporter<AttributeCollec
     }
 
     @Override
-    public boolean exportData(String filePath) {
+    public boolean exportData(String filePath, Criteria criteria) {
         return false;
     }
 
     @Override
     public String getFileName(Type fileType) {
-        return "AttributeCollectionExport" + PimUtil.getTimestamp() + fileType.getExt();
+        return "AttributeCollectionExport" + PlatformUtil.getTimestamp() + fileType.getExt();
     }
 
     public boolean exportAttributeData(String filePath, String attributeCollectionId) {
 
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false);
+        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false);
         List<List<Object>> data = new ArrayList<>();
         data.add(Arrays.asList(new String[]{"ID", "NAME", "DATA TYPE", "UI TYPE", "PARENT ATTRIBUTE ID"}));
         attributeCollection.ifPresent(attributeCollection1 ->
@@ -50,7 +51,7 @@ public class AttributeCollectionExporter implements BaseExporter<AttributeCollec
 
         Map<String, List<List<Object>>> attributesOptions = new HashMap<>();
 
-        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false);
+        Optional<AttributeCollection> attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false);
 
         attributeCollection.ifPresent(attributeCollection1 -> attributeCollection1.getAllAttributes().forEach(attribute -> {
             if ("Y".equals(attribute.getSelectable())) {

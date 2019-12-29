@@ -48,7 +48,7 @@ body.dragging, body.dragging * {
     overflow: hidden;
     width:80px;
     margin-right: 10px;
-    background: url(/assets/img/transparent_bg.png);
+    background-image: url(/assets/img/transparent_bg.png);
     background-repeat: repeat;
     background-size: 30px 30px;
 }
@@ -59,7 +59,7 @@ body.dragging, body.dragging * {
     line-height: 39px;
     overflow: hidden;
     width:40px;
-    background: url(/assets/img/transparent_bg.png);
+    background-image: url(/assets/img/transparent_bg.png);
     background-repeat: repeat;
     background-size: 30px 30px;
     border-radius: 50%;
@@ -672,4 +672,169 @@ table#paginatedPricingTable tbody td:first-child {
 }
 div#main-content {
     min-height:calc(100vh - 67px);
+}
+.overlay{
+    opacity: .32;
+    transition: all .4s;
+    background: black;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    visibility: hidden;
+    z-index: 99;
+}
+.overlay-sheet{
+    transition: transform .4s;
+    background: #ffffff;
+    bottom: 0;
+    right: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: fixed;
+    top: 5px;
+    width: 80%;
+    z-index: 998;
+    min-width: 85%;
+    transform : translate(100%, 0%);
+}
+.overlay-open .overlay-sheet{
+    transform : translate(0px, 0px);
+}
+.overlay-open .overlay{
+    opacity: .32;
+    visibility: visible;
+}
+body.overlay-open{
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+.overlay-holder .sheet-header{
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    background: #fff;
+}
+.overlay-holder .sheet-header h4{
+    margin-bottom: 0;
+}
+.sheet-body{
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1rem;
+    z-index: 99;
+    padding-right: 6px;
+}
+
+.navbar-fixed-top .navbar-btn button i{
+    margin-left: 15px;
+}
+#main-content{
+    width: calc(100% - 60px);
+}
+.offcanvas-active #main-content{
+    width: 100%;
+}
+#left-sidebar{
+    width: auto;
+    background-color: #449cff;
+    box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.4);
+}
+#left-sidebar:hover .user-account .dropdown,
+#left-sidebar:hover .sidebar-nav .metismenu>li a span,
+#left-sidebar:hover .sidebar-nav .metismenu>li.active ul.collapse.in> li a{
+    display: inline-block;
+    opacity: 1;
+    visibility: visible;
+}
+#left-sidebar:hover .sidebar-nav .metismenu{
+    width: 250px;
+}
+    #left-sidebar .user-account {
+        margin: 10px 0px 10px 10px;
+    }
+        #left-sidebar .user-account .dropdown,
+        #left-sidebar .sidebar-nav .metismenu ul.collapse.in> a span,
+        #left-sidebar .sidebar-nav .metismenu>li a span{
+            display: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            color: #FFFFFF;
+        }
+            #left-sidebar .sidebar-nav .metismenu>li a{
+                padding-right: 0;
+            }
+            #left-sidebar .sidebar-nav .metismenu>li a:hover,
+            #left-sidebar .sidebar-nav .metismenu>li a:focus,
+            #left-sidebar .sidebar-nav .metismenu>li a:active,
+            #left-sidebar .sidebar-nav .metismenu>li.active>a {
+                background: #3888e2cc;
+            }
+            #left-sidebar .sidebar-nav .metismenu>li.active>a,
+            #left-sidebar .sidebar-nav .metismenu>li ul.collapse li.active>a{
+                border-left-color: #fff;
+            }
+            #left-sidebar .sidebar-nav .metismenu>li a.has-arrow:after{
+                right: 10px;
+            }
+                #left-sidebar .sidebar-nav .metismenu>li a span{
+                    padding-right: 10px;
+                    min-width: 25px;
+                }
+                #left-sidebar .sidebar-nav .metismenu>li a i{
+                    font-size: 20px;
+                    color: #FFFFFF;
+                }
+                #left-sidebar .sidebar-nav .metismenu>li ul{
+                    background: #3888e2cc;
+                }
+                    #left-sidebar .sidebar-nav .metismenu>li ul a{
+                        width: 100%;
+                        padding: 10px 0px 10px 25px;
+                    }
+                        #left-sidebar .sidebar-nav .metismenu ul a span,
+                        #left-sidebar .sidebar-nav .metismenu ul a i {
+                            color: #ded3d3 !important;
+                        }
+                        #left-sidebar .sidebar-nav .metismenu>li ul a i{
+                            font-size: 14px !important;
+                        }
+                    #left-sidebar .sidebar-nav .metismenu>li ul a:hover span,
+                    #left-sidebar .sidebar-nav .metismenu>li ul a:hover i{
+                        color: #fff !important;
+                    }
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a::before{
+                        content: none;
+                    }
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a:hover,
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a:focus,
+                    #left-sidebar .sidebar-nav .metismenu>li ul.collapse.in> li a:active{
+                        border-color: #fff;
+                    }
+
+@media screen and (max-width: 3000px){
+    #main-content{
+        width: calc(100% - 60px);
+    }
+    .offcanvas-active #main-content{
+        width: 100%;
+    }
+    #left-sidebar{
+        left: 5px;
+    }
+    .offcanvas-active #left-sidebar{
+        left: -250px;
+    }
 }

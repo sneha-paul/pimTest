@@ -1,11 +1,11 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.pim.util.PIMConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class Attribute extends ValidatableEntity<Attribute> {
 
     @NotEmpty(message = "Attribute name cannot be empty")
+    @NotBlank(message = "Attribute name cannot be blank")
     private String name;
     private String label;
     private UIType _uiType = UIType.INPUT_BOX;

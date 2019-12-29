@@ -1,6 +1,6 @@
 package com.bigname.common.util;
 
-import org.hibernate.validator.constraints.EAN;
+import com.m7.xtreme.common.util.StringUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 
 /**

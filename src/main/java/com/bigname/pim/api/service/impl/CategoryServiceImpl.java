@@ -1,28 +1,28 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.EntityAssociation;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.CategoryProductDAO;
-import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
-import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.ProductService;
 import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.PimUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.EntityAssociation;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.Archive;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,46 +40,43 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     private ProductCategoryDAO productCategoryDAO;
     private CategoryProductDAO categoryProductDAO;
     private ProductService productService;
+    private RootCategoryDAO rootCategoryDAO;
 
     @Autowired
-    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductCategoryDAO productCategoryDAO, ProductService productService) {
+    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductCategoryDAO productCategoryDAO, ProductService productService, RootCategoryDAO rootCategoryDAO) {
         super(categoryDAO, "category", validator);
         this.categoryDAO = categoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
         this.categoryProductDAO = categoryProductDAO;
         this.productCategoryDAO = productCategoryDAO;
         this.productService = productService;
+        this.rootCategoryDAO = rootCategoryDAO;
     }
 
     @Override
-    public Page<Map<String, Object>> findAllSubCategories(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(categoryId, findBy, false)
+    public Page<Map<String, Object>> findAllSubCategories(ID<String> categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
                 .map(category -> categoryDAO.findAllSubCategories(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public Page<Map<String, Object>> findAllCategoryProducts(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(categoryId, findBy, false)
+    public Page<Map<String, Object>> findAllCategoryProducts(ID<String> categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
                 .map(product -> categoryDAO.findAllCategoryProducts(product.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public List<CategoryProduct> getAllCategoryProducts(String categoryInternalId) {
-        return categoryProductDAO.findByCategoryId(categoryInternalId);
-    }
-
-    @Override
-    public Page<Category> findAvailableSubCategoriesForCategory(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(categoryId, findBy, false)
+    public Page<Category> findAvailableSubCategoriesForCategory(ID<String> categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
                 .map(category -> categoryDAO.findAvailableSubCategoriesForCategory(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public Page<Product> findAvailableProductsForCategory(String categoryId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(categoryId, findBy, false)
+    public Page<Product> findAvailableProductsForCategory(ID<String> categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
                 .map(product -> categoryDAO.findAvailableProductsForCategory(product.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
@@ -89,7 +86,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
 
         List<Map<String, Object>> hierarchy = new ArrayList<>();
         //Unsorted relatedCategories
-        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
 
         Map<String, List<RelatedCategory>> parentCategoriesMap = new LinkedHashMap<>();
 
@@ -107,7 +104,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         }
 
         //Sorted rootCategories
-        Map<String, Category> rootCategoriesMap = getAllWithExclusions(new ArrayList<>(nonRootCategoryIds).toArray(new String[0]), FindBy.INTERNAL_ID, Sort.by(new Sort.Order(Sort.Direction.ASC, "categoryName"))).stream().collect(CollectionsUtil.toLinkedMap(Category::getId, e -> e));
+        Map<String, Category> rootCategoriesMap = getAllWithExclusions(nonRootCategoryIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), Sort.by(new Sort.Order(Sort.Direction.ASC, "categoryName"))).stream().collect(CollectionsUtil.toLinkedMap(Category::getId, e -> e));
 
         //Sort all subCategories within each parent category
         parentCategoriesMap.forEach((parentCategoryId, subCategories) -> {
@@ -162,7 +159,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     /*public List<Map<String, Object>> getCategoryHierarchy1(boolean... activeRequired) {
         Map<String, Map<String, Object>> nodes = new LinkedHashMap<>();
 
-        List<Category> categories = categoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        List<Category> categories = categoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
         for(Category category : categories) {
             Map<String, Object> node = new HashMap<>();
             node.put("id", category.getId());
@@ -178,7 +175,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         }
 
         Map<String, List<RelatedCategory>> childCategoriesMap = new LinkedHashMap<>();
-        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+        List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
         for (RelatedCategory relatedCategory : relatedCategories) {
             if(childCategoriesMap.containsKey(relatedCategory.getCategoryId())) {
                 childCategoriesMap.get(relatedCategory.getCategoryId()).add(relatedCategory);
@@ -240,35 +237,33 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      /**
      * Method to get available subCategories of a category in paginated format.
      *
-     * @param id Internal or External id of the Category
-     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param categoryId Internal or External id of the Category
      * @param page page number
      * @param size page size
      * @param sort sort object
      * @return
      */
     @Override
-    public Page<Category> getAvailableSubCategoriesForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        Optional<Category> category = get(id, findBy, false);
+    public Page<Category> getAvailableSubCategoriesForCategory(ID<String> categoryId, int page, int size, Sort sort, boolean... activeRequired) {
+        Optional<Category> category = get(categoryId, false);
         Set<String> categoryIds = new HashSet<>();
         category.ifPresent(category1 -> relatedCategoryDAO.findByCategoryId(category1.getId()).forEach(rc -> categoryIds.add(rc.getSubCategoryId())));
         categoryIds.add(category.get().getId());
-        return getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
+        return getAllWithExclusions(categoryIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), page, size, sort, true);
     }
 
     /**
      * Method to get subCategories of a Category in paginated format.
      *
      * @param categoryId Internal or External id of the Category
-     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getSubCategories(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
-        return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.getSubCategories(category.getId(), pageable))
+    public Page<Map<String, Object>> getSubCategories(ID<String> categoryId, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
+                .map(category -> categoryDAO.getSubCategories(category.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
@@ -276,18 +271,18 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      * Method to set the sequencing of two subCategories
      *
      * @param categoryId          Internal or External id of the Category
-     * @param categoryIdFindBy    Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @param sourceId            Internal or External id of the subCategory, whose sequencing needs to be set
-     * @param sourceIdFindBy      Type of the source subCategory id, INTERNAL_ID or EXTERNAL_ID
      * @param destinationId       Internal or External id of the subCategory at the destination slot
-     * @param destinationIdFindBy Type of the destination subCategory id, INTERNAL_ID or EXTERNAL_ID
      * @return true if sequencing got modified, false otherwise
      */
     @Override
-    public boolean setSubCategorySequence(String categoryId, FindBy categoryIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy) {
-        return get(categoryId, categoryIdFindBy, false)
+    public boolean setSubCategorySequence(ID<String> categoryId, ID<String> sourceId, ID<String> destinationId) {
+        List<ID<String>> ids = new ArrayList<>();
+        ids.add(sourceId);
+        ids.add(destinationId);
+        return get(categoryId, false)
                 .map(category -> {
-                    Map<String, Category> categoriesMap = getAll(new String[] {sourceId, destinationId}, FindBy.EXTERNAL_ID, null, false)
+                    Map<String, Category> categoriesMap = getAll(ids, null, false)
                             .stream().collect(Collectors.toMap(Category::getCategoryId, category1 -> category1));
 
                     List<String> subCategoryIds = categoriesMap.entrySet().stream().map(entry -> entry.getValue().getId()).collect(Collectors.toList());
@@ -295,8 +290,8 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                     Map<String, RelatedCategory> subCategoriesMap = relatedCategoryDAO.findByCategoryIdAndSubCategoryIdIn(category.getId(), subCategoryIds.toArray(new String[0]))
                             .stream().collect(Collectors.toMap(RelatedCategory::getSubCategoryId, subCategory -> subCategory));
 
-                    RelatedCategory source = subCategoriesMap.get(categoriesMap.get(sourceId).getId());
-                    RelatedCategory destination = subCategoriesMap.get(categoriesMap.get(destinationId).getId());
+                    RelatedCategory source = subCategoriesMap.get(categoriesMap.get(sourceId.getId()).getId());
+                    RelatedCategory destination = subCategoriesMap.get(categoriesMap.get(destinationId.getId()).getId());
 
                     PIMConstants.ReorderingDirection direction = DOWN;
                     if(source.getSequenceNum() > destination.getSequenceNum() ||
@@ -310,21 +305,21 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                         modifiedSubCategories.add(source);
                         destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
                         modifiedSubCategories.add(destination);
-                        modifiedSubCategories.addAll(rearrangeOtherSubCategories(categoryId, source, destination, direction));
+                        modifiedSubCategories.addAll(rearrangeOtherSubCategories(category.getId(), source, destination, direction));
                     } else {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
                         modifiedSubCategories.add(source);
-                        modifiedSubCategories.addAll(rearrangeOtherSubCategories(categoryId, source, destination, direction));
+                        modifiedSubCategories.addAll(rearrangeOtherSubCategories(category.getId(), source, destination, direction));
                     }
                     relatedCategoryDAO.saveAll(modifiedSubCategories);
                     return true;
                 }).orElse(false);
     }
 
-    private List<RelatedCategory> rearrangeOtherSubCategories(String categoryId, RelatedCategory source, RelatedCategory destination, PIMConstants.ReorderingDirection direction) {
+    private List<RelatedCategory> rearrangeOtherSubCategories(String internalCategoryId, RelatedCategory source, RelatedCategory destination, PIMConstants.ReorderingDirection direction) {
         List<RelatedCategory> adjustedSubCategories = new ArrayList<>();
-        List<RelatedCategory> subCategories = relatedCategoryDAO.findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(categoryId, destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
+        List<RelatedCategory> subCategories = relatedCategoryDAO.findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(internalCategoryId, destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
         int subSequenceNum = direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum();
         for(RelatedCategory subCategory : subCategories) {
             if(subCategory.getSubCategoryId().equals(source.getSubCategoryId()) || subCategory.getSubCategoryId().equals(destination.getSubCategoryId())) {
@@ -344,20 +339,20 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      * Method to set the sequencing of two products inside a category
      *
      * @param categoryId          Internal or External id of the Category
-     * @param categoryIdFindBy    Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @param sourceId            Internal or External id of the product, whose sequencing needs to be set
-     * @param sourceIdFindBy      Type of the source product id, INTERNAL_ID or EXTERNAL_ID
      * @param destinationId       Internal or External id of the product at the destination slot
-     * @param destinationIdFindBy Type of the destination product id, INTERNAL_ID or EXTERNAL_ID
      * @return true if sequencing got modified, false otherwise
      */
     @Override
-    public boolean setProductSequence(String categoryId, FindBy categoryIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy) {
-        return get(categoryId, categoryIdFindBy, false)
+    public boolean setProductSequence(ID<String> categoryId, ID<String> sourceId, ID<String> destinationId) {
+        List<ID<String>> ids = new ArrayList<>();
+        ids.add(sourceId);
+        ids.add(destinationId);
+        return get(categoryId, false)
                 .map(category -> {
 
                     // Get the product instances corresponding to the source and destination ids and store in to a map with productId as the key
-                    Map<String, Product> productsMap = productService.getAll(new String[] {sourceId, destinationId}, FindBy.EXTERNAL_ID, null, false)
+                    Map<String, Product> productsMap = productService.getAll(ids, null, false)
                             .stream().collect(Collectors.toMap(Product::getProductId, product -> product));
 
                     // Get a list of internal product ids of both source and destination products
@@ -367,8 +362,8 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                     Map<String, CategoryProduct> categoryProductsMap = categoryProductDAO.findByCategoryIdAndProductIdIn(category.getId(), categoryProductIds.toArray(new String[0]))
                             .stream().collect(Collectors.toMap(CategoryProduct::getProductId, categoryProduct -> categoryProduct));
 
-                    CategoryProduct source = categoryProductsMap.get(productsMap.get(sourceId).getId());
-                    CategoryProduct destination = categoryProductsMap.get(productsMap.get(destinationId).getId());
+                    CategoryProduct source = categoryProductsMap.get(productsMap.get(sourceId.getId()).getId());
+                    CategoryProduct destination = categoryProductsMap.get(productsMap.get(destinationId.getId()).getId());
 
                     PIMConstants.ReorderingDirection direction = DOWN;
                     if(source.getSequenceNum() > destination.getSequenceNum() ||
@@ -382,21 +377,21 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                         modifiedcategoryProducts.add(source);
                         destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
                         modifiedcategoryProducts.add(destination);
-                        modifiedcategoryProducts.addAll(rearrangeOtherCategoryProducts(categoryId, source, destination, direction));
+                        modifiedcategoryProducts.addAll(rearrangeOtherCategoryProducts(category.getId(), source, destination, direction));
                     } else {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
                         modifiedcategoryProducts.add(source);
-                        modifiedcategoryProducts.addAll(rearrangeOtherCategoryProducts(categoryId, source, destination, direction));
+                        modifiedcategoryProducts.addAll(rearrangeOtherCategoryProducts(category.getId(), source, destination, direction));
                     }
                     categoryProductDAO.saveAll(modifiedcategoryProducts);
                     return true;
                 }).orElse(false);
     }
 
-    private List<CategoryProduct> rearrangeOtherCategoryProducts(String categoryId, CategoryProduct source, CategoryProduct destination, PIMConstants.ReorderingDirection direction) {
+    private List<CategoryProduct> rearrangeOtherCategoryProducts(String internalCategoryId, CategoryProduct source, CategoryProduct destination, PIMConstants.ReorderingDirection direction) {
         List<CategoryProduct> adjustedCategoryProducts = new ArrayList<>();
-        List<CategoryProduct> categoryProducts = categoryProductDAO.findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(categoryId, destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
+        List<CategoryProduct> categoryProducts = categoryProductDAO.findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(internalCategoryId, destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
         int subSequenceNum = direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum();
         for(CategoryProduct categoryProduct : categoryProducts) {
             if(categoryProduct.getProductId().equals(source.getProductId()) || categoryProduct.getProductId().equals(destination.getProductId())) {
@@ -415,17 +410,15 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     /**
      * Method to add subCategory for a category.
      *
-     * @param id Internal or External id of the Category
-     * @param findBy1 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param categoryId Internal or External id of the Category
      * @param subCategoryId Internal or External id of the subCategory
-     * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */
     @Override
-    public RelatedCategory addSubCategory(String id, FindBy findBy1, String subCategoryId, FindBy findBy2) {
-        Optional<Category> category = get(id, findBy1, false);
+    public RelatedCategory addSubCategory(ID<String> categoryId, ID<String> subCategoryId) {
+        Optional<Category> category = get(categoryId, false);
         if(category.isPresent()) {
-            Optional<Category> subCategory = get(subCategoryId, findBy2, false);
+            Optional<Category> subCategory = get(subCategoryId, false);
             if(subCategory.isPresent()) {
                 Optional<RelatedCategory> top = relatedCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
                 List<RelatedCategory> subCategories = relatedCategoryDAO.findBySubCategoryId(category.get().getId());
@@ -437,9 +430,9 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public boolean toggleSubCategory(String categoryId, FindBy categoryIdFindBy, String subCategoryId, FindBy subCategoryIdFindBy, Toggle active) {
-        return get(categoryId, categoryIdFindBy, false)
-                .map(category -> get(subCategoryId, subCategoryIdFindBy, false)
+    public boolean toggleSubCategory(ID<String> categoryId, ID<String> subCategoryId, Toggle active) {
+        return get(categoryId, false)
+                .map(category -> get(subCategoryId, false)
                         .map(subCategory -> relatedCategoryDAO.findFirstByCategoryIdAndSubCategoryId(category.getId(), subCategory.getId())
                                 .map(relatedCategory -> {
                                     relatedCategory.setActive(active.state());
@@ -452,9 +445,9 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public boolean toggleProduct(String categoryId, FindBy categoryIdFindBy, String productId, FindBy productIdFindBy, Toggle active) {
-        return get(categoryId, categoryIdFindBy, false)
-                .map(category -> productService.get(productId, productIdFindBy, false)
+    public boolean toggleProduct(ID<String> categoryId, ID<String> productId, Toggle active) {
+        return get(categoryId, false)
+                .map(category -> productService.get(productId, false)
                         .map(product -> categoryProductDAO.findFirstByCategoryIdAndProductId(category.getId(), product.getId())
                                 .map(categoryProduct -> {
                                     categoryProduct.setActive(active.state());
@@ -467,19 +460,19 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
-    public Page<CategoryProduct> getCategoryProducts(String categoryId, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
+    public Page<CategoryProduct> getCategoryProducts(ID<String> categoryId, int page, int size, Sort sort, boolean... activeRequired) {
         if(sort == null) {
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         Pageable pageable = PageRequest.of(page, size, sort);
-        Optional<Category> _category = get(categoryId, findBy, false);
+        Optional<Category> _category = get(categoryId, false);
         if(_category.isPresent()) {
             Category category = _category.get();
-            Page<CategoryProduct> categoryProducts = categoryProductDAO.findByCategoryIdAndActiveIn(category.getId(), PimUtil.getActiveOptions(activeRequired), pageable);
+            Page<CategoryProduct> categoryProducts = categoryProductDAO.findByCategoryIdAndActiveIn(category.getId(), PlatformUtil.getActiveOptions(activeRequired), pageable);
             List<String> productIds = new ArrayList<>();
             categoryProducts.forEach(cp -> productIds.add(cp.getProductId()));
             if(productIds.size() > 0) {
-                Map<String, Product> productsMap = PimUtil.getIdedMap(productService.getAll(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, null, activeRequired), FindBy.INTERNAL_ID);
+                Map<String, Product> productsMap = PlatformUtil.getIdedMap(productService.getAll(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), null, activeRequired), ID.Type.INTERNAL_ID);
                 categoryProducts.forEach(cp -> cp.init(category, productsMap.get(cp.getProductId())));
             }
             return categoryProducts;
@@ -491,58 +484,142 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
      * Method to get products of a Category in paginated format.
      *
      * @param categoryId Internal or External id of the Category
-     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @param pageable The pageable instance
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getCategoryProducts(String categoryId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
-        return get(categoryId, findBy, false)
-                .map(category -> categoryDAO.getProducts(category.getId(), pageable))
+    public Page<Map<String, Object>> getCategoryProducts(ID<String> categoryId, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
+                .map(category -> categoryDAO.getProducts(category.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     /**
      * Method to get available products of a category in paginated format.
      *
-     * @param id Internal or External id of the Category
-     * @param findBy Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param categoryId Internal or External id of the Category
      * @param page page number
      * @param size page size
      * @param sort sort object
      * @return
      */
     @Override
-    public Page<Product> getAvailableProductsForCategory(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        Optional<Category> category = get(id, findBy, false);
+    public Page<Product> getAvailableProductsForCategory(ID<String> categoryId, int page, int size, Sort sort, boolean... activeRequired) {
+        Optional<Category> category = get(categoryId, false);
         Set<String> productIds = new HashSet<>();
         category.ifPresent(category1 -> categoryProductDAO.findByCategoryId(category1.getId()).forEach(cp -> productIds.add(cp.getProductId())));
-        return productService.getAllWithExclusions(productIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, false);
+        return productService.getAllWithExclusions(productIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), page, size, sort, false);
     }
 
     /**
      * Method to add product for a category.
      *
-     * @param id Internal or External id of the Category
-     * @param findBy1 Type of the category id, INTERNAL_ID or EXTERNAL_ID
+     * @param categoryId Internal or External id of the Category
      * @param productId Internal or External id of the Product
-     * @param findBy2 Type of the product id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */
     @Override
-    public CategoryProduct addProduct(String id, FindBy findBy1, String productId, FindBy findBy2) {
-        Optional<Category> category = get(id, findBy1, false);
+    public CategoryProduct addProduct(ID<String> categoryId, ID<String> productId) {
+        Optional<Category> category = get(categoryId, false);
         if(category.isPresent()) {
-            Optional<Product> product = productService.get(productId, findBy2, false);
+            Optional<Product> product = productService.get(productId, false);
             if(product.isPresent()) {
                 Optional<ProductCategory> top1 = productCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                productCategoryDAO.save(new ProductCategory(product.get().getId(), category.get().getId(), top1.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+                productCategoryDAO.save(new ProductCategory(product.get().getId(), getInternalId(categoryId).getId().toString(), top1.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
 
                 Optional<CategoryProduct> top2 = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top2.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
+                return categoryProductDAO.save(new CategoryProduct(getInternalId(categoryId).getId().toString(), product.get().getId(), top2.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean toggleCategory(ID<String> categoryId, Toggle toggle) {
+        return get(categoryId, false)
+                .map(category -> {
+
+                    category.setGroup("DETAILS");
+                    category.setActive(toggle.state());
+                    categoryDAO.save(category);
+
+                    rootCategoryDAO.findByRootCategoryId(category.getId())
+                            .forEach(rootCategory -> {
+                                rootCategory.setActive(toggle.state());
+                                rootCategoryDAO.save(rootCategory);
+                            });
+                    relatedCategoryDAO.findBySubCategoryId(category.getId())
+                            .forEach(relatedCategory -> {
+                                relatedCategory.setActive(toggle.state());
+                                relatedCategoryDAO.save(relatedCategory);
+                            });
+                    productCategoryDAO.findByCategoryId(category.getId())
+                            .forEach(productCategory -> {
+                                productCategory.setActive(toggle.state());
+                                productCategoryDAO.save(productCategory);
+                            });
+
+                    return true;
+
+                }).orElseThrow(() -> new EntityNotFoundException("unable to find"));
+    }
+
+    @Override
+    public List<RootCategory> getAllRootCategoriesWithCategoryId(ID<String> categoryId) {
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? rootCategoryDAO.findByRootCategoryId(internalId.getId()) : new ArrayList<>();
+    }
+
+    @Override
+    public List<RelatedCategory> getAllRelatedCategoriesWithSubCategoryId(ID<String> categoryId) {
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? relatedCategoryDAO.findBySubCategoryId(internalId.getId()) : new ArrayList<>();
+    }
+
+    @Override
+    public List<ProductCategory> getAllProductCategoriesWithCategoryId(ID<String> categoryId) {
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? productCategoryDAO.findByCategoryId(internalId.getId()) : new ArrayList<>();
+    }
+
+    @Override
+    public List<CategoryProduct> getAllCategoryProducts(ID<String> categoryId) {
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? categoryProductDAO.findByCategoryId(internalId.getId()) : new ArrayList<>();
+    }
+
+    @Override
+    public void updateRootCategory(RootCategory rootCategory) {
+        rootCategoryDAO.save(rootCategory);
+    }
+
+    @Override
+    public void updateRelatedCategory(RelatedCategory relatedCategory) {
+        relatedCategoryDAO.save(relatedCategory);
+    }
+
+    @Override
+    public void updateProductCategory(ProductCategory productCategory) {
+        productCategoryDAO.save(productCategory);
+    }
+
+    @Override
+    public void archiveCategoryAssociations(ID<String> categoryId, Archive archived, Category category) {
+        if(archived == Archive.NO) {
+            List<RelatedCategory> relatedCategories = getAllRelatedCategoriesWithSubCategoryId(categoryId);
+            relatedCategories.forEach(relatedCategory -> categoryDAO.archiveAssociationById(ID.INTERNAL_ID(relatedCategory.getId()), archived, RelatedCategory.class));
+
+            List<CategoryProduct> categoryProducts = getAllCategoryProducts(categoryId);
+            categoryProducts.forEach(categoryProduct -> categoryDAO.archiveAssociationById(ID.INTERNAL_ID(categoryProduct.getId()), archived, CategoryProduct.class));
+        } else {
+            List<CategoryProduct> categoryProducts = getAllCategoryProducts(categoryId);
+            categoryProducts.forEach(categoryProduct -> categoryDAO.archiveAssociationById(ID.INTERNAL_ID(categoryProduct.getId()), archived, CategoryProduct.class));
+        }
+    }
+
+    @Override
+    public List<RelatedCategory> getAll() {
+        return relatedCategoryDAO.findAll();
     }
 }

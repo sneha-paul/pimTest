@@ -1,48 +1,42 @@
 package com.bigname.pim.client.util;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.URLUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.service.BaseService;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
-import com.bigname.pim.client.model.Breadcrumbs;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.common.util.URLUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.Event;
+import com.m7.xtreme.xplatform.domain.JobInstance;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
+import com.m7.xtreme.xplatform.service.EventService;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
+import com.m7.xtreme.xplatform.service.UserService;
+import com.m7.xtreme.xplatform.util.BaseBreadcrumbsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.ValidationUtil.isEmpty;
-import static com.bigname.common.util.ValidationUtil.isNotEmpty;
-import static com.bigname.pim.util.PIMConstants.Character.EQUALS;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class BreadcrumbsBuilder {
-    private Map<String, BaseService> services = new HashMap<>();
-    private HttpServletRequest request = null;
-    private Map<String, Object> parameterMap = new HashMap<>();
-    private Breadcrumbs breadcrumbs;
-    private String id;
-    private Class<?> entity;
+public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
 
-    public BreadcrumbsBuilder(String id, Class<?> entity, BaseService... services) {
-        this(id, entity, null, null, services);
+    public BreadcrumbsBuilder(){
+
     }
 
-    public BreadcrumbsBuilder(String id, Class<?> entity, HttpServletRequest request, Map<String, Object> parameterMap, BaseService... services) {
-        this.id = id;
-        this.entity = entity;
-        this.request = request;
-        if(parameterMap != null) {
-            this.parameterMap = parameterMap;
-        }
+    @Override
+    protected void parseServices(BaseService... services) {
         ConversionUtil.toList(services).forEach(baseService -> {
             if(baseService instanceof WebsiteService) {
                 this.services.put("websiteService", baseService);
@@ -70,13 +64,11 @@ public class BreadcrumbsBuilder {
                 this.services.put("configService", baseService);
             } else if(baseService instanceof AssetFamilyService) {
                 this.services.put("assetFamilyService", baseService);
+            } else if(baseService instanceof JobInstanceService) {
+                this.services.put("jobInstanceService", baseService);
             }
 
         });
-    }
-
-    private String getParameter(String name) {
-        return parameterMap.containsKey(name) ? (String) parameterMap.get(name) : "";
     }
 
     public Breadcrumbs build() {
@@ -108,7 +100,7 @@ public class BreadcrumbsBuilder {
         return breadcrumbs;
     }
 
-    private String[] getUrls(String id, Class<?> entity) {
+    protected String[] getUrls(String id, Class<?> entity) {
 
 
         String url1 = "/pim/" + getNames(entity)[1];
@@ -214,7 +206,7 @@ public class BreadcrumbsBuilder {
         return new String[] {url1, url2};
     }
 
-    private String[] getNames(Class<?> entity) {
+    protected String[] getNames(Class<?> entity) {
         switch(entity.getCanonicalName()) {
             case "com.bigname.pim.api.domain.Website":
                 return new String[] {"Websites", "websites"};
@@ -234,51 +226,55 @@ public class BreadcrumbsBuilder {
                 return new String[] {"Pricing Attributes", "pricingAttributes"};
             case "com.bigname.pim.api.domain.Family":
                 return new String[] {"Product Types", "families"};
-            case "com.bigname.pim.api.domain.User":
+            case "com.m7.xtreme.xcore.domain.User":
                 return new String[] {"User", "users"};
-            case "com.bigname.pim.api.domain.Event":
+            case "com.m7.xtreme.xcore.domain.Event":
                 return new String[] {"Event", "events"};
             case "com.bigname.pim.api.domain.Config":
                 return new String[] {"Config", "configs"};
             case "com.bigname.pim.api.domain.AssetFamily":
                 return new String[] {"AssetFamily", "assetFamilies"};
+            case "com.m7.xtreme.xcore.domain.JobInstance":
+                return new String[] {"Jobs", "jobs"};
         }
         return new String[] {"", "", "", ""};
     }
 
-    private String getCrumbName(String id, Class<?> entity) {
+    protected String getCrumbName(String id, Class<?> entity) {
         switch(entity.getCanonicalName()) {
             case "com.bigname.pim.api.domain.Website":
-                return ((WebsiteService)services.get("websiteService")).get(id, FindBy.EXTERNAL_ID, false).map(Website::getWebsiteName).orElse("");
+                return ((WebsiteService)services.get("websiteService")).get(ID.EXTERNAL_ID(id), false).map(Website::getWebsiteName).orElse("");
             case "com.bigname.pim.api.domain.Catalog":
-                return ((CatalogService)services.get("catalogService")).get(id, FindBy.EXTERNAL_ID, false).map(Catalog::getCatalogName).orElse("");
+                return ((CatalogService)services.get("catalogService")).get(ID.EXTERNAL_ID(id), false).map(Catalog::getCatalogName).orElse("");
             case "com.bigname.pim.api.domain.Category":
-                return ((CategoryService)services.get("categoryService")).get(id, FindBy.EXTERNAL_ID, false).map(Category::getCategoryName).orElse("");
+                return ((CategoryService)services.get("categoryService")).get(ID.EXTERNAL_ID(id), false).map(Category::getCategoryName).orElse("");
             case "com.bigname.pim.api.domain.Product":
-                return ((ProductService)services.get("productService")).get(id, FindBy.EXTERNAL_ID, false).map(Product::getProductName).orElse("");
+                return ((ProductService)services.get("productService")).get(ID.EXTERNAL_ID(id), false).map(Product::getProductName).orElse("");
             case "com.bigname.pim.api.domain.ProductVariant":
-                return ((ProductVariantService)services.get("productVariantService")).get(id, FindBy.EXTERNAL_ID, getParameter("channelId"), false).map(ProductVariant::getProductVariantName).orElse("");
+                return ((ProductVariantService)services.get("productVariantService")).get(ID.EXTERNAL_ID(id), getParameter("channelId"), false).map(ProductVariant::getProductVariantName).orElse("");
             case "com.bigname.pim.api.domain.AttributeCollection":
-                return ((AttributeCollectionService)services.get("attributeCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AttributeCollection::getCollectionName).orElse("");
+                return ((AttributeCollectionService)services.get("attributeCollectionService")).get(ID.EXTERNAL_ID(id), false).map(AttributeCollection::getCollectionName).orElse("");
             case "com.bigname.pim.api.domain.AssetCollection":
-                return ((AssetCollectionService)services.get("assetCollectionService")).get(id, FindBy.EXTERNAL_ID, false).map(AssetCollection::getCollectionName).orElse("");
+                return ((AssetCollectionService)services.get("assetCollectionService")).get(ID.EXTERNAL_ID(id), false).map(AssetCollection::getCollectionName).orElse("");
             case "com.bigname.pim.api.domain.PricingAttribute":
-                return ((PricingAttributeService)services.get("pricingAttributeService")).get(id, FindBy.EXTERNAL_ID, false).map(PricingAttribute::getPricingAttributeName).orElse("");
+                return ((PricingAttributeService)services.get("pricingAttributeService")).get(ID.EXTERNAL_ID(id), false).map(PricingAttribute::getPricingAttributeName).orElse("");
             case "com.bigname.pim.api.domain.Family":
-                return ((FamilyService)services.get("familyService")).get(id, FindBy.EXTERNAL_ID, false).map(Family::getFamilyName).orElse("");
-            case "com.bigname.pim.api.domain.User":
-                return ((UserService)services.get("userService")).get(id, FindBy.EXTERNAL_ID, false).map(User::getUserName).orElse("");
-            case "com.bigname.pim.api.domain.Event":
-                return ((EventService)services.get("eventService")).get(id, FindBy.EXTERNAL_ID, false).map(Event::getUser).orElse("");
+                return ((FamilyService)services.get("familyService")).get(ID.EXTERNAL_ID(id), false).map(Family::getFamilyName).orElse("");
+            case "com.m7.xtreme.xcore.domain.User":
+                return ((UserService)services.get("userService")).get(ID.EXTERNAL_ID(id), false).map(User::getUserName).orElse("");
+            case "com.m7.xtreme.xcore.domain.Event":
+                return ((EventService)services.get("eventService")).get(ID.EXTERNAL_ID(id), false).map(Event::getUser).orElse("");
             case "com.bigname.pim.api.domain.Config":
-                return ((ConfigService)services.get("configService")).get(id, FindBy.EXTERNAL_ID, false).map(Config::getConfigName).orElse("");
+                return ((ConfigService)services.get("configService")).get(ID.EXTERNAL_ID(id), false).map(Config::getConfigName).orElse("");
             case "com.bigname.pim.api.domain.AssetFamily":
-                return ((AssetFamilyService)services.get("assetFamilyService")).get(id, FindBy.EXTERNAL_ID, false).map(AssetFamily::getAssetFamilyName).orElse("");
+                return ((AssetFamilyService)services.get("assetFamilyService")).get(ID.EXTERNAL_ID(id), false).map(AssetFamily::getAssetFamilyName).orElse("");
+            case "com.m7.xtreme.xcore.domain.JobInstance":
+                return ((JobInstanceService)services.get("jobInstanceService")).get(ID.EXTERNAL_ID(id), false).map(JobInstance::getJobName).orElse("");
         }
         return "";
     }
 
-    private void addCrumbs(String id, Class<?> entity, boolean... endNode) {
+    protected void addCrumbs(String id, Class<?> entity, boolean... endNode) {
         if(!id.isEmpty()) {
             String[] names = getNames(entity);
             String[] urls = getUrls(id, entity);
@@ -298,11 +294,11 @@ public class BreadcrumbsBuilder {
         }
     }
 
-    private void addParentCrumbs() {
+    protected void addParentCrumbs() {
         if(isNotEmpty(getParameter("parentId"))) {
             String parentId = getParameter("parentId");
             String[] parentIds = StringUtil.splitPipeDelimited(parentId);
-            Map<String, Category> parentsMap = ((CategoryService) services.get("categoryService")).getAll(parentIds, FindBy.EXTERNAL_ID, null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
+            Map<String, Category> parentsMap = ((CategoryService) services.get("categoryService")).getAll(Arrays.stream(parentIds).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false).stream().collect(Collectors.toMap(Entity::getExternalId, c -> c));
 
             String _parentId = "";
             for (int i = 0; i < parentIds.length; i++) {
@@ -328,23 +324,4 @@ public class BreadcrumbsBuilder {
             }
         }
     }
-
-    private String buildURL(String baseURL, String hash, Map<String, Object> parameters) {
-        StringBuilder url = new StringBuilder(baseURL);
-        if(!parameters.isEmpty()) {
-            if(!baseURL.contains("?")) {
-                url.append("?");
-            } else {
-                url.append("&");
-            }
-
-            boolean[] first = {true};
-            parameters.forEach((name, value) -> {
-                url.append(first[0] ? "" : "&").append(name).append(EQUALS).append(value);
-                first[0] = false;
-            });
-        }
-        return isEmpty(hash) ? url.toString() : url.append(hash).toString();
-    }
-
 }

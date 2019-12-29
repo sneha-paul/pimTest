@@ -1,12 +1,15 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.FamilyService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,13 +17,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 13/03/2019.
@@ -31,16 +34,49 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes={PimApplication.class})
 public class FamilyAttributeGroupTest {
     @Autowired
-    FamilyDAO familyDAO;
+    private FamilyDAO familyDAO;
     @Autowired
-    FamilyService familyService;
+    private FamilyService familyService;
     @Autowired
-    AttributeCollectionDAO attributeCollectionDAO;
+    private AttributeCollectionDAO attributeCollectionDAO;
+    @Autowired
+    private UserDAO userDAO;
+
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) familyDAO.getTemplate();
+        }
+
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest(){
         //Create Attribute collection
@@ -51,7 +87,7 @@ public class FamilyAttributeGroupTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()),false).orElse(null);
 
         //Create attribute
         Attribute attribute = new Attribute();
@@ -64,7 +100,7 @@ public class FamilyAttributeGroupTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Create Attribute Option
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -82,7 +118,7 @@ public class FamilyAttributeGroupTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
             //Create Family
             Family familyDTO = new Family();
@@ -92,7 +128,7 @@ public class FamilyAttributeGroupTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             //Create Attribute Group
@@ -100,7 +136,7 @@ public class FamilyAttributeGroupTest {
             familyAttributeGroup.setActive("Y");
             familyAttributeGroup.setMasterGroup("Y");
             familyAttributeGroup.setFullId("DEFAULT_GROUP");
-           // familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
+            // familyAttributeGroup.setName(FamilyAttributeGroup.DEFAULT_GROUP);
             familyAttributeGroup.setId(familyAttributeGroup.getFullId());
 
 
@@ -129,112 +165,139 @@ public class FamilyAttributeGroupTest {
             Assert.assertEquals(familyAttributeGroup1.getFullId(), familyAttributeGroup.getFullId());
 
         });
-        }
+    }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getName() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setName() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getLabel() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setLabel() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void isEmpty() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFullId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setFullId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getDefaultGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setDefaultGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getActive() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setActive() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getMasterGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setMasterGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getSequenceNum() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setSequenceNum() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getSubSequenceNum() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setSubSequenceNum() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getParentGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setParentGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getChildGroups() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setChildGroups() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addChildGroup() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setAttributes() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void orchestrate() throws Exception {
         //Create New Instance
@@ -249,10 +312,12 @@ public class FamilyAttributeGroupTest {
         Assert.assertEquals(familyAttributeGroupDTO.getId(), "test");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void isAvailable() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create New Instance
@@ -273,13 +338,15 @@ public class FamilyAttributeGroupTest {
         Assert.assertEquals(map1.get("active"), map.get("active"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void equals() throws Exception {
     }
+
     @After
     public void tearDown() throws Exception {
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
     }
 
 }

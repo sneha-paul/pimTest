@@ -100,4 +100,20 @@ $(function(){
         };
         eModal.ajax(options);
     });
+
+    $('.js-catalogHistory-tab').on('shown.bs.tab.catalogHistory', function (e) {
+        $.initGrid({
+            selector: '#paginatedCatalogHistoryTable',
+            names: ['versions','version'],
+            dataUrl: $.getURL('/pim/catalogs/{catalogId}/history'),
+            hideStatus:'true',
+            columns: [
+                { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
+                { data: 'userName', name : 'userName' , title : 'User', orderable: false},
+                { data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+            ],
+            buttons: [$.detailsButton({pageUrl: $.getURL('/pim/catalogs/{catalogId}/history/')})]
+        });
+        $(this).removeClass('js-catalogHistory-tab').off('shown.bs.tab.catalogHistory');
+    });
 });

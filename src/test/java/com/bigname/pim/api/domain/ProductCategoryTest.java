@@ -1,17 +1,18 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
-import com.bigname.pim.api.persistence.dao.ProductCategoryDAO;
-import com.bigname.pim.api.persistence.dao.ProductDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
 import com.bigname.pim.api.service.CategoryService;
 import com.bigname.pim.api.service.FamilyService;
 import com.bigname.pim.api.service.ProductService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,8 +20,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,8 +29,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 22/03/2019.
@@ -39,26 +38,57 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes={PimApplication.class})
 public class ProductCategoryTest {
     @Autowired
-    ProductService productService;
+    private ProductService productService;
     @Autowired
-    ProductDAO productDAO;
+    private ProductDAO productDAO;
     @Autowired
-    FamilyService familyService;
+    private FamilyService familyService;
     @Autowired
-    FamilyDAO familyDAO;
+    private FamilyDAO familyDAO;
     @Autowired
-    ProductCategoryDAO productCategoryDAO;
+    private ProductCategoryDAO productCategoryDAO;
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
     @Autowired
-    CategoryDAO categoryDAO;
+    private CategoryDAO categoryDAO;
+    @Autowired
+    private UserDAO userDAO;
 
+    private MongoTemplate mongoTemplate;
+    
     @Before
     public void setUp() throws Exception {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) productDAO.getTemplate();
+        }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Category.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Creating families
@@ -74,7 +104,7 @@ public class ProductCategoryTest {
             familyService.create(familyDTO);
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
@@ -88,7 +118,7 @@ public class ProductCategoryTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //Create Product Category
         List<Map<String, Object>> categoriesData = new ArrayList<>();
@@ -100,43 +130,50 @@ public class ProductCategoryTest {
             categoryDTO.setActive((String)categoryData.get("active"));
             categoryDTO.setDescription((String)categoryData.get("description"));
             categoryService.create(categoryDTO);
-            Category category = categoryService.get(categoriesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Category category = categoryService.get(ID.EXTERNAL_ID(categoriesData.get(0).get("externalId").toString()), false).orElse(null);
 
-          ProductCategory productCategory = productService.addCategory(product.getProductId(), FindBy.EXTERNAL_ID, categoryDTO.getCategoryId(), FindBy.EXTERNAL_ID);
+          ProductCategory productCategory = productService.addCategory(ID.EXTERNAL_ID(product.getProductId()), ID.EXTERNAL_ID(categoryDTO.getCategoryId()));
 
             Assert.assertEquals(productCategory.getProductId(), product.getId());
             Assert.assertEquals(productCategory.getCategoryId(), category.getId());
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void init() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getProductId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setProductId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getCategoryId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setCategoryId() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
     }
+
     @After
     public void tearDown() throws Exception {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Product.class);
+        mongoTemplate.dropCollection(Family.class);
+        mongoTemplate.dropCollection(Category.class);
     }
 
 }

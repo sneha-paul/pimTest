@@ -1,14 +1,14 @@
 package com.bigname.pim.util;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.domain.ValidatableEntity;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.POIUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 public class ProductFeedCleaner {
 
     public static final String productFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Active_Products_ENVELOPES.xlsx";
-    public static final String updatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Active_Products_ENVELOPES-" + PimUtil.getTimestamp() + ".xlsx";
-    public static final String categorizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Categorized_Active_Products_ENVELOPES-" + PimUtil.getTimestamp() + ".xlsx";
+    public static final String updatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Active_Products_ENVELOPES-" + PlatformUtil.getTimestamp() + ".xlsx";
+    public static final String categorizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Categorized_Active_Products_ENVELOPES-" + PlatformUtil.getTimestamp() + ".xlsx";
     public static final String attributeOptionsFilePath = "/usr/local/pim/uploads/data/cleanup/AttributeOptions_ENVELOPES.xlsx";
-    public static final String missingAttributeOptionsFilePath = "/usr/local/pim/uploads/data/cleanup/MissingAttributeOptions_ENVELOPES-" + PimUtil.getTimestamp() + ".xlsx";
+    public static final String missingAttributeOptionsFilePath = "/usr/local/pim/uploads/data/cleanup/MissingAttributeOptions_ENVELOPES-" + PlatformUtil.getTimestamp() + ".xlsx";
     public static final String parentProductsFilePath = "/usr/local/pim/uploads/data/cleanup/ParentProductsData.xlsx";
-    public static final String missingParentProductsFilePath = "/usr/local/pim/uploads/data/cleanup/MissingParentProductsData-" + PimUtil.getTimestamp() + ".xlsx";
+    public static final String missingParentProductsFilePath = "/usr/local/pim/uploads/data/cleanup/MissingParentProductsData-" + PlatformUtil.getTimestamp() + ".xlsx";
 
     private static Map<String, Map<String, Map<String, Object>>> attributeOptionsMap = readAttributesData(attributeOptionsFilePath);
     private static Map<String, Map<String, Object>> parentProductsMap = readParentProductsData(parentProductsFilePath).entrySet().stream().findFirst().get().getValue();

@@ -1,23 +1,20 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,9 +40,10 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
         return attributeCollections;
     }
 
+
     @Override
-    public Optional<AttributeCollection> get(String id, FindBy findBy, boolean... activeRequired) {
-        Optional<AttributeCollection> collection =  super.get(id, findBy, activeRequired);
+    public <String> Optional<AttributeCollection> get(ID<String> id, boolean... activeRequired) {
+        Optional<AttributeCollection> collection =  super.get(id, activeRequired);
         collection.ifPresent(this::setAttributeList);
         return collection;
     }
@@ -58,20 +56,19 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
      * Method to get attributes of an attributeCollection in paginated format.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param page page number
      * @param size page size
      * @param sort sort Object
      * @return
      */
     @Override
-    public Page<Attribute> getAttributes(String collectionId, FindBy findBy, int page, int size, Sort sort) {
+    public Page<Attribute> getAttributes(ID<String> collectionId, int page, int size, Sort sort) {
         if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }
         final Map<String, AttributeGroup> attributeGroups = new HashMap<>();
         List<Attribute> attributes = new ArrayList<>();
-        get(collectionId, findBy, false).ifPresent(attributeCollection -> attributeGroups.putAll(attributeCollection.getAttributes()));
+        get(collectionId, false).ifPresent(attributeCollection -> attributeGroups.putAll(attributeCollection.getAttributes()));
         AttributeGroup.getAllAttributeGroups(attributeGroups, AttributeGroup.GetMode.ALL, true).forEach(g -> g.getAttributes().forEach((k, a) -> attributes.add(a)));
         return paginate(attributes, page, size, sort);
     }
@@ -80,14 +77,13 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
      * Method to get attributeGroups of an attributeCollection in list format.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param sort sort Object
      * @return
      */
     @Override
-    public List<Pair<String, String>> getAttributeGroupsIdNamePair(String collectionId, FindBy findBy, Sort sort) {
+    public List<Pair<String, String>> getAttributeGroupsIdNamePair(ID<String> collectionId, Sort sort) {
         List<Pair<String, String>> idNamePairs = new ArrayList<>();
-        Optional<AttributeCollection> attributeCollection = get(collectionId, findBy, false);
+        Optional<AttributeCollection> attributeCollection = get(collectionId, false);
         attributeCollection.ifPresent(attributeCollection1 -> AttributeGroup.getAllAttributeGroups(attributeCollection1.getAttributes(), AttributeGroup.GetMode.ALL, true).forEach(attributeGroup -> idNamePairs.add(Pair.with(attributeGroup.getFullId(), AttributeGroup.getFullGroupLabel(attributeGroup, " > ")))));
 //        idNamePairs.sort(Comparator.comparing(Pair::getValue0)); // TODO -replace after implementing sorting based on sort parameter
         return idNamePairs;
@@ -97,7 +93,6 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
      * Method to get attributeOptions of an attribute in paginated format.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param attributeId Internal or External id of the Attribute
      * @param page page number
      * @param size page size
@@ -105,12 +100,12 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
      * @return
      */
     @Override
-    public Page<AttributeOption> getAttributeOptions(String collectionId, FindBy findBy, String attributeId, int page, int size, Sort sort) {
+    public Page<AttributeOption> getAttributeOptions(ID<String> collectionId, String attributeId, int page, int size, Sort sort) {
          /*if(sort == null) {
             sort = Sort.by(Sort.Direction.ASC, "name");
         }*/
         Map<String, AttributeOption> parentAttributeOptions = new HashMap<>();
-        List<AttributeOption> attributeOptions = get(collectionId, findBy, false)
+        List<AttributeOption> attributeOptions = get(collectionId, false)
                 .map(attributeCollection -> attributeCollection.getAttribute(attributeId)
                         .map(attribute -> {
                             parentAttributeOptions.putAll(attributeCollection.getAttribute(attribute.getParentAttributeId())
@@ -126,7 +121,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
 
 
         attributeOptions.forEach(attributeOption -> {
-            attributeOption.setCollectionId(collectionId);
+            attributeOption.setCollectionId(collectionId.getId());
             attributeOption.setId(StringUtil.getSimpleId(attributeOption.getFullId()));
             String parentOptionSimpleId = StringUtil.getSimpleId(attributeOption.getParentOptionFullId());
             if(ValidationUtil.isNotEmpty(parentOptionSimpleId)) {
@@ -151,14 +146,13 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
      * Method to find an attribute from an attributeCollection.
      *
      * @param collectionId Internal or External id of the AttributeCollection
-     * @param findBy Type of the attributeCollection id, INTERNAL_ID or EXTERNAL_ID
      * @param attributeFullId Internal or External id of the Attribute
      * @return
      */
     @Override
-    public Optional<Attribute> findAttribute(String collectionId, FindBy findBy, String attributeFullId) {
+    public Optional<Attribute> findAttribute(ID<String> collectionId, String attributeFullId) {
         List<Attribute> attributes = new ArrayList<>();
-        get(collectionId, findBy).ifPresent(attributeCollection -> attributeCollection.getAllAttributes().stream().filter(attribute -> attribute.getFullId().equalsIgnoreCase(attributeFullId)).forEach(attributes::add));
+        get(collectionId).ifPresent(attributeCollection -> attributeCollection.getAllAttributes().stream().filter(attribute -> attribute.getFullId().equalsIgnoreCase(attributeFullId)).forEach(attributes::add));
         return attributes.isEmpty() ? Optional.empty() : Optional.of(attributes.get(0));
     }
 
@@ -171,7 +165,7 @@ public class AttributeCollectionServiceImpl extends BaseServiceSupport<Attribute
      */
     @Override
     public Optional<AttributeOption> findAttributeOption(FamilyAttribute familyAttribute, String attributeOptionId) {
-        Optional<Attribute> attribute = findAttribute(familyAttribute.getCollectionId(), FindBy.EXTERNAL_ID, familyAttribute.getAttributeId());
+        Optional<Attribute> attribute = findAttribute(ID.EXTERNAL_ID(familyAttribute.getCollectionId()), familyAttribute.getAttributeId());
         return attribute.map(attribute1 -> attribute1.getOptions().entrySet().stream().filter(e -> {e.getValue().setCollectionId(familyAttribute.getCollectionId());return e.getKey().equals(attributeOptionId);}).map(Map.Entry::getValue).findFirst()).orElse(Optional.empty());
     }
 }

@@ -1,12 +1,11 @@
 package com.bigname.common.util;
 
 import com.bigname.pim.api.domain.Website;
+import com.m7.xtreme.common.util.ReflectionUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sruthi on 27-02-2019.

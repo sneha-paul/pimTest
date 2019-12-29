@@ -1,11 +1,14 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
+import com.bigname.pim.api.persistence.dao.mongo.PricingAttributeDAO;
 import com.bigname.pim.api.service.PricingAttributeService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +16,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -22,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 06/03/2019.
@@ -34,13 +37,44 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes={PimApplication.class})
 public class PricingAttributeTest {
     @Autowired
-    PricingAttributeService pricingAttributeService;
+    private PricingAttributeService pricingAttributeService;
     @Autowired
-    PricingAttributeDAO pricingAttributeDAO;
+    private PricingAttributeDAO pricingAttributeDAO;
+    @Autowired
+    private UserDAO userDAO;
+
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) pricingAttributeDAO.getTemplate();
+        }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(PricingAttribute.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create new instance
@@ -56,13 +90,14 @@ public class PricingAttributeTest {
         Assert.assertEquals(pricingAttributeDTO.getActive(), "N");
 
         pricingAttributeService.create(pricingAttributeDTO);
-        PricingAttribute newPricingAttribute = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+        PricingAttribute newPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newPricingAttribute));
         Assert.assertEquals(newPricingAttribute.getPricingAttributeId(), pricingAttributeDTO.getPricingAttributeId());
         Assert.assertEquals(newPricingAttribute.getPricingAttributeName(), pricingAttributeDTO.getPricingAttributeName());
         Assert.assertEquals(newPricingAttribute.getActive(), pricingAttributeDTO.getActive());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() throws Exception {
         //Create New Map
@@ -77,15 +112,16 @@ public class PricingAttributeTest {
             pricingAttributeDAO.insert(pricingAttributeDTO);
 
             //Clone PricingAttribute
-            PricingAttribute newPricingAttribute = pricingAttributeService.get(pricingAttributeDTO.getPricingAttributeId(), EXTERNAL_ID, false).orElse(null);
+            PricingAttribute newPricingAttribute = pricingAttributeService.get(ID.EXTERNAL_ID(pricingAttributeDTO.getPricingAttributeId()), false).orElse(null);
            Assert.assertTrue(newPricingAttribute != null);
              Assert.assertTrue(newPricingAttribute.diff(pricingAttributeDTO).isEmpty());
 
-            PricingAttribute pricingAttributeClone = pricingAttributeService.cloneInstance(newPricingAttribute.getPricingAttributeId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            PricingAttribute pricingAttributeClone = pricingAttributeService.cloneInstance(ID.EXTERNAL_ID(newPricingAttribute.getPricingAttributeId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(pricingAttributeClone.getPricingAttributeId() .equals(newPricingAttribute.getPricingAttributeId() + "_COPY") && pricingAttributeClone.getPricingAttributeName().equals(newPricingAttribute.getPricingAttributeName() + "_COPY") &&  pricingAttributeClone.getActive() != newPricingAttribute.getActive());
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create Original instance
@@ -124,6 +160,7 @@ public class PricingAttributeTest {
         Assert.assertEquals(original.getActive(), "N");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create New Instance
@@ -144,6 +181,7 @@ public class PricingAttributeTest {
         Assert.assertEquals(map1.get("active"), map.get("active"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create first instance
@@ -175,9 +213,10 @@ public class PricingAttributeTest {
         Assert.assertEquals(diff1.size(), 1);
         Assert.assertEquals(diff1.get("pricingAttributeName"), "test.com2");
     }
+
     @After
     public void tearDown() throws Exception {
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+        mongoTemplate.dropCollection(PricingAttribute.class);
     }
 
 }

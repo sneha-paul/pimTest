@@ -1,10 +1,10 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.domain.Entity;
 import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by sruthi on 20-09-2018.
  */
 @Document
-public class ProductVariant extends Entity<ProductVariant> {
+public class ProductVariant extends MongoEntity<ProductVariant> {
 
     @Transient
     @NotEmpty(message = "ProductVariant Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
@@ -272,6 +272,27 @@ public class ProductVariant extends Entity<ProductVariant> {
 
         return diff;
     }
+
+    /*@Override
+    public Object getCopy(ProductVariant productVariant) {
+        ProductVariant _productVariant = new ProductVariant();
+        _productVariant.setProductVariantName(productVariant.getProductVariantName());
+        _productVariant.setProductVariantId(productVariant.getProductVariantId());
+        _productVariant.setProductId(productVariant.getProductId());
+        _productVariant.setAxisAttributes(productVariant.getAxisAttributes());
+        _productVariant.setVariantAttributes(productVariant.getVariantAttributes());
+        _productVariant.setVariantAssets(productVariant.getVariantAssets());
+        _productVariant.setPricingDetails(productVariant.getPricingDetails());
+        _productVariant.setChannelId(productVariant.getChannelId());
+        _productVariant.setSubSequenceNum(productVariant.getSubSequenceNum());
+        _productVariant.setSequenceNum(productVariant.getSequenceNum());
+        _productVariant.setActive(productVariant.getActive());
+        _productVariant.setArchived(productVariant.getArchived());
+        _productVariant.setDiscontinued(productVariant.getDiscontinued());
+        _productVariant.setVersionId(productVariant.getVersionId());
+        _productVariant.setId(productVariant.getId());
+        return _productVariant;
+    }*/
 
     public interface SeoGroup {}
 }

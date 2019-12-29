@@ -1,32 +1,24 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.persistence.dao.UserDAO;
 import com.bigname.pim.api.service.RegistrationService;
-import com.bigname.pim.api.service.UserService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -49,9 +41,14 @@ public class RegistrationServiceImplTest {
     @Autowired
     private RegistrationService registrationService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) userDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(User.class);
     }
 
     @Test
@@ -87,7 +84,7 @@ public class RegistrationServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        mongoTemplate.dropCollection(User.class);
     }
 
 

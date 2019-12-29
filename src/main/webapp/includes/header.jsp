@@ -4,7 +4,7 @@
     </div>
 
     <div class="navbar-brand">
-        <a href="index.html"><img src="/assets/img/logo.png" style="width:140px; margin-left:30px; vertical-align:middle;" alt="BIGNAME Logo" class="img-responsive logo"></a>
+        <a href="index.html"><img src="/assets/img/logo.png" style="width:140px; vertical-align:middle;" alt="BIGNAME Logo" class="img-responsive logo"></a>
     </div>
 
     <div class="navbar-right">

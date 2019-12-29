@@ -1,17 +1,18 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Catalog;
-import com.bigname.pim.api.domain.User;
 import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.WebsiteDAO;
 import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.api.service.UserService;
 import com.bigname.pim.api.service.WebsiteService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -72,20 +74,26 @@ public class WebsiteControllerTest {
     @Autowired
     private CategoryDAO categoryDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
-            user.setUserName("MANU@BLACWOOD.COm");
+            user.setUserName("MANU@BLACWOOD.COM");
             user.setPassword("temppass");
             user.setEmail("manu@blacwood.com");
             user.setActive("Y");
             userService.create(user);
         }
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        categoryDAO.getMongoTemplate().dropCollection(Catalog.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void contexLoads() throws Exception {
         Assert.assertNotNull(websiteController);
@@ -150,6 +158,10 @@ public class WebsiteControllerTest {
     @WithUserDetails("manu@blacwood.com")
     @Test
     public void detailsTest() throws Exception {
+        /*If nullPointer exception occur for getCurrentUser(), break the events into different functions*/
+        //Add a website instance
+        List<Website> createdWebsiteInstances = addWebsiteInstances();
+
         //Create mode
         mockMvc.perform(
                 get("/pim/websites/create"))
@@ -165,8 +177,6 @@ public class WebsiteControllerTest {
                 .andExpect(view().name("error"))
                 .andExpect(forwardedUrl("/error.jsp"));*/
 
-        //Add a website instance
-        List<Website> createdWebsiteInstances = addWebsiteInstances();
         Assert.assertFalse(createdWebsiteInstances.isEmpty());
 
         //Details mode with valid websiteID
@@ -281,7 +291,7 @@ public class WebsiteControllerTest {
         });
 
         //Adding websiteCatalogs
-        Website website = websiteService.get(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID,false).orElse(null);
+        Website website = websiteService.get(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString()), false).orElse(null);
 
         List<Map<String, Object>> catalogsData = new ArrayList<>();
         catalogsData.add(CollectionsUtil.toMap("name", "Test Catalog 1.com", "externalId", "TEST_CATALOG_1", "active", "Y"));
@@ -295,8 +305,8 @@ public class WebsiteControllerTest {
             catalogDTO.setActive((String)catalogData.get("active"));
             catalogService.create(catalogDTO);
 
-            Catalog catalog = catalogService.get((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID,false).orElse(null);
-            websiteService.addCatalog(website.getExternalId(), FindBy.EXTERNAL_ID, catalog.getExternalId(), FindBy.EXTERNAL_ID);
+            Catalog catalog = catalogService.get(ID.EXTERNAL_ID((String) catalogData.get("externalId")), false).orElse(null);
+            websiteService.addCatalog(ID.EXTERNAL_ID(website.getExternalId()), ID.EXTERNAL_ID(catalog.getExternalId()));
         });
 
         //Getting websites data
@@ -365,7 +375,7 @@ public class WebsiteControllerTest {
         });
 
         //Adding websiteCatalog
-        websiteService.addCatalog(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID);
+        websiteService.addCatalog(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString()), ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString()));
 
         //Getting availableCatalogs
         MultiValueMap<String, String> detailsParams1 = new LinkedMultiValueMap<>();
@@ -414,8 +424,8 @@ public class WebsiteControllerTest {
         });
 
         //Adding websiteCatalog
-        Website website = websiteService.get(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
-        Page<Catalog> availableCatalogs = websiteService.getAvailableCatalogsForWebsite(website.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
+        Website website = websiteService.get(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString()), false).orElse(null);
+        Page<Catalog> availableCatalogs = websiteService.getAvailableCatalogsForWebsite(ID.EXTERNAL_ID(website.getExternalId()), 1, 1, null, false);
 
         MultiValueMap<String, String> detailsParams = new LinkedMultiValueMap<>();
         detailsParams.put("id", ConversionUtil.toList("TEST_WEBSITE_1"));
@@ -430,16 +440,11 @@ public class WebsiteControllerTest {
         result.andExpect(jsonPath("$.size()").value(1));
         result.andExpect(jsonPath("$.success").value(true));
 
-        Page<Catalog> availableCatalogs1 = websiteService.getAvailableCatalogsForWebsite(website.getExternalId(), FindBy.EXTERNAL_ID, 1, 1, null, false);
+        Page<Catalog> availableCatalogs1 = websiteService.getAvailableCatalogsForWebsite(ID.EXTERNAL_ID(website.getExternalId()), 1, 1, null, false);
         Assert.assertEquals(availableCatalogs1.getTotalElements(), availableCatalogs.getTotalElements() - 1);
 
     }
 
-    @After
-    public void tearDown() throws Exception {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        categoryDAO.getMongoTemplate().dropCollection(Catalog.class);
-    }
 
     private List<Website> addWebsiteInstances() {
         List<Website> createdWebsiteInstances = new ArrayList<>();
@@ -455,5 +460,13 @@ public class WebsiteControllerTest {
         });
         return createdWebsiteInstances;
     }
+
+    @After
+    public void tearDown() throws Exception {
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
+    }
+
+
 
 }

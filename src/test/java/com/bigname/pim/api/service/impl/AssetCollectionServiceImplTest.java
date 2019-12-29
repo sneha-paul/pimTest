@@ -1,12 +1,16 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +18,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,9 +27,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -34,6 +37,9 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes={PimApplication.class})
 public class AssetCollectionServiceImplTest {
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private AssetCollectionDAO assetCollectionDAO;
 
     @Autowired
@@ -42,15 +48,30 @@ public class AssetCollectionServiceImplTest {
     @Autowired
     private VirtualFileService assetService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) assetCollectionDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAssetsHierarchyTest() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAssetCollectionTest() throws Exception {
         List<Map<String, Object>> assetCollectionData = new ArrayList<>();
@@ -65,7 +86,7 @@ public class AssetCollectionServiceImplTest {
             assetCollectionDTO.setRootId(assetService.create(VirtualFile.getRootInstance()).getId());
             assetCollectionDAO.insert(assetCollectionDTO);
 
-            AssetCollection newAssetCollection = assetCollectionService.get(assetCollectionDTO.getCollectionId(), EXTERNAL_ID, false).orElse(null);
+            AssetCollection newAssetCollection = assetCollectionService.get(ID.EXTERNAL_ID(assetCollectionDTO.getCollectionId()), false).orElse(null);
             Assert.assertTrue(newAssetCollection != null);
             Assert.assertTrue(newAssetCollection.diff(assetCollectionDTO).isEmpty());
         });
@@ -77,7 +98,7 @@ public class AssetCollectionServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
 }

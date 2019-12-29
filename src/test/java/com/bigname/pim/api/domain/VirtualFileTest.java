@@ -1,9 +1,12 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
+import com.bigname.pim.api.persistence.dao.mongo.VirtualFileDAO;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +14,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -18,8 +23,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 21/03/2019.
@@ -30,13 +33,44 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes={PimApplication.class})
 public class VirtualFileTest {
     @Autowired
-    VirtualFileService virtualFileService;
+    private VirtualFileService virtualFileService;
     @Autowired
-    VirtualFileDAO virtualFileDAO;
+    private VirtualFileDAO virtualFileDAO;
+    @Autowired
+    private UserDAO userDAO;
+
+    private MongoTemplate mongoTemplate;
     @Before
     public void setUp() throws Exception {
-        virtualFileDAO.getMongoTemplate().dropCollection(VirtualFile.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) virtualFileDAO.getTemplate();
+        }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(VirtualFile.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create new instance
@@ -62,7 +96,7 @@ public class VirtualFileTest {
 
         //create
         virtualFileService.create(virtualFileDTO);
-        VirtualFile newVirtualFile = virtualFileService.get(virtualFileDTO.getFileId(), EXTERNAL_ID, false).orElse(null);
+        VirtualFile newVirtualFile = virtualFileService.get(ID.EXTERNAL_ID(virtualFileDTO.getFileId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newVirtualFile));
         Assert.assertEquals(newVirtualFile.getFileId(), virtualFileDTO.getFileId());
         Assert.assertEquals(newVirtualFile.getFileName(), virtualFileDTO.getFileName());
@@ -72,6 +106,8 @@ public class VirtualFileTest {
         Assert.assertEquals(newVirtualFile.getRootDirectoryId(), virtualFileDTO.getRootDirectoryId());
         Assert.assertEquals(newVirtualFile.getSize(), virtualFileDTO.getSize());
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create Original Instance
@@ -118,6 +154,8 @@ public class VirtualFileTest {
         Assert.assertEquals(original.getType(), "test11-A");
         Assert.assertEquals(original.getExtension(), "test22-A");
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create New Instance
@@ -147,8 +185,9 @@ public class VirtualFileTest {
         Assert.assertEquals(map1.get("extension"), map.get("extension"));
         Assert.assertEquals(map1.get("active"), map.get("active"));
     }
+
     @After
     public void tearDown() throws Exception {
-        virtualFileDAO.getMongoTemplate().dropCollection(VirtualFile.class);
+        mongoTemplate.dropCollection(VirtualFile.class);
     }
 }

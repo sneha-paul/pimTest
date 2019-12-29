@@ -1,11 +1,10 @@
 package com.bigname.common.util;
 
+import com.m7.xtreme.common.util.URLUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by sruthi on 27-02-2019.

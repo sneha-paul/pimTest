@@ -5,6 +5,8 @@ $(function(){
         pageUrl: '/pim/categories/',
         toolbar: [{name: 'EXPORT', actionUrl: '/pim/categories/export'}, {name: 'IMPORT'}],
         dataUrl: '/pim/categories/data',
+        toggleUrl:'/pim/categories/{externalId}/categories/active/{active}',
+        archiveUrl:'/pim/categories/{externalId}/categories/archive/{archived}',
         columns: [
             { data: 'categoryName', name : 'categoryName' , title : 'Category Name', width:'45%', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6>';}},
             { data: 'externalId', name : 'externalId', title : 'Category ID', width:'30%' }
@@ -52,6 +54,17 @@ $(function(){
         title:'Create Category',
         buttons: [
             {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('categories');$.closeModal();});}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
+
+    $.addModal({
+        selector: '#js-advanced-search',
+        url: $.getURL('/pim/categories/search'),
+        name:'advanced-search',
+        title:'Advanced Search',
+        buttons: [
+            {text: 'SEARCH', style: 'primary', close: false, click: function(){$.getDataTable('categories').search('').draw();$.closeModal();}},
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });

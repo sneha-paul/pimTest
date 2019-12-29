@@ -1,7 +1,7 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.domain.Entity;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -21,7 +21,7 @@ import java.util.Map;
 @CompoundIndexes({
         @CompoundIndex(name = "uniqueFileName", unique = true, def = "{'parentDirectoryId':1, 'fileName':1}")
 })
-public class VirtualFile extends Entity<VirtualFile> {
+public class VirtualFile extends MongoEntity<VirtualFile> {
 
     @Transient
     @NotEmpty(message = "Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
@@ -202,4 +202,22 @@ public class VirtualFile extends Entity<VirtualFile> {
         map.put("active", getActive());
         return map;
     }
+
+    /*@Override
+    public Object getCopy(VirtualFile virtualFile) {
+        VirtualFile _virtualFile = new VirtualFile();
+        _virtualFile.setFileName(virtualFile.getFileName());
+        _virtualFile.setIsDirectory(virtualFile.getIsDirectory());
+        _virtualFile.setParentDirectoryId(virtualFile.getParentDirectoryId());
+        _virtualFile.setParentIds(virtualFile.getParentIds());
+        _virtualFile.setRootDirectoryId(virtualFile.getRootDirectoryId());
+        _virtualFile.setSize(virtualFile.getSize());
+        _virtualFile.setFileId(virtualFile.getFileId());
+        _virtualFile.setActive(virtualFile.getActive());
+        _virtualFile.setArchived(virtualFile.getArchived());
+        _virtualFile.setDiscontinued(virtualFile.getDiscontinued());
+        _virtualFile.setVersionId(virtualFile.getVersionId());
+        _virtualFile.setId(virtualFile.getId());
+        return _virtualFile;
+    }*/
 }

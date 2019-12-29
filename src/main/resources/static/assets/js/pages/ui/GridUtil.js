@@ -30,7 +30,7 @@
                 title: 'Details',
                 icon: 'icon-eye',
                 click: function (row) {
-                    window.location.href = $.getURLWithRequestParams(options.pageUrl + row.externalId, options.urlParams || {});
+                    window.location.href = $.getURLWithRequestParams(options.pageUrl.includes('history') === true ? (options.pageUrl + row.timeStamp) : options.pageUrl + row.externalId, options.urlParams || {});
                 }
             };
         },
@@ -82,6 +82,24 @@
                         }),
                         options.names[1],
                         $.refreshDataTable.bind(this, options.names[0]), row.active);
+                }
+            };
+        },
+
+        archivedStatusButton: function(options) {
+            return {
+                name: 'ARCHIVE_STATUS',
+                style: 'success',
+                title: 'Disable',
+                icon: 'fa-archive',
+                click: function(row){
+                    $.archiveStatus(
+                        $.getURL((typeof options.archiveUrl === 'undefined' || options.archiveUrl === '' ? options.pageUrl + '{externalId}/archive/{archived}' : options.archiveUrl), {
+                            externalId: row.externalId,
+                            archived: row.archived
+                        }),
+                        options.names[1],
+                        $.refreshDataTable.bind(this, options.names[0]), row.archived);
                 }
             };
         },
@@ -181,7 +199,9 @@
 
         /** Renderers **/
         renderStatusColumn: function(data) {
-            if (data.discontinued === 'Y') {
+            if(data.archived === 'Y') {
+                return '<span class="badge badge-warning">Archived</span>';
+            } else if (data.discontinued === 'Y') {
                 return '<span class="badge badge-warning">Discontinued</span>';
             } else {
                 if (data.active === 'Y') {
@@ -277,6 +297,9 @@
                             case 'CHANGE_PASSWORD':
                                 buttons[i] = $.changePasswordButton(options);
                                 break;
+                            case 'ARCHIVED':
+                                buttons[i] = $.archivedStatusButton(options);
+                                break;
                         }
                     }
                 });
@@ -302,7 +325,8 @@
                 buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
                     $.cloneButton(options),
-                    $.toggleStatusButton(options)
+                    $.toggleStatusButton(options),
+                    $.archivedStatusButton(options)
                 ]
             }));
         },
@@ -318,6 +342,9 @@
                             case 'TOGGLE_STATUS':
                                 buttons[i] = $.toggleStatusButton(options);
                                 break;
+                            case 'ARCHIVED':
+                                buttons[i] = $.archivedStatusButton(options);
+                                break;
                         }
                     }
                 });
@@ -329,7 +356,8 @@
                 columns: columns,
                 buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
-                    $.toggleStatusButton(options)
+                    $.toggleStatusButton(options),
+                    $.archivedStatusButton(options)
                 ]
             }));
         }

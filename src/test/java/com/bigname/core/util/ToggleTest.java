@@ -1,10 +1,12 @@
 package com.bigname.core.util;
 
+import com.m7.xtreme.xcore.util.Toggle;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.bigname.core.util.Toggle.DISABLE;
-import static com.bigname.core.util.Toggle.ENABLE;
+import static com.m7.xtreme.xcore.util.Toggle.DISABLE;
+import static com.m7.xtreme.xcore.util.Toggle.ENABLE;
+
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -13,13 +15,13 @@ public class ToggleTest {
 
     @Test
     public void state() throws Exception {
-      Assert.assertEquals(Toggle.ENABLE.state(), "Y");
+      Assert.assertEquals(ENABLE.state(), "Y");
       Assert.assertEquals(DISABLE.state(), "N");
     }
 
     @Test
     public void booleanValue() throws Exception {
-        Assert.assertTrue(Toggle.ENABLE.booleanValue());
+        Assert.assertTrue(ENABLE.booleanValue());
         Assert.assertFalse(DISABLE.booleanValue());
     }
 

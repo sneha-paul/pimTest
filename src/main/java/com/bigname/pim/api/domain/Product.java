@@ -1,16 +1,17 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.BeanUtil;
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
 import com.bigname.pim.util.PIMConstants;
 import com.bigname.pim.util.ProductUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.common.util.BeanUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,15 +22,17 @@ import java.util.Map;
  * Created by sruthi on 19-09-2018.
  */
 @Document
-public class Product extends Entity<Product> {
+public class Product extends MongoEntity<Product> {
 
 
     @Transient
     @NotEmpty(message = "Product Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Product Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     String productId;
 
     //    @Indexed(unique = true)
     @NotEmpty(message = "Product Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Product Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String productName;
 
     @NotEmpty(message = "Product Family cannot be empty", groups = {CreateGroup.class})
@@ -262,5 +265,24 @@ public class Product extends Entity<Product> {
         }
 
         return diff;
+    }
+
+    /*@Override
+    public Object getCopy(Product product) {
+        Product _product = new Product();
+        _product.setProductName(product.getProductName());
+        _product.setProductFamilyId(product.getProductFamilyId());
+        _product.setProductId(product.getProductId());
+        _product.setScopedFamilyAttributes(product.getScopedFamilyAttributes());
+        _product.setActive(product.getActive());
+        _product.setArchived(product.getArchived());
+        _product.setDiscontinued(product.getDiscontinued());
+        _product.setVersionId(product.getVersionId());
+        _product.setId(product.getId());
+        return _product;
+    }*/
+
+    private void setScopedFamilyAttributes(Map<String, Map<String, Object>> scopedFamilyAttributes) {
+        this.scopedFamilyAttributes = scopedFamilyAttributes;
     }
 }

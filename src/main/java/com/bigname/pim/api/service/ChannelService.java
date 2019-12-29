@@ -1,10 +1,8 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.core.service.BaseService;
 import com.bigname.pim.api.domain.Channel;
-import com.bigname.pim.api.persistence.dao.ChannelDAO;
-
-import java.util.List;
+import com.bigname.pim.api.persistence.dao.mongo.ChannelDAO;
+import com.m7.xtreme.xcore.service.BaseService;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

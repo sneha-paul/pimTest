@@ -1,11 +1,11 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.UserDAO;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
-import com.bigname.pim.api.service.UserService;
-import com.bigname.pim.api.service.WebsiteService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,8 +22,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 20/03/2019.
@@ -32,14 +32,42 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes={PimApplication.class})
 public class UserTest {
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    UserDAO userDAO;
+    private UserDAO userDAO;
+
+    private MongoTemplate mongoTemplate;
 
     @Before
     public void setUp() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) userDAO.getTemplate();
+        }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest() {
         //Create new instance
@@ -61,7 +89,7 @@ public class UserTest {
 
         //Create
         userService.create(userDTO);
-        User newUser = userService.get(userDTO.getExternalId(), EXTERNAL_ID, false).orElse(null);
+        User newUser = userService.get(ID.EXTERNAL_ID(userDTO.getExternalId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newUser));
         Assert.assertEquals(newUser.getExternalId(), userDTO.getExternalId());
         Assert.assertEquals(newUser.getEmail(), userDTO.getEmail());
@@ -69,6 +97,8 @@ public class UserTest {
         Assert.assertEquals(newUser.getPassword(), userDTO.getPassword());
         Assert.assertEquals(newUser.getStatus(), userDTO.getStatus());
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create new Instance
@@ -94,6 +124,8 @@ public class UserTest {
         Assert.assertEquals(map1.get("status"), map.get("status"));
         Assert.assertEquals(map1.get("active"), map.get("active"));
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create first instance
@@ -122,9 +154,10 @@ public class UserTest {
         Assert.assertEquals(diff1.size(), 1);
         Assert.assertEquals(diff1.get("password"), "test2");
     }
+
     @After
     public void tearDown() throws Exception {
-        userDAO.getMongoTemplate().dropCollection(User.class);
+        //mongoTemplate.dropCollection(User.class);
     }
 
 

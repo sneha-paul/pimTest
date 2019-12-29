@@ -1,35 +1,40 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.xcore.domain.MongoEntity;
+import com.m7.xtreme.xplatform.domain.Version;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
-import static com.bigname.common.util.RegExBuilder.*;
 import static com.bigname.pim.api.domain.Website.Property.*;
+import static com.m7.xtreme.common.util.RegExBuilder.*;
 
 
-public class Website extends Entity<Website> {
+public class Website extends MongoEntity<Website> {
 
     @Transient
     @NotEmpty(message = "Website Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @Pattern(regexp = "[" + ALPHA + NUMERIC + UNDERSCORE + "]", message = "website.websiteId.invalid")
+    @NotBlank(message = "Website Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String websiteId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Website name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @Pattern(regexp = "[" + ALPHA + NUMERIC + SPACE + "]", message = "website.websiteName.invalid")
+    @NotBlank(message = "Website name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String websiteName;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Website URL cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Website URL cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String url;
 
     @Transient
@@ -148,8 +153,20 @@ public class Website extends Entity<Website> {
             diff.put("active", website.getActive());
         }
 
-
-
         return diff;
     }
+
+    /*@Override
+    public Website getCopy(Website website) {
+        Website _website = new Website();
+        _website.setWebsiteName(website.getWebsiteName());
+        _website.setWebsiteId(website.getWebsiteId());
+        _website.setUrl(website.getUrl());
+        _website.setActive(website.getActive());
+        _website.setDiscontinued(website.getDiscontinued());
+        _website.setArchived(website.getArchived());
+        _website.setVersionId(website.getVersionId());
+        _website.setId(website.getId());
+        return _website;
+    }*/
 }

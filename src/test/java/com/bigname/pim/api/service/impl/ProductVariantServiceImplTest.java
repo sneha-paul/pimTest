@@ -1,15 +1,19 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.*;
+import com.bigname.pim.api.persistence.dao.mongo.*;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
 import com.bigname.pim.api.service.*;
-import com.bigname.pim.util.PimUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.Criteria;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,7 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,7 +33,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -38,6 +42,10 @@ import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class ProductVariantServiceImplTest {
+
+    @Autowired
+    private UserService userService;
+
     @Autowired
     private ProductDAO productDAO;
 
@@ -71,20 +79,34 @@ public class ProductVariantServiceImplTest {
     @Autowired
     private ProductVariantService productVariantService;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) productDAO.getTemplate();
+        }
 
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Channel.class);
 
-        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
+        mongoTemplate.dropCollection(ProductVariant.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() throws Exception {
         //creating channel
@@ -99,7 +121,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -110,7 +132,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -138,7 +160,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -164,7 +186,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -172,7 +194,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -228,7 +250,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -241,7 +263,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -257,10 +279,11 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         //Getting productVariants
-        Page<ProductVariant> productVariants =  productVariantService.findAll("productVariantName", "Test", product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), PageRequest.of(0, productVariantData.size()), false);
+        Page<ProductVariant> productVariants =  productVariantService.findAll("productVariantName", "Test", ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), PageRequest.of(0, productVariantData.size()), false);
         Assert.assertEquals(productVariants.getContent().size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateTest() throws Exception {
         //creating channel
@@ -275,7 +298,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -286,7 +309,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -314,7 +337,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -340,7 +363,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -348,7 +371,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -404,7 +427,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -417,7 +440,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         ProductVariant productVariantDTO = new ProductVariant();
@@ -428,17 +451,18 @@ public class ProductVariantServiceImplTest {
         productVariantDTO.setChannelId(channel.getChannelId());
         productVariantDAO.insert(productVariantDTO);
 
-        ProductVariant productVariant =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        ProductVariant productVariant =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         productVariant.setActive("N");
         productVariant.setGroup("DETAILS");
 
         //updating ProductVariant
-        ProductVariant updatedProductVariant =  productVariantService.update(productVariant.getId(), FindBy.INTERNAL_ID, productVariant);
-        ProductVariant productVariant1 =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        ProductVariant updatedProductVariant =  productVariantService.update(ID.INTERNAL_ID(productVariant.getId()), productVariant);
+        ProductVariant productVariant1 =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(productVariant1));
         Assert.assertEquals(productVariant1.getActive(), "N");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() throws Exception {
         //creating channel
@@ -453,7 +477,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -464,7 +488,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -492,7 +516,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -518,7 +542,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -526,7 +550,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -582,7 +606,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -595,7 +619,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         ProductVariant productVariantDTO = new ProductVariant();
@@ -606,10 +630,11 @@ public class ProductVariantServiceImplTest {
         productVariantDTO.setChannelId(channel.getChannelId());
         productVariantDAO.insert(productVariantDTO);
         // Getting productVariant
-        ProductVariant productVariant =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        ProductVariant productVariant =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         Assert.assertEquals(productVariant.getProductVariantName(), productVariantDTO.getProductVariantName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void get1Test() throws Exception {
         //creating channel
@@ -624,7 +649,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -635,7 +660,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -663,7 +688,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -689,7 +714,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -697,7 +722,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -753,7 +778,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -766,7 +791,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -781,10 +806,11 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         //Getting productVariant
-        ProductVariant productVariant = productVariantService.get(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(),productVariantData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        ProductVariant productVariant = productVariantService.get(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), ID.EXTERNAL_ID(productVariantData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertEquals(productVariant.getProductVariantName(), productVariantData.get(0).get("name"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void get2Test() throws Exception {
         //creating channel
@@ -799,7 +825,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -810,7 +836,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -838,7 +864,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -864,7 +890,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -872,7 +898,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -928,7 +954,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -941,7 +967,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         ProductVariant productVariantDTO = new ProductVariant();
@@ -952,11 +978,12 @@ public class ProductVariantServiceImplTest {
         productVariantDTO.setChannelId(channel.getChannelId());
         productVariantDAO.insert(productVariantDTO);
         // Getting productVariant
-        ProductVariant productVariant = productVariantDAO.findById(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID).orElse(null);
-        ProductVariant productVariant1 = productVariantService.get(productVariant.getId(), FindBy.INTERNAL_ID, false).orElse(null);
+        ProductVariant productVariant = productVariantDAO.findById(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId())).orElse(null);
+        ProductVariant productVariant1 = productVariantService.get(ID.INTERNAL_ID(productVariant.getId()), false).orElse(null);
         Assert.assertEquals(productVariant1.getProductVariantName(), productVariantDTO.getProductVariantName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() throws Exception {
         //creating channel
@@ -971,7 +998,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -982,7 +1009,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -1010,7 +1037,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1036,7 +1063,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1044,7 +1071,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1100,7 +1127,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -1113,7 +1140,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         ProductVariant productVariantDTO = new ProductVariant();
@@ -1124,19 +1151,20 @@ public class ProductVariantServiceImplTest {
         productVariantDTO.setChannelId(channel.getChannelId());
         productVariantDAO.insert(productVariantDTO);
         // Getting productVariant
-        ProductVariant productVariant =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        ProductVariant productVariant =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         //toggle
-        productVariantService.toggle(productVariant.getId(), FindBy.INTERNAL_ID, Toggle.get(productVariant.getActive()));
-        ProductVariant updatedProductVariant =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        productVariantService.toggle(ID.INTERNAL_ID(productVariant.getId()), Toggle.get(productVariant.getActive()));
+        ProductVariant updatedProductVariant =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedProductVariant));
         Assert.assertEquals(updatedProductVariant.getActive(), "N");
 
-        productVariantService.toggle(updatedProductVariant.getId(), FindBy.INTERNAL_ID, Toggle.get(updatedProductVariant.getActive()));
-        ProductVariant updatedProductVariant1 =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        productVariantService.toggle(ID.INTERNAL_ID(updatedProductVariant.getId()), Toggle.get(updatedProductVariant.getActive()));
+        ProductVariant updatedProductVariant1 =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedProductVariant1));
         Assert.assertEquals(updatedProductVariant1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggle1Test() throws Exception {
         //creating channel
@@ -1151,7 +1179,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -1162,7 +1190,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -1190,7 +1218,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1216,7 +1244,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1224,7 +1252,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1280,7 +1308,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -1293,7 +1321,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         ProductVariant productVariantDTO = new ProductVariant();
@@ -1304,30 +1332,33 @@ public class ProductVariantServiceImplTest {
         productVariantDTO.setChannelId(channel.getChannelId());
         productVariantDAO.insert(productVariantDTO);
         // Getting productVariant
-        ProductVariant productVariant =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        ProductVariant productVariant =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         //toggle
-        productVariantService.toggle(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), productVariant.getId(), FindBy.INTERNAL_ID, Toggle.get(productVariant.getActive()));
-        ProductVariant updatedProductVariant =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        productVariantService.toggle(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), ID.INTERNAL_ID(productVariant.getId()), Toggle.get(productVariant.getActive()));
+        ProductVariant updatedProductVariant =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedProductVariant));
         Assert.assertEquals(updatedProductVariant.getActive(), "N");
 
-        productVariantService.toggle(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), updatedProductVariant.getId(), FindBy.INTERNAL_ID, Toggle.get(updatedProductVariant.getActive()));
-        ProductVariant updatedProductVariant1 =  productVariantService.get(productVariantDTO.getProductVariantId(), FindBy.EXTERNAL_ID, channel.getChannelId(), false).orElse(null);
+        productVariantService.toggle(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), ID.INTERNAL_ID(updatedProductVariant.getId()), Toggle.get(updatedProductVariant.getActive()));
+        ProductVariant updatedProductVariant1 =  productVariantService.get(ID.EXTERNAL_ID(productVariantDTO.getProductVariantId()), channel.getChannelId(), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedProductVariant1));
         Assert.assertEquals(updatedProductVariant1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstanceTest() throws Exception {
 
         //TODO check(method not used)
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance1Test() throws Exception {
         //TODO check(method not used)
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllTest() throws Exception {
         //creating channel
@@ -1342,7 +1373,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -1353,7 +1384,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -1381,7 +1412,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1407,7 +1438,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1415,7 +1446,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1471,7 +1502,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -1484,7 +1515,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -1504,6 +1535,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll1Test() throws Exception {
         //creating channel
@@ -1518,7 +1550,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -1529,7 +1561,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -1557,7 +1589,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1583,7 +1615,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1591,7 +1623,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1647,7 +1679,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -1660,7 +1692,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -1677,10 +1709,11 @@ public class ProductVariantServiceImplTest {
         });
         // Getting productVariants
         String[] ids = {productsData.get(0).get("externalId").toString()};
-        List<ProductVariant> productVariants = productVariantService.getAll(ids, FindBy.EXTERNAL_ID, channel.getChannelId(), false);
+        List<ProductVariant> productVariants = productVariantService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), channel.getChannelId(), false);
         Assert.assertEquals(productVariants.size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll2Test() throws Exception {
         //creating channel
@@ -1695,7 +1728,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -1706,7 +1739,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -1734,7 +1767,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1760,7 +1793,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1768,7 +1801,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1824,7 +1857,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -1837,7 +1870,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -1857,6 +1890,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.getContent().size(), 0);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll3Test() throws Exception {
         //creating channel
@@ -1871,7 +1905,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -1882,7 +1916,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -1910,7 +1944,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -1936,7 +1970,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1944,7 +1978,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2000,7 +2034,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -2013,7 +2047,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -2029,10 +2063,11 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariants
-        Page<ProductVariant> productVariants = productVariantService.getAll(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), 0, productVariantData.size(), null, false);
+        Page<ProductVariant> productVariants = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll4Test() throws Exception {
         //creating channel
@@ -2047,7 +2082,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -2058,7 +2093,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -2086,7 +2121,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -2112,7 +2147,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -2120,7 +2155,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2176,7 +2211,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -2189,7 +2224,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -2209,6 +2244,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariants.size(), 0);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll5Test() throws Exception {
         //creating channel
@@ -2223,7 +2259,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -2234,7 +2270,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -2262,7 +2298,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -2288,7 +2324,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -2296,7 +2332,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2352,7 +2388,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -2365,7 +2401,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -2381,10 +2417,11 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariants
-        List<ProductVariant> productVariants = productVariantService.getAll(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), null, false);
+        List<ProductVariant> productVariants = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll6Test() throws Exception {
         //creating channel
@@ -2399,7 +2436,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -2410,7 +2447,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -2438,7 +2475,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -2464,7 +2501,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -2472,7 +2509,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2528,7 +2565,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -2541,7 +2578,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -2557,12 +2594,13 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariant
-        List<ProductVariant> productVariants1 = productVariantService.getAll(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), null, false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
         String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        Page<ProductVariant> productVariants = productVariantService.getAll(ids, FindBy.INTERNAL_ID, 0, productVariantData.size(), null, false);
+        Page<ProductVariant> productVariants = productVariantService.getAll(Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll7Test() throws Exception {
         //creating channel
@@ -2577,7 +2615,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -2588,7 +2626,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -2616,7 +2654,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -2642,7 +2680,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -2650,7 +2688,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2706,7 +2744,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -2719,7 +2757,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -2735,12 +2773,13 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariants
-        List<ProductVariant> productVariants1 = productVariantService.getAll(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), null, false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
         String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        Page<ProductVariant> productVariants = productVariantService.getAll(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), ids, FindBy.INTERNAL_ID, 0, productVariantData.size(), null, false);
+        Page<ProductVariant> productVariants = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
         Assert.assertEquals(productVariants.getContent().size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll8Test() throws Exception {
         //creating channel
@@ -2755,7 +2794,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -2766,7 +2805,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -2794,7 +2833,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -2820,7 +2859,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -2828,7 +2867,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2884,7 +2923,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -2897,7 +2936,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -2913,12 +2952,13 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariant
-        List<ProductVariant> productVariants1 = productVariantService.getAll(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), null, false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
         String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        List<ProductVariant> productVariants = productVariantService.getAll(ids,FindBy.INTERNAL_ID, Sort.by("productVariantName"),false);
+        List<ProductVariant> productVariants = productVariantService.getAll(Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), Sort.by("productVariantName"),false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsTest() throws Exception {
         //creating channel
@@ -2933,7 +2973,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -2944,7 +2984,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -2972,7 +3012,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -2998,7 +3038,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -3006,7 +3046,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -3062,7 +3102,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -3075,7 +3115,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -3093,11 +3133,12 @@ public class ProductVariantServiceImplTest {
         // Getting productVariant
         String[] ids = {productVariantData.get(0).get("externalId").toString(), productVariantData.get(1).get("externalId").toString()};
         //Getting productVariants with exclude Ids
-        Page<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
+        Page<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, 10, null, false);
         Map<String, ProductVariant> productVariant = paginatedResult.getContent().stream().collect(Collectors.toMap(variant -> variant.getProductVariantId(), variant -> variant));
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusions1Test() throws Exception {
         //creating channel
@@ -3112,7 +3153,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -3123,7 +3164,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -3151,7 +3192,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -3177,7 +3218,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -3185,7 +3226,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -3241,7 +3282,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -3254,7 +3295,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -3272,11 +3313,12 @@ public class ProductVariantServiceImplTest {
         // Getting productVariant
         String[] ids = {productVariantData.get(0).get("externalId").toString(), productVariantData.get(1).get("externalId").toString()};
         //Getting productVariants with exclude Ids
-        Page<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), ids, FindBy.EXTERNAL_ID, 0, productVariantData.size(), null, false);
+        Page<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, productVariantData.size(), null, false);
         Map<String, ProductVariant> productVariant = paginatedResult.getContent().stream().collect(Collectors.toMap(variant -> variant.getProductVariantId(), variant -> variant));
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusions2Test() throws Exception {
         //creating channel
@@ -3291,7 +3333,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -3302,7 +3344,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -3330,7 +3372,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -3356,7 +3398,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -3364,7 +3406,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -3420,7 +3462,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -3433,7 +3475,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -3450,11 +3492,12 @@ public class ProductVariantServiceImplTest {
         });
         String[] ids = {productVariantData.get(0).get("externalId").toString(), productVariantData.get(1).get("externalId").toString()};
         //Getting productVariants with exclude Ids
-        List<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(ids, FindBy.EXTERNAL_ID, null, false);
+        List<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, ProductVariant> productVariant = paginatedResult.stream().collect(Collectors.toMap(variant -> variant.getProductVariantId(), variant -> variant));
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusions3Test() throws Exception {
         //creating channel
@@ -3469,7 +3512,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -3480,7 +3523,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -3508,7 +3551,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -3534,7 +3577,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -3542,7 +3585,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -3598,7 +3641,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -3611,7 +3654,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -3629,40 +3672,47 @@ public class ProductVariantServiceImplTest {
 
         //Getting productVariants with exclude Ids
         String[] ids = {productVariantData.get(0).get("externalId").toString(), productVariantData.get(1).get("externalId").toString()};
-        List<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), ids, FindBy.EXTERNAL_ID, null, false);
+        List<ProductVariant> paginatedResult = productVariantService.getAllWithExclusions(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, ProductVariant> productVariant = paginatedResult.stream().collect(Collectors.toMap(variant -> variant.getProductVariantId(), variant -> variant));
         Assert.assertTrue(productVariant.size() == (productVariantData.size() - ids.length) && !productVariant.containsKey(ids[0]) && !productVariant.containsKey(ids[1]));    }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
         //TODO MANU
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getProductVariantPricingTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void addAssetsTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void deleteAssetTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void reorderAssetsTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setAsDefaultAssetTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll9Test() throws Exception {
         //creating channel
@@ -3677,7 +3727,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -3688,7 +3738,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -3716,7 +3766,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -3742,7 +3792,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -3750,7 +3800,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -3806,7 +3856,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -3819,7 +3869,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -3835,12 +3885,13 @@ public class ProductVariantServiceImplTest {
             productVariantDAO.insert(productVariantDTO);
         });
         // Getting productVariant
-        List<ProductVariant> productVariants1 = productVariantService.getAll(product.getProductId(), FindBy.EXTERNAL_ID, channel.getChannelId(), null, false);
+        List<ProductVariant> productVariants1 = productVariantService.getAll(ID.EXTERNAL_ID(product.getProductId()), channel.getChannelId(), null, false);
         String[] ids={productVariants1.get(0).getId(),productVariants1.get(1).getId()};
-        List<ProductVariant> productVariants = productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, channel.getChannelId(), ids, FindBy.INTERNAL_ID, null, false);
+        List<ProductVariant> productVariants = productVariantService.getAll(ID.INTERNAL_ID(product.getId()), channel.getChannelId(), Arrays.stream(ids).map(ID::INTERNAL_ID).collect(Collectors.toList()), null, false);
         Assert.assertEquals(productVariants.size(), 2);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createTest() throws Exception {
         //creating channel
@@ -3855,7 +3906,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
 
         //creating AttributeCollection
@@ -3866,7 +3917,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollectionDetails));
         //creating Attributes
         List<AttributeCollection> attributeCollectionList = new ArrayList<>();
@@ -3894,7 +3945,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionList.add(attributeCollectionDetails);
         attributeCollectionService.update(attributeCollectionList);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDetails.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDetails.getCollectionId()), false).orElse(null);
 
         List<Attribute> attributes = attributeCollection.getAllAttributes();
         Attribute attributeDetails = attributeCollectionDetails.getAttribute(attributes.get(0).getFullId()).orElse(null);
@@ -3920,7 +3971,7 @@ public class ProductVariantServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Family Test1", "externalId", "FAMILY_TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach((Map<String, Object> familyData) -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -3928,7 +3979,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyService.create(familyDTO);
 
-            Family family = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family));
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -3984,7 +4035,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
         //creating Products
         List<Map<String, Object>> productsData = new ArrayList<>();
         productsData.add(CollectionsUtil.toMap("name", "Product Test 1", "externalId", "PRODUCT_TEST_1", "productFamilyId", familyDetails.getFamilyId(), "active", "Y"));
@@ -3997,7 +4048,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4016,11 +4067,13 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariant.size(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setProductVariantsSequenceTest() throws Exception {
         //TODO
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating channel
@@ -4035,7 +4088,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4045,7 +4098,7 @@ public class ProductVariantServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -4057,7 +4110,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOptions
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -4076,7 +4129,7 @@ public class ProductVariantServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -4084,7 +4137,7 @@ public class ProductVariantServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -4109,7 +4162,7 @@ public class ProductVariantServiceImplTest {
 
         });
 
-        Family familyDetails = familyService.get(familiesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family familyDetails = familyService.get(ID.EXTERNAL_ID(familiesData.get(0).get("externalId").toString()), false).orElse(null);
 
         //creating products
         List<Map<String, Object>> productsData = new ArrayList<>();
@@ -4126,7 +4179,7 @@ public class ProductVariantServiceImplTest {
         productService.create(productDTOs);
         Assert.assertEquals(productDAO.findAll(PageRequest.of(0, productDTOs.size()), false).getTotalElements(), productsData.size());
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4147,6 +4200,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(productVariantService.findAll(PageRequest.of(0, productDTOs.size()), false).getTotalElements(), productVariantData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //creating channel
@@ -4161,7 +4215,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4172,7 +4226,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -4194,7 +4248,7 @@ public class ProductVariantServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         //creating products
@@ -4209,7 +4263,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4231,6 +4285,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //creating channel
@@ -4245,7 +4300,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4256,7 +4311,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -4278,7 +4333,7 @@ public class ProductVariantServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         //creating products
@@ -4293,7 +4348,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4315,6 +4370,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //creating channel
@@ -4329,7 +4385,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4340,7 +4396,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -4362,7 +4418,7 @@ public class ProductVariantServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         //creating products
@@ -4377,7 +4433,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4412,6 +4468,7 @@ public class ProductVariantServiceImplTest {
         Assert.assertFalse(productVariantsMap.size() == productVariantData.size() && productVariantsMap.containsKey(ids[0]) && productVariantsMap.containsKey(ids[1]) );
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll3Test() {
         //creating channel
@@ -4426,7 +4483,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4437,7 +4494,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -4459,7 +4516,7 @@ public class ProductVariantServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         //creating products
@@ -4474,7 +4531,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4492,10 +4549,11 @@ public class ProductVariantServiceImplTest {
 
         //Getting productVariants
         long size = productVariantData.stream().filter(x -> x.get("active").equals("Y")).count();
-        List<ProductVariant> result = productVariantService.findAll(CollectionsUtil.toMap("active", "Y"));
+        List<ProductVariant> result = productVariantService.findAll(Criteria.where("active").eq("Y"));
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll4Test() {
         //creating channel
@@ -4510,7 +4568,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4521,7 +4579,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -4543,7 +4601,7 @@ public class ProductVariantServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         //creating products
@@ -4558,7 +4616,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4576,11 +4634,11 @@ public class ProductVariantServiceImplTest {
 
         //Getting productVariants
         long size = productsData.stream().filter(x -> x.get("active").equals("Y")).count();
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "Y"));
-        List<Product> result = productService.findAll(criteria);
+        List<Product> result = productService.findAll(Criteria.where("active").eq("Y"));
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //creating channel
@@ -4595,7 +4653,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4606,7 +4664,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -4628,7 +4686,7 @@ public class ProductVariantServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         //creating products
@@ -4643,7 +4701,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4660,10 +4718,11 @@ public class ProductVariantServiceImplTest {
         });
 
         //Getting productVariant
-        ProductVariant result = productVariantService.findOne(CollectionsUtil.toMap("productVariantName", productVariantData.get(0).get("name"))).orElse(null);
+        ProductVariant result = productVariantService.findOne(Criteria.where("productVariantName").eq(productVariantData.get(0).get("name"))).orElse(null);
         Assert.assertEquals(productVariantData.get(0).get("name"), result.getProductVariantName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //creating channel
@@ -4678,7 +4737,7 @@ public class ProductVariantServiceImplTest {
             channelService.create(channel);
         });
 
-        Channel channel = channelService.get(channelsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Channel channel = channelService.get(ID.EXTERNAL_ID(channelsData.get(0).get("externalId").toString()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(channel));
         //creating AttributeCollection
         AttributeCollection attributeCollectionDTO = new AttributeCollection();
@@ -4689,7 +4748,7 @@ public class ProductVariantServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -4711,7 +4770,7 @@ public class ProductVariantServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         //creating products
@@ -4726,7 +4785,7 @@ public class ProductVariantServiceImplTest {
             productService.create(productDTO);
         });
 
-        Product product = productService.get(productsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Product product = productService.get(ID.EXTERNAL_ID(productsData.get(0).get("externalId").toString()), false).orElse(null);
 
         //create productVariantInstance
         List<Map<String, Object>> productVariantData = new ArrayList<>();
@@ -4743,24 +4802,24 @@ public class ProductVariantServiceImplTest {
         });
 
         //Getting productVariant
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("productVariantName", productVariantData.get(0).get("name")));
+        Criteria criteria = Criteria.where("productVariantName").eq(productVariantData.get(0).get("name"));
         ProductVariant result = productVariantService.findOne(criteria).orElse(null);
         Assert.assertEquals(productVariantData.get(0).get("name"), result.getProductVariantName());
     }
 
     @After
     public void tearDown() throws Exception {
-        productDAO.getMongoTemplate().dropCollection(Product.class);
+        mongoTemplate.dropCollection(Product.class);
 
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(Family.class);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
 
-        channelDAO.getMongoTemplate().dropCollection(Channel.class);
+        mongoTemplate.dropCollection(Channel.class);
 
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
 
-        productVariantDAO.getMongoTemplate().dropCollection(ProductVariant.class);
+        mongoTemplate.dropCollection(ProductVariant.class);
     }
 
 }

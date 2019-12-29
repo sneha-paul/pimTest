@@ -1,18 +1,16 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.CatalogDAO;
-import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
-import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
-import com.bigname.pim.api.persistence.dao.WebsiteCatalogDAO;
+import com.bigname.pim.api.persistence.dao.mongo.*;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.util.PimUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.Archive;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,20 +34,22 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     private RootCategoryDAO rootCategoryDAO;
     private RelatedCategoryDAO relatedCategoryDAO;
     private CategoryService categoryService;
+    private CategoryDAO categoryDAO;
 
     @Autowired
-    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService) {
+    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService, CategoryDAO categoryDAO) {
         super(catalogDAO, "catalog", validator);
         this.catalogDAO = catalogDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
         this.rootCategoryDAO = rootCategoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
         this.categoryService = categoryService;
+        this.categoryDAO = categoryDAO;
     }
 
     @Override
-    public Page<Map<String, Object>> findAllRootCategories(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(catalogId, findBy, false)
+    public Page<Map<String, Object>> findAllRootCategories(ID<String> catalogId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(catalogId, false)
                 .map(category -> catalogDAO.findAllRootCategories(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
@@ -60,8 +60,8 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     }
 
     @Override
-    public Page<Category> findAvailableRootCategoriesForCatalog(String catalogId, FindBy findBy, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        return get(catalogId, findBy, false)
+    public Page<Category> findAvailableRootCategoriesForCatalog(ID<String> catalogId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(catalogId, false)
                 .map(category -> catalogDAO.findAvailableRootCategoriesForCatalog(category.getId(), searchField, keyword, pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
@@ -70,24 +70,23 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * Method to get available categories of a catalog in paginated format.
      *
      * @param id Internal or External id of the Catalog
-     * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param page page number
      * @param size page size
      * @param sort sort object
      * @return
      */
     @Override
-    public Page<Category> getAvailableRootCategoriesForCatalog(String id, FindBy findBy, int page, int size, Sort sort, boolean... activeRequired) {
-        Optional<Catalog> catalog = get(id, findBy, false);
+    public Page<Category> getAvailableRootCategoriesForCatalog(ID<String> id, int page, int size, Sort sort, boolean... activeRequired) {
+        Optional<Catalog> catalog = get(id, false);
         Set<String> categoryIds = new HashSet<>();
         catalog.ifPresent(catalog1 -> rootCategoryDAO.findByCatalogId(catalog1.getId()).forEach(rc -> categoryIds.add(rc.getRootCategoryId())));
-        return categoryService.getAllWithExclusions(categoryIds.toArray(new String[0]), FindBy.INTERNAL_ID, page, size, sort, true);
+        return categoryService.getAllWithExclusions(categoryIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), page, size, sort, true);
     }
 
     @Override
-    public boolean toggleRootCategory(String catalogId, FindBy catalogIdFindBy, String rootCategoryId, FindBy rootCategoryIdFindBy, Toggle active) {
-        return get(catalogId, catalogIdFindBy, false)
-                .map(catalog -> categoryService.get(rootCategoryId, rootCategoryIdFindBy, false)
+    public boolean toggleRootCategory(ID<String> catalogId, ID<String> rootCategoryId, Toggle active) {
+        return get(catalogId, false)
+                .map(catalog -> categoryService.get(rootCategoryId, false)
                         .map(rootCategory -> rootCategoryDAO.findFirstByCatalogIdAndRootCategoryId(catalog.getId(), rootCategory.getId())
                                 .map(rootCategory1 -> {
                                     rootCategory1.setActive(active.state());
@@ -103,28 +102,27 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * Method to get categories of a Catalog in paginated format.
      *
      * @param catalogId Internal or External id of the Catalog
-     * @param findBy Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param pageable The pageable object
      * @param activeRequired activeRequired Boolean flag
      * @return
      */
     @Override
-    public Page<Map<String, Object>> getRootCategories(String catalogId, FindBy findBy, Pageable pageable, boolean... activeRequired) {
-        return get(catalogId, findBy, false)
-                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), pageable))
+    public Page<Map<String, Object>> getRootCategories(ID<String> catalogId, Pageable pageable, boolean... activeRequired) {
+        return get(catalogId, false)
+                .map(catalog -> catalogDAO.getRootCategories(catalog.getId(), pageable, activeRequired))
                 .orElse(new PageImpl<>(new ArrayList<>()));
     }
 
     @Override
-    public List<Map<String, Object>> getCategoryHierarchy(String catalogId, boolean... activeRequired) {
+    public List<Map<String, Object>> getCategoryHierarchy(ID<String> catalogId, boolean... activeRequired) {
         List<Map<String, Object>> hierarchy = new ArrayList<>();
-        get(catalogId, FindBy.EXTERNAL_ID, false)
+        get(catalogId, false)
                 .ifPresent(catalog -> {
                     //Sorted rootCategories
                     Map<String, RootCategory> rootCategoriesMap = rootCategoryDAO.findByCatalogIdOrderBySequenceNumAscSubSequenceNumDesc(catalog.getId()).stream().collect(CollectionsUtil.toLinkedMap(RootCategory::getRootCategoryId, e -> e));
 
                     //Unsorted relatedCategories
-                    List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PimUtil.getActiveOptions(activeRequired));
+                    List<RelatedCategory> relatedCategories = relatedCategoryDAO.findByActiveIn(PlatformUtil.getActiveOptions(activeRequired));
 
                     Map<String, List<RelatedCategory>> parentCategoriesMap = new LinkedHashMap<>();
 
@@ -149,7 +147,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                     });
 
                     //Categories lookup map
-                    Map<String, Category> categoriesMap = categoryService.getAll(new ArrayList<>(categoryIds).toArray(new String[0]), FindBy.INTERNAL_ID, null, false).stream().collect(Collectors.toMap(c -> c.getId(), c -> c));
+                    Map<String, Category> categoriesMap = categoryService.getAll(categoryIds.stream().map(ID::INTERNAL_ID).collect(Collectors.toList()), null, false).stream().collect(Collectors.toMap(c -> c.getId(), c -> c));
 
                     //Build the full node hierarchy for each root category
                     rootCategoriesMap.forEach((rootCategoryId, rootCategory) -> hierarchy.addAll(buildFullNode(rootCategoryId, 0, "", parentCategoriesMap, categoriesMap)));
@@ -199,18 +197,18 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * Method to set the sequencing of two root categories
      *
      * @param catalogId           Internal or External id of the Catalog
-     * @param catalogIdFindBy     Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param sourceId            Internal or External id of the rootCategory, whose sequencing needs to be set
-     * @param sourceIdFindBy      Type of the source rootCategory id, INTERNAL_ID or EXTERNAL_ID
      * @param destinationId       Internal or External id of the rootCategory at the destination slot
-     * @param destinationIdFindBy Type of the destination rootCategory id, INTERNAL_ID or EXTERNAL_ID
      * @return true if sequencing got modified, false otherwise
      */
     @Override
-    public boolean setRootCategorySequence(String catalogId, FindBy catalogIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy) {
-        return get(catalogId, catalogIdFindBy, false)
+    public boolean setRootCategorySequence(ID<String> catalogId, ID<String> sourceId, ID<String> destinationId) {
+        List<ID<String>> ids = new ArrayList<>();
+        ids.add(sourceId);
+        ids.add(destinationId);
+        return get(catalogId, false)
                 .map(catalog -> {
-                    Map<String, Category> categoriesMap = categoryService.getAll(new String[] {sourceId, destinationId}, FindBy.EXTERNAL_ID, null, false)
+                    Map<String, Category> categoriesMap = categoryService.getAll(ids, null, false)
                             .stream().collect(Collectors.toMap(Category::getCategoryId, category -> category));
 
                     List<String> rootCategoryIds = categoriesMap.entrySet().stream().map(entry -> entry.getValue().getId()).collect(Collectors.toList());
@@ -218,8 +216,8 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                     Map<String, RootCategory> rootCategoriesMap = rootCategoryDAO.findByCatalogIdAndRootCategoryIdIn(catalog.getId(), rootCategoryIds.toArray(new String[0]))
                             .stream().collect(Collectors.toMap(RootCategory::getRootCategoryId, rootCategory -> rootCategory));
 
-                    RootCategory source = rootCategoriesMap.get(categoriesMap.get(sourceId).getId());
-                    RootCategory destination = rootCategoriesMap.get(categoriesMap.get(destinationId).getId());
+                    RootCategory source = rootCategoriesMap.get(categoriesMap.get(sourceId.getId()).getId());
+                    RootCategory destination = rootCategoriesMap.get(categoriesMap.get(destinationId.getId()).getId());
 
                     ReorderingDirection direction = DOWN;
                     if(source.getSequenceNum() > destination.getSequenceNum() ||
@@ -233,12 +231,12 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                         modifiedRootCategories.add(source);
                         destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
                         modifiedRootCategories.add(destination);
-                        modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId, source, destination, direction));
+                        modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId.getId(), source, destination, direction));
                     } else {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
                         modifiedRootCategories.add(source);
-                        modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId, source, destination, direction));
+                        modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId.getId(), source, destination, direction));
                     }
                     rootCategoryDAO.saveAll(modifiedRootCategories);
                     return true;
@@ -267,16 +265,14 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
      * Method to add category for a catalog.
      *
      * @param id Internal or External id of the Catalog
-     * @param findBy1 Type of the catalog id, INTERNAL_ID or EXTERNAL_ID
      * @param rootCategoryId Internal or External id of the Category
-     * @param findBy2 Type of the category id, INTERNAL_ID or EXTERNAL_ID
      * @return
      */
     @Override
-    public RootCategory addRootCategory(String id, FindBy findBy1, String rootCategoryId, FindBy findBy2) {
-        Optional<Catalog> catalog = get(id, findBy1, false);
+    public RootCategory addRootCategory(ID<String> id, ID<String> rootCategoryId) {
+        Optional<Catalog> catalog = get(id, false);
         if(catalog.isPresent()) {
-            Optional<Category> rootCategory = categoryService.get(rootCategoryId, findBy2, false);
+            Optional<Category> rootCategory = categoryService.get(rootCategoryId, false);
             if(rootCategory.isPresent()) {
                 Optional<RootCategory> top = rootCategoryDAO.findTopByCatalogIdAndSequenceNumOrderBySubSequenceNumDesc(catalog.get().getId(), 0);
                 return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
@@ -291,9 +287,9 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     }
 
     @Override
-    public boolean toggleCatalog(String catalogId, FindBy findBy, Toggle toggle) {
+    public boolean toggleCatalog(ID<String> catalogId, Toggle toggle) {
 
-        return get(catalogId, findBy, false)
+        return get(catalogId, false)
                 .map(catalog -> {
 
                     catalog.setGroup("DETAILS");
@@ -312,5 +308,24 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     @Override
     public void updateWebsiteCatalog(WebsiteCatalog websiteCatalog) {
         websiteCatalogDAO.save(websiteCatalog);
+    }
+
+    @Override
+    public void archiveCatalogAssociations(ID<String> catalogId, Archive archived, Catalog catalog) {
+        /*Catalog catalog = get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
+        if(isEmpty(catalog)) {
+            catalog = get(ID.EXTERNAL_ID(catalogId), false, false, false, true).orElse(null);
+        }*/
+
+        if(archived == Archive.NO) {
+            List<WebsiteCatalog> websiteCatalogs = getAllWebsiteCatalogsWithCatalogId(catalog.getId());
+            websiteCatalogs.forEach(websiteCatalog -> catalogDAO.archiveAssociationById(ID.INTERNAL_ID(websiteCatalog.getId()), archived, WebsiteCatalog.class));
+
+            List<RootCategory> rootCategories = getAllRootCategories(catalog.getId());
+            rootCategories.forEach(rootCategory -> catalogDAO.archiveAssociationById(ID.INTERNAL_ID(rootCategory.getId()), archived, RootCategory.class));
+        } else {
+            List<RootCategory> rootCategories = getAllRootCategories(catalog.getId());
+            rootCategories.forEach(rootCategory -> catalogDAO.archiveAssociationById(ID.INTERNAL_ID(rootCategory.getId()), archived, RootCategory.class));
+        }
     }
 }

@@ -1,10 +1,10 @@
 package com.bigname.pim.api.domain;
 
-
-import com.bigname.core.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,14 +13,16 @@ import java.util.Map;
 /**
  * Created by dona on 08-11-2018.
  */
-public class PricingAttribute extends Entity<PricingAttribute> {
+public class PricingAttribute extends MongoEntity<PricingAttribute> {
 
     @Transient
     @NotEmpty(message = "Pricing Attribute Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Pricing Attribute Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pricingAttributeId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Pricing Attribute Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Pricing Attribute Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pricingAttributeName;
 
 
@@ -68,6 +70,7 @@ public class PricingAttribute extends Entity<PricingAttribute> {
                     this.setExternalId(pricingAttribute.getExternalId());
                     this.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
                     this.setActive(pricingAttribute.getActive());
+                    mergeBaseProperties(pricingAttribute);
                     break;
             }
         }
@@ -80,6 +83,7 @@ public class PricingAttribute extends Entity<PricingAttribute> {
         map.put("externalId", getExternalId());
         map.put("pricingAttributeName", getPricingAttributeName());
         map.put("active", getActive());
+        map.putAll(getBasePropertiesMap());
         return map;
     }
 
@@ -94,4 +98,17 @@ public class PricingAttribute extends Entity<PricingAttribute> {
         }
         return diff;
     }
+
+    /*@Override
+    public Object getCopy(PricingAttribute pricingAttribute) {
+        PricingAttribute _pricingAttribute = new PricingAttribute();
+        _pricingAttribute.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
+        _pricingAttribute.setPricingAttributeId(pricingAttribute.getPricingAttributeId());
+        _pricingAttribute.setActive(pricingAttribute.getActive());
+        _pricingAttribute.setArchived(pricingAttribute.getArchived());
+        _pricingAttribute.setDiscontinued(pricingAttribute.getDiscontinued());
+        _pricingAttribute.setVersionId(pricingAttribute.getVersionId());
+        _pricingAttribute.setId(pricingAttribute.getId());
+        return _pricingAttribute;
+    }*/
 }

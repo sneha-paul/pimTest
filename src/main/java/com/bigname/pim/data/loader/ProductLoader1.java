@@ -1,15 +1,14 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.ConvertUtil;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.POIUtil;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.ID;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
@@ -23,9 +22,10 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.StringUtil.split;
-import static com.bigname.common.util.StringUtil.trim;
-import static com.bigname.common.util.ValidationUtil.*;
+import static com.m7.xtreme.common.util.StringUtil.split;
+import static com.m7.xtreme.common.util.StringUtil.trim;
+import static com.m7.xtreme.common.util.ValidationUtil.*;
+
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -841,7 +841,7 @@ public class ProductLoader1 {
         List<List<String>> data = POIUtil.readData(filePath);
 
         //Create the attributeCollection if it won't already exists
-        if(!attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).isPresent()) {
+        if(!attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false).isPresent()) {
             AttributeCollection attributeCollection = new AttributeCollection();
             attributeCollection.setCollectionId(attributeCollectionId);
             attributeCollection.setCollectionName("Envelopes Attributes Collection");
@@ -862,7 +862,7 @@ public class ProductLoader1 {
         Map<String, Set<String>> familyVariantGroups = new LinkedHashMap<>();
 
         //Load the attributeCollection from the database for the given collectionId
-        attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).ifPresent(attributeCollection -> {
+        attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false).ifPresent(attributeCollection -> {
             // The metadata row containing the attribute names, this will be first row in the data sheet
             List<String> attributeNamesMetadata = data.get(0);
 
@@ -890,7 +890,7 @@ public class ProductLoader1 {
             //Product variants data WITHOUT metadata, this will be a sublist of the complete data without the metadata rows
             List<List<String>> variantsData = data.subList(numOfMetadataRows, data.size());
 
-            Map<String, List<List<String>>> variantsAssets = getProductAssets();
+            //Map<String, List<List<String>>> variantsAssets = getProductAssets(); //TODO uncomment after testing
 
             //Map of valid attributeNames, grouped by familyId
             Map<String, Set<String>> familyAttributes = getFamilyAttributes(data);
@@ -1139,7 +1139,7 @@ public class ProductLoader1 {
                     //If the current attribute is selectable, add any new attribute options, if any
                     if(isSelectable) {
                         // cellValue can either be a simple single value or delimited multiple values
-                        List<String> attributeOptionValues = StringUtil.split(cellValue, delimiters.split(""));
+                        List<String> attributeOptionValues = split(cellValue, delimiters.split(""));
 
                         //Add the single or multi option values
                         attributeOptionValues.forEach(attributeOptionValue -> {
@@ -1174,7 +1174,7 @@ public class ProductLoader1 {
 
             attributeCollection.setGroup("ATTRIBUTES");
             //Update attribute collection with the newly added attributes and corresponding attribute options
-            attributeCollectionService.update(attributeCollectionId, FindBy.EXTERNAL_ID, attributeCollection);
+            attributeCollectionService.update(ID.EXTERNAL_ID(attributeCollectionId), attributeCollection);
 
             //Attribute Collection updated with the new attributes and new options
 
@@ -1219,7 +1219,7 @@ public class ProductLoader1 {
             //Map of all existing product variants grouped by productId
             Map<String, Map<String, ProductVariant>> existingVariants = new HashMap<>();
 
-            productVariantService.getAll(new ArrayList<>(existingProducts.keySet()).toArray(new String[0]), FindBy.EXTERNAL_ID, channelId, false).forEach(productVariant -> {
+            productVariantService.getAll(existingProducts.keySet().stream().map(ID::EXTERNAL_ID).collect(Collectors.toList()), channelId, false).forEach(productVariant -> {
                 String productId = productVariant.getProductId();
                 if(!existingVariants.containsKey(productId)) {
                     existingVariants.put(productId, new HashMap<>());
@@ -1392,10 +1392,10 @@ public class ProductLoader1 {
                             String idOfProduct = product.getId();
                             if(productCategoryMap.containsKey(product.getProductId()) && existingCategories.containsKey(productCategoryMap.get(product.getProductId()))) {
                                 Category category = existingCategories.get(productCategoryMap.get(product.getProductId()));
-                                List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(category.getCategoryId(), FindBy.EXTERNAL_ID, 0, 300, null, false).getContent();
+                                List<CategoryProduct> categoryProducts = categoryService.getCategoryProducts(ID.EXTERNAL_ID(category.getCategoryId()), 0, 300, null, false).getContent();
                                 CategoryProduct categoryProduct = categoryProducts.stream().filter(categoryProduct1 -> categoryProduct1.getProductId().equals(idOfProduct)).findFirst().orElse(null);
                                 if (isNull(categoryProduct)) {
-                                    categoryService.addProduct(category.getCategoryId(), FindBy.EXTERNAL_ID, product.getProductId(), FindBy.EXTERNAL_ID);
+                                    categoryService.addProduct(ID.EXTERNAL_ID(category.getCategoryId()), ID.EXTERNAL_ID(product.getProductId()));
                                 }
                             } else {
                                 System.out.println("=================##############" + product.getProductId() + "," + productCategoryMap.get(product.getProductId()));
@@ -1467,11 +1467,11 @@ public class ProductLoader1 {
                     VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
                     VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
                     VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
-                    productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                    productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
                     assetNames.add(assetFileName);
                     if (isEmpty(product.getChannelAssets())) {
-                        productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
-                        product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                        productService.addAssets(ID.EXTERNAL_ID(productId), channelId, Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
+                        product = productService.get(ID.EXTERNAL_ID(productId), false).get();
                         existingProducts.put(productId, product);
 
                     }
@@ -1479,7 +1479,8 @@ public class ProductLoader1 {
                     //                        System.out.println(assetFileName + " <======= Not Found");
                 }
 
-                if (variantsAssets.containsKey(variantId)) {
+                //TODO uncomment after testing
+                /*if (variantsAssets.containsKey(variantId)) {
                     List<List<String>> variantAssets = variantsAssets.get(variantId);
                     for (int i = 0; i < variantAssets.size(); i++) {
                         List<String> variantAsset = variantAssets.get(i);
@@ -1488,18 +1489,18 @@ public class ProductLoader1 {
                             VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
                             VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
                             VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
-                            productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                            productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
                             assetNames.add(assetFileName);
                             if (isEmpty(product.getChannelAssets())) {
-                                productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
-                                product = productService.get(productId, FindBy.EXTERNAL_ID, false).get();
+                                productService.addAssets(ID.EXTERNAL_ID(productId), channelId, Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
+                                product = productService.get(ID.EXTERNAL_ID(productId), false).get();
                                 existingProducts.put(productId, product);
                             }
                         } else {
                             //                                System.out.println(assetFileName + " <======= Asset Not Found");
                         }
                     }
-                }
+                }*/
 
                 File[] files = getFileNames(new File(assetLoader.getSourceLocation()), variantId + "_");
                 for(int x = 0; x < files.length; x ++) {
@@ -1510,17 +1511,17 @@ public class ProductLoader1 {
                             VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
                             VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
                             VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
-                            productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
-                            productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
-                            existingProducts.put(productId, productService.get(productId, FindBy.EXTERNAL_ID, false).get());
+                            productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
+                            productService.addAssets(ID.EXTERNAL_ID(productId), channelId, Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
+                            existingProducts.put(productId, productService.get(ID.EXTERNAL_ID(productId), false).get());
                         } else {
                             VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
                             VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
                             VirtualFile variantDefaultAsset = assetLoader.uploadFile(variantFolder.getId(), "", assetFileName, variantFolder.getRootDirectoryId());
-                            productVariantService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, variantId, FindBy.EXTERNAL_ID, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
+                            productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
                             if (isEmpty(product.getChannelAssets())) {
-                                productService.addAssets(productId, FindBy.EXTERNAL_ID, channelId, new String[]{variantDefaultAsset.getId()}, FileAsset.AssetFamily.ASSETS);
-                                existingProducts.put(productId, productService.get(productId, FindBy.EXTERNAL_ID, false).get());
+                                productService.addAssets(ID.EXTERNAL_ID(productId), channelId, Arrays.stream(new String[]{variantDefaultAsset.getId()}).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
+                                existingProducts.put(productId, productService.get(ID.EXTERNAL_ID(productId), false).get());
                             }
                         }
                     }
@@ -1552,7 +1553,7 @@ public class ProductLoader1 {
 
 
         //Create the attributeCollection if it won't already exists
-        if(!attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).isPresent()) {
+        if(!attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false).isPresent()) {
             AttributeCollection attributeCollection = new AttributeCollection();
             attributeCollection.setCollectionId(attributeCollectionId);
             attributeCollection.setCollectionName("Envelopes Attributes Collection");
@@ -1573,7 +1574,7 @@ public class ProductLoader1 {
         Map<String, Set<String>> familyVariantGroups = new LinkedHashMap<>();
 
         //Load the attributeCollection from the database for the given collectionId
-        attributeCollectionService.get(attributeCollectionId, FindBy.EXTERNAL_ID, false).ifPresent(attributeCollection -> {
+        attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionId), false).ifPresent(attributeCollection -> {
             // The metadata row containing the attribute names, this will be first row in the data sheet
             List<String> attributeNamesMetadata = data.get(0);
 
@@ -1715,7 +1716,7 @@ public class ProductLoader1 {
     }
 
     private void setVariantAttributeValues(ProductVariant productVariantDTO, Map<String, Object> attributesMap) {
-        productService.get(productVariantDTO.getProduct().getProductId(), FindBy.EXTERNAL_ID, false).ifPresent(product -> {
+        productService.get(ID.EXTERNAL_ID(productVariantDTO.getProduct().getProductId()), false).ifPresent(product -> {
             product.setChannelId(productVariantDTO.getChannelId());
             productVariantDTO.setProduct(product);
             Family productFamily = product.getProductFamily();

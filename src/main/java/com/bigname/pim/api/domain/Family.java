@@ -1,11 +1,12 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
-import com.bigname.core.exception.EntityNotFoundException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.xcore.domain.MongoEntity;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,14 +14,16 @@ import java.util.stream.Collectors;
 /**
  * Created by manu on 9/1/18.
  */
-public class Family extends Entity<Family> {
+public class Family extends MongoEntity<Family> {
 
     @Transient
     @NotEmpty(message = "Family Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Family Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     String familyId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Family Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Family Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String familyName;
 
     private Map<String, FamilyAttributeGroup> attributes = new LinkedHashMap<>();
@@ -242,6 +245,7 @@ public class Family extends Entity<Family> {
         map.put("externalId", getExternalId());
         map.put("familyName", getFamilyName());
         map.put("active", getActive());
+        map.put("archived", getArchived());
         return map;
     }
 
@@ -399,4 +403,20 @@ public class Family extends Entity<Family> {
         }
         return diff;
     }
+
+    /*@Override
+    public Object getCopy(Family family) {
+        Family _family = new Family();
+        _family.setFamilyName(family.getFamilyName());
+        _family.setFamilyId(family.getFamilyId());
+        _family.setAttributes(family.getAttributes());
+        _family.setChannelVariantGroups(family.getChannelVariantGroups());
+        _family.setVariantGroups(family.getVariantGroups());
+        _family.setActive(family.getActive());
+        _family.setArchived(family.getArchived());
+        _family.setDiscontinued(family.getDiscontinued());
+        _family.setVersionId(family.getVersionId());
+        _family.setId(family.getId());
+        return _family;
+    }*/
 }

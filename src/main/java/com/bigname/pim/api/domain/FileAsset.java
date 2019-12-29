@@ -39,7 +39,7 @@ public class FileAsset {
     public FileAsset() {}
 
     public FileAsset(VirtualFile virtualFile, int... sequenceNum) {
-       this.id = virtualFile.getId();
+       this.id = (String) virtualFile.getId();
        this.name = virtualFile.getFileName();
        this.internalName = virtualFile.getInternalFileName();
        this.type = Type.getType(virtualFile.getType());

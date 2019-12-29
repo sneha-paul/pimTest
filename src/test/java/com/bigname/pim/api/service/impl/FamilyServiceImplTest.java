@@ -1,17 +1,20 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.ValidatableEntity;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.AttributeCollectionDAO;
-import com.bigname.pim.api.persistence.dao.FamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AttributeCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
 import com.bigname.pim.api.service.AttributeCollectionService;
 import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.util.PimUtil;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.util.Criteria;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.junit.After;
@@ -24,7 +27,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,7 +36,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 
 /**
  * Created by sruthi on 23-02-2019.
@@ -42,6 +45,10 @@ import static com.bigname.core.util.FindBy.EXTERNAL_ID;
 @SpringBootTest
 @ContextConfiguration(classes={PimApplication.class})
 public class FamilyServiceImplTest {
+
+    @Autowired
+    private UserService userService;
+
     @Autowired
     AttributeCollectionService attributeCollectionService;
 
@@ -54,12 +61,26 @@ public class FamilyServiceImplTest {
     @Autowired
     FamilyService familyService;
 
+    private MongoTemplate mongoTemplate;
+    
     @Before
     public void setUp() throws Exception {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setActive("Y");
+            userService.create(user);
+        }
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) familyDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void saveAllTest() throws Exception {
         //creating AttributeCollection
@@ -70,7 +91,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -82,7 +103,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -113,6 +134,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(familyDAO.findAll(PageRequest.of(0, familyDTOs.size()), false).getTotalElements(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFamilyAttributesTest() throws Exception {
         //creating AttributeCollection
@@ -123,7 +145,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -135,7 +157,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -153,7 +175,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -161,7 +183,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -186,13 +208,14 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting FamilyAttributes
-            Page<FamilyAttribute> result=familyService.getFamilyAttributes(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 3, null);
+            Page<FamilyAttribute> result=familyService.getFamilyAttributes(ID.EXTERNAL_ID(family.getFamilyId()), 0, 3, null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.getContent().get(0).getName(), "Test_Attribute");
         });
 
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getVariantGroupsTest() throws Exception {
         //creating AttributeCollection
@@ -203,7 +226,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -215,7 +238,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -233,7 +256,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -241,7 +264,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -283,12 +306,13 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting variantGroups
-            Page<VariantGroup> result=familyService.getVariantGroups(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+            Page<VariantGroup> result=familyService.getVariantGroups(ID.EXTERNAL_ID(family.getFamilyId()), 0, 1, null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.getSize(), 1);
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAttributeGroupsIdNamePairTest() throws Exception {
         //creating AttributeCollection
@@ -299,7 +323,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -311,7 +335,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -329,7 +353,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -337,7 +361,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -362,11 +386,12 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting AttributeGroups
-            List<Pair<String, String>> result=familyService.getAttributeGroupsIdNamePair(family.getFamilyId(), FindBy.EXTERNAL_ID,null);
+            List<Pair<String, String>> result=familyService.getAttributeGroupsIdNamePair(ID.EXTERNAL_ID(family.getFamilyId()),null);
             Assert.assertEquals(result.size(),3);
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getParentAttributeGroupsIdNamePairTest() throws Exception {
         //creating AttributeCollection
@@ -377,7 +402,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -389,7 +414,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -407,7 +432,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -415,7 +440,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -440,11 +465,12 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //Getting ParentAttributeGroups
-            List<Pair<String, String>> result=familyService.getParentAttributeGroupsIdNamePair(family.getFamilyId(), FindBy.EXTERNAL_ID, null);
+            List<Pair<String, String>> result=familyService.getParentAttributeGroupsIdNamePair(ID.EXTERNAL_ID(family.getFamilyId()), null);
             Assert.assertEquals(result.get(0).getValue(0),"DETAILS_GROUP");
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFamilyAttributeOptionsTest() throws Exception {
         //creating AttributeCollection
@@ -455,7 +481,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -467,7 +493,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -485,7 +511,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -493,7 +519,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -528,12 +554,13 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
             FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
             //Getting FamilyAttributeOptions
-            Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
+            Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(ID.EXTERNAL_ID(family.getFamilyId()), familyAttribute.getId(), 0, 2, null);
             Assert.assertEquals(result.getContent().size(), 1);
             Assert.assertEquals(result.getContent().get(0).getValue(), "TestOption");
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getVariantAxisAttributesTest() throws Exception {
         //creating AttributeCollection
@@ -544,7 +571,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -556,7 +583,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -574,7 +601,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -582,7 +609,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -630,12 +657,13 @@ public class FamilyServiceImplTest {
 
             familyDAO.save(family);
             //Getting VariantAxisAttributes
-            List<FamilyAttribute> result=familyService.getVariantAxisAttributes(family.getFamilyId(),variantGroup.getId(), FindBy.EXTERNAL_ID, null);
+            List<FamilyAttribute> result=familyService.getVariantAxisAttributes(ID.EXTERNAL_ID(family.getFamilyId()), variantGroup.getId(), null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.get(0).getName(),attribute.getName());
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAvailableVariantAxisAttributesTest() throws Exception {
         //TODO
@@ -701,7 +729,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findByExternalId(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -754,6 +782,7 @@ public class FamilyServiceImplTest {
         });*/
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getFamilyVariantGroupsTest() throws Exception {
         //creating AttributeCollection
@@ -764,7 +793,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -776,7 +805,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -794,7 +823,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -802,7 +831,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -850,6 +879,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest1() throws Exception {
         //creating AttributeCollection
@@ -860,7 +890,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -872,7 +902,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -897,15 +927,16 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
             //Getting family
-            Family result=familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID,false).orElse(null);
+            Family result=familyService.get(ID.EXTERNAL_ID(family.getFamilyId()),false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(result));
             Assert.assertEquals(result.getFamilyName(), "Test1");
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllTest() throws Exception {
         //creating AttributeCollection
@@ -916,7 +947,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -928,7 +959,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -953,7 +984,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
         });
 
@@ -962,6 +993,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAll1Test() throws Exception {
         //creating AttributeCollection
@@ -972,7 +1004,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -984,7 +1016,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -1005,7 +1037,7 @@ public class FamilyServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1013,16 +1045,17 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
         });
         String[] ids = {familiesData.get(0).get("externalId").toString(), familiesData.get(1).get("externalId").toString(), familiesData.get(2).get("externalId").toString()};
         //Getting Families
-        List<Family> ListedData = familyService.getAll(ids, FindBy.EXTERNAL_ID, null);
+        List<Family> ListedData = familyService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null);
         Assert.assertEquals(ListedData.size(),familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleVariantGroupTest() throws Exception {
         //creating AttributeCollection
@@ -1033,7 +1066,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -1045,7 +1078,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -1063,7 +1096,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String)familyData.get("name"));
             familyDTO.setFamilyId((String)familyData.get("externalId"));
@@ -1071,7 +1104,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1112,11 +1145,12 @@ public class FamilyServiceImplTest {
             familyDAO.save(family);
 
             //toggle
-            boolean result=familyService.toggleVariantGroup(family.getId(), FindBy.INTERNAL_ID,"TEST_VARIANT_1", FindBy.EXTERNAL_ID, Toggle.get("active"));
+            boolean result=familyService.toggleVariantGroup(ID.INTERNAL_ID(family.getId()), "TEST_VARIANT_1", Toggle.get("active"));
             Assert.assertTrue(result);
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntityTest() {
         //creating AttributeCollection
@@ -1128,7 +1162,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         //creating Attribute
@@ -1144,7 +1178,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionService.update(attributeList);
 
-        Page<Attribute> attribute1= attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, 0, 1, null);
+        Page<Attribute> attribute1= attributeCollectionService.getAttributes(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), 0, 1, null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attribute1));
         Assert.assertEquals(attribute1.getContent().get(0).getName(),attribute.getName());
 
@@ -1159,7 +1193,7 @@ public class FamilyServiceImplTest {
         attributeDetails.get().getOptions().put(ValidatableEntity.toId("TestOption"), attributeOption);
         attributeCollectionService.update(attributeList);
 
-        Page<AttributeOption> attributeOption1= attributeCollectionService.getAttributeOptions(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, attribute.getFullId(), 0, 1, null);
+        Page<AttributeOption> attributeOption1= attributeCollectionService.getAttributeOptions(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), attribute.getFullId(), 0, 1, null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeOption1));
         Assert.assertEquals(attributeOption1.getContent().get(0).getValue(),attributeOption.getValue());
         //creating family
@@ -1169,7 +1203,7 @@ public class FamilyServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertEquals(family.getFamilyName(), familyDTO.getFamilyName());
 
         FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1193,7 +1227,7 @@ public class FamilyServiceImplTest {
         List<Family> familyList= new ArrayList<>();
         familyList.add(family);
         familyService.update(familyList);
-        Page<FamilyAttribute> familyAttributes= familyService.getFamilyAttributes(family.getFamilyId(), FindBy.EXTERNAL_ID, 0, 1, null);
+        Page<FamilyAttribute> familyAttributes= familyService.getFamilyAttributes(ID.EXTERNAL_ID(family.getFamilyId()), 0, 1, null);
         Assert.assertEquals(familyAttributes.getContent().get(0).getName(),familyAttributeDTO.getName());
 
         FamilyAttribute familyAttribute1 = family.getAllAttributesMap(false).get(attribute.getId());
@@ -1217,7 +1251,7 @@ public class FamilyServiceImplTest {
         family.getChannelVariantGroups().put("ECOMMERCE", variantGroup.getId());
         familyDAO.save(family);
         FamilyAttribute familyAttribute = family.getAllAttributesMap(false).get(attribute.getId());
-        Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(family.getFamilyId(), FindBy.EXTERNAL_ID, familyAttribute.getId(), 0, 2, null);
+        Page<FamilyAttributeOption> result = familyService.getFamilyAttributeOptions(ID.EXTERNAL_ID(family.getFamilyId()), familyAttribute.getId(), 0, 2, null);
         Assert.assertEquals(result.getContent().size(), 1);
         Assert.assertEquals(result.getContent().get(0).getValue(), "TestOption");
 
@@ -1227,6 +1261,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(variantGroups.get(0).getValue0(), "TEST_1");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createEntitiesTest(){
         //creating AttributeCollection
@@ -1237,7 +1272,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -1249,7 +1284,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //creating AttributeOptions
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -1280,6 +1315,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(familyDAO.findAll(PageRequest.of(0, familyDTOs.size()), false).getTotalElements(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toggleTest() {
         //Creating Family
@@ -1289,20 +1325,21 @@ public class FamilyServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
 
         //toggle
-        familyService.toggle(family.getFamilyId(), EXTERNAL_ID, Toggle.get(family.getActive()));
-        Family updatedFamily = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        familyService.toggle(ID.EXTERNAL_ID(family.getFamilyId()), Toggle.get(family.getActive()));
+        Family updatedFamily = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily));
         Assert.assertEquals(updatedFamily.getActive(), "N");
 
-        familyService.toggle(updatedFamily.getFamilyId(), EXTERNAL_ID, Toggle.get(updatedFamily.getActive()));
-        Family updatedFamily1 = familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        familyService.toggle(ID.EXTERNAL_ID(updatedFamily.getFamilyId()), Toggle.get(updatedFamily.getActive()));
+        Family updatedFamily1 = familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily1));
         Assert.assertEquals(updatedFamily1.getActive(), "Y");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getTest() {
         //Creating AttributeCollection
@@ -1313,7 +1350,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -1325,7 +1362,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -1343,7 +1380,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1351,7 +1388,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1392,13 +1429,14 @@ public class FamilyServiceImplTest {
 
             familyDAO.save(family);
             //Getting Family
-            Family family1=familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+            Family family1=familyService.get(ID.EXTERNAL_ID(family.getFamilyId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(family1));
             Assert.assertEquals(family1.getFamilyName(),familiesData.get(0).get("name"));
             Assert.assertEquals(family1.getAllAttributes().size(),1);
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsPageTest() {
         //Creating AttributeCollection
@@ -1409,7 +1447,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -1421,7 +1459,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         ////Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -1439,7 +1477,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1447,7 +1485,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1494,6 +1532,7 @@ public class FamilyServiceImplTest {
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsListTest() {
         //creating Families
@@ -1517,7 +1556,7 @@ public class FamilyServiceImplTest {
         String[] expected = familiesData.stream().map(familyData -> (String)familyData.get("name")).sorted(String::compareTo).collect(Collectors.toList()).toArray(new String[0]);
         Assert.assertArrayEquals(expected, actual);
 
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
 
 
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
@@ -1541,6 +1580,7 @@ public class FamilyServiceImplTest {
         Assert.assertNotEquals(expected, actual);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsPageTest() {
         //Creating AttributeCollection
@@ -1551,7 +1591,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -1564,7 +1604,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -1584,7 +1624,7 @@ public class FamilyServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1592,7 +1632,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1635,11 +1675,12 @@ public class FamilyServiceImplTest {
         String[] ids = {familiesData.get(0).get("externalId").toString(), familiesData.get(1).get("externalId").toString(), familiesData.get(2).get("externalId").toString()};
 
         //Getting Family
-        Page<Family> paginatedResult = familyService.getAll(ids, EXTERNAL_ID, 0, 10, null, false);
+        Page<Family> paginatedResult = familyService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, 10, null, false);
         Map<String, Family> familiesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(family -> family.getFamilyId(), family -> family));
         Assert.assertTrue(familiesMap.size() == ids.length && familiesMap.containsKey(ids[0]) && familiesMap.containsKey(ids[1]) && familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithIdsAsListTest() {
         //Creating AttributeCollection
@@ -1650,7 +1691,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -1663,7 +1704,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -1683,7 +1724,7 @@ public class FamilyServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1691,7 +1732,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1733,11 +1774,12 @@ public class FamilyServiceImplTest {
         });
         String[] ids = {familiesData.get(0).get("externalId").toString(), familiesData.get(1).get("externalId").toString(), familiesData.get(2).get("externalId").toString()};
         //Getting families
-        List<Family> listedResult = familyService.getAll(ids, EXTERNAL_ID, null, false);
+        List<Family> listedResult = familyService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, Family> familiesMap = listedResult.stream().collect(Collectors.toMap(family1 -> family1.getFamilyId(), family1 -> family1));
         Assert.assertTrue(familiesMap.size() == ids.length && familiesMap.containsKey(ids[0]) && familiesMap.containsKey(ids[1]) && familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsPageTest() {
         //Creating AttributeCollection
@@ -1748,7 +1790,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -1761,7 +1803,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -1781,7 +1823,7 @@ public class FamilyServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1789,7 +1831,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1831,11 +1873,12 @@ public class FamilyServiceImplTest {
         });
         String[] ids = {familiesData.get(0).get("externalId").toString(), familiesData.get(1).get("externalId").toString(), familiesData.get(2).get("externalId").toString()};
         //Getting families with exclude Ids
-        Page<Family> paginatedResult = familyService.getAllWithExclusions(ids, EXTERNAL_ID, 0, 10, null, false);
+        Page<Family> paginatedResult = familyService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), 0, 10, null, false);
         Map<String, Family> familiesMap = paginatedResult.getContent().stream().collect(Collectors.toMap(family -> family.getFamilyId(), family -> family));
         Assert.assertTrue(familiesMap.size() == (familiesData.size() - ids.length) && !familiesMap.containsKey(ids[0]) && !familiesMap.containsKey(ids[1]) && !familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllWithExclusionsAsListTest() {
         //Creating AttributeCollection
@@ -1846,7 +1889,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -1859,7 +1902,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -1879,7 +1922,7 @@ public class FamilyServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1887,7 +1930,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -1929,11 +1972,12 @@ public class FamilyServiceImplTest {
         });
         String[] ids = {familiesData.get(0).get("externalId").toString(), familiesData.get(1).get("externalId").toString(), familiesData.get(2).get("externalId").toString()};
         //Getting families with exclude Ids
-        List<Family> listedResult = familyService.getAllWithExclusions(ids, EXTERNAL_ID, null, false);
+        List<Family> listedResult = familyService.getAllWithExclusions(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, Family> familiesMap = listedResult.stream().collect(Collectors.toMap(family1 -> family1.getFamilyId(), family1 -> family1));
         Assert.assertTrue(familiesMap.size() == (familiesData.size() - ids.length) && !familiesMap.containsKey(ids[0]) && !familiesMap.containsKey(ids[1]) && !familiesMap.containsKey(ids[2]));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllAtSearchTest() {
         //Creating AttributeCollection
@@ -1944,7 +1988,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -1957,7 +2001,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -1977,7 +2021,7 @@ public class FamilyServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -1985,7 +2029,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2030,6 +2074,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll2Test() {
         //Creating AttributeCollection
@@ -2040,7 +2085,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -2053,7 +2098,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
         AttributeOption attributeOption = new AttributeOption();
@@ -2073,7 +2118,7 @@ public class FamilyServiceImplTest {
         familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "N"));
 
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -2081,7 +2126,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2126,6 +2171,7 @@ public class FamilyServiceImplTest {
         Assert.assertEquals(paginatedResult.getContent().size(), familiesData.size());//size
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntityTest() {
         //creating AttributeCollection
@@ -2137,14 +2183,14 @@ public class FamilyServiceImplTest {
 
         attributeCollectionService.create(attributeCollectionDTO);
 
-        AttributeCollection attributeCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(attributeCollection));
         Assert.assertTrue(attributeCollection.diff(attributeCollectionDTO).isEmpty());
         attributeCollection.setActive("N");
         attributeCollection.setGroup("DETAILS");
 
-        attributeCollectionService.update(attributeCollection.getCollectionId(), EXTERNAL_ID, attributeCollection);
-        AttributeCollection updatedCollection = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        attributeCollectionService.update(ID.EXTERNAL_ID(attributeCollection.getCollectionId()), attributeCollection);
+        AttributeCollection updatedCollection = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedCollection));
         Assert.assertEquals(updatedCollection.getActive(), "N");
         //Cteating Attribute
@@ -2159,7 +2205,7 @@ public class FamilyServiceImplTest {
         attributeList.add(attributeCollection);
         attributeCollectionService.update(attributeList);
 
-        AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        AttributeCollection attributeCollectionUpdate = attributeCollectionService.get(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         Attribute attribute1 = new Attribute();
         attribute1.setActive("Y");
@@ -2172,7 +2218,7 @@ public class FamilyServiceImplTest {
         attributeList= new ArrayList<>();
         attributeList.add(attributeCollectionUpdate);
         attributeCollectionService.update(attributeList);
-        Page<Attribute> result = attributeCollectionService.getAttributes(attributeCollectionDTO.getCollectionId(), FindBy.EXTERNAL_ID,0,3,null);
+        Page<Attribute> result = attributeCollectionService.getAttributes(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()),0,3,null);
         Assert.assertEquals(result.getContent().get(0).getName(),attribute1.getName());
 
         //Creating Family
@@ -2182,25 +2228,26 @@ public class FamilyServiceImplTest {
         familyDTO.setActive("Y");
         familyDTO.setDiscontinued("N");
         familyService.create(familyDTO);
-        Family family=familyService.get(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        Family family=familyService.get(ID.EXTERNAL_ID(familyDTO.getFamilyId()), false).orElse(null);
         family.setActive("N");
         family.setGroup("DETAILS");
 
         //updating family
-        familyService.update(family.getFamilyId(), EXTERNAL_ID, family);
-        Family updatedFamily = familyService.get(family.getFamilyId(), FindBy.EXTERNAL_ID, false).orElse(null);
+        familyService.update(ID.EXTERNAL_ID(family.getFamilyId()), family);
+        Family updatedFamily = familyService.get(ID.EXTERNAL_ID(family.getFamilyId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(updatedFamily));
         Assert.assertEquals(updatedFamily.getActive(), "N");
         //TODO Update  familyAttribute and familyOption is pending
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void updateEntitiesTest(){
         //Creating Family
         List<Map<String, Object>> familiesData = new ArrayList<>();
-        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "Y"));
-        familiesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y", "discontinue", "Y"));
-        familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y", "discontinue", "Y"));
+        familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y"));
+        familiesData.add(CollectionsUtil.toMap("name", "Test2", "externalId", "TEST_2", "active", "Y"));
+        familiesData.add(CollectionsUtil.toMap("name", "Test3", "externalId", "TEST_3", "active", "Y"));
 
         familiesData.forEach(familyData -> {
             Family familyDTO = new Family();
@@ -2213,7 +2260,7 @@ public class FamilyServiceImplTest {
 
         String[] ids = {familiesData.get(0).get("externalId").toString(), familiesData.get(1).get("externalId").toString(), familiesData.get(2).get("externalId").toString()};
 
-        List<Family> result = familyService.getAll(ids, EXTERNAL_ID, null, false);
+        List<Family> result = familyService.getAll(Arrays.stream(ids).map(ID::EXTERNAL_ID).collect(Collectors.toList()), null, false);
         Map<String, Family> familiesMap = result.stream().collect(Collectors.toMap(family -> family.getFamilyId(), family -> family));
         Assert.assertTrue(familiesMap.size() == ids.length && familiesMap.containsKey(ids[0]) && familiesMap.containsKey(ids[1]) && familiesMap.containsKey(ids[2]));
 
@@ -2231,6 +2278,7 @@ public class FamilyServiceImplTest {
         //TODO Update  familyAttribute and familyOption is pending
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAllTest() {
         //Creating AttributeCollection
@@ -2241,7 +2289,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -2258,7 +2306,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -2266,7 +2314,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2289,10 +2337,12 @@ public class FamilyServiceImplTest {
             family.addAttribute(familyAttributeDTO);
         });
         //Getting AttributeCollections
-        List<AttributeCollection> result = attributeCollectionService.findAll(CollectionsUtil.toMap("active", "N"));
+        List<AttributeCollection> result = attributeCollectionService.findAll(Criteria.where("active").eq("N"));
         long size = familiesData.stream().filter(x -> x.get("active").equals("N")).count();
         Assert.assertTrue(result.size() == size);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findAll1Test() {
         //Creating AttributeCollection
@@ -2303,7 +2353,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -2319,7 +2369,7 @@ public class FamilyServiceImplTest {
         List<Map<String, Object>> familiesData = new ArrayList<>();
         familiesData.add(CollectionsUtil.toMap("name", "Test1", "externalId", "TEST_1", "active", "Y", "discontinue", "N"));
         familiesData.forEach(familyData -> {
-            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+            AttributeCollection finalAttributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
             Family familyDTO = new Family();
             familyDTO.setFamilyName((String) familyData.get("name"));
             familyDTO.setFamilyId((String) familyData.get("externalId"));
@@ -2327,7 +2377,7 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String) familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
 
             FamilyAttributeGroup familyAttributeGroup = new FamilyAttributeGroup();
@@ -2351,12 +2401,12 @@ public class FamilyServiceImplTest {
         });
 
         long size = familiesData.stream().filter(x -> x.get("active").equals("N")).count();
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("active", "N"));
         //Getting Families
-        List<Family> result = familyService.findAll(criteria);
+        List<Family> result = familyService.findAll(Criteria.where("active").eq("N"));
         Assert.assertTrue(result.size() == size);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOneTest() {
         //Creating AttributeCollection
@@ -2367,7 +2417,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
         //Creating Attribute
         Attribute attribute = new Attribute();
         attribute.setActive("Y");
@@ -2379,7 +2429,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -2404,16 +2454,17 @@ public class FamilyServiceImplTest {
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
 
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
             familyDAO.save(family);
         });
 
         //Getting Family
-        Optional<Family> result = familyService.findOne(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
+        Optional<Family> result = familyService.findOne(Criteria.where("familyName").eq(familiesData.get(0).get("name")));
         Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void findOne1Test() {
         //Creating AttributeCollection
@@ -2424,7 +2475,7 @@ public class FamilyServiceImplTest {
         attributeCollectionDTO.setDiscontinued("N");
         attributeCollectionDAO.insert(attributeCollectionDTO);
 
-        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        AttributeCollection attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating Attribute
         Attribute attribute = new Attribute();
@@ -2437,7 +2488,7 @@ public class FamilyServiceImplTest {
 
         attributeCollectionDAO.save(attributeCollectionDetails);
 
-        attributeCollectionDetails = attributeCollectionDAO.findByExternalId(attributeCollectionDTO.getCollectionId()).orElse(null);
+        attributeCollectionDetails = attributeCollectionDAO.findById(ID.EXTERNAL_ID(attributeCollectionDTO.getCollectionId()), false).orElse(null);
 
         //Creating AttributeOption
         Optional<Attribute> attributeDetails = attributeCollectionDetails.getAttribute(attribute.getFullId());
@@ -2461,17 +2512,18 @@ public class FamilyServiceImplTest {
             familyDTO.setActive((String)familyData.get("active"));
             familyDTO.setDiscontinued((String)familyData.get("discontinue"));
             familyDAO.insert(familyDTO);
-            Family family = familyDAO.findByExternalId(familyDTO.getFamilyId()).orElse(null);
+            Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
             Assert.assertTrue(family != null);
             familyDAO.save(family);
 
         });
-        Criteria criteria = PimUtil.buildCriteria(CollectionsUtil.toMap("familyName", familiesData.get(0).get("name")));
+        Criteria criteria = Criteria.where("familyName").eq(familiesData.get(0).get("name"));
         //Getting Family
         Optional<Family> result = familyService.findOne(criteria);
         Assert.assertEquals(familiesData.get(0).get("name"), result.get().getFamilyName());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void validateTest() throws Exception {
 
@@ -2509,7 +2561,7 @@ public class FamilyServiceImplTest {
         context.clear();
 
         /*Testing uniqueConstraint violation of familyId with update operation*/
-        Family family = familyDAO.findById(familyDTO.getFamilyId(), FindBy.EXTERNAL_ID).orElse(null);
+        Family family = familyDAO.findById(ID.EXTERNAL_ID(familyDTO.getFamilyId())).orElse(null);
         family.setFamilyName("Envelope");
         family.setFamilyId("TEST_1");
         family.setActive("Y");
@@ -2528,8 +2580,8 @@ public class FamilyServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        attributeCollectionDAO.getMongoTemplate().dropCollection(AttributeCollection.class);
-        familyDAO.getMongoTemplate().dropCollection(Family.class);
+        mongoTemplate.dropCollection(AttributeCollection.class);
+        mongoTemplate.dropCollection(Family.class);
     }
 
 }

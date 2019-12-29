@@ -1,9 +1,12 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.AssetFamilyDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetFamilyDAO;
 import com.bigname.pim.api.service.AssetFamilyService;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +14,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -18,8 +23,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 06/03/2019.
@@ -31,14 +34,46 @@ import static org.junit.Assert.*;
 
 public class AssetFamilyTest {
     @Autowired
-    AssetFamilyService assetFamilyService;
+    private AssetFamilyService assetFamilyService;
     @Autowired
-    AssetFamilyDAO assetFamilyDAO;
+    private AssetFamilyDAO assetFamilyDAO;
+    @Autowired
+    private UserDAO userDAO;
+
+    private MongoTemplate mongoTemplate;
 
     @Before
     public void setUp() throws Exception {
-        assetFamilyDAO.getMongoTemplate().dropCollection(AssetFamily.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) assetFamilyDAO.getTemplate();
+        }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+
+        mongoTemplate.dropCollection(AssetFamily.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest(){
         //Create New Instance
@@ -56,7 +91,7 @@ public class AssetFamilyTest {
         Assert.assertEquals(assetFamilyDTO.getActive(), "N");
 
         assetFamilyService.create(assetFamilyDTO);
-        AssetFamily newAssetFamily = assetFamilyService.get(assetFamilyDTO.getAssetFamilyId(), EXTERNAL_ID, false).orElse(null);
+        AssetFamily newAssetFamily = assetFamilyService.get(ID.EXTERNAL_ID(assetFamilyDTO.getAssetFamilyId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newAssetFamily));
         Assert.assertEquals(newAssetFamily.getAssetFamilyId(), assetFamilyDTO.getAssetFamilyId());
         Assert.assertEquals(newAssetFamily.getAssetFamilyName(), assetFamilyDTO.getAssetFamilyName());
@@ -64,6 +99,7 @@ public class AssetFamilyTest {
         Assert.assertEquals(newAssetFamily.getActive(), assetFamilyDTO.getActive());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create New Instance For Original
@@ -95,6 +131,8 @@ public class AssetFamilyTest {
         Assert.assertEquals(original.getAssetFamilyName(), "Test-A");
         Assert.assertEquals(original.getDescription(), "test-A");
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create New Instance
@@ -117,6 +155,6 @@ public class AssetFamilyTest {
     }
     @After
     public void tearDown() throws Exception {
-        assetFamilyDAO.getMongoTemplate().dropCollection(AssetFamily.class);
+        mongoTemplate.dropCollection(AssetFamily.class);
     }
 }

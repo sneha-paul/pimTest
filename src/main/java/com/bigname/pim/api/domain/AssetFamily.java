@@ -1,20 +1,22 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
-import com.bigname.core.domain.ValidatableEntity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
+import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import static com.bigname.common.util.RegExBuilder.*;
+
 import static com.bigname.pim.api.domain.Website.Property.*;
+import static com.m7.xtreme.common.util.RegExBuilder.*;
 
 /**
  * Created by sanoop on 14/02/2019.
  */
-public class AssetFamily extends Entity<AssetFamily> {
+public class AssetFamily extends MongoEntity<AssetFamily> {
 
     @Transient
     @NotEmpty(message = "AssetFamily Id cannot be empty", groups = {ValidatableEntity.CreateGroup.class, ValidatableEntity.DetailsGroup.class})
@@ -29,13 +31,6 @@ public class AssetFamily extends Entity<AssetFamily> {
     private String description;
 
     public AssetFamily() { super(); }
-
-    public AssetFamily(Map<String, Object> properties) {
-        this.setAssetFamilyName((String) properties.get(WEBSITE_NAME.name()));
-        this.setAssetFamilyId((String) properties.get(WEBSITE_ID.name()));
-        this.setDescription((String) properties.get(URL.name()));
-        this.setActive((String) properties.get(ACTIVE.name()));
-    }
 
     public String getAssetFamilyId() {return getExternalId();}
 

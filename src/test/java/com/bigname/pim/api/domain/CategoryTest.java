@@ -1,11 +1,14 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
 import com.bigname.pim.api.service.CategoryService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +16,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -22,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 05/03/2019.
@@ -35,14 +38,47 @@ import static org.junit.Assert.*;
 public class CategoryTest {
 
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
     @Autowired
-    CategoryDAO categoryDAO;
+    private CategoryDAO categoryDAO;
+    @Autowired
+    private UserDAO userDAO;
+
+    private MongoTemplate mongoTemplate;
 
     @Before
     public void setUp() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) categoryDAO.getTemplate();
+        }
+
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+
+        mongoTemplate.dropCollection(Category.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest(){
         //Create New Instance
@@ -67,7 +103,7 @@ public class CategoryTest {
 
         //Create
         categoryService.create(categoryDTO);
-        Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+        Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newCategory));
 
         Assert.assertEquals(newCategory.getCategoryId(), categoryDTO.getCategoryId());
@@ -79,14 +115,18 @@ public class CategoryTest {
         Assert.assertEquals(newCategory.getActive(), categoryDTO.getActive());
 
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getSubCategories() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void setSubCategories() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void orchestrate() throws Exception {
         //Create new instance
@@ -99,6 +139,7 @@ public class CategoryTest {
         Assert.assertEquals(categoryDTO.getCategoryId(), "TEST");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() throws Exception {
         //Adding website
@@ -113,14 +154,16 @@ public class CategoryTest {
             categoryDAO.insert(categoryDTO);
 
             //Clone Category
-            Category newCategory = categoryService.get(categoryDTO.getCategoryId(), EXTERNAL_ID, false).orElse(null);
+            Category newCategory = categoryService.get(ID.EXTERNAL_ID(categoryDTO.getCategoryId()), false).orElse(null);
             Assert.assertTrue(newCategory != null);
          //   Assert.assertTrue(newCategory.diff(categoryDTO).isEmpty());
 
-            Category categoryClone = categoryService.cloneInstance(newCategory.getCategoryId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Category categoryClone = categoryService.cloneInstance(ID.EXTERNAL_ID(newCategory.getCategoryId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(categoryClone.getCategoryId() .equals(newCategory.getCategoryId() + "_COPY") && categoryClone.getCategoryName().equals(newCategory.getCategoryName() + "_COPY") && categoryClone.getDescription().equals(newCategory.getDescription() + "_COPY") && categoryClone.getActive() != newCategory.getActive());
         });
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create Category Original instance
@@ -194,6 +237,8 @@ public class CategoryTest {
         Assert.assertEquals(original.getDescription(), "ONE-A");
         Assert.assertEquals(original.getLongDescription(), "ONE-A");
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create new Instance
@@ -212,14 +257,17 @@ public class CategoryTest {
         Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void equals() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void equals1() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create first instance
@@ -244,9 +292,10 @@ public class CategoryTest {
         Assert.assertEquals(diff1.size(), 1);
         Assert.assertEquals(diff1.get("categoryName"), "test.com");
     }
+
     @After
     public void tearDown() throws Exception {
-        categoryDAO.getMongoTemplate().dropCollection(Category.class);
+        mongoTemplate.dropCollection(Category.class);
     }
 
 }

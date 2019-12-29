@@ -1,8 +1,8 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.core.service.BaseService;
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
+import com.bigname.pim.api.persistence.dao.mongo.VirtualFileDAO;
+import com.m7.xtreme.xcore.service.BaseService;
 
 import java.util.List;
 import java.util.Optional;

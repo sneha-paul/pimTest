@@ -8,6 +8,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
                             <button id="js-create-product" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Parent Product</span></button>
+                            <button id="js-advanced-search-product" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>
                         </div>
                     </div>
                 </div>
@@ -32,6 +33,8 @@
             pageUrl: '/pim/products/',
             toolbar: [{name: 'EXPORT', actionUrl: '/pim/products/export'}, {name: 'IMPORT'}],
             dataUrl: '/pim/products/data',
+            toggleUrl:'/pim/products/{externalId}/products/active/{active}',
+            archiveUrl:'/pim/products/{externalId}/products/archive/{archived}',
             columns: [
                 {
                     data: 'productName', name : 'productName' , title : 'Parent Product Name', width: '35%',
@@ -69,6 +72,16 @@
             title:'Create Parent Product',
             buttons: [
                 {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('products');$.closeModal();});}},
+                {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+            ]
+        });
+        $.addModal({
+            selector: '#js-advanced-search-product',
+            url: $.getURL('/pim/products/search'),
+            name:'advanced-search',
+            title:'Advanced Search',
+            buttons: [
+                {text: 'SEARCH', style: 'primary', close: false, click: function(){$.getDataTable('products').search('').draw();$.closeModal();}},
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });

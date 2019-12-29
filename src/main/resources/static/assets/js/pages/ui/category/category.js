@@ -180,4 +180,20 @@ $(function(){
         };
         eModal.ajax(options);
     });
+
+    $('.js-categoryHistory-tab').on('shown.bs.tab.categoryHistory', function (e) {
+        $.initGrid({
+            selector: '#paginatedCategoryHistoryTable',
+            names: ['versions','version'],
+            dataUrl: $.getURL('/pim/categories/{categoryId}/history'),
+            hideStatus:'true',
+            columns: [
+                { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
+                { data: 'userName', name : 'userName' , title : 'User', orderable: false},
+                { data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+            ],
+            buttons: [$.detailsButton({pageUrl: $.getURL('/pim/categories/{categoryId}/history/')})]
+        });
+        $(this).removeClass('js-categoryHistory-tab').off('shown.bs.tab.categoryHistory');
+    });
 });

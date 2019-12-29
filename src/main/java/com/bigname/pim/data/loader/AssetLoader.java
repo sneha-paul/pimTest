@@ -1,11 +1,11 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.AssetCollection;
 import com.bigname.pim.api.domain.VirtualFile;
 import com.bigname.pim.api.service.AssetCollectionService;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.bigname.common.util.StringUtil.trim;
-import static com.bigname.common.util.ValidationUtil.isEmpty;
-import static com.bigname.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.trim;
+
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
@@ -71,7 +72,7 @@ public class AssetLoader {
         if(isNotEmpty(folderName) && isNotEmpty(parentId)) {
             folderName = trim(folderName);
             parentId = trim(parentId);
-            VirtualFile parentFolder = assetService.get(parentId, FindBy.INTERNAL_ID, false).orElse(null);
+            VirtualFile parentFolder = assetService.get(ID.EXTERNAL_ID(parentId), false).orElse(null);
             if (isNotEmpty(parentFolder)) {
                 VirtualFile folder = assetService.getFile(folderName, parentId).orElse(null);
                 if (isNotEmpty(folder)) {

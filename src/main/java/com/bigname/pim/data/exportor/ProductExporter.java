@@ -1,31 +1,42 @@
 package com.bigname.pim.data.exportor;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.data.exporter.BaseExporter;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.*;
 import com.bigname.pim.api.service.*;
 import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.POIUtil;
-import com.bigname.pim.util.PimUtil;
+import com.m7.xtreme.common.criteria.model.SimpleCriteria;
+import com.m7.xtreme.common.util.*;
+import com.m7.xtreme.xcore.data.exporter.BaseExporter;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.BlackBox;
+import com.m7.xtreme.xcore.util.Criteria;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.JobInstance;
+import com.m7.xtreme.xplatform.service.JobInstanceService;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import javax.naming.event.ObjectChangeListener;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import static com.bigname.common.util.StringUtil.*;
+import static com.m7.xtreme.common.util.StringUtil.getSimpleId;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
+import static com.m7.xtreme.xcore.util.Criteria.FieldType.STRING;
+
 
 /**
  * Created by sruthi on 31-01-2019.
  */
 @Component
-public class ProductExporter implements BaseExporter<Product, ProductService> {
+public class ProductExporter implements BaseExporter<Product, ProductService>, Job {
 
     @Autowired
     private ProductVariantService productVariantService;
@@ -48,35 +59,91 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
     @Autowired
     private CategoryService categoryService;
 
-    public boolean exportData(String filePath) {
+    public boolean exportData(String filePath, Criteria criteria) {
+        Map<String, Object> productCriteriaMap = criteria.toMap();
+        Map<String, Object> variantCriteriaMap = new HashMap<>();
+        variantCriteriaMap.put("condition", productCriteriaMap.get("condition"));
+        variantCriteriaMap.put("not", productCriteriaMap.get("not"));
+        List<Map<String, Object>> variantsList = new ArrayList<>();
+        List<Map<String, Object>> mainRules = (List<Map<String, Object>>)productCriteriaMap.get("rules");
+        boolean isVariants = false;
+        if(isNotEmpty(mainRules)) {
+            Iterator<Map<String, Object>> rulesIterator = mainRules.iterator();
+            while (rulesIterator.hasNext()) {
+                int count = 0;
+                Map<String, Object> rules = (Map<String, Object>)rulesIterator.next();
+                List<Map<String, Object>> variantsConditionList = new ArrayList<>();
+                Map<String, Object> variantConditionMap = new HashMap<>();
+                List<Map<String, Object>> rulesList = (List<Map<String, Object>>)rules.get("rules");
+                Iterator<Map<String, Object>> ruleIterator = rulesList.iterator();
+                while(ruleIterator.hasNext()) {
+                    Map<String, Object> innerRule = ruleIterator.next();
+                    String field = (String) innerRule.get("field");
+                    if(field.contains("variant.")) {
+                        isVariants = true;
+                        if(count == 0) {
+                            variantConditionMap.put("condition", rules.get("condition"));
+                            variantConditionMap.put("not", rules.get("not"));
+                            variantsList.add(variantConditionMap);
+                            count = 1;
+                        }
+                        String[] fieldName = field.split("\\.");
+                        innerRule.put("field", fieldName[1]);
+                        variantsConditionList.add(innerRule);
+                        ruleIterator.remove();
+                    }
+                }
+                if(isVariants) {
+                    variantConditionMap.put("rules", variantsConditionList);
+                    rulesIterator.remove();
+                }
+            }
+            variantCriteriaMap.put("rules", variantsList);
+        }
+
+        Criteria productCriteria = Criteria.fromMap(productCriteriaMap);
+        List<Product> productData = productService.findAll(productCriteria,true);
+        List<String> idList = new ArrayList<>();
+        productData.forEach(product -> idList.add(product.getId()));
+
+        //Criteria _criteria1 = Criteria.where("productId", STRING).in(idList.toArray());
+        //productVariantService.findAll(_criteria1, true);
+        Criteria criteria1 = Criteria.where("productId", "STRING").eq("9fd5acc9-1960-4f72-b2c8-d7523da945ee");//33e77864-3b65-4213-a6f9-dc25de0dc8ef
+
+        Criteria variantCriteria = Criteria.fromMap(variantCriteriaMap);
+        variantCriteria.and(criteria1);
+
+        List<Map<String, Object>> proVariants = productService.findAllVariants(variantCriteria, true);
+
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
         Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
 
         List<Map<String, Object>> variantsAttributes = new ArrayList<>();
         Set<String> header = new HashSet<>();
-        productVariantData.forEach(variant -> {
+        proVariants.forEach(variant -> {
+            //if(idList.contains(variant.get("productId"))) {
             Map<String, Object> variantAttributesMap = new HashMap<>();
             variant.forEach((key, value) -> {
-                if(value instanceof String) {
+                if (value instanceof String) {
                     variantAttributesMap.put(key, value);
                 }
 
                 String productFamilyId = (String) variant.get("productFamilyId");
                 String familyId = null;
-                if(productFamilyId != null && familyLookup.containsKey(productFamilyId)){
+                if (productFamilyId != null && familyLookup.containsKey(productFamilyId)) {
                     familyId = familyLookup.get(productFamilyId).getFamilyId();
                 }
 
-                Map<String, Object> scopedProductAttributes = (Map<String, Object>)((Map<String, Object>)variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
-                Map<String, Object> pricingDetails = (Map<String, Object>)variant.get("pricingDetails");
-                Map<String, Object> variantAttributes = (Map<String, Object>)variant.get("variantAttributes");
-                if(scopedProductAttributes != null) {
+                Map<String, Object> scopedProductAttributes = (Map<String, Object>) ((Map<String, Object>) variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
+                Map<String, Object> pricingDetails = (Map<String, Object>) variant.get("pricingDetails");
+                Map<String, Object> variantAttributes = (Map<String, Object>) variant.get("variantAttributes");
+                if (scopedProductAttributes != null) {
                     variantAttributesMap.putAll(scopedProductAttributes);
                 } else {
                     System.out.println(variant);
                 }
-                variantAttributesMap.put("PRICING_DETAILS", CollectionsUtil.buildMapString(pricingDetails,0).toString());
-                if(variantAttributes != null) {
+                variantAttributesMap.put("PRICING_DETAILS", CollectionsUtil.buildMapString(pricingDetails, 0).toString());
+                if (variantAttributes != null) {
                     variantAttributesMap.putAll(variantAttributes);
                 } else {
                     System.out.println(variant);
@@ -88,6 +155,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
             });
             header.addAll(variantAttributesMap.keySet());
             variantsAttributes.add(variantAttributesMap);
+            //}
         });
 
         List<List<Object>> data = new ArrayList<>();
@@ -108,7 +176,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
 
     @Override
     public String getFileName(Type fileType) {
-        return "ProductExport" + PimUtil.getTimestamp() + fileType.getExt();
+        return "ProductExport" + PlatformUtil.getTimestamp() + fileType.getExt();
     }
 
     public boolean exportFullJsonData(String filePath) {
@@ -192,17 +260,17 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
         List<Website> websitesList = websiteService.getAll(null, true, true, true);
         websitesList.forEach(website -> {
             Map<String, Object> websiteNode = CollectionsUtil.toMap(
-                                                        "_ID",  website.getId(),
-                                                        "WEBSITE_ID",   website.getWebsiteId(),
-                                                        "NAME",         website.getWebsiteName(),
-                                                        "URL",          website.getUrl(),
-                                                        "ACTIVE",       website.getActive(),
-                                                        "DISCONTINUED", website.getDiscontinued());
+                    "_ID",  website.getId(),
+                    "WEBSITE_ID",   website.getWebsiteId(),
+                    "NAME",         website.getWebsiteName(),
+                    "URL",          website.getUrl(),
+                    "ACTIVE",       website.getActive(),
+                    "DISCONTINUED", website.getDiscontinued());
             int[] seqNum = {0};
             websiteNode.put("CATALOGS", websiteService.getAllWebsiteCatalogs(website.getId()).stream()
-                                                            .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
-                                                            .map(websiteCatalog -> CollectionsUtil.toMap("_ID", websiteCatalog.getCatalogId(), "ACTIVE", websiteCatalog.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
-                                                            .collect(Collectors.toList()));
+                    .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                    .map(websiteCatalog -> CollectionsUtil.toMap("_ID", websiteCatalog.getCatalogId(), "ACTIVE", websiteCatalog.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
+                    .collect(Collectors.toList()));
 
             websitesNode.add(websiteNode);
         });
@@ -212,17 +280,17 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
         List<Catalog> catalogsList = catalogService.getAll(null, true, true, true);
         catalogsList.forEach(catalog -> {
             Map<String, Object> catalogNode =  CollectionsUtil.toMap(
-                                                        "_ID",  catalog.getId(),
-                                                        "CATALOG_ID",   catalog.getCatalogId(),
-                                                        "NAME",         catalog.getCatalogName(),
-                                                        "DESCRIPTION",  catalog.getDescription(),
-                                                        "ACTIVE",       catalog.getActive(),
-                                                        "DISCONTINUED", catalog.getDiscontinued());
+                    "_ID",  catalog.getId(),
+                    "CATALOG_ID",   catalog.getCatalogId(),
+                    "NAME",         catalog.getCatalogName(),
+                    "DESCRIPTION",  catalog.getDescription(),
+                    "ACTIVE",       catalog.getActive(),
+                    "DISCONTINUED", catalog.getDiscontinued());
             int[] seqNum = {0};
             catalogNode.put("CATEGORIES", catalogService.getAllRootCategories(catalog.getId()).stream()
-                                                            .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
-                                                            .map(rootCategory -> CollectionsUtil.toMap("_ID", rootCategory.getRootCategoryId(), "ACTIVE", rootCategory.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
-                                                            .collect(Collectors.toList()));
+                    .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
+                    .map(rootCategory -> CollectionsUtil.toMap("_ID", rootCategory.getRootCategoryId(), "ACTIVE", rootCategory.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
+                    .collect(Collectors.toList()));
 
             catalogsNode.add(catalogNode);
         });
@@ -233,18 +301,18 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
         List<Category> categoriesList = categoryService.getAll(null, true, true, true);
         categoriesList.forEach(category -> {
             Map<String, Object> categoryNode =  CollectionsUtil.toMap(
-                                                        "_ID",      category.getId(),
-                                                        "CATEGORY_ID",      category.getCategoryId(),
-                                                        "NAME",             category.getCategoryName(),
-                                                        "DESCRIPTION",      category.getDescription(),
-                                                        "LONG_DESCRIPTION", category.getLongDescription(),
-                                                        "META_DESCRIPTION", category.getMetaDescription(),
-                                                        "META_KEYWORDS",    category.getMetaKeywords(),
-                                                        "META_TITLE",       category.getMetaTitle(),
-                                                        "ACTIVE",           category.getActive(),
-                                                        "DISCONTINUED",     category.getDiscontinued());
+                    "_ID",      category.getId(),
+                    "CATEGORY_ID",      category.getCategoryId(),
+                    "NAME",             category.getCategoryName(),
+                    "DESCRIPTION",      category.getDescription(),
+                    "LONG_DESCRIPTION", category.getLongDescription(),
+                    "META_DESCRIPTION", category.getMetaDescription(),
+                    "META_KEYWORDS",    category.getMetaKeywords(),
+                    "META_TITLE",       category.getMetaTitle(),
+                    "ACTIVE",           category.getActive(),
+                    "DISCONTINUED",     category.getDiscontinued());
             int[] seqNum = {0};
-            categoryNode.put("PRODUCTS", categoryService.getAllCategoryProducts(category.getId()).stream()
+            categoryNode.put("PRODUCTS", categoryService.getAllCategoryProducts(ID.INTERNAL_ID(category.getId())).stream()
                     .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
                     .map(categoryProduct -> CollectionsUtil.toMap("_ID", categoryProduct.getProductId(), "ACTIVE", categoryProduct.getActive(), "SEQUENCE_NUM", seqNum[0] ++))
                     .collect(Collectors.toList()));
@@ -285,7 +353,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
             }
             productNode.put("DIGITAL_ASSETS", digitalAssets);
             int[] seqNum = {0};
-            productNode.put("PRODUCT_VARIANTS", productService.getProductVariants(product.getProductId(), FindBy.EXTERNAL_ID, PIMConstants.DEFAULT_CHANNEL_ID, null, false).stream()
+            productNode.put("PRODUCT_VARIANTS", productService.getProductVariants(ID.EXTERNAL_ID(product.getProductId()), PIMConstants.DEFAULT_CHANNEL_ID, null, false).stream()
                     .sorted((e1, e2) -> (int)(e1.getSequenceNum() == e2.getSequenceNum() ? e2.getSubSequenceNum() - e1.getSubSequenceNum() : e1.getSequenceNum() - e2.getSequenceNum()))
                     .map(productVariant -> {
                         Map<String, Object> variantNode =  CollectionsUtil.toMap(
@@ -392,12 +460,134 @@ public class ProductExporter implements BaseExporter<Product, ProductService> {
         List<Product> products =  productService.getAll(null, false);
         data.add(Arrays.asList(new String[]{"CHILD PRODUCT NAME", "CHILD PRODUCT ID", "PARENT PRODUCT ID"}));
         products.forEach(product -> {
-            List<ProductVariant> variants =  productVariantService.getAll(product.getId(), FindBy.INTERNAL_ID, product.getChannelId(), null, false);
+            List<ProductVariant> variants =  productVariantService.getAll(ID.INTERNAL_ID(product.getId()), product.getChannelId(), null, false);
             variants.forEach(variant -> data.add(Arrays.asList(variant.getProductVariantName(), variant.getProductVariantId(),product.getExternalId())));
         });
 
         POIUtil.writeData(filePath, "Child Products", data);
         return true;
+    }
+
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        BlackBox logger = new BlackBox();
+        boolean success = false;
+
+        String fileName = getFileName(BaseExporter.Type.XLSX);
+        String fileLocation = "/usr/local/pim/uploads/data/export/";
+        JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
+
+        //job instance updation
+        String jobInstanceId = jobDataMap.getString("jobId");
+        JobInstanceService jobInstanceService = (JobInstanceService) jobDataMap.get("jobInstanceService");
+        JobInstance jobInstance = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
+        logger.info("Job " + jobInstance.getJobName() + " started");
+        jobInstance.setLogs(logger.toLogMessage());
+        jobInstanceService.updateJobsDetails(jobInstance);
+
+        ProductVariantService productVariantService = null;
+        FamilyService familyService = null;
+        ProductService productService = null;
+        Set<BaseService> services = (Set<BaseService>) jobDataMap.get("services");
+        for(Iterator<BaseService> iter = services.iterator(); iter.hasNext(); ) {
+            BaseService bs = iter.next();
+            if(bs.getEntityName().equals("productVariant")) {
+                productVariantService = (ProductVariantService) bs;
+            } else if(bs.getEntityName().equals("family")){
+                familyService = (FamilyService) bs;
+            } else if(bs.getEntityName().equals("product")){
+                productService = (ProductService) bs;
+            }
+        }
+
+        Criteria criteria = Criteria.fromJson(jobDataMap.get("searchCriteria").toString());
+        List<Product> productData = productService.findAll(criteria,true);
+        List<String> idList = new ArrayList<>();
+        productData.forEach(product -> idList.add(product.getId()));
+
+        List<Map<String, Object>> productVariantData = productVariantService.getAll();
+        Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
+
+        List<Map<String, Object>> variantsAttributes = new ArrayList<>();
+        Set<String> header = new HashSet<>();
+        productVariantData.forEach(variant -> {
+            if(idList.contains(variant.get("productId"))) {
+                Map<String, Object> variantAttributesMap = new HashMap<>();
+                variant.forEach((key, value) -> {
+
+                    if (value instanceof String) {
+                        variantAttributesMap.put(key, value);
+                    }
+
+                    String productFamilyId = (String) variant.get("productFamilyId");
+                    String familyId = null;
+                    if (productFamilyId != null && familyLookup.containsKey(productFamilyId)) {
+                        familyId = familyLookup.get(productFamilyId).getFamilyId();
+                    }
+
+                    Map<String, Object> scopedProductAttributes = (Map<String, Object>) ((Map<String, Object>) variant.get("scopedFamilyAttributes")).get("ECOMMERCE");
+                    Map<String, Object> pricingDetails = (Map<String, Object>) variant.get("pricingDetails");
+                    Map<String, Object> variantAttributes = (Map<String, Object>) variant.get("variantAttributes");
+                    if (scopedProductAttributes != null) {
+                        variantAttributesMap.putAll(scopedProductAttributes);
+                    } else {
+                        System.out.println(variant);
+                    }
+                    variantAttributesMap.put("PRICING_DETAILS", CollectionsUtil.buildMapString(pricingDetails, 0).toString());
+                    if (variantAttributes != null) {
+                        variantAttributesMap.putAll(variantAttributes);
+                    } else {
+                        System.out.println(variant);
+                    }
+                    variantAttributesMap.replace("productFamilyId", familyId);
+                    variantAttributesMap.remove("createdUser");
+                    variantAttributesMap.remove("lastModifiedUser");
+
+                });
+                header.addAll(variantAttributesMap.keySet());
+                variantsAttributes.add(variantAttributesMap);
+            }
+        });
+
+        List<List<Object>> data = new ArrayList<>();
+        List<Object> headerColumns = new ArrayList<>(header);
+        data.add(headerColumns);
+        for (Map<String, Object> variantAttributes : variantsAttributes) {
+            List<Object> variantData = new ArrayList<>();
+            for(int i = 0; i < headerColumns.size(); i++){
+                String key = (String)headerColumns.get(i);
+                variantData.add(variantAttributes.get(key));
+            }
+            data.add(variantData);
+
+        }
+        POIUtil.writeData(fileLocation + fileName, "Product", data);
+
+        success = true;
+
+
+        logger.info("Job completed");
+        System.out.println("============== : "+jobExecutionContext.getJobDetail().getJobDataMap().getString("jobService"));
+
+        System.out.println("Job Executed");
+        String jobName = jobExecutionContext.getJobDetail().getKey().getName();
+        String jobType = jobExecutionContext.getJobDetail().getKey().getGroup();
+        System.out.println("JobType : " + jobType);
+        System.out.println("========" + jobExecutionContext.getFireInstanceId());
+        System.out.println(jobExecutionContext.getTrigger().getStartTime());
+        Instant endDateInstant = Instant.ofEpochMilli(jobExecutionContext.getScheduledFireTime().getTime());
+        LocalDateTime endTime = LocalDateTime.ofInstant(endDateInstant, ZoneId.systemDefault());
+        System.out.println("End Time : " + endTime);
+        Instant startDateInstant = Instant.ofEpochMilli(jobExecutionContext.getTrigger().getStartTime().getTime());
+        LocalDateTime startDateTime = LocalDateTime.ofInstant(startDateInstant, ZoneId.systemDefault());
+        if(success) {
+            JobInstance jobInstance1 = jobInstanceService.get(ID.INTERNAL_ID(jobInstanceId), false).orElse(null);
+            jobInstance1.setLogs(logger.toLogMessage());
+            jobInstance1.setStatus("Completed");
+            jobInstance1.setCompletedTime(endTime);
+            jobInstance1.setActualStartTime(startDateTime);
+            jobInstanceService.updateJobsDetails(jobInstance1);
+        }
     }
 }
 

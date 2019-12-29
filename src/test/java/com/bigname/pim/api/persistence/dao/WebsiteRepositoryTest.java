@@ -1,13 +1,16 @@
 package com.bigname.pim.api.persistence.dao;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Website;
 import com.bigname.pim.api.domain.WebsiteCatalog;
+import com.bigname.pim.api.persistence.dao.mongo.CatalogDAO;
+import com.bigname.pim.api.persistence.dao.mongo.WebsiteCatalogDAO;
+import com.bigname.pim.api.persistence.dao.mongo.WebsiteDAO;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -44,11 +48,15 @@ public class WebsiteRepositoryTest {
     @Autowired
     private WebsiteCatalogDAO websiteCatalogDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() {
-
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
 
     @Test
@@ -88,11 +96,11 @@ public class WebsiteRepositoryTest {
             websiteDTO.setUrl((String)websiteData.get("url"));
             websiteDAO.insert(websiteDTO);
 
-            Optional<Website> website = websiteDAO.findByExternalId(websiteDTO.getWebsiteId());
+            Optional<Website> website = websiteDAO.findById(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false);
             Assert.assertTrue(website.isPresent());
-            website = websiteDAO.findById(websiteDTO.getWebsiteId(), FindBy.EXTERNAL_ID);
+            website = websiteDAO.findById(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()));
             Assert.assertTrue(website.isPresent());
-            website = websiteDAO.findById(websiteDTO.getId(), FindBy.INTERNAL_ID);
+            website = websiteDAO.findById(ID.INTERNAL_ID(websiteDTO.getId()));
             Assert.assertTrue(website.isPresent());
         });
     }
@@ -112,13 +120,13 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
 
             //updating website
-            Website websiteDetails = websiteDAO.findByExternalId(websitesData.get(0).get("externalId").toString()).orElse(null);
+            Website websiteDetails = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId")), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDetails));
             websiteDetails.setUrl("www.newtest1.com");
             websiteDetails.setGroup("DETAILS");
             websiteDAO.save(websiteDetails);
 
-            Website website = websiteDAO.findByExternalId(websiteDetails.getWebsiteId()).orElse(null);
+            Website website = websiteDAO.findById(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false).orElse(null);
             Assert.assertTrue(ValidationUtil.isNotEmpty(website));
             Map<String, Object> diff = websiteDTO.diff(website);
             Assert.assertEquals(diff.size(), 1);
@@ -158,7 +166,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(1, websitesData.size() - 1), false).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size() - 1), false).getTotalPages(), 2);
 
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        mongoTemplate.dropCollection(Website.class);
 
         websitesData = new ArrayList<>();
         websitesData.add(CollectionsUtil.toMap("name", "Test1.com", "externalId", "TEST_1", "url", "www.test1.com", "active", "N"));
@@ -193,7 +201,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false).getTotalElements(), activeCount[0] + inactiveCount[0]);
         Assert.assertEquals(websiteDAO.findAll(PageRequest.of(0, websitesData.size()), false, false, true).getTotalElements(), 0);
 
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        mongoTemplate.dropCollection(Website.class);
 
         LocalDateTime today = LocalDate.now().atStartOfDay();
         LocalDateTime todayEOD = ConversionUtil.getEOD(LocalDate.now());
@@ -248,7 +256,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -264,7 +272,7 @@ public class WebsiteRepositoryTest {
             catalogDAO.insert(catalogDTO);
 
             //creating WebsiteCatalogs
-            Catalog catalog = catalogDAO.findById((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+            Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID((String) catalogData.get("externalId"))).orElse(null);
 
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
             websiteCatalog.setWebsiteId(website.getId());
@@ -276,14 +284,14 @@ public class WebsiteRepositoryTest {
         });
 
         //Getting websiteCatalogs
-        Page<Map<String, Object>> websiteCatalogMap = websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size(), null));
+        Page<Map<String, Object>> websiteCatalogMap = websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size(), null));
         Assert.assertEquals(websiteCatalogMap.getSize(), catalogsData.size());
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size(), null)).getTotalElements(), catalogsData.size());
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getTotalElements(), catalogsData.size());
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size(), null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size()-1, null)).getTotalElements(), catalogsData.size());
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
         Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(1, 1, null)).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(),PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
+        Assert.assertEquals(websiteDAO.getWebsiteCatalogs(website.getId(), PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -301,7 +309,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -314,7 +322,7 @@ public class WebsiteRepositoryTest {
             catalogDTO.setActive((String)catalogData.get("active"));
             catalogDAO.insert(catalogDTO);
 
-            Catalog catalog = catalogDAO.findById((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+            Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID((String) catalogData.get("externalId"))).orElse(null);
 
             //creating WebsiteCatalogs
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
@@ -334,7 +342,7 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1, null)).getContent().size(), catalogsData.size() - 1);
         Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(), "catalogName", "test", PageRequest.of(1, 1, null)).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1, null)).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
+        Assert.assertEquals(websiteDAO.findAllWebsiteCatalogs(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1, null)).getTotalPages(), 2);
     }
 
     @Test
@@ -352,7 +360,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating Catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -368,7 +376,7 @@ public class WebsiteRepositoryTest {
             catalogDAO.insert(catalogDTO);
 
             //Creating websiteCatalogs
-            Catalog catalog = catalogDAO.findById((String)catalogData.get("externalId"), FindBy.EXTERNAL_ID).orElse(null);
+            Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID((String) catalogData.get("externalId"))).orElse(null);
 
             WebsiteCatalog websiteCatalog = new WebsiteCatalog();
             websiteCatalog.setWebsiteId(website.getId());
@@ -399,7 +407,7 @@ public class WebsiteRepositoryTest {
             websiteDAO.insert(websiteDTO);
         });
 
-        Website website = websiteDAO.findById(websitesData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Website website = websiteDAO.findById(ID.EXTERNAL_ID(websitesData.get(0).get("externalId").toString())).orElse(null);
 
         //creating catalogs
         List<Map<String, Object>> catalogsData = new ArrayList<>();
@@ -422,11 +430,11 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getContent().size(), catalogsData.size()-1 );
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(), "catalogName", "test", PageRequest.of(1, 1), false).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1), false).getContent().size(), 1);
-        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 2);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 2);
 
 
         //Creating websiteCatalogs
-        Catalog catalog = catalogDAO.findById(catalogsData.get(0).get("externalId").toString(), FindBy.EXTERNAL_ID).orElse(null);
+        Catalog catalog = catalogDAO.findById(ID.EXTERNAL_ID(catalogsData.get(0).get("externalId").toString())).orElse(null);
         WebsiteCatalog websiteCatalog = new WebsiteCatalog();
         websiteCatalog.setWebsiteId(website.getId());
         websiteCatalog.setCatalogId(catalog.getId());
@@ -443,14 +451,14 @@ public class WebsiteRepositoryTest {
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getContent().size(), catalogsData.size() - 1);
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(), "catalogName", "test", PageRequest.of(1, 1), false).getContent().size(), 1);
         Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(1, catalogsData.size()-1), false).getContent().size(), 0);
-        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test",PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 1);
+        Assert.assertEquals(websiteDAO.findAvailableCatalogsForWebsite(website.getId(),"catalogName", "test", PageRequest.of(0, catalogsData.size()-1), false).getTotalPages(), 1);
 
     }
 
     @After
     public void tearDown() {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
-        catalogDAO.getMongoTemplate().dropCollection(Catalog.class);
+        mongoTemplate.dropCollection(Website.class);
+        mongoTemplate.dropCollection(Catalog.class);
     }
 
 }

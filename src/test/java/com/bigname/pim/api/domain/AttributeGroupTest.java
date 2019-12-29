@@ -1,6 +1,6 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.ValidationUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Manu V NarayanaPrasad (manu@blacwood.com)

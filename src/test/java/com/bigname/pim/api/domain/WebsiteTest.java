@@ -1,11 +1,14 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.domain.Entity;
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.persistence.dao.WebsiteDAO;
+import com.bigname.pim.api.persistence.dao.mongo.WebsiteDAO;
 import com.bigname.pim.api.service.WebsiteService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.UserDAO;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -13,6 +16,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -22,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.bigname.core.util.FindBy.EXTERNAL_ID;
-import static org.junit.Assert.*;
 
 /**
  * Created by sanoop on 05/03/2019.
@@ -35,14 +38,45 @@ import static org.junit.Assert.*;
 public class WebsiteTest {
 
     @Autowired
-    WebsiteService websiteService;
+    private WebsiteService websiteService;
     @Autowired
-    WebsiteDAO websiteDAO;
+    private WebsiteDAO websiteDAO;
+    @Autowired
+    private UserDAO userDAO;
+
+    private MongoTemplate mongoTemplate;
 
     @Before
     public void setUp() throws Exception {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) websiteDAO.getTemplate();
+        }
+        User user1 = userDAO.findByEmail("MANU@BLACWOOD.COM");
+        if(ValidationUtil.isEmpty(user1)){
+            User user = new User();
+            user.setUserName("MANU@BLACWOOD.COM");
+            user.setPassword("temppass");
+            user.setEmail("manu@blacwood.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Blacwood");
+            userDAO.save(user);
+        }
+        User user2 = userDAO.findByEmail("MANU@E-XPOSURE.COM");
+        if(ValidationUtil.isEmpty(user2)) {
+            User user = new User();
+            user.setUserName("MANU@E-XPOSURE.COM");
+            user.setPassword("temppass1");
+            user.setEmail("manu@e-xposure.com");
+            user.setStatus("Active");
+            user.setActive("Y");
+            user.setTenantId("Exposure");
+            userDAO.save(user);
+        }
+        mongoTemplate.dropCollection(Website.class);
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void accessorsTest(){
         //Create new instance
@@ -63,7 +97,7 @@ public class WebsiteTest {
 
         //create
         websiteService.create(websiteDTO);
-        Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+        Website newWebsite = websiteService.get(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false).orElse(null);
         Assert.assertTrue(ValidationUtil.isNotEmpty(newWebsite));
         Assert.assertEquals(newWebsite.getWebsiteId(), websiteDTO.getWebsiteId());
         Assert.assertEquals(newWebsite.getWebsiteName(), websiteDTO.getWebsiteName());
@@ -72,6 +106,7 @@ public class WebsiteTest {
         Assert.assertEquals(newWebsite.getActive(), websiteDTO.getActive());
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void cloneInstance() throws Exception {
         //Adding website
@@ -87,15 +122,16 @@ public class WebsiteTest {
             websiteDAO.insert(websiteDTO);
 
             //Clone website
-            Website newWebsite = websiteService.get(websiteDTO.getWebsiteId(), EXTERNAL_ID, false).orElse(null);
+            Website newWebsite = websiteService.get(ID.EXTERNAL_ID(websiteDTO.getWebsiteId()), false).orElse(null);
             Assert.assertTrue(newWebsite != null);
             Assert.assertTrue(newWebsite.diff(websiteDTO).isEmpty());
 
-            Website websiteClone = websiteService.cloneInstance(newWebsite.getWebsiteId(), EXTERNAL_ID, Entity.CloneType.LIGHT);
+            Website websiteClone = websiteService.cloneInstance(ID.EXTERNAL_ID(newWebsite.getWebsiteId()), Entity.CloneType.LIGHT);
             Assert.assertTrue(websiteClone.getWebsiteId() .equals(newWebsite.getWebsiteId() + "_COPY") && websiteClone.getWebsiteName().equals(newWebsite.getWebsiteName() + "_COPY") && websiteClone.getUrl().equals(newWebsite.getUrl() + "_COPY") && websiteClone.getActive() != newWebsite.getActive());
         });
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void merge() throws Exception {
         //Create Website Original
@@ -133,6 +169,7 @@ public class WebsiteTest {
         Assert.assertEquals(original.getUrl(), "www.one.com");
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void toMap() throws Exception {
         //Create new Instance
@@ -152,10 +189,12 @@ public class WebsiteTest {
         Assert.assertEquals(map1.get("url"), map.get("url"));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void equals() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void orchestrate() throws Exception {
         //Create id
@@ -167,6 +206,8 @@ public class WebsiteTest {
         Assert.assertTrue(ValidationUtil.isNotEmpty(websiteDTO.getWebsiteId()));
         Assert.assertEquals(websiteDTO.getWebsiteId(), "TEST");
     }
+
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void diff() throws Exception {
         //Create first instance
@@ -193,8 +234,9 @@ public class WebsiteTest {
         Assert.assertEquals(diff1.size(), 1);
         Assert.assertEquals(diff1.get("websiteName"), "test.com2");
     }
+
     @After
     public void tearDown() throws Exception {
-        websiteDAO.getMongoTemplate().dropCollection(Website.class);
+        mongoTemplate.dropCollection(Website.class);
     }
 }

@@ -1,13 +1,12 @@
 package com.bigname.pim.api.service;
 
-import com.bigname.core.domain.Entity;
-import com.bigname.core.service.BaseService;
-import com.bigname.core.util.FindBy;
-import com.bigname.core.util.Toggle;
 import com.bigname.pim.api.domain.FileAsset;
-import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
-import com.bigname.pim.api.persistence.dao.ProductVariantDAO;
+import com.bigname.pim.api.persistence.dao.mongo.ProductVariantDAO;
+import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.service.BaseService;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,42 +20,45 @@ import java.util.Optional;
  */
 public interface ProductVariantService extends BaseService<ProductVariant, ProductVariantDAO> {
 
-    boolean toggle(String productId, FindBy productIdFindBy,  String channelId, String productVariantId, FindBy variantIdFindBy, Toggle active);
+    boolean toggle(ID<String> productId, String channelId, ID<String> productVariantId, Toggle active);
 
-    ProductVariant cloneInstance(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, Entity.CloneType type);
+    ProductVariant cloneInstance(ID<String> productId, String channelId, ID<String> productVariantId, Entity.CloneType type);
 
-    Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, int page, int size, Sort sort, boolean... activeRequired);
+    Page<ProductVariant> getAll(ID<String> productId,  String channelId, int page, int size, Sort sort, boolean... activeRequired);
 
-    List<ProductVariant> getAll(String[] productIds, FindBy productIdFindBy, String channelId, boolean... activeRequired);
+    List<ProductVariant> getAll(List<ID<String>> productIds, String channelId, boolean... activeRequired);
 
-    List<ProductVariant> getAll(String productId, FindBy productIdFindBy, String channelId, Sort sort, boolean... activeRequired);
+    List<ProductVariant> getAll(ID<String> productId, String channelId, Sort sort, boolean... activeRequired);
 
-    Page<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, String[] variantIds, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<ProductVariant> getAll(ID<String> productId,  String channelId, List<ID<String>> productVariantIds, int page, int size, Sort sort, boolean... activeRequired);
 
-    List<ProductVariant> getAll(String productId, FindBy productIdFindBy,  String channelId, String[] variantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired);
+    List<ProductVariant> getAll(ID<String> productId,  String channelId, List<ID<String>> productVariantIds, Sort sort, boolean... activeRequired);
 
-    Page<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy,  String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<ProductVariant> getAllWithExclusions(ID<String> productId,  String channelId, List<ID<String>> excludedVariantIds, int page, int size, Sort sort, boolean... activeRequired);
 
-    List<ProductVariant> getAllWithExclusions(String productId, FindBy productIdFindBy,  String channelId, String[] excludedVariantIds, FindBy variantIdFindBy, Sort sort, boolean... activeRequired);
+    List<ProductVariant> getAllWithExclusions(ID<String> productId,  String channelId, List<ID<String>> excludedVariantIds, Sort sort, boolean... activeRequired);
 
-    Page<ProductVariant> findAll(String searchField, String keyword, String productId, FindBy findBy, String channelId, Pageable pageable, boolean... activeRequired);
+    Page<ProductVariant> findAll(String searchField, String keyword, ID<String> productId, String channelId, Pageable pageable, boolean... activeRequired);
 
-    Optional<ProductVariant> get(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, boolean... activeRequired);
+    <I> Optional<ProductVariant> get(ID<I> productId, String channelId, ID<I> productVariantId, boolean... activeRequired);
 
-    Optional<ProductVariant> get(String productVariantId, FindBy findBy, String channelId, boolean... activeRequired);
+    Optional<ProductVariant> get(ID<String> productVariantId, String channelId, boolean... activeRequired);
 
-    Page<ProductVariant> getProductVariantPricing(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, int page, int size, Sort sort, boolean... activeRequired);
+    Page<ProductVariant> getProductVariantPricing(ID<String> productId, String channelId, ID<String> productVariantId, int page, int size, Sort sort, boolean... activeRequired);
 
-    ProductVariant addAssets(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String[] assetIds, FileAsset.AssetFamily assetFamily);
+    ProductVariant addAssets(ID<String> productId, String channelId, ID<String> productVariantId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily);
 
-    ProductVariant deleteAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily);
+    ProductVariant deleteAsset(ID<String> productId, String channelId, ID<String> productVariantId, ID<String> assetId, FileAsset.AssetFamily assetFamily);
 
-    ProductVariant reorderAssets(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String[] assetIds, FileAsset.AssetFamily assetFamily);
+    ProductVariant reorderAssets(ID<String> productId, String channelId, ID<String> productVariantId, List<ID<String>> assetIds, FileAsset.AssetFamily assetFamily);
 
-    ProductVariant setAsDefaultAsset(String productId, FindBy productIdFindBy, String channelId, String productVariantId, FindBy variantIdFindBy, String assetId, FileAsset.AssetFamily assetFamily);
+    ProductVariant setAsDefaultAsset(ID<String> productId, String channelId, ID<String> productVariantId, ID<String> assetId, FileAsset.AssetFamily assetFamily);
 
     List<Map<String,Object>> getAll();
 
-    boolean setProductVariantsSequence(String productId, FindBy productIdFindBy, String channelId, FindBy channelIdFindBy, String sourceId, FindBy sourceIdFindBy, String destinationId, FindBy destinationIdFindBy);
+    boolean setProductVariantsSequence(ID<String> productId, ID<String> channelId, ID<String> sourceId, ID<String> destinationId);
 
+    void createVariantByElastic(ProductVariant productVariant);
+
+    void updateVariantByElastic(String id, ProductVariant productVariant);
 }

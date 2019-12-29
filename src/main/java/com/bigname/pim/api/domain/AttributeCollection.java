@@ -1,13 +1,14 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.common.util.StringUtil;
-import com.bigname.core.domain.Entity;
-import com.bigname.core.exception.EntityNotFoundException;
-import com.bigname.pim.util.PIMConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.xcore.domain.MongoEntity;
+import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.w3c.dom.Attr;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,14 +17,16 @@ import java.util.stream.Collectors;
  * @author Manu V NarayanaPrasad (manu@blacwood.com)
  * @since 1.0
  */
-public class AttributeCollection extends Entity<AttributeCollection> {
+public class AttributeCollection extends MongoEntity<AttributeCollection> {
 
     @Transient
     @NotEmpty(message = "Collection Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Collection Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String collectionId;
 
     @Indexed(unique = true)
     @NotEmpty(message = "Collection Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Collection Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String collectionName;
 
     private Map<String, AttributeGroup> attributes = new LinkedHashMap<>();
@@ -106,25 +109,26 @@ public class AttributeCollection extends Entity<AttributeCollection> {
                     //If parent option is modified, update the parentBasedOptions map in the corresponding attribute
                     String existingFullParentOptionId = attributeOption.getParentOptionFullId();
                     String newFullParentOptionId = attributeOptionDTO.getParentOptionFullId();
+                    if(existingFullParentOptionId != null && newFullParentOptionId != null) {
+                        if (!existingFullParentOptionId.equals(newFullParentOptionId)) {   // Parent option modified
 
-                    if(!existingFullParentOptionId.equals(newFullParentOptionId)) {   // Parent option modified
+                            //Get the attribute
+                            getAttribute(attributeFullId)
+                                    .map(attribute -> {
+                                        String existingSimpleParentOptionId = existingFullParentOptionId.substring(existingFullParentOptionId.lastIndexOf("|") + 1);
+                                        String newSimpleParentOptionId = newFullParentOptionId.substring(newFullParentOptionId.lastIndexOf("|") + 1);
 
-                        //Get the attribute
-                        getAttribute(attributeFullId)
-                                .map(attribute -> {
-                                    String existingSimpleParentOptionId = existingFullParentOptionId.substring(existingFullParentOptionId.lastIndexOf("|") + 1);
-                                    String newSimpleParentOptionId = newFullParentOptionId.substring(newFullParentOptionId.lastIndexOf("|") + 1);
-
-                                    //If the parentBaseOptions have no entry for the newParentOptionId, create an empty entry
-                                    if(!attribute.getParentBasedOptions().containsKey(newSimpleParentOptionId)) {
-                                        attribute.getParentBasedOptions().put(newSimpleParentOptionId, new ArrayList<>());
-                                    }
-                                    //Swap the optionId in the parentBasedOptions map, from existingParentId to newParentId
-                                    attribute.getParentBasedOptions().get(newSimpleParentOptionId).add(attributeOptionDTO.getId());
-                                    //Remove the optionId from
-                                    attribute.getParentBasedOptions().get(existingSimpleParentOptionId).remove(attributeOptionDTO.getId());
-                                    return attribute;
-                                });
+                                        //If the parentBaseOptions have no entry for the newParentOptionId, create an empty entry
+                                        if (!attribute.getParentBasedOptions().containsKey(newSimpleParentOptionId)) {
+                                            attribute.getParentBasedOptions().put(newSimpleParentOptionId, new ArrayList<>());
+                                        }
+                                        //Swap the optionId in the parentBasedOptions map, from existingParentId to newParentId
+                                        attribute.getParentBasedOptions().get(newSimpleParentOptionId).add(attributeOptionDTO.getId());
+                                        //Remove the optionId from
+                                        attribute.getParentBasedOptions().get(existingSimpleParentOptionId).remove(attributeOptionDTO.getId());
+                                        return attribute;
+                                    });
+                        }
                     }
                     attributeOption.merge(attributeOptionDTO);
 
@@ -252,6 +256,7 @@ public class AttributeCollection extends Entity<AttributeCollection> {
         map.put("externalId", getExternalId());
         map.put("collectionName", getCollectionName());
         map.put("active", getActive());
+        map.put("archived", getArchived());
         return map;
     }
 
@@ -291,4 +296,18 @@ public class AttributeCollection extends Entity<AttributeCollection> {
         // Only multi-select attributes can be used as parents
         return getAllAttributes().stream().filter(attribute -> "Y".equals(attribute.getUiType().isSelectable()) && !excludedAttributeIds.contains(attribute.getId())).sorted(Comparator.comparing(Attribute::getName)).collect(Collectors.toList());
     }
+
+    /*@Override
+    public Object getCopy(AttributeCollection attributeCollection) {
+        AttributeCollection _attributeCollection = new AttributeCollection();
+        _attributeCollection.setCollectionName(attributeCollection.getCollectionName());
+        _attributeCollection.setCollectionId(attributeCollection.getCollectionId());
+        _attributeCollection.setAttributes(attributeCollection.getAttributes());
+        _attributeCollection.setActive(attributeCollection.getActive());
+        _attributeCollection.setArchived(attributeCollection.getArchived());
+        _attributeCollection.setDiscontinued(attributeCollection.getDiscontinued());
+        _attributeCollection.setVersionId(attributeCollection.getVersionId());
+        _attributeCollection.setId(attributeCollection.getId());
+        return _attributeCollection;
+    }*/
 }

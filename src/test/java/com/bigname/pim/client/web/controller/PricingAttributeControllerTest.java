@@ -1,12 +1,13 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.PricingAttribute;
-import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.persistence.dao.PricingAttributeDAO;
-import com.bigname.pim.api.service.UserService;
+import com.bigname.pim.api.persistence.dao.mongo.PricingAttributeDAO;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,7 +27,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,22 +54,27 @@ public class PricingAttributeControllerTest {
     @Autowired
     private PricingAttributeDAO pricingAttributeDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
-            user.setUserName("MANU@BLACWOOD.COm");
+            user.setUserName("MANU@BLACWOOD.COM");
             user.setPassword("temppass");
             user.setEmail("manu@blacwood.com");
             user.setActive("Y");
             userService.create(user);
         }
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) pricingAttributeDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(PricingAttribute.class);
     }
 
     @After
     public void tearDown() throws Exception {
-        pricingAttributeDAO.getMongoTemplate().dropCollection(PricingAttribute.class);
+        mongoTemplate.dropCollection(PricingAttribute.class);
     }
 
     @Test

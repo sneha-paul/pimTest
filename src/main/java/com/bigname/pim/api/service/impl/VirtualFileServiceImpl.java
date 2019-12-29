@@ -1,24 +1,20 @@
 package com.bigname.pim.api.service.impl;
 
-import com.bigname.common.util.CollectionsUtil;
-import com.bigname.common.util.ValidationUtil;
-import com.bigname.core.service.BaseServiceSupport;
-import com.bigname.core.util.FindBy;
 import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
-import com.bigname.pim.api.persistence.dao.VirtualFileDAO;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
+import com.bigname.pim.api.persistence.dao.mongo.VirtualFileDAO;
 import com.bigname.pim.api.service.VirtualFileService;
+import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import com.m7.xtreme.xcore.util.Criteria;
+import com.m7.xtreme.xcore.util.ID;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,9 +61,9 @@ public class VirtualFileServiceImpl extends BaseServiceSupport<VirtualFile, Virt
     @Override
     public Map<String, Pair<String, Object>> validate(Map<String, Object> context, Map<String, Pair<String, Object>> fieldErrors, VirtualFile virtualFile, String group) {
         Map<String, Pair<String, Object>> _fieldErrors = super.validate(context, fieldErrors, virtualFile, group);
-        VirtualFile existing = ValidationUtil.isNotEmpty(context.get("id")) ? get((String)context.get("id"), FindBy.EXTERNAL_ID, false).orElse(null) : null;
+        VirtualFile existing = ValidationUtil.isNotEmpty(context.get("id")) ? get(ID.EXTERNAL_ID(context.get("id")), false).orElse(null) : null;
         if(ValidationUtil.isEmpty(context.get("id")) || (existing != null && !existing.getFileName().equals(virtualFile.getFileName()))) {
-            findOne(CollectionsUtil.toMap("parentDirectoryId", virtualFile.getParentDirectoryId(), "fileName", virtualFile.getFileName().trim(), "isDirectory", virtualFile.getIsDirectory()))
+            findOne(Criteria.where("parentDirectoryId").eq(virtualFile.getParentDirectoryId()).and("fileName").eq(virtualFile.getFileName().trim()).and("isDirectory").eq(virtualFile.getIsDirectory()))
                     .ifPresent(virtualFile1 -> fieldErrors.put("fileName", Pair.with("A " + (virtualFile.getIsDirectory().equals("Y") ? "directory" : "file") + " with the given name already exists", virtualFile.getFileName())));
         }
         return _fieldErrors;

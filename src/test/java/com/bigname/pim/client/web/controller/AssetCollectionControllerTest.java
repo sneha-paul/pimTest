@@ -1,12 +1,14 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.core.util.FindBy;
+
 import com.bigname.pim.PimApplication;
 import com.bigname.pim.api.domain.AssetCollection;
-import com.bigname.pim.api.domain.User;
-import com.bigname.pim.api.persistence.dao.AssetCollectionDAO;
-import com.bigname.pim.api.service.UserService;
+import com.bigname.pim.api.persistence.dao.mongo.AssetCollectionDAO;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.User;
+import com.m7.xtreme.xplatform.service.UserService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,7 +28,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,22 +54,27 @@ public class AssetCollectionControllerTest {
     @Autowired
     private AssetCollectionDAO assetCollectionDAO;
 
+    private MongoTemplate mongoTemplate;
+
     @Before
     public void setUp() throws Exception {
-        if(!userService.get("MANU@BLACWOOD.COM", FindBy.EXTERNAL_ID).isPresent()) {
+        if(!userService.get(ID.EXTERNAL_ID("MANU@BLACWOOD.COM")).isPresent()) {
             User user = new User();
-            user.setUserName("MANU@BLACWOOD.COm");
+            user.setUserName("MANU@BLACWOOD.COM");
             user.setPassword("temppass");
             user.setEmail("manu@blacwood.com");
             user.setActive("Y");
             userService.create(user);
         }
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        if(ValidationUtil.isEmpty(mongoTemplate)) {
+            mongoTemplate = (MongoTemplate) assetCollectionDAO.getTemplate();
+        }
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
     @After
     public void tearDown() throws Exception {
-        assetCollectionDAO.getMongoTemplate().dropCollection(AssetCollection.class);
+        mongoTemplate.dropCollection(AssetCollection.class);
     }
 
     @Test
@@ -76,10 +83,12 @@ public class AssetCollectionControllerTest {
         Assert.assertNotNull(assetCollectionDAO);
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void all() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void all1() throws Exception {
     }
@@ -104,38 +113,47 @@ public class AssetCollectionControllerTest {
         result.andExpect(jsonPath("$.group.length()").value(1));
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void update() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void details() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void assetDetails() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void assetBrowser() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAssetsData() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void createAsset() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void uploadFile() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void getAllAsHierarchy() throws Exception {
     }
 
+    @WithUserDetails("manu@blacwood.com")
     @Test
     public void downloadImage() throws Exception {
     }

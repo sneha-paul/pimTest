@@ -1,16 +1,16 @@
 package com.bigname.pim.data.loader;
 
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.Catalog;
 import com.bigname.pim.api.domain.Category;
 import com.bigname.pim.api.domain.RelatedCategory;
 import com.bigname.pim.api.domain.RootCategory;
-import com.bigname.pim.api.persistence.dao.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.RelatedCategoryDAO;
-import com.bigname.pim.api.persistence.dao.RootCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
+import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
 import com.bigname.pim.api.service.CatalogService;
 import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.util.POIUtil;
+import com.m7.xtreme.common.util.POIUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,7 @@ public class CategoryLoader {
                 parentId = parentId.contains("|") ? parentId.substring(parentId.lastIndexOf("|") + 1) : parentId;
             }
             String description = data.get(i).get(attributeNamesMetadata.indexOf("DESCRIPTION"));
-            String discontinued = data.get(i).get(attributeNamesMetadata.indexOf("DISCONTINUED"));
+            String discontinued = "N"; //data.get(i).get(attributeNamesMetadata.indexOf("DISCONTINUED")); //TODO change after testing
             String longDescription = data.get(i).get(attributeNamesMetadata.indexOf("LONG_DESCRIPTION"));
             String metaTitle = data.get(i).get(attributeNamesMetadata.indexOf("META_TITLE"));
             String metaDescription = data.get(i).get(attributeNamesMetadata.indexOf("META_DESCRIPTION"));

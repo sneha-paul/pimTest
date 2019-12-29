@@ -1,10 +1,11 @@
 package com.bigname.pim.util;
 
-import com.bigname.common.util.ConversionUtil;
-import com.bigname.common.util.ValidationUtil;
 import com.bigname.pim.api.domain.FileAsset;
 import com.bigname.pim.api.domain.Product;
 import com.bigname.pim.api.domain.ProductVariant;
+import com.m7.xtreme.common.util.ConversionUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.util.ID;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,10 +28,10 @@ public class ProductUtil {
         return productAssets;
     }
 
-    public static void setDefaultAsset(List<Map<String, Object>> productAssets, String assetId) {
+    public static void setDefaultAsset(List<Map<String, Object>> productAssets, ID<String> assetId) {
         resetDefaultAsset(productAssets);
         productAssets.forEach(asset -> {
-            if(asset.get("id").equals(assetId)) {
+            if(asset.get("id").equals(assetId.getId())) {
                 asset.put("defaultFlag", "Y");
             }
         });
@@ -69,9 +70,9 @@ public class ProductUtil {
         }
     }
 
-    public static List<Map<String, Object>> deleteAsset(List<Map<String, Object>> productAssets, String assetId) {
+    public static List<Map<String, Object>> deleteAsset(List<Map<String, Object>> productAssets, ID<String> assetId) {
         //Find the index of the item that needs to be removed
-        int removeIdx = productAssets.indexOf(productAssets.stream().filter(asset -> asset.get("id").equals(assetId)).findFirst().orElse(null));
+        int removeIdx = productAssets.indexOf(productAssets.stream().filter(asset -> asset.get("id").equals(assetId.getId())).findFirst().orElse(null));
         if(removeIdx > -1) {
             // Remove the asset
             productAssets.remove(removeIdx);

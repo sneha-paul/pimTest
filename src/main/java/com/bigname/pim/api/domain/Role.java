@@ -1,6 +1,6 @@
 package com.bigname.pim.api.domain;
 
-import com.bigname.core.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by sruthi on 27-02-2019.
  */
 @Document
-public class Role extends Entity<Role> {
+public class Role extends MongoEntity<Role> {
 
     private String roleId;
 
