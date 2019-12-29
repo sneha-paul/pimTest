@@ -1,15 +1,15 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.persistence.dao.mongo.CategoryProductDAO;
-import com.bigname.pim.api.persistence.dao.mongo.FamilyDAO;
-import com.bigname.pim.api.persistence.dao.mongo.ProductDAO;
-import com.bigname.pim.api.persistence.dao.mongo.RelatedCategoryDAO;
-import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
-import com.bigname.pim.api.service.CategoryService;
-import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.api.service.ProductService;
+import com.bigname.pim.core.domain.*;
+import com.bigname.pim.core.persistence.dao.mongo.CategoryProductDAO;
+import com.bigname.pim.core.persistence.dao.mongo.FamilyDAO;
+import com.bigname.pim.core.persistence.dao.mongo.ProductDAO;
+import com.bigname.pim.core.persistence.dao.mongo.RelatedCategoryDAO;
+import com.bigname.pim.core.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.core.service.CategoryService;
+import com.bigname.pim.core.service.FamilyService;
+import com.bigname.pim.core.service.ProductService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;

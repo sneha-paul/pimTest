@@ -1,5 +1,5 @@
-<%--@elvariable id="attributeOption" type="com.bigname.pim.api.domain.AttributeOption"--%>
-<%--@elvariable id="attribute" type="com.bigname.pim.api.domain.Attribute"--%>
+<%--@elvariable id="attributeOption" type="com.bigname.pim.core.domain.AttributeOption"--%>
+<%--@elvariable id="attribute" type="com.bigname.pim.core.domain.Attribute"--%>
 <%--@elvariable id="parentAttributeOptions" type="java.util.Map<String, String>"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="popup-content" style="padding-left: 0;padding-right: 0;">

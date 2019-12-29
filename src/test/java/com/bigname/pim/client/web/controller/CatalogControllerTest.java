@@ -1,14 +1,14 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.Catalog;
-import com.bigname.pim.api.domain.Category;
-import com.bigname.pim.api.domain.RootCategory;
-import com.bigname.pim.api.persistence.dao.mongo.CatalogDAO;
-import com.bigname.pim.api.persistence.dao.mongo.CategoryDAO;
-import com.bigname.pim.api.persistence.dao.mongo.RootCategoryDAO;
-import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.api.service.CategoryService;
+import com.bigname.pim.core.domain.Catalog;
+import com.bigname.pim.core.domain.Category;
+import com.bigname.pim.core.domain.RootCategory;
+import com.bigname.pim.core.persistence.dao.mongo.CatalogDAO;
+import com.bigname.pim.core.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.core.persistence.dao.mongo.RootCategoryDAO;
+import com.bigname.pim.core.service.CatalogService;
+import com.bigname.pim.core.service.CategoryService;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;

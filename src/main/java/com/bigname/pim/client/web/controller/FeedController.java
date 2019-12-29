@@ -1,6 +1,6 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.data.loader.*;
+import com.bigname.pim.core.data.loader.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

@@ -8,7 +8,7 @@
         </tiles:insertDefinition>
     </c:when>
     <c:otherwise>
-        <%--@elvariable id="asset" type="com.bigname.pim.api.domain.VirtualFile"--%>
+        <%--@elvariable id="asset" type="com.bigname.pim.core.domain.VirtualFile"--%>
         <c:set var="isDirectory" value="${asset.isDirectory eq 'Y'}" />
         <div class="popup-content" style="padding:20px">
             <c:choose>

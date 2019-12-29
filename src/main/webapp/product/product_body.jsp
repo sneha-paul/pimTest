@@ -1,10 +1,10 @@
 <%--@elvariable id="channels" type="java.util.Map"--%>
-<%--@elvariable id="product" type="com.bigname.pim.api.domain.Product"--%>
-<%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.api.domain.ProductFamily>"--%>
-<%--@elvariable id="masterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
-<%--@elvariable id="detailsMasterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
-<%--@elvariable id="featuresMasterGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
-<%--@elvariable id="defaultDetailsAttributeGroup" type="com.bigname.pim.api.domain.FamilyAttributeGroup"--%>
+<%--@elvariable id="product" type="com.bigname.pim.core.domain.Product"--%>
+<%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.core.domain.ProductFamily>"--%>
+<%--@elvariable id="masterGroup" type="com.bigname.pim.core.domain.FamilyAttributeGroup"--%>
+<%--@elvariable id="detailsMasterGroup" type="com.bigname.pim.core.domain.FamilyAttributeGroup"--%>
+<%--@elvariable id="featuresMasterGroup" type="com.bigname.pim.core.domain.FamilyAttributeGroup"--%>
+<%--@elvariable id="defaultDetailsAttributeGroup" type="com.bigname.pim.core.domain.FamilyAttributeGroup"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="masterGroups" value="${product.productFamily.addonMasterGroups}"/>
 <c:set var="detailsMasterGroup" value="${product.productFamily.detailsMasterGroup}"/>

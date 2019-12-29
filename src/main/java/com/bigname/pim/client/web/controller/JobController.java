@@ -1,6 +1,6 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
 import com.m7.xtreme.xplatform.service.UserService;
 import org.springframework.stereotype.Controller;

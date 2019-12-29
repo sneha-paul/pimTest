@@ -1,10 +1,10 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.AssetCollection;
-import com.bigname.pim.api.domain.VirtualFile;
-import com.bigname.pim.api.service.AssetCollectionService;
-import com.bigname.pim.api.service.VirtualFileService;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.domain.AssetCollection;
+import com.bigname.pim.core.domain.VirtualFile;
+import com.bigname.pim.core.service.AssetCollectionService;
+import com.bigname.pim.core.service.VirtualFileService;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Result;

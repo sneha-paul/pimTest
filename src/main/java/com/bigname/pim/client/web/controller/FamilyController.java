@@ -1,10 +1,10 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.service.AttributeCollectionService;
-import com.bigname.pim.api.service.ChannelService;
-import com.bigname.pim.api.service.FamilyService;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.domain.*;
+import com.bigname.pim.core.service.AttributeCollectionService;
+import com.bigname.pim.core.service.ChannelService;
+import com.bigname.pim.core.service.FamilyService;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;

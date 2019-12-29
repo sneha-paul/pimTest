@@ -1,4 +1,4 @@
-<%--@elvariable id="variantGroup" type="com.bigname.pim.api.domain.VariantGroup"--%>
+<%--@elvariable id="variantGroup" type="com.bigname.pim.core.domain.VariantGroup"--%>
 <%--@elvariable id="variantGroupAttributes" type="java.util.Map<String, java.util.List<com.bigname.pim.api.domain.FamilyAttribute>"--%>
 <%--@elvariable id="variantGroupAxisAttributes" type="java.util.Map<String, java.util.List<com.bigname.pim.api.domain.FamilyAttribute>"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

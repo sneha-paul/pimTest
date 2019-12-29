@@ -1,0 +1,114 @@
+package com.bigname.pim.core.domain;
+
+import com.m7.xtreme.xcore.domain.MongoEntity;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * Created by dona on 08-11-2018.
+ */
+public class PricingAttribute extends MongoEntity<PricingAttribute> {
+
+    @Transient
+    @NotEmpty(message = "Pricing Attribute Id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Pricing Attribute Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
+    private String pricingAttributeId;
+
+    @Indexed(unique = true)
+    @NotEmpty(message = "Pricing Attribute Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Pricing Attribute Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
+    private String pricingAttributeName;
+
+
+    public PricingAttribute() {
+        super();
+    }
+
+
+    public String getPricingAttributeId() {
+        return getExternalId();
+    }
+
+    public void setPricingAttributeId(String pricingAttributeId) {
+        this.pricingAttributeId = pricingAttributeId;
+        setExternalId(pricingAttributeId);
+    }
+
+    public String getPricingAttributeName() {
+        return pricingAttributeName;
+    }
+
+    public void setPricingAttributeName(String pricingAttributeName) {
+        this.pricingAttributeName = pricingAttributeName;
+    }
+
+    @Override
+    protected void setExternalId() {
+        this.pricingAttributeId = getExternalId();
+    }
+
+    @Override
+    public PricingAttribute cloneInstance() {
+        PricingAttribute clone = new PricingAttribute();
+        clone.setActive("N");
+        clone.setExternalId(cloneValue(getExternalId()));
+        clone.setPricingAttributeName(cloneValue(getPricingAttributeName()));
+        return clone;
+    }
+
+    @Override
+    public PricingAttribute merge(PricingAttribute pricingAttribute) {
+        for (String group : pricingAttribute.getGroup()) {
+            switch (group) {
+                case "DETAILS":
+                    this.setExternalId(pricingAttribute.getExternalId());
+                    this.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
+                    this.setActive(pricingAttribute.getActive());
+                    mergeBaseProperties(pricingAttribute);
+                    break;
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("externalId", getExternalId());
+        map.put("pricingAttributeName", getPricingAttributeName());
+        map.put("active", getActive());
+        map.putAll(getBasePropertiesMap());
+        return map;
+    }
+
+    public Map<String, Object> diff(PricingAttribute pricingAttribute, boolean... ignoreInternalId) {
+        boolean _ignoreInternalId = ignoreInternalId != null && ignoreInternalId.length > 0 && ignoreInternalId[0];
+        Map<String, Object> diff = new HashMap<>();
+        if (!_ignoreInternalId && !this.getId().equals(pricingAttribute.getId())) {
+            diff.put("internalId", pricingAttribute.getId());
+        }
+        if (!this.getPricingAttributeName().equals(pricingAttribute.getPricingAttributeName())) {
+            diff.put("pricingAttributeName", pricingAttribute.getPricingAttributeName());
+        }
+        return diff;
+    }
+
+    /*@Override
+    public Object getCopy(PricingAttribute pricingAttribute) {
+        PricingAttribute _pricingAttribute = new PricingAttribute();
+        _pricingAttribute.setPricingAttributeName(pricingAttribute.getPricingAttributeName());
+        _pricingAttribute.setPricingAttributeId(pricingAttribute.getPricingAttributeId());
+        _pricingAttribute.setActive(pricingAttribute.getActive());
+        _pricingAttribute.setArchived(pricingAttribute.getArchived());
+        _pricingAttribute.setDiscontinued(pricingAttribute.getDiscontinued());
+        _pricingAttribute.setVersionId(pricingAttribute.getVersionId());
+        _pricingAttribute.setId(pricingAttribute.getId());
+        return _pricingAttribute;
+    }*/
+}

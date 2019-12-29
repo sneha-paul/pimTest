@@ -1,8 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.persistence.dao.mongo.SimpleJob;
-import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.persistence.dao.mongo.SimpleJob;
+import com.bigname.pim.core.service.CatalogService;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.util.JobUtil;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.domain.CronDetails;

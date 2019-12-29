@@ -1,4 +1,4 @@
-<%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.api.domain.Family>"--%>
+<%--@elvariable id="productFamilies" type="java.util.List<com.bigname.pim.core.domain.Family>"--%>
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:choose>

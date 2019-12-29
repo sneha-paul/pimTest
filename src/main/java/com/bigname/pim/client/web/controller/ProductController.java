@@ -1,11 +1,11 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.*;
-import com.bigname.pim.api.service.*;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
-import com.bigname.pim.data.exportor.ProductExporter;
-import com.bigname.pim.util.PIMConstants;
-import com.bigname.pim.util.ProductUtil;
+import com.bigname.pim.core.domain.*;
+import com.bigname.pim.core.service.*;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.data.exportor.ProductExporter;
+import com.bigname.pim.core.util.PIMConstants;
+import com.bigname.pim.core.util.ProductUtil;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.StringUtil;

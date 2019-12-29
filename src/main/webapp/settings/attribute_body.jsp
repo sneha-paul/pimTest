@@ -1,5 +1,5 @@
-<%--@elvariable id="attribute" type="com.bigname.pim.api.domain.Attribute"--%>
-<%--@elvariable id="parentAttribute" type="com.bigname.pim.api.domain.Attribute"--%>
+<%--@elvariable id="attribute" type="com.bigname.pim.core.domain.Attribute"--%>
+<%--@elvariable id="parentAttribute" type="com.bigname.pim.core.domain.Attribute"--%>
 <%--@elvariable id="attributeGroups" type="java.util.List<org.javatuples.Pair<String, String>"--%>
 <%--@elvariable id="parentAttributes" type="java.util.Map<String, String>"--%>
 <%--@elvariable id="uiTypes" type="java.util.Map<String, String>"--%>

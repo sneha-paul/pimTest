@@ -1,8 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.AssetFamily;
-import com.bigname.pim.api.service.AssetFamilyService;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.domain.AssetFamily;
+import com.bigname.pim.core.service.AssetFamilyService;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;

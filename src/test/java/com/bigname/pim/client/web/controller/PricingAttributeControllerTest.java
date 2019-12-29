@@ -1,8 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.PimApplication;
-import com.bigname.pim.api.domain.PricingAttribute;
-import com.bigname.pim.api.persistence.dao.mongo.PricingAttributeDAO;
+import com.bigname.pim.core.domain.PricingAttribute;
+import com.bigname.pim.core.persistence.dao.mongo.PricingAttributeDAO;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.util.ID;

@@ -1,12 +1,12 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.Catalog;
-import com.bigname.pim.api.domain.RootCategory;
-import com.bigname.pim.api.domain.WebsiteCatalog;
-import com.bigname.pim.api.service.CatalogService;
-import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
-import com.bigname.pim.data.exportor.CatalogExporter;
+import com.bigname.pim.core.domain.Catalog;
+import com.bigname.pim.core.domain.RootCategory;
+import com.bigname.pim.core.domain.WebsiteCatalog;
+import com.bigname.pim.core.service.CatalogService;
+import com.bigname.pim.core.service.WebsiteService;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.data.exportor.CatalogExporter;
 import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;

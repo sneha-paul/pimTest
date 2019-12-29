@@ -1,9 +1,9 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.api.domain.WebsiteCatalog;
-import com.bigname.pim.api.service.WebsiteService;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.domain.Website;
+import com.bigname.pim.core.domain.WebsiteCatalog;
+import com.bigname.pim.core.service.WebsiteService;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
@@ -16,8 +16,6 @@ import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.domain.Version;
 import com.m7.xtreme.xplatform.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;

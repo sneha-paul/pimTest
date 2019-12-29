@@ -1,4 +1,4 @@
-<%--@elvariable id="pricingAttribute" type="com.bigname.pim.api.domain.PricingAttribute"--%>
+<%--@elvariable id="pricingAttribute" type="com.bigname.pim.core.domain.PricingAttribute"--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="popup-content" style="padding:20px">
     <div class="body">
@@ -16,7 +16,7 @@
                                     </div>
                                     <select class="custom-select" id="pricingAttribute" name="pricingAttributeId">
                                         <option value="">Select One</option>
-                                            <%--@elvariable id="availablePricingAttributes" type="java.util.List<com.bigname.pim.api.domain.PricingAttribute>"--%>
+                                            <%--@elvariable id="availablePricingAttributes" type="java.util.List<com.bigname.pim.core.domain.PricingAttribute>"--%>
                                         <c:forEach var="pricingAttribute" items="${availablePricingAttributes}">
                                             <option value="${pricingAttribute.pricingAttributeId}">${pricingAttribute.pricingAttributeName}</option>
                                         </c:forEach>

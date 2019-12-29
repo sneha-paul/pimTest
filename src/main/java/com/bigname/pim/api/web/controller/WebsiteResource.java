@@ -1,7 +1,7 @@
 package com.bigname.pim.api.web.controller;
 
-import com.bigname.pim.api.domain.Website;
-import com.bigname.pim.api.service.WebsiteService;
+import com.bigname.pim.core.domain.Website;
+import com.bigname.pim.core.service.WebsiteService;
 import com.m7.xtreme.xcore.util.ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static com.bigname.pim.util.ConvertUtil.toBoolean;
-import static com.bigname.pim.util.Defaults.PAGE_SIZE;
-import static com.bigname.pim.util.Defaults.PAGE_SIZES;
+import static com.bigname.pim.core.util.ConvertUtil.toBoolean;
+import static com.bigname.pim.core.util.Defaults.PAGE_SIZE;
+import static com.bigname.pim.core.util.Defaults.PAGE_SIZES;
 
 @RestController
 @RequestMapping("pim/api/websites")

@@ -10,7 +10,7 @@
         </tiles:insertDefinition>
     </c:when>
     <c:otherwise>
-        <%--@elvariable id="productVariant" type="com.bigname.pim.api.domain.ProductVariant"--%>
+        <%--@elvariable id="productVariant" type="com.bigname.pim.core.domain.ProductVariant"--%>
         <div class="popup-content" style="padding:20px">
             <div class="body">
                 <div class="table-responsive scrollable-dt modal-dt">

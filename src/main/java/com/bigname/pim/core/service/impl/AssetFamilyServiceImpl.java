@@ -1,0 +1,26 @@
+package com.bigname.pim.core.service.impl;
+
+import com.bigname.pim.core.domain.AssetFamily;
+import com.bigname.pim.core.persistence.dao.mongo.AssetFamilyDAO;
+import com.bigname.pim.core.service.AssetFamilyService;
+import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.validation.Validator;
+
+
+/**
+ * Created by sanoop on 14/02/2019.
+ */
+@Service
+public class AssetFamilyServiceImpl extends BaseServiceSupport<AssetFamily, AssetFamilyDAO, AssetFamilyService> implements AssetFamilyService{
+
+    private AssetFamilyDAO assetFamilyDAO;
+
+    @Autowired
+    public AssetFamilyServiceImpl(AssetFamilyDAO assetFamilyDAO, Validator validator) {
+        super(assetFamilyDAO, "AssetFamily", validator);
+        this.assetFamilyDAO = assetFamilyDAO;
+    }
+}

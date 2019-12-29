@@ -1,8 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.api.domain.Config;
-import com.bigname.pim.api.service.ConfigService;
-import com.bigname.pim.client.util.BreadcrumbsBuilder;
+import com.bigname.pim.core.domain.Config;
+import com.bigname.pim.core.service.ConfigService;
+import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
