@@ -170,15 +170,19 @@ public class AssetCollectionTest {
         //Create New Map For Equals Checking
         Map<String, String> map = new HashMap<>();
         map.put("externalId", "TEST");
-        map.put("collectionName", "Test");
-        map.put("rootId", "test");
+        map.put("name", "Test");
+        map.put("parentId", "");
+        map.put("id", "test");
+        map.put("isDirectory", "Y");
         map.put("active", "Y");
 
-        Map<String, String> map1 = assetCollectionDTO.toMap();
+        Map<String, String> map1 = assetCollectionDTO.toMap1();
         Assert.assertEquals(map1.get("externalId"), map.get("externalId"));
-        Assert.assertEquals(map1.get("collectionName"), map.get("collectionName"));
-        Assert.assertEquals(map1.get("rootId"), map.get("rootId"));
+        Assert.assertEquals(map1.get("name"), map.get("name"));
+        Assert.assertEquals(map1.get("id"), map.get("id"));
         Assert.assertEquals(map1.get("active"), map.get("active"));
+        Assert.assertEquals(map1.get("isDirectory"), map.get("isDirectory"));
+        Assert.assertEquals(map1.get("parentId"), map.get("parentId"));
     }
 
     @WithUserDetails("manu@blacwood.com")

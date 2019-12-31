@@ -145,7 +145,7 @@ public class ConversionUtilTest {
         Website website = new Website();
         website.setWebsiteName("Envelope");
         website.setWebsiteId("ENVELOPE");
-        String actual = "{\"internalId\":null,\"tenantId\":\"SINGLE\",\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"archived\":\"N\",\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
+        String actual = "{\"internalId\":null,\"tenantId\":\"SINGLE\",\"id\":\""+website.getId()+"\",\"externalId\":\"ENVELOPE\",\"active\":\"N\",\"discontinued\":\"N\",\"archived\":\"N\",\"versionId\":0,\"activeFromDate\":null,\"activeToDate\":null,\"discontinuedFromDate\":null,\"discontinuedToDate\":null,\"createdUser\":null,\"createdDateTime\":null,\"lastModifiedUser\":null,\"lastModifiedDateTime\":null,\"websiteId\":\"ENVELOPE\",\"websiteName\":\"Envelope\",\"url\":null}";
         Assert.assertEquals(ConversionUtil.toJSONString(website),actual);
     }
 
@@ -173,6 +173,7 @@ public class ConversionUtilTest {
         websiteMap.put("lastModifiedUser", null);
         websiteMap.put("id", website.getId());
         websiteMap.put("createdUser", null);
+        websiteMap.put("versionId", 0);
         websiteMap.put("tenantId", Tenancy.SINGLE.toString());
 
         Assert.assertEquals(ConversionUtil.toJSONMap(website),websiteMap);
