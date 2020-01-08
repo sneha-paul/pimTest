@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class ProductFeedCleaner {
 
-    public static final String productFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Active_Products_ENVELOPES.xlsx";
+    public static final String productFeedFilePath = "/usr/local/pim/uploads/data/cleanup/01082020/EnvelopesActiveFeed_PROD_EXTENDED_010820201200-1578503534686.xlsx";
     public static final String updatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Active_Products_ENVELOPES-" + PlatformUtil.getTimestamp() + ".xlsx";
     public static final String categorizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Categorized_Active_Products_ENVELOPES-" + PlatformUtil.getTimestamp() + ".xlsx";
     public static final String attributeOptionsFilePath = "/usr/local/pim/uploads/data/cleanup/AttributeOptions_ENVELOPES.xlsx";
@@ -33,7 +33,7 @@ public class ProductFeedCleaner {
     static Map<String, String> requiredOutputFieldsmap = new LinkedHashMap<>();
 
     static {
-        requiredOutputFieldsmap.put("Code", "PARENT_PRODUCT_ID");
+        requiredOutputFieldsmap.put("Code", "VARIANT_PRODUCT_ID");
         requiredOutputFieldsmap.put("Product Type", "PRODUCT_TYPE");
         requiredOutputFieldsmap.put("Netsuite Category", "NETSUITE_CATEGORY");
         requiredOutputFieldsmap.put("Category", "ROOT_CATEGORY");
@@ -663,7 +663,9 @@ public class ProductFeedCleaner {
         }
         Map<String, List<List<Object>>> missingParentProductsMap = new HashMap<>();
         missingParentProductsMap.put("Parent Products", new ArrayList<>(missingParentProductsData));
-        POIUtil.writeData(missingParentProductsFilePath, missingParentProductsMap);
+        if(!missingParentProductsData.isEmpty()) {
+            POIUtil.writeData(missingParentProductsFilePath, missingParentProductsMap);
+        }
         POIUtil.writeData(missingAttributeOptionsFilePath, missingAttributesMap.entrySet().stream().filter(e -> !e.getValue().isEmpty()).collect(CollectionsUtil.toLinkedMap(e -> e.getKey(), e -> new ArrayList(e.getValue()))));
         POIUtil.writeData(updatedProductFeedFilePath, "PRODUCTS", products);
         POIUtil.writeData(categorizedProductFeedFilePath, groupedProducts);

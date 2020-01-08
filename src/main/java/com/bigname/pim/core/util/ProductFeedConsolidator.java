@@ -1,4 +1,7 @@
-package com.bigname.pim.util;
+package com.bigname.pim.core.util;
+
+import com.m7.xtreme.common.util.POIUtil;
+import com.m7.xtreme.common.util.PlatformUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,7 +10,7 @@ import java.util.Map;
 
 public class ProductFeedConsolidator {
     public static final String categorizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/PIM - Categorized_Active_Products_4-23-19.xlsx";
-    public static final String consolidatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Consolidated_Active_Products_ENVELOPES-" + PimUtil.getTimestamp() + ".xlsx";
+    public static final String consolidatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Consolidated_Active_Products_ENVELOPES-" + PlatformUtil.getTimestamp() + ".xlsx";
 
     public static Map<String, List<List<Object>>> groupedProducts = POIUtil.readMultiSheetData(categorizedProductFeedFilePath, 52);
     static Map<String, String> requiredOutputFieldsmap = new LinkedHashMap<>();
