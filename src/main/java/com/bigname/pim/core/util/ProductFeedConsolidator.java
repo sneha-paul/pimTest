@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ProductFeedConsolidator {
-    public static final String categorizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/PIM - Categorized_Active_Products_4-23-19.xlsx";
-    public static final String consolidatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Consolidated_Active_Products_ENVELOPES-" + PlatformUtil.getTimestamp() + ".xlsx";
+    public static final String categorizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Cleanedup_Data/PIM_Categorized_Active_products_ENVELOPES_1-08-20-FINAL.xlsx";
+    public static final String consolidatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Cleanedup_Data/PIM_Active_products_ENVELOPES_1-08-20-FINAL.xlsx";
 
-    public static Map<String, List<List<Object>>> groupedProducts = POIUtil.readMultiSheetData(categorizedProductFeedFilePath, 52);
+    public static Map<String, List<List<Object>>> groupedProducts = POIUtil.readMultiSheetData(categorizedProductFeedFilePath, 56);
     static Map<String, String> requiredOutputFieldsmap = new LinkedHashMap<>();
 
     static {
@@ -74,7 +74,7 @@ public class ProductFeedConsolidator {
         requiredOutputFieldsmap.put("Color Family Description", "COLOR_FAMILY_DESCRIPTION");
     }
 
-    public static void consolidate() {
+    public static List<List<Object>> consolidate() {
         List<List<Object>> consolidatedData = new ArrayList<>();
         groupedProducts.forEach((k, v) -> {
             if(consolidatedData.isEmpty()) {
@@ -85,11 +85,12 @@ public class ProductFeedConsolidator {
                 consolidatedData.addAll(_v);
             }
         });
-        POIUtil.writeData(consolidatedProductFeedFilePath, "ENVELOPES", consolidatedData);
+        return consolidatedData;
     }
 
 
     public static void main(String[] args) {
-        consolidate();
+        List<List<Object>> consolidatedData = consolidate();
+        POIUtil.writeData(consolidatedProductFeedFilePath, "ENVELOPES", consolidatedData);
     }
 }
