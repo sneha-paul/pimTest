@@ -9,9 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 public class ProductFeedFinalizer {
-    public static final String consolidatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Cleanedup_Data/PIM_Active_products_ENVELOPES_1-08-20-FINAL.xlsx";
-    public static final String finalizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Cleanedup_Data/Finalized_PIM_Active_products_ENVELOPES_1-08-20.xlsx";
+    public static final String consolidatedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Cleanedup_Data/PIM_Active_products_ENVELOPES_1-08-20-FINAL-PATCHED.xlsx";
+    public static final String patchFeedFilePath = "/usr/local/pim/uploads/data/cleanup/01132020/FULL_ActiveFeed_PROD_011320201200-1578939659491.xlsx";
+    public static final String finalizedProductFeedFilePath = "/usr/local/pim/uploads/data/cleanup/Cleanedup_Data/Finalized_PIM_Active_products_ENVELOPES_1-08-20P.xlsx";
     public static List<List<Object>> consolidatedProducts = POIUtil.readMultiSheetData(consolidatedProductFeedFilePath, 56).get("ENVELOPES");
+
+    Map<String, List<List<Object>>> groupedProducts = POIUtil.readMultiSheetData(patchFeedFilePath, 74);
+    List<List<Object>> consolidatedProductsList = ProductFeedComparator.consolidate(groupedProducts);
+
+    Map<String, Map<String, Object>> productsMap = getProductsMap(consolidatedProductsList);
 
     static Map<String, List<String>> headerData = new LinkedHashMap<>();
     static {
@@ -22,7 +28,7 @@ public class ProductFeedFinalizer {
         headerData.put("Parent Name", List.of("PRODUCT_NAME", "", "", "", "", "0", "PARENT_PRODUCT_NAME"));
         headerData.put("Product Type", List.of("FAMILY_ID", "", "", "", "", "0", "PRODUCT_TYPE"));
         headerData.put("Category", List.of("CATEGORY_ID", "", "", "", "", "0", "ROOT_CATEGORY"));
-        headerData.put("Style", List.of("DROPDOWN", "", "", "Details", "", "1", "PRODUCT_CATEGORY"));
+        headerData.put("Style", List.of("DROPDOWN", "", "", "Details", "", "1", "PRODUCT_CATEGORY/STYLE"));
         headerData.put("Product Page Name", List.of("INPUTBOX", "", "", "Details", "", "1", "PRODUCT_PAGE_NAME"));
         headerData.put("Netsuite Category", List.of("DROPDOWN", "", "", "Details", "", "1", "NETSUITE_CATEGORY"));
         headerData.put("Color Group", List.of("MULTI_SELECT", "", "|", "Product Features", "", "1", "COLOR_GROUP"));
@@ -40,16 +46,20 @@ public class ProductFeedFinalizer {
         headerData.put("Style Description", List.of("TEXTAREA", "", "", "Details", "", "1", "STYLE_DESCRIPTION"));
         headerData.put("Color Family Description", List.of("TEXTAREA", "", "", "Details", "", "1", "COLOR_FAMILY_DESCRIPTION"));
         headerData.put("Availability", List.of("DROPDOWN", "", "", "Details", "", "1", "AVAILABILITY"));
+        headerData.put("Recycled", List.of("YES_NO", "", "", "Details", "General Options", "1", "RECYCLED"));
         headerData.put("Recycled Content", List.of("DROPDOWN", "", "", "Product Features", "", "1", "RECYCLED_CONTENT"));
+        headerData.put("Recycled Percent", List.of("DROPDOWN", "", "", "Product Features", "", "1", "RECYCLED_PERCENT"));
+        headerData.put("Brand Collection", List.of("DROPDOWN", "", "", "Product Features", "", "1", "BRAND_COLLECTION"));
+        headerData.put("Brand", List.of("DROPDOWN", "", "", "Product Features", "", "1", "BRAND"));
         headerData.put("Compare to Brand", List.of("DROPDOWN", "", "", "Product Features", "", "1", "COMPARE_TO_BRAND"));
         headerData.put("Window Size", List.of("DROPDOWN", "", "", "Product Features", "", "1", "WINDOW_SIZE"));
         headerData.put("Window Position", List.of("DROPDOWN", "", "", "Product Features", "", "1", "WINDOW_POSITION"));
+        headerData.put("Window Location", List.of("DROPDOWN", "", "", "Product Features", "", "1", "WINDOW_LOCATION"));
+        headerData.put("Sealing Method Type", List.of("DROPDOWN", "", "", "Product Features", "", "1", "SEALING_METHOD_TYPE"));
         headerData.put("Sealing Method", List.of("DROPDOWN", "", "", "Product Features", "", "1", "SEALING_METHOD"));
-        headerData.put("Recycled", List.of("YES_NO", "", "", "Details", "General Options", "1", "RECYCLED"));
         headerData.put("Laser", List.of("YES_NO", "", "", "Details", "General Options", "1", "LASER"));
         headerData.put("Inkjet", List.of("YES_NO", "", "", "Details", "General Options", "1", "INKJET"));
         headerData.put("Carton Quantity", List.of("INPUTBOX", "", "", "Details", "", "1", "CARTON_QUANTITY"));
-        headerData.put("Recycled Percent", List.of("DROPDOWN", "", "", "Product Features", "", "1", "RECYCLED_PERCENT"));
         headerData.put("Tagline", List.of("INPUTBOX", "", "", "Details", "", "1", "TAGLINE"));
         headerData.put("Shape", List.of("INPUTBOX", "", "", "Product Features", "", "1", "SHAPE"));
         headerData.put("Labels Per Sheet", List.of("INPUTBOX", "", "", "Details", "", "1", "LABELS_PER_SHEET"));
@@ -62,13 +72,13 @@ public class ProductFeedFinalizer {
         headerData.put("Horizontal Spacing", List.of("INPUTBOX", "", "", "Details", "", "1", "HORIZONTAL_SPACING"));
         headerData.put("Backslits", List.of("INPUTBOX", "", "", "Details", "", "1", "BACKSLITS"));
         headerData.put("Rush Production", List.of("YES_NO", "", "", "Details", "General Options", "1", "RUSH_PRODUCTION"));
-        //headerData.put("Image Url", List.of("IGNORE", "", "", "", "", "1", ""));
-        //headerData.put("Created Date", List.of("IGNORE", "", "", "", "", "1", ""));
-        //headerData.put("URL", List.of("INPUTBOX", "", "", "Details", "", "1", ""));
         //headerData.put("Printable", List.of("YES_NO", "", "", "Details", "General Options", "0", ""));
         headerData.put("Plain Lead Time", List.of("INPUTBOX", "", "", "Details", "Product Lead Time", "0", "PLAIN_LEAD_TIME"));
         headerData.put("Standard Lead Time", List.of("INPUTBOX", "", "", "Details", "Product Lead Time", "0", "STANDARD_LEAD_TIME"));
         headerData.put("Rush Lead Time", List.of("INPUTBOX", "", "", "Details", "Product Lead Time", "0", "RUSH_LEAD_TIME"));
+        //headerData.put("Image Url", List.of("IGNORE", "", "", "", "", "1", ""));
+        //headerData.put("Created Date", List.of("IGNORE", "", "", "", "", "1", ""));
+        //headerData.put("URL", List.of("INPUTBOX", "", "", "Details", "", "1", ""));
         //headerData.put("Pocket Style", List.of("MULTI_SELECT", "", "|", "Product Features", "", "1", ""));
         //headerData.put("Reinforced Edge", List.of("DROPDOWN", "", "", "Product Features", "", "1", ""));
         //headerData.put("Dimension Closed", List.of("DROPDOWN", "Pocket Style", "|", "Product Features", "", "1", ""));
@@ -85,8 +95,30 @@ public class ProductFeedFinalizer {
     }
 
     public static List<List<Object>> finalizeFeed() {
-        Map<String, Map<String, Object>> productsMap1 = getProductsMap(consolidatedProducts);
-        return null;
+        List<List<Object>> finalizedProducts = new ArrayList<>();
+        Map<String, Map<String, Object>> productsMap = getProductsMap(consolidatedProducts);
+        finalizedProducts.add(new ArrayList<>());
+        headerData.forEach((k, v) -> {
+            finalizedProducts.get(finalizedProducts.size() - 1).add(k);
+        });
+
+        for(int [] i = {0}; i[0] < headerData.get("AttributeName").size() - 1; i[0] =  i[0] + 1) {
+            finalizedProducts.add(new ArrayList<>());
+            headerData.forEach((k, v) -> {
+               finalizedProducts.get(finalizedProducts.size() - 1).add(v.get(i[0]));
+            });
+        }
+
+        productsMap.forEach((k, v) -> {
+            finalizedProducts.add(new ArrayList<>());
+            headerData.forEach((k1, v1) -> {
+                finalizedProducts.get(finalizedProducts.size() - 1).add(v.get(v1.get(6)));
+            });
+        });
+
+
+
+        return finalizedProducts;
     }
 
     public static Map<String, Map<String, Object>> getProductsMap(List<List<Object>> productsList) {
@@ -110,6 +142,6 @@ public class ProductFeedFinalizer {
 
     public static void main(String[] args) {
         List<List<Object>> finalizedData = finalizeFeed();
-        POIUtil.writeData(consolidatedProductFeedFilePath, "ENVELOPES", finalizedData);
+        POIUtil.writeData(finalizedProductFeedFilePath, "ENVELOPES", finalizedData);
     }
 }
