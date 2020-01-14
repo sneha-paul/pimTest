@@ -208,31 +208,31 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
 
     protected String[] getNames(Class<?> entity) {
         switch(entity.getCanonicalName()) {
-            case "com.bigname.pim.api.domain.Website":
+            case "com.bigname.pim.core.domain.Website":
                 return new String[] {"Websites", "websites"};
-            case "com.bigname.pim.api.domain.Catalog":
+            case "com.bigname.pim.core.domain.Catalog":
                 return new String[] {"Catalogs", "catalogs"};
-            case "com.bigname.pim.api.domain.Category":
+            case "com.bigname.pim.core.domain.Category":
                 return new String[] {"Categories", "categories"};
-            case "com.bigname.pim.api.domain.Product":
+            case "com.bigname.pim.core.domain.Product":
                 return new String[] {"Parent Products", "products"};
-            case "com.bigname.pim.api.domain.ProductVariant":
+            case "com.bigname.pim.core.domain.ProductVariant":
                 return new String[] {"Child Products", "variants"};
-            case "com.bigname.pim.api.domain.AssetCollection":
+            case "com.bigname.pim.core.domain.AssetCollection":
                 return new String[] {"Asset Collections", "assetCollections"};
-            case "com.bigname.pim.api.domain.AttributeCollection":
+            case "com.bigname.pim.core.domain.AttributeCollection":
                 return new String[] {"Attribute Collections", "attributeCollections"};
-            case "com.bigname.pim.api.domain.PricingAttribute":
+            case "com.bigname.pim.core.domain.PricingAttribute":
                 return new String[] {"Pricing Attributes", "pricingAttributes"};
-            case "com.bigname.pim.api.domain.Family":
+            case "com.bigname.pim.core.domain.Family":
                 return new String[] {"Product Types", "families"};
             case "com.m7.xtreme.xcore.domain.User":
                 return new String[] {"User", "users"};
             case "com.m7.xtreme.xcore.domain.Event":
                 return new String[] {"Event", "events"};
-            case "com.bigname.pim.api.domain.Config":
+            case "com.bigname.pim.core.domain.Config":
                 return new String[] {"Config", "configs"};
-            case "com.bigname.pim.api.domain.AssetFamily":
+            case "com.bigname.pim.core.domain.AssetFamily":
                 return new String[] {"AssetFamily", "assetFamilies"};
             case "com.m7.xtreme.xcore.domain.JobInstance":
                 return new String[] {"Jobs", "jobs"};
@@ -242,31 +242,31 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
 
     protected String getCrumbName(String id, Class<?> entity) {
         switch(entity.getCanonicalName()) {
-            case "com.bigname.pim.api.domain.Website":
+            case "com.bigname.pim.core.domain.Website":
                 return ((WebsiteService)services.get("websiteService")).get(ID.EXTERNAL_ID(id), false).map(Website::getWebsiteName).orElse("");
-            case "com.bigname.pim.api.domain.Catalog":
+            case "com.bigname.pim.core.domain.Catalog":
                 return ((CatalogService)services.get("catalogService")).get(ID.EXTERNAL_ID(id), false).map(Catalog::getCatalogName).orElse("");
-            case "com.bigname.pim.api.domain.Category":
+            case "com.bigname.pim.core.domain.Category":
                 return ((CategoryService)services.get("categoryService")).get(ID.EXTERNAL_ID(id), false).map(Category::getCategoryName).orElse("");
-            case "com.bigname.pim.api.domain.Product":
+            case "com.bigname.pim.core.domain.Product":
                 return ((ProductService)services.get("productService")).get(ID.EXTERNAL_ID(id), false).map(Product::getProductName).orElse("");
-            case "com.bigname.pim.api.domain.ProductVariant":
+            case "com.bigname.pim.core.domain.ProductVariant":
                 return ((ProductVariantService)services.get("productVariantService")).get(ID.EXTERNAL_ID(id), getParameter("channelId"), false).map(ProductVariant::getProductVariantName).orElse("");
-            case "com.bigname.pim.api.domain.AttributeCollection":
+            case "com.bigname.pim.core.domain.AttributeCollection":
                 return ((AttributeCollectionService)services.get("attributeCollectionService")).get(ID.EXTERNAL_ID(id), false).map(AttributeCollection::getCollectionName).orElse("");
-            case "com.bigname.pim.api.domain.AssetCollection":
+            case "com.bigname.pim.core.domain.AssetCollection":
                 return ((AssetCollectionService)services.get("assetCollectionService")).get(ID.EXTERNAL_ID(id), false).map(AssetCollection::getCollectionName).orElse("");
-            case "com.bigname.pim.api.domain.PricingAttribute":
+            case "com.bigname.pim.core.domain.PricingAttribute":
                 return ((PricingAttributeService)services.get("pricingAttributeService")).get(ID.EXTERNAL_ID(id), false).map(PricingAttribute::getPricingAttributeName).orElse("");
-            case "com.bigname.pim.api.domain.Family":
+            case "com.bigname.pim.core.domain.Family":
                 return ((FamilyService)services.get("familyService")).get(ID.EXTERNAL_ID(id), false).map(Family::getFamilyName).orElse("");
             case "com.m7.xtreme.xcore.domain.User":
                 return ((UserService)services.get("userService")).get(ID.EXTERNAL_ID(id), false).map(User::getUserName).orElse("");
             case "com.m7.xtreme.xcore.domain.Event":
                 return ((EventService)services.get("eventService")).get(ID.EXTERNAL_ID(id), false).map(Event::getUser).orElse("");
-            case "com.bigname.pim.api.domain.Config":
+            case "com.bigname.pim.core.domain.Config":
                 return ((ConfigService)services.get("configService")).get(ID.EXTERNAL_ID(id), false).map(Config::getConfigName).orElse("");
-            case "com.bigname.pim.api.domain.AssetFamily":
+            case "com.bigname.pim.core.domain.AssetFamily":
                 return ((AssetFamilyService)services.get("assetFamilyService")).get(ID.EXTERNAL_ID(id), false).map(AssetFamily::getAssetFamilyName).orElse("");
             case "com.m7.xtreme.xcore.domain.JobInstance":
                 return ((JobInstanceService)services.get("jobInstanceService")).get(ID.EXTERNAL_ID(id), false).map(JobInstance::getJobName).orElse("");
