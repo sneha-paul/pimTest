@@ -72,7 +72,7 @@ public class AssetLoader {
         if(isNotEmpty(folderName) && isNotEmpty(parentId)) {
             folderName = trim(folderName);
             parentId = trim(parentId);
-            VirtualFile parentFolder = assetService.get(ID.EXTERNAL_ID(parentId), false).orElse(null);
+            VirtualFile parentFolder = assetService.get(ID.INTERNAL_ID(parentId), false).orElse(null);
             if (isNotEmpty(parentFolder)) {
                 VirtualFile folder = assetService.getFile(folderName, parentId).orElse(null);
                 if (isNotEmpty(folder)) {
