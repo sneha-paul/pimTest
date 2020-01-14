@@ -1,5 +1,20 @@
 [
   {"id":"a56442d0-f7e8-41d7-aa74-4229867ede59","channelName":"Ecommerce","externalId":"ECOMMERCE","active":"Y","_class":"com.bigname.pim.core.domain.Channel"},
 
+  {"id":"6459a5e8-7a58-4702-8eb0-7480e5042b19","websiteName":"Envelopes.com","url":"https://www.envelopes.com","externalId":"ENVELOPES","active":"Y","_class":"com.bigname.pim.core.domain.Website"},
+  {"id":"055ccdc9-2ee3-4234-adf9-310db9418476","websiteName":"Folders.com","url":"https://www.folders.com","externalId":"FOLDERS","active":"Y","_class":"com.bigname.pim.core.domain.Website"},
+
+  {"id":"1aa28e5e-55b6-4a1b-88b0-5e5b4230f291","catalogName":"Envelopes Catalog","description":"Default envelopes.com catalog","externalId":"ENVELOPES","active":"Y","discontinued":"N","_class":"com.bigname.pim.core.domain.Catalog"},
+  {"id":"d9a22899-28cc-4b22-a068-fcb5c12f5f16","catalogName":"Folders Catalog","description":"Default folders.com catalog","externalId":"FOLDERS","active":"Y","discontinued":"N","_class":"com.bigname.pim.core.domain.Catalog"},
+
+  {"id":"6e5d91d6-3103-410f-aa62-6c547708bb7a","websiteId":"6459a5e8-7a58-4702-8eb0-7480e5042b19","catalogId":"1aa28e5e-55b6-4a1b-88b0-5e5b4230f291","sequenceNum":"0","subSequenceNum":0,"active":"Y","_class":"com.bigname.pim.core.domain.WebsiteCatalog"},
+  {"id":"5b421ec1-7323-418d-8d76-638ffe4bd9a5","websiteId":"055ccdc9-2ee3-4234-adf9-310db9418476","catalogId":"d9a22899-28cc-4b22-a068-fcb5c12f5f16","sequenceNum":"0","subSequenceNum":1,"active":"Y","_class":"com.bigname.pim.core.domain.WebsiteCatalog"},
+
+  {"id":"70b239e0-6b10-4275-8257-5c398d20ad66","pricingAttributeName":"Plain","externalId":"PLAIN","active":"Y","_class":"com.bigname.pim.core.domain.PricingAttribute"},
+  {"id":"4ffb1861-1ac8-4849-853f-90c1023ab20a","pricingAttributeName":"1 Color","externalId":"1_COLOR","active":"Y","_class":"com.bigname.pim.core.domain.PricingAttribute"},
+  {"id":"e12ff7cb-4f81-4813-b419-94def11b6c8e","pricingAttributeName":"2 Color","externalId":"2_COLOR","active":"Y","_class":"com.bigname.pim.core.domain.PricingAttribute"},
+  {"id":"27b8b66b-aff3-4970-be2f-7e1ecb968f73","pricingAttributeName":"4 Color","externalId":"4_COLOR","active":"Y","_class":"com.bigname.pim.core.domain.PricingAttribute"},
+
   {"id":"8f9eef8e-9bf2-437b-9d34-2109607f1dc6","email":"manu@blacwood.com","userName":"Manu Prasad","password":"$2a$10$M7/ONda3/I3sQiS.OwKi1O97fKKFzAZUEzsDY.STju4XCHOA934Ni","avathar":"avatar.png","externalId":"manu@blacwood.com","active":"Y","_class":"com.m7.xtreme.xplatform.domain.User"}
+
  ]
