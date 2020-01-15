@@ -13,7 +13,7 @@
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#details">Details</a></li>
                     <li class="nav-item"><a class="nav-link js-rootCategories-tab" data-toggle="tab" href="#rootCategories">Categories</a></li>
                     <li class="nav-item"><a class="nav-link js-hierarchy-tab" data-toggle="tab" href="#hierarchy">Hierarchy</a></li>
-                    <li class="nav-item"><a class="nav-link js-catalogHistory-tab" data-toggle="tab" href="#catalogHistory">History</a></li>
+                    <%--<li class="nav-item"><a class="nav-link js-catalogHistory-tab" data-toggle="tab" href="#catalogHistory">History</a></li>--%>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">
