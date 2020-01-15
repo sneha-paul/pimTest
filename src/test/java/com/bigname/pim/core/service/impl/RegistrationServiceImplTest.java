@@ -47,7 +47,7 @@ public class RegistrationServiceImplTest {
         if(ValidationUtil.isEmpty(mongoTemplate)) {
             mongoTemplate = (MongoTemplate) userDAO.getTemplate();
         }
-        mongoTemplate.dropCollection(User.class);
+//        mongoTemplate.dropCollection(User.class);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class RegistrationServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        mongoTemplate.dropCollection(User.class);
+//        mongoTemplate.dropCollection(User.class);
     }
 
 
