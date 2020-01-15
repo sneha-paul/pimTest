@@ -1031,10 +1031,10 @@
                         };*/
                         data.statusOptions = $.getDataTableStatusOptions(options.selector);
                         // data.advancedSearch = JSON.stringify($('#jqs-adv-search-query').val());
-                        data.advancedSearch = JSON.stringify(testAdvSearch);
+                        //data.advancedSearch = JSON.stringify(testAdvSearch);
                     },
                     url: options.url,
-                    method: 'post',
+                    method: 'get',
                     dataSrc: function(json) {
                         $.each(json.data, function(index, value) {
 
