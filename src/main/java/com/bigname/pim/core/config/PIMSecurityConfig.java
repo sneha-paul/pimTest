@@ -21,6 +21,7 @@ public class PIMSecurityConfig extends BaseSecurityConfig {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+
                 .authorizeRequests()
                 .antMatchers("/assets/**").permitAll()
                 .antMatchers("/actuator/health").permitAll()//.hasRole("ADMIN")
@@ -37,5 +38,6 @@ public class PIMSecurityConfig extends BaseSecurityConfig {
                 .permitAll()
                 .and().exceptionHandling().authenticationEntryPoint(new AjaxAwareAuthenticationEntryPoint("/login"))
                 .and().csrf().disable();
+//                .requiresChannel().anyRequest().requiresSecure();
     }
 }
