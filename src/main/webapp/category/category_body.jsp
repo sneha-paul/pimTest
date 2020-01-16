@@ -11,7 +11,7 @@
                     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#seo">SEO</a></li>
                     <li class="nav-item"><a class="nav-link js-subCategories-tab" data-toggle="tab" href="#subCategories">SubCategories</a></li>
                     <li class="nav-item"><a class="nav-link js-products-tab" data-toggle="tab" href="#products">Parent Products</a></li>
-                    <li class="nav-item"><a class="nav-link js-categoryHistory-tab" data-toggle="tab" href="#categoryHistory">History</a></li>
+                    <%--<li class="nav-item"><a class="nav-link js-categoryHistory-tab" data-toggle="tab" href="#categoryHistory">History</a></li>--%>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="details">

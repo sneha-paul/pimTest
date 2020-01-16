@@ -30,7 +30,7 @@
                     </div>
                     <br>
                     <input type="hidden" name="group" value="CREATE"/>
-                    <img src="/asset/img/tiny.png" onload="$.initAHAH(this)"/>
+                    <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
                 </form>
             </div>
         </div>
