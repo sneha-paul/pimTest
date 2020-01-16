@@ -38,7 +38,7 @@
                                             </div>
                                             <br>
                                             <input type="hidden" name="group" value="DETAILS"/>
-                                            <a href="${breadcrumbs.backURL}"><button type="button" class="btn btn-danger">Cancel</button></a>
+                                            <a href="/pim/events"><button type="button" class="btn btn-danger">Cancel</button></a>
                                         </form>
                                     </div>
                                 </div>
