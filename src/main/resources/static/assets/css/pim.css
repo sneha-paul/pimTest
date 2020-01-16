@@ -171,6 +171,9 @@ body.dragging, body.dragging * {
     padding-bottom:25px;
     background-color: #f8f8f8;
 }
+.scrollable-dt .dataTables_scroll .dataTables_scrollBody table thead{
+    display: none;
+}
 
 .tab-content .scrollable-dt .dt-body .dataTables_scrollBody {
     max-height: calc(35vh + 50px) !important;
@@ -764,6 +767,9 @@ body.overlay-open{
     #left-sidebar .user-account {
         margin: 10px 0px 10px 10px;
     }
+        #left-sidebar .sidebar-nav .metismenu > li{
+            flex: auto;
+        }
         #left-sidebar .user-account .dropdown,
         #left-sidebar .sidebar-nav .metismenu ul.collapse.in> a span,
         #left-sidebar .sidebar-nav .metismenu>li a span{
@@ -780,7 +786,7 @@ body.overlay-open{
             #left-sidebar .sidebar-nav .metismenu>li a:focus,
             #left-sidebar .sidebar-nav .metismenu>li a:active,
             #left-sidebar .sidebar-nav .metismenu>li.active>a {
-                background: #3888e2cc;
+                background: rgba(56, 136, 226, 0.8);
             }
             #left-sidebar .sidebar-nav .metismenu>li.active>a,
             #left-sidebar .sidebar-nav .metismenu>li ul.collapse li.active>a{
