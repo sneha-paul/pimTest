@@ -170,30 +170,22 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
      */
     @Override
     public Page<Product> getAll(int page, int size, Sort sort, boolean... activeRequired) {
-        Page<Product> products = super.getAll(page, size, sort, activeRequired);
-        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
-        return products;
+        return setProductFamily(super.getAll(page, size, sort, activeRequired));
     }
 
     @Override
     public Page<Product> findAll(Criteria criteria, Pageable pageable, boolean... activeRequired){
-        Page<Product> products = super.findAll(criteria, pageable, activeRequired);
-        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
-        return products;
+        return setProductFamily(super.findAll(criteria, pageable, activeRequired));
     }
 
     @Override
     public Page<Product> findAll(Pageable pageable, boolean... activeRequired) {
-        Page<Product> products = super.findAll(pageable, activeRequired);
-        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
-        return products;
+        return setProductFamily(super.findAll(pageable, activeRequired));
     }
 
     @Override
     public Page<Product> findAll(String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
-        Page<Product> products = super.findAll(searchField, keyword, pageable, activeRequired);
-        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
-        return products;
+        return setProductFamily(super.findAll(searchField, keyword, pageable, activeRequired));
     }
 
     /**
@@ -206,13 +198,42 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
      */
     @Override
     public <I> List<Product> getAll(List<ID<I>> productIds, Sort sort, boolean... activeRequired) {
-        List<Product> products = super.getAll(productIds, sort, activeRequired);
-        products.forEach(product -> setProductFamily(product, ID.Type.INTERNAL_ID));
-        return products;
+        return setProductFamily(super.getAll(productIds, sort, activeRequired));
     }
 
     private void setProductFamily(Product product, ID.Type type) {
         familyService.get(type == ID.Type.EXTERNAL_ID ? ID.EXTERNAL_ID(product.getProductFamilyId()) : ID.INTERNAL_ID(product.getProductFamilyId())).ifPresent(product::setProductFamily);
+    }
+
+    private List<Product> setProductFamily(List<Product> products) {
+        Map<String, Family> familiesMap = getFamiliesMap();
+        return products.parallelStream().map(product -> {
+            Family productFamily = familiesMap.get(product.getProductFamilyId());
+            if(productFamily != null) {
+                product.setProductFamily(productFamily);
+            }
+            return product;
+        }).collect(Collectors.toList());
+    }
+
+    private Page<Product> setProductFamily(Page<Product> products) {
+        Map<String, Family> familiesMap = getFamiliesMap();
+        return new PageImpl<>(products.map(product -> {
+            Family productFamily = familiesMap.get(product.getProductFamilyId());
+            if(productFamily != null) {
+                product.setProductFamily(productFamily);
+            }
+            return product;
+        }).stream().collect(Collectors.toList()), products.getPageable(), products.getTotalElements());
+    }
+
+    private Map<String, Family> getFamiliesMap() {
+        Map<String, Family> familiesMap = new HashMap<>();
+        familyService.getAll(null, false).forEach(family -> {
+            familiesMap.put(family.getId(), family);
+            familiesMap.put(family.getFamilyId(), family);
+        });
+        return familiesMap;
     }
 
     /**
