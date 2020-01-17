@@ -190,7 +190,7 @@ public class Product extends MongoEntity<Product> {
         clone.setDiscontinued("N");
         clone.setExternalId(cloneValue(getExternalId()));
         clone.setProductName(cloneValue(getProductName()));
-        clone.setProductFamilyId(cloneValue(getProductFamilyId()));
+        clone.setProductFamilyId(getProductFamilyId());
         return clone;
     }
 

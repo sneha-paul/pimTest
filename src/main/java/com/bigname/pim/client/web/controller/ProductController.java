@@ -1,6 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.core.domain.*;
+import com.bigname.pim.core.persistence.dao.mongo.ProductCategoryDAO;
 import com.bigname.pim.core.service.*;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.bigname.pim.core.data.exportor.ProductExporter;
@@ -62,7 +63,7 @@ public class ProductController extends BaseController<Product, ProductService> {
         if(isValid(product, model, Product.CreateGroup.class)) {
             product.setActive("N");
             product.setDiscontinued("N");
-            productService.create(product);
+            productService.create(product, ID.Type.EXTERNAL_ID);
             model.put("success", true);
         }
         return model;
@@ -73,10 +74,10 @@ public class ProductController extends BaseController<Product, ProductService> {
     @RequestMapping(value = "/{productId}/channels/{channelId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "productId") String productId, Product product, HttpServletRequest request) {
-        productService.get(ID.EXTERNAL_ID(productId), false).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
+        productService.get(ID.EXTERNAL_ID(productId), true, true, true).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
         product.setAttributeValues(getAttributesMap(request));
 
-        Product productDetails = productService.get(ID.EXTERNAL_ID(productId), false).orElse(null);
+        Product productDetails = productService.get(ID.EXTERNAL_ID(productId), true, true, true).orElse(null);
         productService.getAllCategoryProductsWithProductId(ID.INTERNAL_ID(productDetails.getId()))
                 .forEach(categoryProduct -> {
                     categoryProduct.setActive(product.getActive());
@@ -152,7 +153,7 @@ public class ProductController extends BaseController<Product, ProductService> {
         if(id == null) {
             return super.details(model);
         } else {
-            Product product = productService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            Product product = productService.get(ID.EXTERNAL_ID(id), true, true, true).orElse(null);
             if(isNotEmpty(product)) {
                 product.setChannelId(channelId);
                 model.put("product", product);
@@ -190,7 +191,7 @@ public class ProductController extends BaseController<Product, ProductService> {
                             return productService.findAll(dataTableRequest.getPageRequest(defaultSort), dataTableRequest.getStatusOptions());
                         }
                     } else {
-                        return productService.findAll("productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(defaultSort), false);
+                        return productService.findAll("productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(defaultSort), dataTableRequest.getStatusOptions());
                     }
                 },
                 paginatedResult -> {

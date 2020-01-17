@@ -133,12 +133,12 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
      */
     @Override
     public Product create(Product product) {
-        /**
-         *  No need to check if product.getProductFamilyId is empty.
-         *  There is @NotEmpty validation constraint on the Product bean
-         */
+       return create(product, ID.Type.INTERNAL_ID);
+    }
 
-        setProductFamily(product, ID.Type.EXTERNAL_ID);
+    @Override
+    public Product create(Product product, ID.Type type) {
+        setProductFamily(product, type);
         if(isEmpty(product.getProductFamily())) {
             throw new GenericEntityException("Unable to create product, invalid product family id : " + product.getProductFamilyId());
         } else {
