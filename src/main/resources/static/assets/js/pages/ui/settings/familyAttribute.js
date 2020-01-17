@@ -10,7 +10,6 @@ $(function(){
                 // { data: 'parent', name : 'parent' , title : parentAttributeName, visible: '' !== parentAttributeName},
                 { data: 'value', name : 'value' , title : 'Value'},
                 { data: 'id', name : 'id', title : 'ID' },
-                { data: 'actions', name : 'actions', title : 'Actions', orderable: false }
             ],
            // buttons: [$.attributeOptionDetailButton({actionUrl: '/pim/families/{familyId}/attributes/{attributeId}/options/{attributeOptionId}'})]
         });
