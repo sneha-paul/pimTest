@@ -143,7 +143,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "sequenceNum"), new Sort.Order(Sort.Direction.DESC, "subSequenceNum"));
         }
         Sort finalSort = sort;
-        return productDAO.findById(productId).map(product -> productVariantDAO.findByProductIdAndChannelIdAndActiveIn(product.getId(), channelId, PlatformUtil.getActiveOptions(activeRequired), PageRequest.of(page, size, finalSort))).orElse(null);
+        return productDAO.findById(productId, false).map(product -> productVariantDAO.findByProductIdAndChannelIdAndActiveInAndDiscontinuedIn(product.getId(), channelId, PlatformUtil.getActiveOptions(activeRequired), PlatformUtil.getDiscontinuedOptions(activeRequired), PageRequest.of(page, size, finalSort))).orElse(null);
     }
 
     @Override

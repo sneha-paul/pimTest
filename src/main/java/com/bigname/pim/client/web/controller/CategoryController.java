@@ -74,7 +74,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @RequestMapping(value = "/{categoryId}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "categoryId") String categoryId, Category category) {
-        Category category1 = categoryService.get(ID.EXTERNAL_ID(categoryId), false).orElse(null);
+        Category category1 = categoryService.get(ID.EXTERNAL_ID(categoryId), true, true, true).orElse(null);
 
         categoryService.getAllRootCategoriesWithCategoryId(ID.INTERNAL_ID(category1.getId()))
                 .forEach(rootCategory -> {
@@ -109,7 +109,7 @@ public class CategoryController extends BaseController<Category, CategoryService
         if(id == null) {
             return super.details(model);
         } else {
-            Category category = categoryService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+            Category category = categoryService.get(ID.EXTERNAL_ID(id), true, true, true).orElse(null);
             if(isNotEmpty(category)) {
                 if(parameterMap.containsKey("parentId")) {
                     model.put("parentId", parameterMap.get("parentId"));
@@ -307,7 +307,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Map<String, Object> archive(@PathVariable(value = "categoryId") String categoryId, @PathVariable(value = "archived") String archived) {
         Map<String, Object> model = new HashMap<>();
-        Category category = categoryService.get(ID.EXTERNAL_ID(categoryId), false).orElse(null);
+        Category category = categoryService.get(ID.EXTERNAL_ID(categoryId), true, true, true).orElse(null);
         if(isEmpty(category)) {
             category = categoryService.get(ID.EXTERNAL_ID(categoryId), false, false, false, true).orElse(null);
         }

@@ -12,7 +12,7 @@ import java.util.Optional;
  * Created by sruthi on 20-09-2018.
  */
 public interface ProductVariantDAO extends GenericDAO<ProductVariant>, ProductVariantRepository {
-    Page<ProductVariant> findByProductIdAndChannelIdAndActiveIn(String productId, String channelId, String active[], Pageable pageable);
+    Page<ProductVariant> findByProductIdAndChannelIdAndActiveInAndDiscontinuedIn(String productId, String channelId, String active[], String[] discontinue, Pageable pageable);
     List<ProductVariant> findByProductIdInAndChannelIdAndActiveIn(List<String> productIds, String channelId, String active[]);
     Page<ProductVariant> findByProductIdAndChannelIdAndExternalIdInAndActiveIn(String productId, String channelId, List<String> productVariantIds, String active[], Pageable pageable);
     Optional<ProductVariant> findByIdAndChannelIdAndActiveIn(String id, String channelId, String active[]);
