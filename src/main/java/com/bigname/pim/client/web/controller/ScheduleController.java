@@ -58,7 +58,7 @@ public class ScheduleController extends BaseController<JobInstance, JobInstanceS
         LOGGER.info("scheduleTime : "+ jobInstance.getJobName());
         if(isValid(jobInstance, model, JobInstance.CreateGroup.class)) {
             Class<?> classType = null;
-            String className = "com.bigname.pim.data.exportor." + jobInstance.getJobName();
+            String className = "com.bigname.pim.core.data.exportor." + jobInstance.getJobName();
             try {
                 classType = Class.forName(className);
                 Package.getPackage(jobInstance.getJobName());
