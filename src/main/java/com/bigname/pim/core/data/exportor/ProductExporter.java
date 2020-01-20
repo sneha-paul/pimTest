@@ -57,7 +57,8 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
     private CategoryService categoryService;
 
     public boolean exportData(String filePath, Criteria criteria) {
-        Map<String, Object> productCriteriaMap = criteria.toMap();
+        //TODO - In phase 2
+        /*Map<String, Object> productCriteriaMap = criteria.toMap();
         Map<String, Object> variantCriteriaMap = new HashMap<>();
         variantCriteriaMap.put("condition", productCriteriaMap.get("condition"));
         variantCriteriaMap.put("not", productCriteriaMap.get("not"));
@@ -96,29 +97,24 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
                 }
             }
             variantCriteriaMap.put("rules", variantsList);
-        }
+        }*/
 
-        Criteria productCriteria = Criteria.fromMap(productCriteriaMap);
+        //TODO In phase 2
+        /*Criteria productCriteria = Criteria.fromMap(productCriteriaMap);
         List<Product> productData = productService.findAll(productCriteria,true);
         List<String> idList = new ArrayList<>();
         productData.forEach(product -> idList.add(product.getId()));
-
-        //Criteria _criteria1 = Criteria.where("productId", STRING).in(idList.toArray());
-        //productVariantService.findAll(_criteria1, true);
         Criteria criteria1 = Criteria.where("productId", "STRING").eq("9fd5acc9-1960-4f72-b2c8-d7523da945ee");//33e77864-3b65-4213-a6f9-dc25de0dc8ef
-
         Criteria variantCriteria = Criteria.fromMap(variantCriteriaMap);
         variantCriteria.and(criteria1);
-
-        List<Map<String, Object>> proVariants = productService.findAllVariants(variantCriteria, true);
+        List<Map<String, Object>> proVariants = productService.findAllVariants(variantCriteria, true);*/
 
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
         Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
 
         List<Map<String, Object>> variantsAttributes = new ArrayList<>();
         Set<String> header = new HashSet<>();
-        proVariants.forEach(variant -> {
-            //if(idList.contains(variant.get("productId"))) {
+        productVariantData.forEach(variant -> {
             Map<String, Object> variantAttributesMap = new HashMap<>();
             variant.forEach((key, value) -> {
                 if (value instanceof String) {
@@ -152,7 +148,6 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
             });
             header.addAll(variantAttributesMap.keySet());
             variantsAttributes.add(variantAttributesMap);
-            //}
         });
 
         List<List<Object>> data = new ArrayList<>();
@@ -497,10 +492,11 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
             }
         }
 
-        Criteria criteria = Criteria.fromJson(jobDataMap.get("searchCriteria").toString());
+        //TODO In phase 2
+        /*Criteria criteria = Criteria.fromJson(jobDataMap.get("searchCriteria").toString());
         List<Product> productData = productService.findAll(criteria,true);
         List<String> idList = new ArrayList<>();
-        productData.forEach(product -> idList.add(product.getId()));
+        productData.forEach(product -> idList.add(product.getId()));*/
 
         List<Map<String, Object>> productVariantData = productVariantService.getAll();
         Map<String, Family> familyLookup = familyService.getAll(null, false).stream().collect(Collectors.toMap(Entity::getId, f -> f));
@@ -508,7 +504,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
         List<Map<String, Object>> variantsAttributes = new ArrayList<>();
         Set<String> header = new HashSet<>();
         productVariantData.forEach(variant -> {
-            if(idList.contains(variant.get("productId"))) {
+            //if(idList.contains(variant.get("productId"))) {
                 Map<String, Object> variantAttributesMap = new HashMap<>();
                 variant.forEach((key, value) -> {
 
@@ -543,7 +539,7 @@ public class ProductExporter implements BaseExporter<Product, ProductService>, J
                 });
                 header.addAll(variantAttributesMap.keySet());
                 variantsAttributes.add(variantAttributesMap);
-            }
+            //}
         });
 
         List<List<Object>> data = new ArrayList<>();

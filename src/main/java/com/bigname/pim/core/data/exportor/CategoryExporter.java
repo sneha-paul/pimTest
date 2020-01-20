@@ -43,7 +43,8 @@ public class CategoryExporter implements BaseExporter<Category, CategoryService>
 
     public boolean exportData(String filePath, Criteria criteria) {
 
-        Map<String, Category> categoriesLookupMap = categoryService.findAll(criteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
+        //Map<String, Category> categoriesLookupMap = categoryService.findAll(criteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e)); TODO - In phase 2
+        Map<String, Category> categoriesLookupMap = categoryService.getAll(null, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
         Map<String, RelatedCategory> relatedCategoriesLookupMap = relatedCategoryDAO.findAll().stream().collect(Collectors.toMap(e -> e.getSubCategoryId(), e -> e));
 
         List<Map<String, Object>> hierarchy =  categoryService.getCategoryHierarchy(true);
@@ -86,7 +87,8 @@ public class CategoryExporter implements BaseExporter<Category, CategoryService>
         CategoryService categoryService = (CategoryService) jobDataMap.get("service");
         Criteria criteria = Criteria.fromJson(jobDataMap.get("searchCriteria").toString());
 
-        Map<String, Category> categoriesLookupMap = categoryService.findAll(criteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
+        //Map<String, Category> categoriesLookupMap = categoryService.findAll(criteria, true).stream().collect(Collectors.toMap(Category::getId, e -> e)); TODO - In phase 2
+        Map<String, Category> categoriesLookupMap = categoryService.getAll(null, true).stream().collect(Collectors.toMap(Category::getId, e -> e));
         Map<String, RelatedCategory> relatedCategoriesLookupMap = categoryService.getAll().stream().collect(Collectors.toMap(e -> e.getSubCategoryId(), e -> e));
 
         List<Map<String, Object>> hierarchy =  categoryService.getCategoryHierarchy(true);
