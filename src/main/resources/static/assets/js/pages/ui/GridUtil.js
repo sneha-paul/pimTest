@@ -328,7 +328,7 @@
                     $.detailsButton(options),
                     $.cloneButton(options),
                     $.toggleStatusButton(options),
-                    $.archivedStatusButton(options)
+                    //$.archivedStatusButton(options) TODO In phase 2
                 ]
             }));
         },
@@ -359,7 +359,7 @@
                 buttons: buttons.length > 0 ? buttons : [
                     $.detailsButton(options),
                     $.toggleStatusButton(options),
-                    $.archivedStatusButton(options)
+                    //$.archivedStatusButton(options) TODO In phase 2
                 ]
             }));
         }
