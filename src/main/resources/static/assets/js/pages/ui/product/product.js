@@ -77,6 +77,7 @@ $( document ).ready(function() {
             selector: '#paginatedProductVariantsSortableTable',
             names: ['productVariantsSortable', 'productVariant'],
             pageUrl: $.getURL('/pim/products/{productId}/variants/'),
+            showDiscontinueFilter: true,
             dataUrl: $.getURL('/pim/products/{productId}/channels/{channelId}/variants/data'),
             toggleUrl: '/pim/products/{productId}/channels/{channelId}/variants/{externalId}/active/{active}',
             archiveUrl:'/pim/products/{productId}/channels/{channelId}/variants/{externalId}/archive/{archived}',

@@ -4,6 +4,7 @@ $(function(){
         names: ['categories','category'],
         pageUrl: '/pim/categories/',
         toolbar: [{name: 'EXPORT', actionUrl: '/pim/categories/export'}, {name: 'IMPORT'}],
+        showDiscontinueFilter: true,
         dataUrl: '/pim/categories/data',
         toggleUrl:'/pim/categories/{externalId}/categories/active/{active}',
         archiveUrl:'/pim/categories/{externalId}/categories/archive/{archived}',

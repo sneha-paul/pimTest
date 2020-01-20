@@ -32,6 +32,7 @@
             names: ['products','product'],
             pageUrl: '/pim/products/',
             toolbar: [{name: 'EXPORT', actionUrl: '/pim/products/export'}, {name: 'IMPORT'}],
+            showDiscontinueFilter: true,
             dataUrl: '/pim/products/data',
             toggleUrl:'/pim/products/{externalId}/products/active/{active}',
             archiveUrl:'/pim/products/{externalId}/products/archive/{archived}',
