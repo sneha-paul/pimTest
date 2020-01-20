@@ -12,6 +12,7 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.exception.GenericEntityException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
@@ -133,7 +134,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
      */
     @Override
     public Product create(Product product) {
-       return create(product, ID.Type.INTERNAL_ID);
+       return create(product, ID.Type.EXTERNAL_ID);
     }
 
     @Override
@@ -337,6 +338,12 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
             );
         }
         return _fieldErrors;
+    }
+
+    //While cloning the Product instance, the family Id is of Type INTERNAL_ID, so override the default cloneInstance method to use INTERNAL_ID of the family instead of the default EXTERNAL_ID
+    @Override
+    protected Product cloneInstance(Product product, Entity.CloneType type) {
+        return create(product, ID.Type.INTERNAL_ID);
     }
 
     /**

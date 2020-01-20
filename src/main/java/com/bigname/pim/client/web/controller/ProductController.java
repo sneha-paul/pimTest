@@ -63,7 +63,7 @@ public class ProductController extends BaseController<Product, ProductService> {
         if(isValid(product, model, Product.CreateGroup.class)) {
             product.setActive("N");
             product.setDiscontinued("N");
-            productService.create(product, ID.Type.EXTERNAL_ID);
+            productService.create(product);
             model.put("success", true);
         }
         return model;

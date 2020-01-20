@@ -1448,6 +1448,14 @@
             return $.getPageAttributes()[key];
         },
 
+        getPageUrl: function() {
+            return $.getPageAttribute("pageUrl");
+        },
+
+        getRootUrl: function() {
+            return$.getPageAttribute('rootUrl');
+        },
+
         removePageAttribute: function(key) {
             return delete $.getPageAttributes()[key];
         },
