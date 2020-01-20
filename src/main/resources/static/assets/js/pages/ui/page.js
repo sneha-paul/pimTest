@@ -582,7 +582,7 @@
                             }
                         });
                     toolbar.push(inactiveButton);
-                    // if(options.showDiscontinueFilter) {
+                    if(options.showDiscontinueFilter) {
                         let discontinuedButton = $('<button class="btn btn-sm btn-outline-warning" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
                             .click(function () {
                                 if ($.getDataTableStatusOptions(options.selector) === '0010') {
@@ -593,7 +593,7 @@
                                 }
                             });
                         toolbar.push(discontinuedButton);
-                    // }
+                    }
                     if(options.showArchiveFilter) {
                         let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="fa fa-file-archive-o"></i></button>')
                             .click(function () {
