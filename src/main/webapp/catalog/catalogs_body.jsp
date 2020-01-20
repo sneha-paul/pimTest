@@ -30,6 +30,7 @@
             names: ['catalogs','catalog'],
             pageUrl: '/pim/catalogs/',
             toolbar: [{name: 'EXPORT', actionUrl: '/pim/catalogs/export'}, {name: 'IMPORT'}],
+            showDiscontinueFilter: true,
             dataUrl: '/pim/catalogs/data',
             toggleUrl: '/pim/catalogs/{externalId}/catalogs/active/{active}',
             archiveUrl:'/pim/catalogs/{externalId}/catalogs/archive/{archived}',

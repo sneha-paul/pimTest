@@ -414,14 +414,14 @@
 
                             case 'IMPORT':
                             {
-                                toolbar.push($('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="Import Data"><i class="fa fa-download"></i></button>')
+                                toolbar.push($('<button class="btn btn-sm btn-outline-info" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="Import Data"><i class="fa fa-download"></i></button>')
                                     .click(function () {
 
                                     }));
                             }
                             break;
                             case 'EXPORT':
-                                toolbar.push($('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
+                                toolbar.push($('<button class="btn btn-sm btn-outline-primary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Export Data"><i class="fa fa-upload"></i></button>')
                                     .click(function() {
                                         //category json
                                         var testAdvSearch1 = {
@@ -567,7 +567,7 @@
                             if($.getDataTableStatusOptions(options.selector) === '1000') {
                                 toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
                             } else {
-                                $(this).toggleClass(['btn-outline-secondary', 'btn-success', 'js-active-on']);
+                                $(this).toggleClass(['btn-outline-success', 'btn-success', 'js-active-on']);
                                 $searchButton.click();
                             }
                         });
@@ -577,33 +577,35 @@
                             if($.getDataTableStatusOptions(options.selector) === '0100') {
                                 toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
                             } else {
-                                $(this).toggleClass(['btn-outline-secondary', 'btn-danger', 'js-inactive-on']);
+                                $(this).toggleClass(['btn-outline-danger', 'btn-danger', 'js-inactive-on']);
                                 $searchButton.click();
                             }
                         });
                     toolbar.push(inactiveButton);
-                    let discontinuedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
-                        .click(function() {
-                            if($.getDataTableStatusOptions(options.selector) === '0010') {
-                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
-                            } else {
-                                $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-discontinued-on']);
-                                $searchButton.click();
-                            }
-                        });
-                    toolbar.push(discontinuedButton);
-
-                    let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="fa fa-file-archive-o"></i></button>')
-                        .click(function() {
-                            if($.getDataTableStatusOptions(options.selector) === '0001') {
-                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
-                            } else {
-                                $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-archived-on']);
-                                $searchButton.click();
-                            }
-                        });
-                    toolbar.push(archivedButton);
-
+                    // if(options.showDiscontinueFilter) {
+                        let discontinuedButton = $('<button class="btn btn-sm btn-outline-warning" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
+                            .click(function () {
+                                if ($.getDataTableStatusOptions(options.selector) === '0010') {
+                                    toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                                } else {
+                                    $(this).toggleClass(['btn-outline-warning', 'btn-warning', 'js-discontinued-on']);
+                                    $searchButton.click();
+                                }
+                            });
+                        toolbar.push(discontinuedButton);
+                    // }
+                    if(options.showArchiveFilter) {
+                        let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="fa fa-file-archive-o"></i></button>')
+                            .click(function () {
+                                if ($.getDataTableStatusOptions(options.selector) === '0001') {
+                                    toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                                } else {
+                                    $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-archived-on']);
+                                    $searchButton.click();
+                                }
+                            });
+                        toolbar.push(archivedButton);
+                    }
                     $(options.selector + '_wrapper').find('.dt-buttons').append(toolbar);
                     $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' , trigger : 'hover'});
                 },
