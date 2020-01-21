@@ -99,7 +99,7 @@ public class FeedController {
         model.put("success", success);
         return model;
     }
-
+//Use this
     @ResponseBody
     @RequestMapping(value = "/load/products2", method = RequestMethod.GET)
     public Map<String, Object> loadProductData12(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {
@@ -113,7 +113,7 @@ public class FeedController {
         model.put("success", success);
         return model;
     }
-
+//Use this
     @ResponseBody
     @RequestMapping(value = "/load/categories", method = RequestMethod.GET)
     public Map<String, Object> loadCategoryData(@RequestParam(value = "apiKey", required = false) String apiKey, HttpServletRequest request) {

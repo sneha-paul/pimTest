@@ -6,7 +6,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
                                 <button id="js-create-family" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Product Type</span></button>
-                            <button id="js-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>
+<%--                            <button id="js-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>--%>
                         </div>
                     </div>
                 </div>

@@ -7,6 +7,7 @@ import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.POIUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.domain.Entity;
+import com.m7.xtreme.xcore.domain.MongoEntity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.util.ID;
 import org.apache.commons.io.filefilter.RegexFileFilter;
@@ -1446,6 +1447,8 @@ public class ProductLoader1 {
                         });
             }
 
+            AssetCollection productAssetsCollection = assetLoader.createCollection("PRODUCT_ASSETS");
+            long missingAssets = 0;
             for (int row = 0; row < variantsData.size(); row++) {
                 String productId = trim(variantsData.get(row).get(attributeTypesMetadata.indexOf("PRODUCT_ID")), true).toUpperCase();
                 productId = convertCellValue("", productId);
@@ -1459,6 +1462,31 @@ public class ProductLoader1 {
                 if (isEmpty(productId) || isEmpty(productName) || isEmpty(variantId) || isEmpty(familyId) || "FOLDER_STYLE".equalsIgnoreCase(productId)) {
                     continue;
                 }
+
+                File variantDirectory = new File(assetLoader.getSourceLocation() + variantId + "/");
+                if(variantDirectory.isDirectory()) {
+                    Product product = existingProducts.get(productId);
+                    VirtualFile productFolder = assetLoader.createFolder(productId, productAssetsCollection.getRootId());
+                    VirtualFile variantFolder = assetLoader.createFolder(variantId, productFolder.getId());
+                    List<VirtualFile> variantAssets = new ArrayList<>();
+                    List<String> assetNames = new ArrayList<>();
+                    for(String assetFileName : variantDirectory.list()) {
+                        variantAssets.add(assetLoader.uploadFile(variantFolder.getId(), assetLoader.getSourceLocation() + variantId + "/", assetFileName, variantFolder.getRootDirectoryId()));
+                        assetNames.add(assetFileName);
+                    }
+                    productVariantService.addAssets(ID.EXTERNAL_ID(productId), channelId, ID.EXTERNAL_ID(variantId), variantAssets.stream().map(MongoEntity::getId).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
+                    if (isEmpty(product.getChannelAssets())) {
+                        productService.addAssets(ID.EXTERNAL_ID(productId), channelId, variantAssets.stream().map(MongoEntity::getId).map(ID::INTERNAL_ID).collect(Collectors.toList()), FileAsset.AssetFamily.ASSETS);
+                        product = productService.get(ID.EXTERNAL_ID(productId), false).get();
+                        existingProducts.put(productId, product);
+                    }
+                } else {
+                    // Missing Assets
+                    missingAssets ++;
+                }
+
+                /*
+                Loading primary product Images
                 Product product = existingProducts.get(productId);
                 AssetCollection productAssetsCollection = assetLoader.createCollection("PRODUCT_ASSETS");
                 String assetFileName = variantId + ".png";
@@ -1479,6 +1507,7 @@ public class ProductLoader1 {
                     //                        System.out.println(assetFileName + " <======= Not Found");
                 }
 
+                // Loading Related Product Images
                 //TODO uncomment after testing
                 if (variantsAssets.containsKey(variantId)) {
                     List<List<String>> variantAssets = variantsAssets.get(variantId);
@@ -1501,7 +1530,7 @@ public class ProductLoader1 {
                         }
                     }
                 }
-
+                // Loading Folders Images
                 File[] files = getFileNames(new File(assetLoader.getSourceLocation()), variantId + "_");
                 for(int x = 0; x < files.length; x ++) {
                     assetFileName = files[x].getName();
@@ -1525,8 +1554,9 @@ public class ProductLoader1 {
                             }
                         }
                     }
-                }
+                }*/
             }
+            System.out.println(variantsData.size() + " -- " + missingAssets);
             System.out.println("Done");
         });
 
