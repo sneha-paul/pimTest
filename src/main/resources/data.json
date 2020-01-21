@@ -15,6 +15,7 @@
   {"id":"e12ff7cb-4f81-4813-b419-94def11b6c8e","pricingAttributeName":"2 Color","externalId":"2_COLOR","active":"Y","_class":"com.bigname.pim.core.domain.PricingAttribute"},
   {"id":"27b8b66b-aff3-4970-be2f-7e1ecb968f73","pricingAttributeName":"4 Color","externalId":"4_COLOR","active":"Y","_class":"com.bigname.pim.core.domain.PricingAttribute"},
 
-  {"id":"8f9eef8e-9bf2-437b-9d34-2109607f1dc6","email":"admin@bigname.com","userName":"Administrator","password":"$2a$10$M7/ONda3/I3sQiS.OwKi1O97fKKFzAZUEzsDY.STju4XCHOA934Ni","avathar":"avatar.png","externalId":"admin@bigname.com","active":"Y","_class":"com.m7.xtreme.xplatform.domain.User"}
+  {"id":"8f9eef8e-9bf2-437b-9d34-2109607f1dc6","email":"admin@bigname.com","userName":"Administrator","password":"$2a$10$M7/ONda3/I3sQiS.OwKi1O97fKKFzAZUEzsDY.STju4XCHOA934Ni","avathar":"avatar.png","externalId":"admin@bigname.com","active":"Y","_class":"com.m7.xtreme.xplatform.domain.User"},
+  {"id":"0025ecfa-14a7-43a9-a504-9acae0658ca6","email":"manu@blacwood.com","userName":"Manu Prasad","password":"$2a$10$M7/ONda3/I3sQiS.OwKi1O97fKKFzAZUEzsDY.STju4XCHOA934Ni","avathar":"avatar.png","externalId":"manu@blacwood.com","active":"Y","_class":"com.m7.xtreme.xplatform.domain.User"}
 
  ]

@@ -354,9 +354,13 @@ select[disabled="disabled"]::-ms-expand {
 .search-btn {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    margin-top: -3px;
-    margin-left: -4px;
+    position: absolute;
+    right: 0;
+    top: 3px;
 }
+    .search-btn i{
+        vertical-align: middle;
+    }
 
 .js-handle {
     /*text-align: center;*/
@@ -645,9 +649,10 @@ table#paginatedPricingTable tbody td:first-child {
     max-height: 220px;
 }
 
-/*.digital-asset .image img {
-    max-height: 330px;
-}*/
+.digital-asset .image img {
+    max-height: 100%;
+    max-width: 100%;
+}
 
 .file_manager .file .file-name {
     padding: 10px;
@@ -746,8 +751,11 @@ body.overlay-open{
 .offcanvas-active #main-content{
     width: 100%;
 }
+.sidebar-scroll{
+    width: 250px !important;
+}
 #left-sidebar{
-    width: auto;
+    width: 75px;
     background-color: #449cff;
     box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.4);
 }
@@ -758,11 +766,14 @@ body.overlay-open{
     opacity: 1;
     visibility: visible;
 }
-#left-sidebar:hover .sidebar-nav .metismenu{
+
+#left-sidebar:hover{
     width: 250px;
 }
     #left-sidebar .user-account {
         margin: 10px 0px 10px 10px;
+        display: flex;
+        width: 200px;
     }
         #left-sidebar .sidebar-nav .metismenu > li{
             flex: auto;
@@ -773,11 +784,16 @@ body.overlay-open{
             display: none;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease-in-out;
             color: #FFFFFF;
         }
             #left-sidebar .sidebar-nav .metismenu>li a{
                 padding-right: 0;
+                display: flex;
+                width: 200px;
+            }
+            #left-sidebar:hover .sidebar-nav .metismenu>li a,
+            #left-sidebar:hover .user-account{
+                width: 100% !important;
             }
             #left-sidebar .sidebar-nav .metismenu>li a:hover,
             #left-sidebar .sidebar-nav .metismenu>li a:focus,
