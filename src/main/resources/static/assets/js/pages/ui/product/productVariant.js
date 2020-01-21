@@ -126,6 +126,11 @@ $( document ).ready(function() {
         $(this).removeClass('js-variantPricing-tab').off('shown.bs.tab.variantPricing');
     });
 
+    $('#aniimated-thumbnials').lightGallery({
+        thumbnail: true,
+        selector: 'a.js-asset'
+    });
+
 
     var adjustment;
     var startSequence = "";
