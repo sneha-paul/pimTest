@@ -28,7 +28,7 @@ public class Catalog extends MongoEntity<Catalog> {
 
     @Indexed(unique = true)
     @NotEmpty(message = "Catalog Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    @NotBlank(message = "Catalog Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Catalog Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String catalogName;
 
     private String description;
