@@ -22,6 +22,9 @@
             pageUrl: '/pim/events/',
             dataUrl: '/pim/events/datas',
             hideStatus:'true',
+            hideActiveFilter: true,
+            hideInactiveFilter: true,
+            buttons: ['DETAILS'],
             columns: [
                 { data: 'timeStamp', name : 'timeStamp', title : 'Time'},
                 { data: 'userName', name : 'userName' , title : 'User' , orderable: false},

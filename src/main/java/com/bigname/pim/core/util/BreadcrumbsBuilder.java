@@ -226,15 +226,15 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 return new String[] {"Pricing Attributes", "pricingAttributes"};
             case "com.bigname.pim.core.domain.Family":
                 return new String[] {"Product Types", "families"};
-            case "com.m7.xtreme.xcore.domain.User":
-                return new String[] {"User", "users"};
-            case "com.m7.xtreme.xcore.domain.Event":
-                return new String[] {"Event", "events"};
+            case "com.m7.xtreme.xplatform.domain.User":
+                return new String[] {"Users", "users"};
+            case "com.m7.xtreme.xplatform.domain.Event":
+                return new String[] {"Events", "events"};
             case "com.bigname.pim.core.domain.Config":
                 return new String[] {"Config", "configs"};
             case "com.bigname.pim.core.domain.AssetFamily":
                 return new String[] {"AssetFamily", "assetFamilies"};
-            case "com.m7.xtreme.xcore.domain.JobInstance":
+            case "com.m7.xtreme.xplatform.domain.JobInstance":
                 return new String[] {"Jobs", "jobs"};
         }
         return new String[] {"", "", "", ""};
@@ -260,15 +260,15 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 return ((PricingAttributeService)services.get("pricingAttributeService")).get(ID.EXTERNAL_ID(id), false).map(PricingAttribute::getPricingAttributeName).orElse("");
             case "com.bigname.pim.core.domain.Family":
                 return ((FamilyService)services.get("familyService")).get(ID.EXTERNAL_ID(id), false).map(Family::getFamilyName).orElse("");
-            case "com.m7.xtreme.xcore.domain.User":
+            case "com.m7.xtreme.xplatform.domain.User":
                 return ((UserService)services.get("userService")).get(ID.EXTERNAL_ID(id), false).map(User::getUserName).orElse("");
-            case "com.m7.xtreme.xcore.domain.Event":
-                return ((EventService)services.get("eventService")).get(ID.EXTERNAL_ID(id), false).map(Event::getUser).orElse("");
+            case "com.m7.xtreme.xplatform.domain.Event":
+                return ((EventService)services.get("eventService")).get(ID.EXTERNAL_ID(id.toUpperCase()), false).map(Event::getUser).orElse("");
             case "com.bigname.pim.core.domain.Config":
                 return ((ConfigService)services.get("configService")).get(ID.EXTERNAL_ID(id), false).map(Config::getConfigName).orElse("");
             case "com.bigname.pim.core.domain.AssetFamily":
                 return ((AssetFamilyService)services.get("assetFamilyService")).get(ID.EXTERNAL_ID(id), false).map(AssetFamily::getAssetFamilyName).orElse("");
-            case "com.m7.xtreme.xcore.domain.JobInstance":
+            case "com.m7.xtreme.xplatform.domain.JobInstance":
                 return ((JobInstanceService)services.get("jobInstanceService")).get(ID.EXTERNAL_ID(id), false).map(JobInstance::getJobName).orElse("");
         }
         return "";

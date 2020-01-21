@@ -20,7 +20,7 @@
 
                     <div class="form-group">
                         <label for="username" class="control-label sr-only">Email</label>
-                        <input type="text" class="form-control" id="username" name="username" value="manu@blacwood.com" placeholder="User Name">
+                        <input type="text" class="form-control" id="username" name="username" value="" placeholder="User Name">
                     </div>
                     <div class="form-group">
                         <label for="password" class="control-label sr-only">Password</label>
@@ -43,9 +43,9 @@
 
 
                     </form>
-                    <div class="separator-linethrough"><span>OR</span></div>
+                    <%--<div class="separator-linethrough"><span>OR</span></div>
                     <button class="btn btn-signin-social"><i class="fa fa-google google-color"></i> Sign in with Google</button>
-                    <button class="btn btn-signin-social"><i class="fa fa-facebook-official facebook-color"></i> Sign in with Facebook</button>
+                    <button class="btn btn-signin-social"><i class="fa fa-facebook-official facebook-color"></i> Sign in with Facebook</button>--%>
                 </div>
             </div>
     </tiles:putAttribute>

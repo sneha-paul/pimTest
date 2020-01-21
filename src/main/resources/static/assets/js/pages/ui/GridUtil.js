@@ -271,6 +271,8 @@
                 actionUrl: options.actionUrl ? options.actionUrl : '',
                 searching: typeof options.searching === 'undefined' ?  true : options.searching,
                 toolbar: typeof options.toolbar === 'undefined' ? [] : options.toolbar,
+                hideActiveFilter: true === options.hideActiveFilter,
+                hideInactiveFilter: true === options.hideInactiveFilter,
                 showDiscontinueFilter: true === options.showDiscontinueFilter,
                 showArchiveFilter: true === options.showArchiveFilter,
                 pageLength: options.pageLength,

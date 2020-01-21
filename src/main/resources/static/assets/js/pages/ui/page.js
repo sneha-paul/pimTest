@@ -561,53 +561,66 @@
                         }
                     });
 
-
-                    let activeButton = $('<button class="btn btn-sm btn-success js-active-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Active Filter"><i class="icon-check"></i></button>')
-                        .click(function() {
-                            if($.getDataTableStatusOptions(options.selector) === '1000') {
-                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
-                            } else {
-                                $(this).toggleClass(['btn-outline-success', 'btn-success', 'js-active-on']);
-                                $searchButton.click();
-                            }
+                    if(typeof options.searching === 'undefined' || options.searching) {
+                        if (typeof options.hideActiveFilter === 'undefined' || !options.hideActiveFilter) {
+                            let activeButton = $('<button class="btn btn-sm btn-success js-active-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Active Filter"><i class="icon-check"></i></button>')
+                                .click(function () {
+                                    if ($.getDataTableStatusOptions(options.selector) === '1000') {
+                                        toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                                    } else {
+                                        $(this).toggleClass(['btn-outline-success', 'btn-success', 'js-active-on']);
+                                        $searchButton.click();
+                                    }
+                                });
+                            toolbar.push(activeButton);
+                        }
+                        if (typeof options.hideInactiveFilter === 'undefined' || !options.hideInactiveFilter) {
+                            let inactiveButton = $('<button class="btn btn-sm btn-danger js-inactive-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Inactive Filter"><i class="icon-close"></i></button>')
+                                .click(function () {
+                                    if ($.getDataTableStatusOptions(options.selector) === '0100') {
+                                        toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                                    } else {
+                                        $(this).toggleClass(['btn-outline-danger', 'btn-danger', 'js-inactive-on']);
+                                        $searchButton.click();
+                                    }
+                                });
+                            toolbar.push(inactiveButton);
+                        }
+                        if (options.showDiscontinueFilter) {
+                            let discontinuedButton = $('<button class="btn btn-sm btn-outline-warning" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
+                                .click(function () {
+                                    if ($.getDataTableStatusOptions(options.selector) === '0010') {
+                                        toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                                    } else {
+                                        $(this).toggleClass(['btn-outline-warning', 'btn-warning', 'js-discontinued-on']);
+                                        $searchButton.click();
+                                    }
+                                });
+                            toolbar.push(discontinuedButton);
+                        }
+                        if (options.showArchiveFilter) {
+                            let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="fa fa-file-archive-o"></i></button>')
+                                .click(function () {
+                                    if ($.getDataTableStatusOptions(options.selector) === '0001') {
+                                        toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
+                                    } else {
+                                        $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-archived-on']);
+                                        $searchButton.click();
+                                    }
+                                });
+                            toolbar.push(archivedButton);
+                        }
+                        $(options.selector + '_wrapper').find('.dt-buttons').append(toolbar);
+                        $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({
+                            container: 'body',
+                            placement: 'top',
+                            trigger: 'hover'
                         });
-                    toolbar.push(activeButton);
-                    let inactiveButton = $('<button class="btn btn-sm btn-danger js-inactive-on" data-toggle="tooltip" data-placement="top" title="" data-original-title="Inactive Filter"><i class="icon-close"></i></button>')
-                        .click(function() {
-                            if($.getDataTableStatusOptions(options.selector) === '0100') {
-                                toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
-                            } else {
-                                $(this).toggleClass(['btn-outline-danger', 'btn-danger', 'js-inactive-on']);
-                                $searchButton.click();
-                            }
-                        });
-                    toolbar.push(inactiveButton);
-                    if(options.showDiscontinueFilter) {
-                        let discontinuedButton = $('<button class="btn btn-sm btn-outline-warning" data-toggle="tooltip" data-placement="top" title="" data-original-title="Discontinued Filter"><i class="icon-ban"></i></button>')
-                            .click(function () {
-                                if ($.getDataTableStatusOptions(options.selector) === '0010') {
-                                    toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
-                                } else {
-                                    $(this).toggleClass(['btn-outline-warning', 'btn-warning', 'js-discontinued-on']);
-                                    $searchButton.click();
-                                }
-                            });
-                        toolbar.push(discontinuedButton);
                     }
-                    if(options.showArchiveFilter) {
-                        let archivedButton = $('<button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="" data-original-title="Archived Filter"><i class="fa fa-file-archive-o"></i></button>')
-                            .click(function () {
-                                if ($.getDataTableStatusOptions(options.selector) === '0001') {
-                                    toastr.warning('Sorry, this filter cannot be turned off, at lease one of the three status filters must be on', "Warning", {timeOut: 4000});
-                                } else {
-                                    $(this).toggleClass(['btn-outline-secondary', 'btn-warning', 'js-archived-on']);
-                                    $searchButton.click();
-                                }
-                            });
-                        toolbar.push(archivedButton);
-                    }
-                    $(options.selector + '_wrapper').find('.dt-buttons').append(toolbar);
-                    $(options.selector + '_wrapper').find('[data-toggle="tooltip"]').tooltip({ container: 'body',placement: 'top' , trigger : 'hover'});
+                    $(options.selector + '_wrapper').find('.dataTables_scrollHead, .dataTables_scrollBody').addClass('scrollHr');
+                    $(options.selector + '_wrapper').find('.scrollHr').scroll( function(){
+                        $(options.selector + '_wrapper .scrollHr').scrollLeft($(this).scrollLeft());
+                    });
                 },
                 ajax: {
                     data: function ( data ) {

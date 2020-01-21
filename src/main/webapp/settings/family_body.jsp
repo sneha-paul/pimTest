@@ -238,6 +238,8 @@
              names: ['familyAttributesScopes', 'familyAttributesScope'],
              dataUrl: $.getURL('/pim/families/{familyId}/attributes/data'),
              actionUrl: $.getURL('/pim/families/{familyId}/attributes'),
+             hideActiveFilter: true,
+             hideInactiveFilter: true,
              columns: columns
              });
 
