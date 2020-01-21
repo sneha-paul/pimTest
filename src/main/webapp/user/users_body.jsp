@@ -35,7 +35,7 @@
                 { data: 'userName', name : 'userName' , title : 'User Name'},
                 { data: 'externalId', name : 'externalId', title : 'Email Id' }
             ],
-            buttons: ['DETAILS', 'CHANGE_PASSWORD', 'TOGGLE_STATUS', 'ARCHIVED']
+            buttons: ['DETAILS', 'CHANGE_PASSWORD', 'TOGGLE_STATUS']
         });
         $.addModal({
             selector: '#js-create-users',
