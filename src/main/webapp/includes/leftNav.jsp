@@ -19,7 +19,7 @@
                     <li <c:if test="${active eq 'FAMILIES'}">class="active"</c:if>><a href="/pim/families"><i class="fa fa-shopping-basket"></i><span>Product Types</span></a></li>
                     <li <c:if test="${active eq 'PRICING_ATTRIBUTES'}">class="active"</c:if>><a href="/pim/pricingAttributes"><i class="fa fa-money"></i><span>Pricing Attributes</span></a></li>
                     <li <c:if test="${active eq 'EVENTS'}">class="active"</c:if>><a href="/pim/events"><i class="fa fa-chain-broken"></i><span>Events</span></a></li>
-                    <li <c:if test="${active eq 'JOBS'}">class="active"</c:if>><a href="/pim/jobs"><i class="fa fa-handshake-o"></i><span>Jobs</span></a></li>
+                    <%--<li <c:if test="${active eq 'JOBS'}">class="active"</c:if>><a href="/pim/jobs"><i class="fa fa-handshake-o"></i><span>Jobs</span></a></li>--%>
                 </ul>
             </li>
         </ul>
