@@ -146,9 +146,11 @@ body.dragging, body.dragging * {
     max-height:100%;
     max-width: 100%;
 }
-
+.dataTables_filter{
+    position: relative;
+}
 .dataTables_filter input {
-    padding-right:20px;
+    padding-right:4em;
 }
 
 .height35 {
@@ -163,7 +165,6 @@ body.dragging, body.dragging * {
 .scrollable-dt {
     overflow: hidden;
 }
-
 .scrollable-dt .dt-body .dataTables_scrollBody {
     max-height: calc(55vh + 50px) !important;
     min-height:calc(20vh + 10px) !important;
@@ -356,7 +357,7 @@ select[disabled="disabled"]::-ms-expand {
     border-bottom-left-radius: 0;
     position: absolute;
     right: 0;
-    top: 3px;
+    top: 0px;
 }
     .search-btn i{
         vertical-align: middle;
