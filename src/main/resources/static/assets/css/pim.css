@@ -759,14 +759,6 @@ body.overlay-open{
     background-color: #449cff;
     box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.4);
 }
-#left-sidebar:hover .user-account .dropdown,
-#left-sidebar:hover .sidebar-nav .metismenu>li a span,
-#left-sidebar:hover .sidebar-nav .metismenu>li.active ul.collapse.in> li a{
-    display: inline-block;
-    opacity: 1;
-    visibility: visible;
-}
-
 #left-sidebar:hover{
     width: 250px;
 }
@@ -781,10 +773,16 @@ body.overlay-open{
         #left-sidebar .user-account .dropdown,
         #left-sidebar .sidebar-nav .metismenu ul.collapse.in> a span,
         #left-sidebar .sidebar-nav .metismenu>li a span{
-            display: none;
             opacity: 0;
             visibility: hidden;
             color: #FFFFFF;
+            line-height: 25px;
+        }
+        #left-sidebar:hover .user-account .dropdown,
+        #left-sidebar:hover .sidebar-nav .metismenu>li a span,
+        #left-sidebar:hover .sidebar-nav .metismenu>li.active ul.collapse.in> li a{
+            opacity: 1;
+            visibility: visible;
         }
             #left-sidebar .sidebar-nav .metismenu>li a{
                 padding-right: 0;
