@@ -1,0 +1,368 @@
+.hidden {
+    display: none;
+}
+
+.caret-right:after {
+    font-family: "FontAwesome";
+    font-weight: 900;
+    margin: 0 10px;
+    color: inherit;
+    content: '\f0da';
+    position: relative;
+    top: 2px;
+}
+
+.border-main {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.icon-code:before {
+    font-family: "FontAwesome";
+    font-weight: 900;
+    margin: 0 10px;
+    color: inherit;
+    content: '\f121';
+}
+
+.icon-code-group:before {
+    font-family: "FontAwesome";
+    font-weight: 900;
+    margin: 0 10px;
+    color: inherit;
+    content: '\f126';
+}
+
+body {
+    font-family: "IBM Plex Sans", sans-serif;
+}
+
+/*.wrapper {
+    -webkit-user-select: none;
+    padding: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    min-width: 80%;
+}*/
+
+.query-builder-container {
+    min-height: 100vh;
+    margin: 20px 0;
+}
+
+.query-builder-container h1,
+.query-builder-container h2,
+.query-builder-container h3,
+.query-builder-container h4,
+.query-builder-container h5,
+.query-builder-container h6 {
+    text-transform: capitalize;
+    font-weight: 600;
+}
+
+.navbar {
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.navbar span {
+    position: absolute;
+    top: 15%;
+    right: 20px;
+    font-size: 18px;
+}
+
+.navbar span .fa-times {
+    color: red;
+    cursor: pointer;
+}
+
+.navbar span .fa-search {
+    color: #0066cc;
+    cursor: pointer;
+}
+
+.navbar .searchbar {
+    border: none;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    -webkit-transition: all 0.2s ease-in;
+    transition: all 0.2s ease-in;
+}
+
+.navbar .searchbar:focus {
+    border-bottom: 2px solid black;
+}
+
+.form-control:focus {
+    border-color: inherit;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.criteria-builder .criteria-group {
+    margin-bottom: 20px;
+    border-left: 3px solid;
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.criteria-builder .criteria-group .form-row:first-child .form-group:first-child {
+    display: none;
+}
+
+.criteria-builder .criteria-group a.condition {
+    font-size: 14px;
+    margin-right: 20px;
+}
+
+.criteria-builder .criteria-group a.condition:before {
+    display: inline-block;
+}
+
+.criteria-builder .criteria-group.zero {
+    border-color: transparent;
+}
+
+.criteria-builder .criteria-group.one {
+    border-color: #007bff;
+    background-color: #e6f2ff;
+}
+
+.criteria-builder .criteria-group.one a.condition {
+    color: #007bff;
+}
+
+.criteria-builder .criteria-group.two {
+    border-color: #ff5733;
+    background-color: #ffeae6;
+}
+
+.criteria-builder .criteria-group.two a.condition {
+    color: #ff5733;
+}
+
+.criteria-builder .criteria-group.three {
+    border-color: #186a3b;
+    background-color: #d5f5e3;
+}
+
+.criteria-builder .criteria-group.three a.condition {
+    color: #186a3b;
+}
+
+.criteria-builder .criteria-group.four {
+    border-color: #9a7d0a;
+    background-color: #fcf3cf;
+}
+
+.criteria-builder .criteria-group.four a.condition {
+    color: #9a7d0a;
+}
+
+.criteria-builder .criteria-group select {
+    text-transform: capitalize;
+    font-size: 12px;
+}
+
+.criteria-builder .criteria-group select.form-control:not([size]):not([multiple]) {
+    height: 2.2rem;
+}
+
+.criteria-builder .criteria-group input {
+    font-size: 14px;
+    height: 2.2rem;
+}
+
+.form-row input,
+.form-row select {
+    outline: 0;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.delete {
+    height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    color: #800000;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.logic {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background-color: #ffff;
+}
+
+.logic .form-group {
+    margin: 0;
+}
+
+.logic.one-two {
+    background: #e6f2ff;
+    background: -webkit-gradient(linear, left top, right top, color-stop(35%, #e6f2ff), to(#ffeae6));
+    background: linear-gradient(90deg, #e6f2ff 35%, #ffeae6 100%);
+}
+
+.logic.two-three {
+    background: #ffeae6;
+    background: -webkit-gradient(linear, left top, right top, color-stop(35%, rgba(255, 234, 230, 0.961222)), to(rgba(213, 245, 227, 0.95562)));
+    background: linear-gradient(90deg, rgba(255, 234, 230, 0.961222) 35%, rgba(213, 245, 227, 0.95562) 100%);
+}
+
+.logic.three-four {
+    background: #daf5e0;
+    background: -webkit-gradient(linear, left top, right top, color-stop(29%, #daf5e0), to(#fcf3cf));
+    background: linear-gradient(90deg, #daf5e0 29%, #fcf3cf 100%);
+}
+
+.logic select {
+    width: 100%;
+    text-align-last: center;
+}
+
+.logic span.right {
+    -webkit-transform: rotateZ(90deg);
+    transform: rotateZ(90deg);
+}
+
+code {
+    font-size: 14px;
+    padding: 30px;
+    background-color: #f8f9f9;
+    display: block;
+}
+
+code .group {
+    padding-left: 10px;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+code .group:before {
+    content: "(";
+}
+
+code .group:after {
+    content: ")";
+}
+
+code .field, code .condition, code .logical, code .value {
+    font-size: 14px;
+    font-family: "Fira Code", monospace;
+}
+
+code .field {
+    color: #3498db;
+}
+
+code .condition {
+    color: #7d6608;
+}
+
+code .logical {
+    color: #1b4f72;
+}
+
+.condition {
+    max-width: 110px;
+}
+
+.logical {
+    max-width: 80px;
+}
+
+.form-group {
+    margin-bottom: 0.5rem;
+}
+
+.switch {
+    position: relative;
+    height: 20px;
+    width: 80px;
+    margin: 0px 5px;
+    background: #fff;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 10px 6px -6px #777;
+    box-shadow: 0 10px 6px -6px #777;
+}
+
+.switch-label {
+    position: relative;
+    z-index: 2;
+    float: left;
+    width: 39px;
+    line-height: 18px;
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+}
+
+.switch-label:active {
+    font-weight: bold;
+}
+
+.switch-label-and {
+    padding-left: 2px;
+}
+
+.switch-label-or {
+    padding-right: 2px;
+}
+
+.switch-input {
+    display: none;
+}
+
+.switch-input:checked + .switch-label {
+    font-weight: bold;
+    color: #fff;
+    -webkit-transition: 0.15s ease-out;
+    transition: 0.15s ease-out;
+    -webkit-transition-property: color, text-shadow;
+    transition-property: color, text-shadow;
+}
+
+.switch-input:checked + .switch-label-or ~ .switch-selection {
+    left: 38px;
+    /* Note: left: 50%; doesn't transition in WebKit */
+}
+
+.switch-selection {
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    left: 0px;
+    display: block;
+    width: 40px;
+    height: 18px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: #800000;
+    -webkit-transition: left 0.15s ease-out;
+    transition: left 0.15s ease-out;
+}

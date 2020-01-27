@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/color_skins.css">
     <link rel="stylesheet" href="/assets/css/pim.css">
+    <link rel="stylesheet" href="/assets/css/CriteriaBuilder.css">
     <%-- PAGE LEVEL CSS --%>
     <c:forEach var="pageCss" items="${pageStyles}">
         <link type="text/css" rel="stylesheet" media="all" href='<c:out value="${pageCss}"/>'>
@@ -51,6 +52,7 @@
     <script src="/assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
     <script src="/assets/vendor/gijgo/js/gijgo.min.js" type="text/javascript"></script>
     <script src="/assets/js/pages/ui/page.js"></script>
+    <script src="/assets/js/pages/ui/CriteriaBuilder.js"></script>
     <script src="/assets/vendor/jquery-datatable/jquery.dataTables.min.js"></script>
     <script src="/assets/js/pages/ui/GridUtil.js"></script>
     <script src="/assets/vendor/jquery/jquery-sortable.js"></script>
