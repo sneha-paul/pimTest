@@ -13,22 +13,13 @@
                 <form method="post" action="/pim/configs" data-method="POST" data-success-message='["Successfully created the config", "Config Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                     <div class="row">
                         <div class="col-md-6 col-sm-12">
-                            <div class="form-group js-external-id">
-                                <label>Parameter Name</label>
-                                <input type="text" name="parameterName" class="form-control" />
+                            <div class="form-group js-name">
+                                <label>Config Name</label>
+                                <input type="text" name="configName" class="form-control" />
                             </div>
                             <div class="form-group js-external-id">
-                                <label>Parameter ID</label>
+                                <label>Config ID</label>
                                 <input type="text" name="configId" class="form-control" />
-                            </div>
-
-                            <div class="form-group">
-                                <label>Parameter Value</label>
-                                <input type="text" name="parameterValue" class="form-control" />
-                            </div>
-                            <div class="form-group">
-                                <label>Parameter Label</label>
-                                <input type="text" name="parameterLabel" class="form-control" />
                             </div>
                         </div>
                     </div>

@@ -30,7 +30,7 @@
             pageUrl: '/pim/configs/',
             dataUrl: '/pim/configs/data',
             columns: [
-                { data: 'parameterValue', name : 'parameterValue' , title : 'Config Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + '<small>';}},
+                { data: 'configName', name : 'configName' , title : 'Config Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + '<small>';}},
                 { data: 'externalId', name : 'externalId', title : 'Config ID' }
             ],
 

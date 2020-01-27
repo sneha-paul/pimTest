@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/color_skins.css">
     <link rel="stylesheet" href="/assets/css/pim.css">
-    <link rel="stylesheet" href="/assets/css/CriteriaBuilder.css">
+<%--    <link rel="stylesheet" href="/assets/css/CriteriaBuilder.css">--%>
     <%-- PAGE LEVEL CSS --%>
     <c:forEach var="pageCss" items="${pageStyles}">
         <link type="text/css" rel="stylesheet" media="all" href='<c:out value="${pageCss}"/>'>

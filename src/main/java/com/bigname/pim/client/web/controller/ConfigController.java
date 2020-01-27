@@ -3,6 +3,7 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.pim.core.domain.Config;
 import com.bigname.pim.core.service.ConfigService;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
+import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,5 +84,26 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         model.put("active", "CONFIG");
         return new ModelAndView("config/configs", model);
     }
+
+    @RequestMapping(value = "/data")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public Result<Map<String, String>> all(HttpServletRequest request) {
+        return super.all(request, "configName");
+    }
+
+    /*@RequestMapping("/{id}/params/data")
+    @ResponseBody
+    public Result<Map<String, Object>> getConfigParams(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return getAssociationGridData(request,
+                WebsiteCatalog.class,
+                dataTableRequest -> {
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return websiteService.getWebsiteCatalogs(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
+                    } else {
+                        return websiteService.findAllWebsiteCatalogs(ID.EXTERNAL_ID(id), "catalogName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    }
+                });
+    }*/
 
 }
