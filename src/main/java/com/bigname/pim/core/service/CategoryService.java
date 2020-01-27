@@ -132,5 +132,13 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
     void archiveCategoryAssociations(ID<String> categoryId, Archive archived, Category category);
 
     List<RelatedCategory> getAll();
+
+    void addParentCategory(ID<String> categoryId, ID<String> productId);
+
+    Page<Map<String, Object>> getAllParentCategoryProducts(ID<String> categoryId, Pageable pageable, boolean... activeRequired);
+
+    boolean toggleParentCategoryProduct(ID<String> categoryId, ID<String> productId, Toggle active);
+
+    boolean setAllParentCategoryProductsSequence(ID<String> categoryId, ID<String> sourceId, ID<String> destinationId);
 }
 

@@ -22,10 +22,11 @@ $( document ).ready(function() {
             buttons: [$.addItemButton({action: addProduct})]
         });
     }, 200);
+
     function addProduct(row) {
         $.ajax({
             url: $.getURL('/pim/categories/{categoryId}/products/{productId}', {'productId': row.externalId}),
-            data: {},
+            data: {parentId: "ACCESSORIES"},
             method: 'POST',
             dataType: 'json'
         }).done(function(data) {

@@ -1,11 +1,7 @@
 package com.bigname.pim.core.service.impl;
 
 import com.bigname.pim.core.domain.*;
-import com.bigname.pim.core.persistence.dao.mongo.CategoryProductDAO;
-import com.bigname.pim.core.persistence.dao.mongo.ProductCategoryDAO;
-import com.bigname.pim.core.persistence.dao.mongo.RelatedCategoryDAO;
-import com.bigname.pim.core.persistence.dao.mongo.RootCategoryDAO;
-import com.bigname.pim.core.persistence.dao.mongo.CategoryDAO;
+import com.bigname.pim.core.persistence.dao.mongo.*;
 import com.bigname.pim.core.service.CategoryService;
 import com.bigname.pim.core.service.ProductService;
 import com.bigname.pim.core.util.PIMConstants;
@@ -41,9 +37,10 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     private CategoryProductDAO categoryProductDAO;
     private ProductService productService;
     private RootCategoryDAO rootCategoryDAO;
+    private ParentCategoryProductDAO parentCategoryProductDAO;
 
     @Autowired
-    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductCategoryDAO productCategoryDAO, ProductService productService, RootCategoryDAO rootCategoryDAO) {
+    public CategoryServiceImpl(CategoryDAO categoryDAO, Validator validator, RelatedCategoryDAO relatedCategoryDAO, CategoryProductDAO categoryProductDAO, ProductCategoryDAO productCategoryDAO, ProductService productService, RootCategoryDAO rootCategoryDAO, ParentCategoryProductDAO parentCategoryProductDAO) {
         super(categoryDAO, "category", validator);
         this.categoryDAO = categoryDAO;
         this.relatedCategoryDAO = relatedCategoryDAO;
@@ -51,6 +48,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         this.productCategoryDAO = productCategoryDAO;
         this.productService = productService;
         this.rootCategoryDAO = rootCategoryDAO;
+        this.parentCategoryProductDAO = parentCategoryProductDAO;
     }
 
     @Override
@@ -621,5 +619,103 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public List<RelatedCategory> getAll() {
         return relatedCategoryDAO.findAll();
+    }
+
+    @Override
+    public void addParentCategory(ID<String> categoryId, ID<String> productId) {
+        Optional<Category> category = get(categoryId, false);
+        if(category.isPresent()) {
+            Optional<Product> product = productService.get(productId, false);
+            if(product.isPresent()) {
+                Optional<ParentCategoryProduct> top2 = parentCategoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
+                parentCategoryProductDAO.save(new ParentCategoryProduct(getInternalId(categoryId).getId().toString(), product.get().getId(), top2.map(parentCategoryProduct -> parentCategoryProduct.getSubSequenceNum() + 1).orElse(0)));
+            }
+        }
+    }
+
+    @Override
+    public Page<Map<String, Object>> getAllParentCategoryProducts(ID<String> categoryId, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
+                .map(category -> categoryDAO.getAllParentCategoryProducts(category.getId(), pageable, activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
+    public boolean setAllParentCategoryProductsSequence(ID<String> categoryId, ID<String> sourceId, ID<String> destinationId) {
+        List<ID<String>> ids = new ArrayList<>();
+        ids.add(sourceId);
+        ids.add(destinationId);
+        return get(categoryId, false)
+                .map(category -> {
+
+                    // Get the product instances corresponding to the source and destination ids and store in to a map with productId as the key
+                    Map<String, Product> productsMap = productService.getAll(ids, null, false)
+                            .stream().collect(Collectors.toMap(Product::getProductId, product -> product));
+
+                    // Get a list of internal product ids of both source and destination products
+                    List<String> categoryProductIds = productsMap.entrySet().stream().map(entry -> entry.getValue().getId()).collect(Collectors.toList());
+
+
+                    Map<String, ParentCategoryProduct> categoryProductsMap = parentCategoryProductDAO.findByCategoryIdAndProductIdIn(category.getId(), categoryProductIds.toArray(new String[0]))
+                            .stream().collect(Collectors.toMap(ParentCategoryProduct::getProductId, categoryProduct -> categoryProduct));
+
+                    ParentCategoryProduct source = categoryProductsMap.get(productsMap.get(sourceId.getId()).getId());
+                    ParentCategoryProduct destination = categoryProductsMap.get(productsMap.get(destinationId.getId()).getId());
+
+                    PIMConstants.ReorderingDirection direction = DOWN;
+                    if(source.getSequenceNum() > destination.getSequenceNum() ||
+                            (source.getSequenceNum() == destination.getSequenceNum() && source.getSubSequenceNum() <= destination.getSubSequenceNum())) {
+                        direction = UP;
+                    }
+                    List<ParentCategoryProduct> modifiedcategoryProducts = new ArrayList<>();
+                    if(direction == DOWN) {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum());
+                        modifiedcategoryProducts.add(source);
+                        destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        modifiedcategoryProducts.add(destination);
+                        modifiedcategoryProducts.addAll(rearrangeOtherParentCategoryProducts(category.getId(), source, destination, direction));
+                    } else {
+                        source.setSequenceNum(destination.getSequenceNum());
+                        source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        modifiedcategoryProducts.add(source);
+                        modifiedcategoryProducts.addAll(rearrangeOtherParentCategoryProducts(category.getId(), source, destination, direction));
+                    }
+                    parentCategoryProductDAO.saveAll(modifiedcategoryProducts);
+                    return true;
+                }).orElse(false);
+    }
+
+    private List<ParentCategoryProduct> rearrangeOtherParentCategoryProducts(String internalCategoryId, ParentCategoryProduct source, CategoryProduct destination, PIMConstants.ReorderingDirection direction) {
+        List<ParentCategoryProduct> adjustedCategoryProducts = new ArrayList<>();
+        List<ParentCategoryProduct> categoryProducts = parentCategoryProductDAO.findByCategoryIdAndSequenceNumAndSubSequenceNumGreaterThanEqualOrderBySubSequenceNumAsc(internalCategoryId, destination.getSequenceNum(), direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum());
+        int subSequenceNum = direction == DOWN ? destination.getSubSequenceNum() : source.getSubSequenceNum();
+        for(ParentCategoryProduct categoryProduct : categoryProducts) {
+            if(categoryProduct.getProductId().equals(source.getProductId()) || categoryProduct.getProductId().equals(destination.getProductId())) {
+                continue;
+            }
+            if(categoryProduct.getSubSequenceNum() == subSequenceNum) {
+                categoryProduct.setSubSequenceNum(++subSequenceNum);
+                adjustedCategoryProducts.add(categoryProduct);
+            } else {
+                break;
+            }
+        }
+        return adjustedCategoryProducts;
+    }
+
+    @Override
+    public boolean toggleParentCategoryProduct(ID<String> categoryId, ID<String> productId, Toggle active) {
+        return get(categoryId, false)
+                .map(category -> productService.get(productId, false)
+                        .map(product -> parentCategoryProductDAO.findFirstByCategoryIdAndProductId(category.getId(), product.getId())
+                                .map(parentCategoryProduct -> {
+                                    parentCategoryProduct.setActive(active.state());
+                                    parentCategoryProductDAO.save(parentCategoryProduct);
+                                    return true;
+                                })
+                                .orElse(false))
+                        .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id: " + productId)))
+                .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + categoryId));
     }
 }

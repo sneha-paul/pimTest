@@ -1,5 +1,6 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.pim.core.data.exportor.CategoryExporter;
 import com.bigname.pim.core.domain.Category;
 import com.bigname.pim.core.domain.CategoryProduct;
 import com.bigname.pim.core.domain.RelatedCategory;
@@ -7,7 +8,6 @@ import com.bigname.pim.core.service.CatalogService;
 import com.bigname.pim.core.service.CategoryService;
 import com.bigname.pim.core.service.WebsiteService;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
-import com.bigname.pim.core.data.exportor.CategoryExporter;
 import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
@@ -277,9 +277,10 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     @ResponseBody
     @RequestMapping(value = "/{id}/products/{productId}", method = RequestMethod.POST)
-    public Map<String, Object> addProduct(@PathVariable(value = "id") String id, @PathVariable(value = "productId") String productId) {
+    public Map<String, Object> addProduct(@PathVariable(value = "id") String id, @PathVariable(value = "productId") String productId, HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
         boolean success = categoryService.addProduct(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(productId)) != null;
+        categoryService.addParentCategory(ID.EXTERNAL_ID(request.getParameter("parentId")), ID.EXTERNAL_ID(productId));
         model.put("success", success);
         return model;
     }
@@ -363,6 +364,39 @@ public class CategoryController extends BaseController<Category, CategoryService
             }
         });
         return super.details(categoryId, model);
+    }
+
+    @RequestMapping("/{id}/allProducts/data")
+    @ResponseBody
+    public Result<Map<String, Object>> getAllParentCategoryProducts(@PathVariable(value = "id") String id, HttpServletRequest request) {
+        return getAssociationGridData(request,
+                CategoryProduct.class,
+                dataTableRequest -> {
+                    if(isEmpty(dataTableRequest.getSearch())) {
+                        return categoryService.getAllParentCategoryProducts(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
+                    } else {
+                        return categoryService.findAllCategoryProducts(ID.EXTERNAL_ID(id), "productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                    }
+                });
+    }
+
+    @RequestMapping(value = "/{id}/allProducts/data", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> setAllParentCategoryProductsSequence(@PathVariable(value = "id") String id, @RequestParam Map<String, String> parameterMap) {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = categoryService.setAllParentCategoryProductsSequence(ID.EXTERNAL_ID(id), ID.EXTERNAL_ID(parameterMap.get("sourceId")), ID.EXTERNAL_ID(parameterMap.get("destinationId")));
+        model.put("success", success);
+        return model;
+    }
+
+    @RequestMapping(value = "/{id}/allProducts/{productId}/active/{active}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> toggleParentCategoryProduct(@PathVariable(value = "id") String categoryId,
+                                             @PathVariable(value = "productId") String productId,
+                                             @PathVariable(value = "active") String active) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("success", categoryService.toggleParentCategoryProduct(ID.EXTERNAL_ID(categoryId), ID.EXTERNAL_ID(productId), Toggle.get(active)));
+        return model;
     }
 
 }

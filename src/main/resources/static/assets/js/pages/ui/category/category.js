@@ -196,4 +196,58 @@ $(function(){
         });
         $(this).removeClass('js-categoryHistory-tab').off('shown.bs.tab.categoryHistory');
     });
+
+    $('.js-allProducts-tab').on('shown.bs.tab.allProducts', function (e){
+        $.initAssociationsGrid({
+            selector: '#paginatedAllProductsSortableTable',
+            names: ['allProductsSortable', 'product'],
+            pageUrl: $.getURL('/pim/products/'),
+            dataUrl: $.getURL('/pim/categories/{categoryId}/allProducts/data'),
+            toggleUrl: '/pim/categories/{categoryId}/allProducts/{externalId}/active/{active}',
+            urlParams: urlParams1,
+            reordering: false,
+            columns: [
+                { data: 'sequenceNum', name : 'sequenceNum', visible: false },
+                { data: 'productName', name : 'productName' , title : 'Parent Product Name', width: '35%', render: function ( data, type, row, meta ) {
+                        let imgUrl = row.imageName === 'noimage.png' ? '/assets/img/' + row.imageName : '/uploads/' + row.imageName;
+                        return '<div class="grid-image-holder pull-left rounded"><img  src="' + imgUrl + '" data-toggle="' + data + '" data-placement="top" title="" alt="" class="grid-main-img rounded"></div><div class="pull-left"><h6>' + data + '</h6><small>' + row.externalId + '<small></div>'}},
+                { data: 'externalId', name : 'externalId', title : 'Parent Product ID' }
+            ]
+        });
+        $(this).removeClass('js-allProducts-tab').off('shown.bs.tab.allProducts');
+    });
+
+    $.initAssociationsGrid({
+        selector: '#paginatedAllProductsReorderableTable',
+        names: ['allProductsReorderable', 'product'],
+        pageUrl: $.getURL('/pim/products/'),
+        dataUrl: $.getURL('/pim/categories/{categoryId}/allProducts/data'),
+        toggleUrl: '/pim/categories/{categoryId}/allProducts/{externalId}/active/{active}',
+        urlParams: urlParams1,
+        reordering: true,
+        columns: [
+            { data: 'sequenceNum', name : 'sequenceNum' , title : 'Seq #', className: 'js-handle' },
+            { data: 'productName', name : 'productName' , title : 'Parent Product Name'},
+            { data: 'externalId', name : 'externalId', title : 'Parent Product ID' }
+        ]
+    });
+
+    $('.js-sorting-mode.allProducts').on('click', function() {
+        if(!$(this).hasClass('selected')) {
+            $.refreshDataTable('allProductsSortable');
+            $('a.nav-link[href*="allProductsSortable"]').trigger('click');
+            $(this).parent().find('.js-reordering-mode.allProducts').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+        }
+
+    });
+
+    $('.js-reordering-mode.allProducts').on('click', function() {
+        if(!$(this).hasClass('selected')) {
+            $.refreshDataTable('allProductsReorderable');
+            $('a.nav-link[href*="allProductsReorderable"]').trigger('click');
+            $(this).parent().find('.js-sorting-mode.allProducts').removeClass('selected btn-secondary').addClass('btn-outline-secondary');
+            $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
+        }
+    });
 });
