@@ -34,4 +34,6 @@ public interface CategoryRepository extends GenericRepository<Category, Criteria
     Page<Product> findAvailableProductsForCategory(String categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
     Page<Map<String, Object>> getAllParentCategoryProducts(String categoryId, Pageable pageable, boolean... activeRequired);
+
+    Page<Map<String, Object>> findAllParentCategoryProducts(String categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 }

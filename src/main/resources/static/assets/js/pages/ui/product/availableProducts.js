@@ -26,7 +26,7 @@ $( document ).ready(function() {
     function addProduct(row) {
         $.ajax({
             url: $.getURL('/pim/categories/{categoryId}/products/{productId}', {'productId': row.externalId}),
-            data: {parentId: "ACCESSORIES"},
+            data: {parentId: $.getPageAttribute('parentId')},
             method: 'POST',
             dataType: 'json'
         }).done(function(data) {

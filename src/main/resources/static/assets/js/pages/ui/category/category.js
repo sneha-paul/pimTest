@@ -250,4 +250,24 @@ $(function(){
             $(this).removeClass('btn-outline-secondary').addClass('selected btn-secondary');
         }
     });
+
+    $('.js-sync').on('click', function() {
+        $.ajax({
+            url: $.getURL('/pim/categories/{categoryId}/syncProducts'),
+            data: {},
+            method: 'POST',
+            dataType: 'json'
+        }).done(function(data) {
+            if(data.success === true) {
+                $.reloadDataTable('paginatedAllProductsReorderableTable');
+                $.reloadDataTable('paginatedAllProductsSortableTable');
+                toastr.success('Successfully added products', 'Products Added');
+            } else {
+                toastr.error('Error occurred while adding the products', 'Error Adding Products');
+            }
+        }).fail(function(jqXHR, status) {
+            toastr.error('Error occurred while adding the products', 'Error Adding Products');
+        });
+    });
+
 });

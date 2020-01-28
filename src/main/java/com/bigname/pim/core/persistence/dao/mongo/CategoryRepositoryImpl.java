@@ -480,4 +480,52 @@ public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category, Crit
                 pageable,
                 () -> mongoTemplate.count(new Query().addCriteria(Criteria.where("categoryId").is(categoryId)), CategoryProduct.class));
     }
+
+    @Override
+    public Page<Map<String, Object>> findAllParentCategoryProducts(String categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        Sort sort = pageable.getSort();
+        SortOperation sortOperation;
+        if(sort == null) {
+            sortOperation = sort(Sort.Direction.ASC, "sequenceNum").and(Sort.Direction.DESC, "subSequenceNum");
+        } else {
+            Sort.Order order = sort.iterator().next();
+            sortOperation = sort(order.getDirection(), order.getProperty());
+        }
+        LookupOperation lookupOperation = LookupOperation.newLookup()
+                .from("product")
+                .localField("productId")
+                .foreignField("_id")
+                .as("parentCategoryProduct");
+
+        keyword = "(?i)" + keyword;
+        Criteria searchCriteria = new Criteria();
+        searchCriteria.orOperator(Criteria.where("externalId").regex(keyword), Criteria.where(searchField).regex(keyword));
+        searchCriteria.andOperator(Criteria.where("active").in(Arrays.asList(PlatformUtil.getActiveOptions(activeRequired))));
+
+        Aggregation aggregation = newAggregation(
+                match(Criteria.where("categoryId").is(categoryId)),
+                lookupOperation,
+                replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(parentCategoryProduct, 0)")).mergeWith(ROOT)),
+                project().andExclude("description", "parentCategoryProduct"),
+                match(searchCriteria)
+        );
+
+        //TODO - need to find an option to get the total count along with the paginated result, instead of running two separate aggregation queries
+        long totalCount = mongoTemplate.aggregate(aggregation, "categoryProduct", Map.class).getMappedResults().size();
+
+        aggregation = newAggregation(
+                match(Criteria.where("categoryId").is(categoryId)),
+                lookupOperation,
+                replaceRoot().withValueOf(ObjectOperators.valueOf(AggregationSpELExpression.expressionOf("arrayElemAt(parentCategoryProduct, 0)")).mergeWith(ROOT)),
+                project().andExclude("description", "parentCategoryProduct"),
+                match(searchCriteria),
+                sortOperation,
+                skip(pageable.getOffset()),
+                limit((long) pageable.getPageSize())
+        );
+
+        List<Map<String, Object>> results = mongoTemplate.aggregate(aggregation, "parentCategoryProduct", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList());
+
+        return new PageImpl<>(results, pageable, totalCount);
+    }
 }

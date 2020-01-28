@@ -375,7 +375,7 @@ public class CategoryController extends BaseController<Category, CategoryService
                     if(isEmpty(dataTableRequest.getSearch())) {
                         return categoryService.getAllParentCategoryProducts(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
                     } else {
-                        return categoryService.findAllCategoryProducts(ID.EXTERNAL_ID(id), "productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
+                        return categoryService.findAllParentCategoryProducts(ID.EXTERNAL_ID(id), "productName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
                 });
     }
@@ -398,5 +398,16 @@ public class CategoryController extends BaseController<Category, CategoryService
         model.put("success", categoryService.toggleParentCategoryProduct(ID.EXTERNAL_ID(categoryId), ID.EXTERNAL_ID(productId), Toggle.get(active)));
         return model;
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/{id}/syncProducts", method = RequestMethod.POST)
+    public Map<String, Object> syncAllParentCategoryProducts(@PathVariable(value = "id") String categoryId, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Map<String, Object> model = new HashMap<>();
+        boolean success = categoryService.syncAllParentCategoryProducts(categoryId, dataTableRequest.getPageRequest(associationSortPredicate));
+        model.put("success", success);
+        return model;
+    }
+
 
 }

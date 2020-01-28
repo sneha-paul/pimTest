@@ -7,6 +7,7 @@ import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -140,5 +141,9 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
     boolean toggleParentCategoryProduct(ID<String> categoryId, ID<String> productId, Toggle active);
 
     boolean setAllParentCategoryProductsSequence(ID<String> categoryId, ID<String> sourceId, ID<String> destinationId);
+
+    Page<Map<String, Object>> findAllParentCategoryProducts(ID<String> categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
+
+    boolean syncAllParentCategoryProducts(String categoryId, Pageable pageable);
 }
 

@@ -6,6 +6,7 @@ import com.bigname.pim.core.service.CategoryService;
 import com.bigname.pim.core.service.ProductService;
 import com.bigname.pim.core.util.PIMConstants;
 import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.EntityAssociation;
@@ -232,7 +233,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         }
     }
 
-     /**
+    /**
      * Method to get available subCategories of a category in paginated format.
      *
      * @param categoryId Internal or External id of the Category
@@ -717,5 +718,49 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                                 .orElse(false))
                         .orElseThrow(() -> new EntityNotFoundException("Unable to find product with id: " + productId)))
                 .orElseThrow(() -> new EntityNotFoundException("Unable to find category with id: " + categoryId));
+    }
+
+    @Override
+    public Page<Map<String, Object>> findAllParentCategoryProducts(ID<String> categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired) {
+        return get(categoryId, false)
+                .map(product -> categoryDAO.findAllParentCategoryProducts(product.getId(), searchField, keyword, pageable, activeRequired))
+                .orElse(new PageImpl<>(new ArrayList<>()));
+    }
+
+    @Override
+    public boolean syncAllParentCategoryProducts(String categoryId, Pageable pageable) {
+        List<Map<String, Object>> categoryList = getSubCategories(ID.EXTERNAL_ID(categoryId), pageable, false).getContent();
+        List<String> productIds = new ArrayList<>();
+        categoryList.forEach(category -> {
+            List<CategoryProduct> categoryProductList = getAllCategoryProducts(ID.EXTERNAL_ID(String.valueOf(category.get("externalId"))));
+            categoryProductList.forEach(categoryProduct -> {
+                productIds.add(categoryProduct.getProductId());
+            });
+        });
+
+        List<String> parentCatProductIds = new ArrayList<>();
+        ID<String> internalId = getInternalId(ID.EXTERNAL_ID(categoryId));
+        List<ParentCategoryProduct> parentCategoryProductList = parentCategoryProductDAO.findByCategoryIdAndProductIdIn(internalId.getId(), productIds.toArray(new String[0]));
+        parentCategoryProductList.forEach(parentCategoryProduct -> {
+            parentCatProductIds.add(parentCategoryProduct.getProductId());
+        });
+
+        productIds.removeAll(parentCatProductIds);
+        List<String> finalProductIds = new ArrayList<>();
+        for(String str : productIds) {
+            if(!finalProductIds.contains(str)) {
+                finalProductIds.add(str);
+            }
+        }
+        finalProductIds.forEach(productId -> {
+            ParentCategoryProduct _parentCategoryProduct = new ParentCategoryProduct();
+            _parentCategoryProduct.setCategoryId(internalId.getId());
+            _parentCategoryProduct.setProductId(productId);
+            _parentCategoryProduct.setSequenceNum(0);
+            _parentCategoryProduct.setSubSequenceNum(0);
+            _parentCategoryProduct.setActive("Y");
+            parentCategoryProductDAO.save(_parentCategoryProduct);
+        });
+        return true;
     }
 }
