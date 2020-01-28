@@ -14,7 +14,6 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.common.util.StringUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
-import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
@@ -26,7 +25,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
 import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
@@ -62,26 +60,11 @@ public class AttributeCollectionController extends BaseController<AttributeColle
         model.put("mode", id == null ? "CREATE" : "DETAILS");
         model.put("view", "settings/attributeCollection" + (reload ? "_body" : ""));
 
-        if(id == null) {
-            return super.details(model);
-        } else {
-            AttributeCollection attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(id), false).orElse(null);
-            if(isNotEmpty(attributeCollection)) {
-                model.put("attributeCollection", attributeCollection);
-            } else if(isEmpty(attributeCollection)) {
-                attributeCollection = attributeCollectionService.get(ID.EXTERNAL_ID(id), false, false, false, true).orElse(null);
-                model.put("attributeCollection", attributeCollection);
-            } else {
-                throw new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id);
-            }
-            return super.details(id, model);
-        }
-
-        /*return id == null ? super.details(model) : attributeCollectionService.get(ID.EXTERNAL_ID(id), false)
+        return id == null ? super.details(model) : attributeCollectionService.get(ID.EXTERNAL_ID(id), false)
                 .map(attributeCollection -> {
                     model.put("attributeCollection", attributeCollection);
                     return super.details(id, model);
-                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));*/
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + id));
     }
 
     /**
@@ -354,13 +337,5 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                     }
                     return model;
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
-    }
-
-    @RequestMapping(value = "/{collectionId}/attributeCollections/archive/{archived}", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> archive(@PathVariable(value = "collectionId") String collectionId, @PathVariable(value = "archived") String archived) {
-        Map<String, Object> model = new HashMap<>();
-        model.put("success", attributeCollectionService.archive(ID.EXTERNAL_ID(collectionId), Archive.get(archived)));
-        return model;
     }
 }

@@ -27,7 +27,6 @@
             names: ['attributeCollections','attributeCollection'],
             pageUrl: '/pim/attributeCollections/',
             dataUrl: '/pim/attributeCollections/data',
-            archiveUrl:'/pim/attributeCollections/{externalId}/attributeCollections/archive/{archived}',
             columns: [
                 { data: 'externalId', name : 'externalId', title : 'Collection ID' },
                 { data: 'collectionName', name : 'collectionName' , title : 'Collection Name'}

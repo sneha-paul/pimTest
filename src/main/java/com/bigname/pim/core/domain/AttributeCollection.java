@@ -255,7 +255,6 @@ public class AttributeCollection extends MongoEntity<AttributeCollection> {
         map.put("externalId", getExternalId());
         map.put("collectionName", getCollectionName());
         map.put("active", getActive());
-        map.put("archived", getArchived());
         return map;
     }
 
