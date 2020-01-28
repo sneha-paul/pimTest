@@ -682,9 +682,9 @@ div#main-content {
     min-height:calc(100vh - 67px);
 }
 .overlay{
-    opacity: .32;
-    -webkit-transition: all .9s;
-    transition: all .6s;
+    opacity: 0;
+    -webkit-transition: opacity 1s;
+    transition: opacity 1s;
     background: black;
     bottom: 0;
     left: 0;
@@ -715,6 +715,8 @@ div#main-content {
 .overlay-open .overlay{
     opacity: .32;
     visibility: visible;
+    -webkit-transition: opacity 1s;
+    transition: opacity 1s;
 }
 body.overlay-open{
     overflow-x: hidden;
