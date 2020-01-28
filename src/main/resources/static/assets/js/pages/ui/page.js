@@ -1310,6 +1310,9 @@
                 }
             };
             eModal.ajax(Object.assign({},defaultOptions, options));
+            setTimeout(function () {
+                $('.modal-content').draggable({ handle:'.modal-header'});
+            },1000);
         },
         closeModal: function() {
             $('.js-eModal-close').trigger('click');

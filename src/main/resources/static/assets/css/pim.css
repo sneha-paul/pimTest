@@ -12,7 +12,9 @@ body.dragging, body.dragging * {
     margin:1rem !important;
     /*padding:0!important;*/
 }
-
+.modal-header{
+    cursor: move;
+}
 .dt-clear {
     position: absolute;
     right: 44px;
@@ -681,7 +683,8 @@ div#main-content {
 }
 .overlay{
     opacity: .32;
-    transition: all .4s;
+    -webkit-transition: all .9s;
+    transition: all .6s;
     background: black;
     bottom: 0;
     left: 0;
@@ -692,7 +695,7 @@ div#main-content {
     z-index: 99;
 }
 .overlay-sheet{
-    transition: transform .4s;
+    transition: transform 1s;
     background: #ffffff;
     bottom: 0;
     right: 0;
@@ -765,8 +768,6 @@ body.overlay-open{
 }
     #left-sidebar .user-account {
         margin: 10px 0px 10px 10px;
-        display: flex;
-        width: 200px;
     }
         #left-sidebar .sidebar-nav .metismenu > li{
             flex: auto;

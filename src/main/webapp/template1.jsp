@@ -33,6 +33,7 @@
     <link rel="stylesheet" type="text/css" href="/assets/vendor/dropzone/css/dropzone.css">
     <link rel="stylesheet" type="text/css" href="/assets/vendor/gijgo/css/gijgo.min.css" />
     <link rel="stylesheet" type="text/css" href="/assets/vendor/handsontable/handsontable.full.min.css"  media="screen">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css" />
     <%-- MAIN CSS --%>
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/color_skins.css">
@@ -44,6 +45,7 @@
     </c:forEach>
     <script src="/assets/vendor/jquery/jquery-3.3.1.min.js"></script>
     <script src="/assets/vendor/underscore/underscore-min.js"></script>
+
     <script src="/assets/vendor/bootstrap/js/popper.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.2/dist/sweetalert2.all.min.js"></script>
@@ -135,6 +137,7 @@
 <script src="/assets/vendor/table-dragger/table-dragger.min.js"></script>
 <script src="/assets/vendor/emodal/eModal.js"></script>
 <script src="/assets/vendor/light-gallery/js/lightgallery-all.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
 <%-- PAGE LEVEL JS --%>
 <c:forEach var="customJS" items="${pageBottomScripts}">
     <script src="<c:out value='${customJS}'/>"></script>
