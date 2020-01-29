@@ -77,4 +77,6 @@ public interface CatalogService extends BaseService<Catalog, CatalogDAO> {
     void updateWebsiteCatalog(WebsiteCatalog websiteCatalog);
 
     void archiveCatalogAssociations(ID<String> catalogId, Archive archived, Catalog catalog);
+
+    List<RootCategory> loadRootCategoryToBOS();
 }

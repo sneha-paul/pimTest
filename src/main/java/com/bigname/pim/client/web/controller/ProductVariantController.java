@@ -1,6 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.core.domain.*;
+import com.bigname.pim.core.persistence.dao.mongo.ProductVariantDAO;
 import com.bigname.pim.core.service.*;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.bigname.pim.core.util.PIMConstants;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +64,8 @@ public class ProductVariantController extends ControllerSupport {
 
     private VirtualFileService assetService;
 
+    private RestTemplate restTemplate;
+
     public ProductVariantController( ProductVariantService productVariantService,
                                      ProductService productService,
                                      ChannelService channelService,
@@ -69,7 +73,8 @@ public class ProductVariantController extends ControllerSupport {
                                      CategoryService categoryService,
                                      CatalogService catalogService,
                                      WebsiteService websiteService,
-                                     VirtualFileService assetService){
+                                     VirtualFileService assetService,
+                                     RestTemplate restTemplate){
         this.productVariantService = productVariantService;
         this.productService = productService;
         this.channelService = channelService;
@@ -78,6 +83,7 @@ public class ProductVariantController extends ControllerSupport {
         this.catalogService = catalogService;
         this.categoryService = categoryService;
         this.assetService = assetService;
+        this.restTemplate = restTemplate;
     }
 
     @RequestMapping("/{productId}/channels/{channelId}/variants/available/list")
@@ -607,5 +613,14 @@ public class ProductVariantController extends ControllerSupport {
         model.put("success", productVariantService.archive(ID.EXTERNAL_ID(variant.getProductVariantId()), Archive.get(archived)));
         return model;
     }
+
+    @RequestMapping(value ="/productVariantsLoad")
+    public String loadProductVariantsToBOS() {
+        List<ProductVariant> productVariantList = productVariantService.loadProductVariantsToBOS();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/product/loadProductVariant1", productVariantList, String.class, map);
+        return response.getBody();
+    }
+
 
 }

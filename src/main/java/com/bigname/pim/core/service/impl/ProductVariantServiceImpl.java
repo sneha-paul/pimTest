@@ -495,4 +495,8 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
         return adjustedProductVariants;
     }
 
+    @Override
+    public List<ProductVariant> loadProductVariantsToBOS() {
+        return productVariantDAO.findAll();
+    }
 }

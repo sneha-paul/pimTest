@@ -626,4 +626,9 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
             });
         return variantsList;
     }
+
+    @Override
+    public List<ProductCategory> loadProductCategoryToBOS() {
+        return productCategoryDAO.findAll();
+    }
 }

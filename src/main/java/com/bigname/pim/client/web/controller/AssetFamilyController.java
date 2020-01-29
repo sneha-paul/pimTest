@@ -8,12 +8,15 @@ import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,10 +26,12 @@ import java.util.Map;
 @RequestMapping("pim/assetFamilies")
 public class AssetFamilyController extends BaseController<AssetFamily ,AssetFamilyService> {
     private AssetFamilyService assetFamilyService;
+    private RestTemplate restTemplate;
 
-    public AssetFamilyController(AssetFamilyService assetFamilyService) {
+    public AssetFamilyController(AssetFamilyService assetFamilyService, RestTemplate restTemplate) {
         super(assetFamilyService, AssetFamily.class, new BreadcrumbsBuilder());
         this.assetFamilyService = assetFamilyService;
+        this.restTemplate = restTemplate;
     }
 
     //create assetsFamily
@@ -92,5 +97,10 @@ public class AssetFamilyController extends BaseController<AssetFamily ,AssetFami
         return all(request, "assetFamilyName");
     }
 
+    @RequestMapping(value ="/assetFamilyLoad")
+    public void loadAssetFamilyToBOS() {
+        List<AssetFamily> assetFamilyList = assetFamilyService.getAll(null, false);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/assetFamily/loadAssetFamily", assetFamilyList, String.class, new HashMap<>());
+    }
 
 }

@@ -9,12 +9,15 @@ import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -27,10 +30,12 @@ import java.util.Map;
 public class PricingAttributeController extends BaseController<PricingAttribute,PricingAttributeService> {
 
     private PricingAttributeService pricingAttributeService;
+    private RestTemplate restTemplate;
 
-    public PricingAttributeController(PricingAttributeService pricingAttributeService) {
+    public PricingAttributeController(PricingAttributeService pricingAttributeService, RestTemplate restTemplate) {
         super(pricingAttributeService, PricingAttribute.class, new BreadcrumbsBuilder());
         this.pricingAttributeService = pricingAttributeService;
+        this.restTemplate = restTemplate;
     }
 
     @RequestMapping()
@@ -134,5 +139,11 @@ public class PricingAttributeController extends BaseController<PricingAttribute,
         Map<String, Object> model = new HashMap<>();
         model.put("success", pricingAttributeService.archive(ID.EXTERNAL_ID(pricingAttributeId), Archive.get(archived)));
         return model;
+    }
+
+    @RequestMapping(value ="/pricingAttributeLoad")
+    public void loadPricingAttributeToBOS() {
+        List<PricingAttribute> pricingAttributeList = pricingAttributeService.getAll(null, false);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/pricingAttribute/loadPricingAttribute", pricingAttributeList, String.class, new HashMap<>());
     }
 }

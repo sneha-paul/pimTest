@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,14 +47,16 @@ public class ProductController extends BaseController<Product, ProductService> {
     private VirtualFileService assetService;
     private FamilyService productFamilyService;
     private ChannelService channelService;
+    private RestTemplate restTemplate;
 
-    public ProductController(ProductService productService, @Lazy ProductExporter productExporter, JobInstanceService jobInstanceService, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService){
+    public ProductController(ProductService productService, @Lazy ProductExporter productExporter, JobInstanceService jobInstanceService, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService, RestTemplate restTemplate){
         super(productService, Product.class, new BreadcrumbsBuilder(), productExporter, jobInstanceService, websiteService, categoryService, catalogService, productVariantService, productFamilyService, productService);
         this.productService = productService;
         this.productVariantService = productVariantService;
         this.productFamilyService = productFamilyService;
         this.channelService = channelService;
         this.assetService = assetService;
+        this.restTemplate = restTemplate;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -302,4 +305,18 @@ public class ProductController extends BaseController<Product, ProductService> {
         model.put("success", productService.archive(ID.EXTERNAL_ID(productId), Archive.get(archived)));
         return model;
     }
+    @RequestMapping(value ="/productLoad")
+    public void loadProductToBOS() {
+        List<Product> productList = productService.getAll(null, false);
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/product/loadProduct", productList, String.class, map);
+    }
+
+    @RequestMapping(value ="/productCategoryLoad")
+    public void loadProductCategoryToBOS() {
+        List<ProductCategory> productCategoryList = productService.loadProductCategoryToBOS();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/product/loadProductCategory", productCategoryList, String.class, map);
+    }
+
 }

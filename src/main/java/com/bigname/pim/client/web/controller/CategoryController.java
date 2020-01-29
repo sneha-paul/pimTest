@@ -28,8 +28,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,11 +55,13 @@ public class CategoryController extends BaseController<Category, CategoryService
 
     private CategoryService categoryService;
     private UserService userService;
+    private RestTemplate restTemplate;
 
-    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, JobInstanceService jobInstanceService, CatalogService catalogService, WebsiteService websiteService, UserService userService){
+    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, JobInstanceService jobInstanceService, CatalogService catalogService, WebsiteService websiteService, UserService userService, RestTemplate restTemplate){
         super(categoryService, Category.class, new BreadcrumbsBuilder(), categoryExporter, jobInstanceService, websiteService, catalogService);
         this.categoryService = categoryService;
         this.userService = userService;
+        this.restTemplate = restTemplate;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -410,5 +415,25 @@ public class CategoryController extends BaseController<Category, CategoryService
         return model;
     }
 
+    @RequestMapping(value ="/categoryLoad")
+    public void loadCategoryToBOS() {
+        List<Category> categoryList = categoryService.getAll(null, false);
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/category/loadCategory", categoryList, String.class, map);
+    }
 
+    @RequestMapping(value ="/relatedCategoryLoad")
+    @ResponseBody
+    public Map<String, Object> loadRelatedCategoryToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        List<RelatedCategory> relatedCategoryList = categoryService.getAll();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/category/loadRelatedCategory", relatedCategoryList, String.class, map);
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
+    }
 }

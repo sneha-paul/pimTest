@@ -22,8 +22,10 @@ import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,12 +47,14 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     private FamilyService familyService;
     private AttributeCollectionService collectionService;
     private ChannelService channelService;
+    private RestTemplate restTemplate;
 
-    public FamilyController(FamilyService familyService, AttributeCollectionService collectionService, ChannelService channelService) {
+    public FamilyController(FamilyService familyService, AttributeCollectionService collectionService, ChannelService channelService, RestTemplate restTemplate) {
         super(familyService, Family.class, new BreadcrumbsBuilder(), collectionService, channelService);
         this.familyService = familyService;
         this.collectionService = collectionService;
         this.channelService = channelService;
+        this.restTemplate = restTemplate;
     }
 
     @RequestMapping()
@@ -583,5 +587,12 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         Map<String, Object> model = new HashMap<>();
         model.put("success", familyService.archive(ID.EXTERNAL_ID(familyId), Archive.get(archived)));
         return model;
+    }
+
+    @RequestMapping(value ="/familyLoad")
+    public void loadFamilyToBOS() {
+        List<Family> familyList = familyService.getAll(null, false);
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/family/loadFamily", familyList, String.class, map);
     }
 }

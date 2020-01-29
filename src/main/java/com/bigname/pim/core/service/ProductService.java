@@ -130,4 +130,6 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
     List<Map<String, Object>> findAllVariants(Criteria criteria, boolean... activeRequired);
 
     Product create(Product product, ID.Type type);
+
+    List<ProductCategory> loadProductCategoryToBOS();
 }

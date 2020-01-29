@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -47,11 +48,13 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
 
     private AssetCollectionService assetCollectionService;
     private VirtualFileService assetService;
+    private RestTemplate restTemplate;
 
-    public AssetCollectionController(AssetCollectionService assetCollectionService, VirtualFileService assetService) {
+    public AssetCollectionController(AssetCollectionService assetCollectionService, VirtualFileService assetService, RestTemplate restTemplate) {
         super(assetCollectionService, AssetCollection.class, new BreadcrumbsBuilder());
         this.assetCollectionService = assetCollectionService;
         this.assetService = assetService;
+        this.restTemplate = restTemplate;
     }
 
     @RequestMapping()
@@ -259,6 +262,17 @@ public class AssetCollectionController extends BaseController<AssetCollection, A
     public ResponseEntity<Resource> downloadImage(@RequestParam(value = "fileId") String fileId, HttpServletRequest request)  {
         VirtualFile asset = assetService.get(ID.INTERNAL_ID(fileId), false).orElse(null);
         return downloadAsset(asset.getInternalFileName(), request);
+    }
+    @RequestMapping(value ="/assetCollectionLoad")
+    public void loadAssetCollectionToBOS() {
+        List<AssetCollection> assetCollectionList = assetCollectionService.getAll(null, false);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/assetCollection/loadAssetCollection", assetCollectionList, String.class, new HashMap<>());
+    }
+
+    @RequestMapping(value ="/virtualFileLoad")
+    public void loadVirtualFileToBOS() {
+        List<VirtualFile> virtualFileList = assetService.getAll(null, false);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopeslocalhost:8084/virtualFile/loadVirtualFile", virtualFileList, String.class, new HashMap<>());
     }
 
 }

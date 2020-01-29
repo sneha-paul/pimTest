@@ -328,4 +328,9 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
             rootCategories.forEach(rootCategory -> catalogDAO.archiveAssociationById(ID.INTERNAL_ID(rootCategory.getId()), archived, RootCategory.class));
         }
     }
+
+    @Override
+    public List<RootCategory> loadRootCategoryToBOS() {
+        return rootCategoryDAO.findAll();
+    }
 }

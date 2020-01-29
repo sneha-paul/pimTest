@@ -43,6 +43,7 @@ public class Product extends MongoEntity<Product> {
     private String channelId = PIMConstants.DEFAULT_CHANNEL_ID; //TODO - should remove this default and make sure channelId is passed correctly whenever required.
 
     @Transient
+    @JsonIgnore
     private Family productFamily;
 
     private Map<String, Map<String, Object>> scopedFamilyAttributes = new HashMap<>();
@@ -108,6 +109,7 @@ public class Product extends MongoEntity<Product> {
         getScopedFamilyAttributes().put(channelId, CollectionsUtil.filterMap(familyAttributes, BeanUtil.getAllFieldNames(this.getClass())));
     }
 
+    @JsonIgnore
     public Map<String, Object> getChannelFamilyAttributes() {
         return scopedFamilyAttributes.get(getChannelId());
     }

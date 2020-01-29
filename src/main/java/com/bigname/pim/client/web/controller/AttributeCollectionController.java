@@ -18,8 +18,10 @@ import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,10 +39,12 @@ import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 public class AttributeCollectionController extends BaseController<AttributeCollection, AttributeCollectionService> {
 
     private AttributeCollectionService attributeCollectionService;
+    private RestTemplate restTemplate;
 
-    public AttributeCollectionController(AttributeCollectionService attributeCollectionService) {
+    public AttributeCollectionController(AttributeCollectionService attributeCollectionService, RestTemplate restTemplate) {
         super(attributeCollectionService, AttributeCollection.class, new BreadcrumbsBuilder());
         this.attributeCollectionService = attributeCollectionService;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -337,5 +341,11 @@ public class AttributeCollectionController extends BaseController<AttributeColle
                     }
                     return model;
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Attribute Collection with Id: " + collectionId));
+    }
+
+    @RequestMapping(value ="/attributeCollectionLoad")
+    public void loadAttributeCollectionToBOS() {
+        List<AttributeCollection> attributeCollectionList = attributeCollectionService.getAll(null, false);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/attributeCollection/loadAttributeCollection", attributeCollectionList, String.class, new HashMap<>());
     }
 }

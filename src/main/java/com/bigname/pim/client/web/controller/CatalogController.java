@@ -26,8 +26,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,12 +55,14 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     private CatalogService catalogService;
     private WebsiteService websiteService;
     private UserService userService;
+    private RestTemplate restTemplate;
 
-    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService, JobInstanceService jobInstanceService, UserService userService) {
+    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService, JobInstanceService jobInstanceService, UserService userService, RestTemplate restTemplate) {
         super(catalogService, Catalog.class, new BreadcrumbsBuilder(), catalogExporter, jobInstanceService, websiteService);
         this.catalogService = catalogService;
         this.websiteService = websiteService;
         this.userService = userService;
+        this.restTemplate = restTemplate;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -284,5 +288,19 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
             }
         });
         return super.details(catalogId, model);
+    }
+
+    @RequestMapping(value ="/catalogLoad")
+    public void loadCatalogToBOS() {
+        List<Catalog> catalogList = catalogService.getAll(null, false);
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/catalog/loadCatalog", catalogList, String.class, map);
+    }
+
+    @RequestMapping(value ="/rootCategoryLoad")
+    public void loadRootCategoryToBOS() {
+        List<RootCategory> rootCategoryList = catalogService.loadRootCategoryToBOS();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/catalog/loadRootCategory", rootCategoryList, String.class, map);
     }
 }

@@ -58,4 +58,5 @@ public interface ProductVariantService extends BaseService<ProductVariant, Produ
 
     boolean setProductVariantsSequence(ID<String> productId, ID<String> channelId, ID<String> sourceId, ID<String> destinationId);
 
+    List<ProductVariant> loadProductVariantsToBOS();
 }
