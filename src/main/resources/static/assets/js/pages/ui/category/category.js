@@ -259,14 +259,16 @@ $(function(){
             dataType: 'json'
         }).done(function(data) {
             if(data.success === true) {
-                $.reloadDataTable('paginatedAllProductsReorderableTable');
-                $.reloadDataTable('paginatedAllProductsSortableTable');
+                /*$.reloadDataTable('paginatedAllProductsReorderableTable');
+                $.reloadDataTable('paginatedAllProductsSortableTable');*/
+                $("#paginatedAllProductsSortableTable").DataTable().ajax.reload();
+                $("#paginatedAllProductsReorderableTable").DataTable().ajax.reload();
                 toastr.success('Successfully added products', 'Products Added');
             } else {
-                toastr.error('Error occurred while adding the products', 'Error Adding Products');
+                toastr.error('Error occurred while adding the products', 'Error in Adding Products');
             }
         }).fail(function(jqXHR, status) {
-            toastr.error('Error occurred while adding the products', 'Error Adding Products');
+            toastr.error('Error occurred while adding the products', 'Error in Adding Products');
         });
     });
 

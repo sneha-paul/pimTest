@@ -1,9 +1,6 @@
 package com.bigname.pim.core.persistence.dao.mongo;
 
-import com.bigname.pim.core.domain.Category;
-import com.bigname.pim.core.domain.CategoryProduct;
-import com.bigname.pim.core.domain.Product;
-import com.bigname.pim.core.domain.RelatedCategory;
+import com.bigname.pim.core.domain.*;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
 import com.m7.xtreme.xcore.persistence.dao.mongo.GenericRepositoryImpl;
@@ -478,7 +475,7 @@ public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category, Crit
         return PageableExecutionUtils.getPage(
                 mongoTemplate.aggregate(aggregation, "parentCategoryProduct", Map.class).getMappedResults().stream().map(CollectionsUtil::generifyMap).collect(Collectors.toList()),
                 pageable,
-                () -> mongoTemplate.count(new Query().addCriteria(Criteria.where("categoryId").is(categoryId)), CategoryProduct.class));
+                () -> mongoTemplate.count(new Query().addCriteria(Criteria.where("categoryId").is(categoryId)), ParentCategoryProduct.class));
     }
 
     @Override
@@ -511,7 +508,7 @@ public class CategoryRepositoryImpl extends GenericRepositoryImpl<Category, Crit
         );
 
         //TODO - need to find an option to get the total count along with the paginated result, instead of running two separate aggregation queries
-        long totalCount = mongoTemplate.aggregate(aggregation, "categoryProduct", Map.class).getMappedResults().size();
+        long totalCount = mongoTemplate.aggregate(aggregation, "parentCategoryProduct", Map.class).getMappedResults().size();
 
         aggregation = newAggregation(
                 match(Criteria.where("categoryId").is(categoryId)),

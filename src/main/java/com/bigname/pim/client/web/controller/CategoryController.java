@@ -3,6 +3,7 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.pim.core.data.exportor.CategoryExporter;
 import com.bigname.pim.core.domain.Category;
 import com.bigname.pim.core.domain.CategoryProduct;
+import com.bigname.pim.core.domain.ParentCategoryProduct;
 import com.bigname.pim.core.domain.RelatedCategory;
 import com.bigname.pim.core.service.CatalogService;
 import com.bigname.pim.core.service.CategoryService;
@@ -370,7 +371,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     @ResponseBody
     public Result<Map<String, Object>> getAllParentCategoryProducts(@PathVariable(value = "id") String id, HttpServletRequest request) {
         return getAssociationGridData(request,
-                CategoryProduct.class,
+                ParentCategoryProduct.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
                         return categoryService.getAllParentCategoryProducts(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
