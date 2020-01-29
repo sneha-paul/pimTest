@@ -54,4 +54,30 @@ $(function(){
         });
         $(this).removeClass('js-websiteHistory-tab').off('shown.bs.tab.websiteHistory');
     });
+
+    $('.js-websitePages-tab').on('shown.bs.tab.websitePages', function (e) {
+        $.initEntitiesGrid({
+            selector: '#paginatedWebsitePageTable',
+            names: ['websitePages', 'websitePage'],
+            pageUrl: $.getURL('/pim/website/'),
+            dataUrl: $.getURL('/pim/website/pages/data'),
+            hideStatus:'true',
+            columns: [
+                {data: 'pageUrl', name: 'pageUrl', title: 'Page Url'}
+            ],
+            buttons: ['DETAILS']
+        });
+        $(this).removeClass('js-websitePages-tab').off('shown.bs.tab.websitePages');
+    });
+
+    $.addModal({
+        selector: '.js-add-pages',
+        url: $.getURL('/pim/website/pages/create'),
+        name:'create-websitePages',
+        title:'Create Website Pages',
+        buttons: [
+            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('websitePages');$.closeModal();});}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
 });

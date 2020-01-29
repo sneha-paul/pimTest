@@ -35,11 +35,12 @@ public class WebsitePage extends MongoEntity<WebsitePage> {
     }
 
     public String getPageId() {
-        return pageId;
+        return getExternalId();
     }
 
     public void setPageId(String pageId) {
         this.pageId = pageId;
+        setExternalId(pageId);
     }
 
     public String getWebsiteId() {
