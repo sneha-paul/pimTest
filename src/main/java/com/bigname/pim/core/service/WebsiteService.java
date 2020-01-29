@@ -54,4 +54,5 @@ public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
     Page<Map<String, Object>> findAllWebsiteCatalogs(ID<String> websiteId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
     List<WebsiteCatalog> getAllWebsiteCatalogs(String websiteInternalId);
 
+    List<WebsiteCatalog> loadWebsiteCatalogsToBOS();
 }

@@ -2,6 +2,8 @@ package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.core.domain.Website;
 import com.bigname.pim.core.domain.WebsiteCatalog;
+import com.bigname.pim.core.domain.WebsitePage;
+import com.bigname.pim.core.service.WebsitePageService;
 import com.bigname.pim.core.service.WebsiteService;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.datatable.model.Pagination;
@@ -20,8 +22,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,12 +50,13 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
 
     private WebsiteService websiteService;
     private UserService userService;
+    private RestTemplate restTemplate;
 
-
-    public WebsiteController(WebsiteService websiteService, UserService userService) {
+    public WebsiteController(WebsiteService websiteService, UserService userService, RestTemplate restTemplate) {
         super(websiteService, Website.class, new BreadcrumbsBuilder());
         this.websiteService = websiteService;
         this.userService = userService;
+        this.restTemplate = restTemplate;
     }
 
 
@@ -278,5 +283,20 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
             }
         });
         return super.details(websiteId, model);
+    }
+
+    @RequestMapping(value ="/websiteLoad")
+    public String loadCatalogToBOS() {
+        boolean status;
+        List<Website> websiteList = websiteService.getAll(null, false);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/website/loadWebsite", websiteList, String.class, new HashMap<>());
+        return response.getBody();
+    }
+
+    @RequestMapping(value ="/websiteCatalogLoad")
+    public String loadWebsiteCatalogsToBOS() {
+        List<WebsiteCatalog> websiteCatalogList = websiteService.loadWebsiteCatalogsToBOS();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/website/loadWebsiteCatalog", websiteCatalogList, String.class, new HashMap<>());
+        return response.getBody();
     }
 }

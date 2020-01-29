@@ -153,5 +153,8 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
         return super.get(id, findBy, activeRequired);
     }*/
 
-
+    @Override
+    public List<WebsiteCatalog> loadWebsiteCatalogsToBOS() {
+        return websiteCatalogDAO.findAll();
+    }
 }
