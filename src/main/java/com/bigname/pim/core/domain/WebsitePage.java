@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.persistence.Transient;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,13 +21,21 @@ public class WebsitePage extends MongoEntity<WebsitePage> {
 
     private String websiteId;
 
+    @NotEmpty(message = "Page Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Page Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pageName;
 
     @Indexed(unique = true)
+    @NotEmpty(message = "Page Url cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Page Url cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pageUrl;
 
+    @NotEmpty(message = "Friendly Url cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Friendly Url cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String friendlyUrl;
 
+    @NotEmpty(message = "Redirect Url cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
+    @NotBlank(message = "Redirect Url cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String redirectURL;
 
     private Map<String, Map<String, Object>> pageAttributes = new LinkedHashMap<>();
@@ -116,6 +126,8 @@ public class WebsitePage extends MongoEntity<WebsitePage> {
                     this.setExternalId(websitePage.getExternalId());
                     this.setPageName(websitePage.getPageName());
                     this.setPageUrl(websitePage.getPageUrl());
+                    this.setFriendlyUrl(websitePage.getFriendlyUrl());
+                    this.setRedirectURL(websitePage.getRedirectURL());
                     mergeBaseProperties(websitePage);
                     break;
             }

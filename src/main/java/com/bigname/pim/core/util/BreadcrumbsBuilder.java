@@ -66,6 +66,8 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 this.services.put("assetFamilyService", baseService);
             } else if(baseService instanceof JobInstanceService) {
                 this.services.put("jobInstanceService", baseService);
+            } else if(baseService instanceof WebsitePageService) {
+                this.services.put("websitePageService", baseService);
             }
 
         });
@@ -203,6 +205,14 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 url1 += "#" + hash;
             }
         }
+        if(entity.equals(WebsitePage.class)) {
+            if(isNotEmpty(websiteId)) {
+                baseURL = "/pim/" + getNames(Website.class)[1] + "/" + websiteId;
+                url1 = buildURL(baseURL,"#websitePages", urlParams);
+                urlParams.put("websiteId", websiteId);
+                url2 = buildURL(url2, "", urlParams);
+            }
+        }
         return new String[] {url1, url2};
     }
 
@@ -236,6 +246,8 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 return new String[] {"AssetFamily", "assetFamilies"};
             case "com.m7.xtreme.xplatform.domain.JobInstance":
                 return new String[] {"Jobs", "jobs"};
+            case "com.bigname.pim.core.domain.WebsitePage":
+                return new String[] {"Pages", "pages"};
         }
         return new String[] {"", "", "", ""};
     }
@@ -270,6 +282,8 @@ public class BreadcrumbsBuilder extends BaseBreadcrumbsBuilder {
                 return ((AssetFamilyService)services.get("assetFamilyService")).get(ID.EXTERNAL_ID(id), false).map(AssetFamily::getAssetFamilyName).orElse("");
             case "com.m7.xtreme.xplatform.domain.JobInstance":
                 return ((JobInstanceService)services.get("jobInstanceService")).get(ID.EXTERNAL_ID(id), false).map(JobInstance::getJobName).orElse("");
+            case "com.bigname.pim.core.domain.WebsitePage":
+                return ((WebsitePageService)services.get("websitePageService")).get(ID.EXTERNAL_ID(id), false).map(WebsitePage::getPageName).orElse("");
         }
         return "";
     }

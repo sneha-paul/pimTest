@@ -129,7 +129,8 @@
 </div>
 <script>
     $.initPage({
-        'websiteId' : '${website.websiteId}'
+        'websiteId' : '${website.websiteId}',
+        'websiteUrl' : '${website.url}'
     });
 </script>
 <script src="/assets/js/pages/ui/website/website.js"></script>

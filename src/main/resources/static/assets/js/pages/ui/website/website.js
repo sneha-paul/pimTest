@@ -56,14 +56,15 @@ $(function(){
     });
 
     $('.js-websitePages-tab').on('shown.bs.tab.websitePages', function (e) {
-        $.initEntitiesGrid({
+        $.initAssociationsGrid({
             selector: '#paginatedWebsitePageTable',
             names: ['websitePages', 'websitePage'],
-            pageUrl: $.getURL('/pim/website/'),
-            dataUrl: $.getURL('/pim/website/pages/data'),
+            pageUrl: $.getURL('/pim/websites/{websiteId}/pages/'),
+            dataUrl: $.getURL('/pim/websites/{websiteId}/pages/data'),
+            urlParams: urlParams,
             hideStatus:'true',
             columns: [
-                {data: 'pageUrl', name: 'pageUrl', title: 'Page Url'}
+                {data: 'pageFriendlyUrl', name: 'pageFriendlyUrl', title: 'Page Url', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + $.getPageAttribute('websiteUrl') + '/' + row.pageUrl + '<small>';}}
             ],
             buttons: ['DETAILS']
         });
@@ -72,7 +73,7 @@ $(function(){
 
     $.addModal({
         selector: '.js-add-pages',
-        url: $.getURL('/pim/website/pages/create'),
+        url: $.getURL('/pim/websites/{websiteId}/pages/create'),
         name:'create-websitePages',
         title:'Create Website Pages',
         buttons: [

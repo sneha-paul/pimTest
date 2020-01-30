@@ -15,12 +15,12 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
-                                        <form method="post" action="/pim/website/pages/${websitePage.pageId}" data-method="PUT" data-success-message='["Successfully updated the page", "Page Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                        <form method="post" action="/pim/websites/pages/${websitePage.pageId}" data-method="PUT" data-success-message='["Successfully updated the page", "Page Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">
-                                                        <label for="websiteName">Website Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="websiteName" name="websiteName" value="${websitePage.pageName}" class="form-control" />
+                                                        <label for="pageName">Page Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <input type="text" id="pageName" name="pageName" value="${websitePage.pageName}" class="form-control" />
                                                     </div>
                                                     <div class="form-group js-external-id">
                                                         <label for="pageId">Page ID</label><code class="highlighter-rouge m-l-10">*</code>
@@ -29,6 +29,18 @@
                                                     <div class="form-group">
                                                         <label for="pageUrl">Page URL</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="url" id="pageUrl" name="pageUrl" class="form-control" value="${websitePage.pageUrl}" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="friendlyUrl">Friendly URL</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <input type="url" id="friendlyUrl" name="friendlyUrl" class="form-control" value="${websitePage.friendlyUrl}" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="redirectURL">Redirect URL</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <input type="url" id="redirectURL" name="redirectURL" class="form-control" value="${websitePage.redirectURL}" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="websiteId">Website</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <input type="url" id="websiteId" name="websiteId" class="form-control" value="${website.websiteId}" readonly/>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>Status</label>
