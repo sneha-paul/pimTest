@@ -18,4 +18,31 @@ $(function(){
         });
         $(this).removeClass('js-config-params-tab').off('shown.bs.tab.params');
     });
+
+    $.addModal({
+        selector: '.js-add-parameters',
+        url: $.getURL('/pim/configs/{configId}/params/create'),
+        name:'create-parameters',
+        title:'Create Parameters',
+        buttons: [
+            {text: 'SAVE', style: 'primary', close: false, click: function(){$.addParam($("#param").val())}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
+
+    $.extend({
+        addParam: function (param) {
+            $.ajaxSubmit({
+                url: '/pim/configs/{configId}/params',
+                data: {param: param},
+                successMessage: ['Parameter Added', 'Successfully added the parameter'],
+                errorMessage: ['Error', 'Error occurred while adding paramater'],
+                successCallback: function(data) {
+                    $("#paginatedConfigParametersTable").DataTable().ajax.reload();
+                    $.closeModal();
+                }
+            });
+        }
+    });
+
 });

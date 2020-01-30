@@ -52,6 +52,13 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
+                                        <div class="row p-b-25">
+                                            <div class="col-lg-12 col-md-12">
+                                                <div class="pull-right">
+                                                    <button type="button" class="btn btn-success js-add-parameters"><i class="fa fa-plus"></i> <span class="p-l-5">Add Parameters</span></button>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="table-responsive">
                                             <table id="paginatedConfigParametersTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark">

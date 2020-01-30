@@ -119,4 +119,16 @@ public class ConfigController extends BaseController<Config, ConfigService> {
                 });
     }*/
 
+    @RequestMapping(value = "/{configId}/params", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> createAttribute(@PathVariable(value = "configId") String configId, @RequestParam(value="param") String param) {
+        Map<String, Object> model = new HashMap<>();
+        Config config = configService.get(ID.EXTERNAL_ID(configId), false).orElse(null);
+        String[] values = param.split("\\.");
+        config.setParameter(values[0], values[1]);
+        configService.update(ID.EXTERNAL_ID(configId), config);
+        model.put("success", true);
+        return model;
+    }
+
 }
