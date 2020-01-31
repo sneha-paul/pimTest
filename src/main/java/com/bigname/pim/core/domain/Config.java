@@ -72,7 +72,7 @@ public class Config extends MongoEntity<Config> {
     public Map<String, Object> getSiteParameters(String... websiteId) {
         String _websiteId = ConversionUtil.getValue(websiteId);
         _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
-        return new HashMap<>(params.get(_websiteId));
+        return new HashMap<>(casePreservedParams.get(_websiteId)); //TODO check : change params to casePreservedParams
     }
 
     @Override
@@ -99,6 +99,10 @@ public class Config extends MongoEntity<Config> {
                     this.setExternalId(config.getExternalId());
                     this.setConfigName(config.getConfigName());
                     mergeBaseProperties(config);
+                    Map<String, Object> parameter = config.getSiteParameters();
+                    parameter.forEach((k,v) -> {
+                        this.setParameter(k, v);
+                    });
                     break;
             }
         }

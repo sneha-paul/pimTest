@@ -3,19 +3,25 @@ package com.bigname.pim.client.web.controller;
 import com.bigname.pim.core.domain.Config;
 import com.bigname.pim.core.service.ConfigService;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
+import com.m7.xtreme.common.datatable.model.Pagination;
+import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
-import com.m7.xtreme.common.util.CollectionsUtil;
+import com.m7.xtreme.common.datatable.model.SortOrder;
 import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
-import org.javatuples.Pair;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -105,10 +111,10 @@ public class ConfigController extends BaseController<Config, ConfigService> {
 
     }
 
-    /*@RequestMapping("/{id}/params/data")
+    @RequestMapping("/{configId}/params/data")
     @ResponseBody
-    public Result<Map<String, Object>> getConfigParams(@PathVariable(value = "id") String id, HttpServletRequest request) {
-        return getAssociationGridData(request,
+    public Result<Map<String, String>> getConfigParams(@PathVariable(value = "configId") String configId, HttpServletRequest request) {
+        /*return getAssociationGridData(request,
                 WebsiteCatalog.class,
                 dataTableRequest -> {
                     if(isEmpty(dataTableRequest.getSearch())) {
@@ -116,19 +122,54 @@ public class ConfigController extends BaseController<Config, ConfigService> {
                     } else {
                         return websiteService.findAllWebsiteCatalogs(ID.EXTERNAL_ID(id), "catalogName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
                     }
-                });
-    }*/
+                });*/
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
 
-    @RequestMapping(value = "/{configId}/params", method = RequestMethod.POST)
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        List<Map<String, Object>> paramList = configService.getParams(ID.EXTERNAL_ID(configId));
+        paramList.forEach(param -> param.forEach((k, v) -> {
+            Map<String, String> newMap = new HashMap<>();
+            newMap.put("paramName", k);
+            newMap.put("paramValue", String.valueOf(v));
+            dataObjects.add(newMap);
+        }));
+        Page<Map<String, String>> paginatedResult = new PageImpl<>(dataObjects);
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+
+        configService.deleteConfigParam(configId, "google");
+        return result;
+    }
+
+    @RequestMapping(value = "/{configId}/params", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> createAttribute(@PathVariable(value = "configId") String configId, @RequestParam(value="param") String param) {
+    public Map<String, Object> createOrUpdateParameter(@PathVariable(value = "configId") String configId, @RequestParam Map<String, Object> parameters) {
         Map<String, Object> model = new HashMap<>();
-        Config config = configService.get(ID.EXTERNAL_ID(configId), false).orElse(null);
-        String[] values = param.split("\\.");
-        config.setParameter(values[0], values[1]);
-        configService.update(ID.EXTERNAL_ID(configId), config);
-        model.put("success", true);
+        boolean[] success = {false};
+        configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+            List<Map<String, Object>> paramList = configService.getParams(ID.EXTERNAL_ID(config.getConfigId()));
+            paramList.forEach(param -> config.setParameter(String.valueOf(parameters.get("paramName")), parameters.get("paramValue")));
+            config.setGroup("DETAILS");
+            configService.update(ID.EXTERNAL_ID(configId), config);
+            success[0] = true;
+        });
+        model.put("success", success[0]);
         return model;
     }
 
+    @RequestMapping(value = "/{configId}/{paramName}/delete")
+    @ResponseBody
+    public Map<String, Object> deleteParams(@PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName) {
+        Map<String, Object> model = new HashMap<>();
+        configService.deleteConfigParam(configId, paramName);
+        return model;
+    }
 }

@@ -35,6 +35,18 @@
             };
         },
 
+        deleteButton: function(options) {
+            return {
+                name: 'DELETE',
+                style: 'danger',
+                title: 'Delete',
+                icon: 'icon-trash',
+                click: function (row) {
+                    window.location.href = $.getURLWithRequestParams(options.pageUrl + row.paramName + '/delete', options.urlParams || {});
+                }
+            };
+        },
+
         attributeOptionsTabButton: function(options) {
             return {
                 style: 'primary',
@@ -303,6 +315,9 @@
                                 break;
                             case 'ARCHIVED':
                                 buttons[i] = $.archivedStatusButton(options);
+                                break;
+                            case 'DELETE':
+                                buttons[i] = $.deleteButton(options);
                                 break;
                         }
                     }
