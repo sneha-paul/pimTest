@@ -40,7 +40,7 @@ public class WebsitePageController extends ControllerSupport {
         this.websiteService = websiteService;
     }
 
-    @RequestMapping(value = "{websiteId}/pages/data")
+    @RequestMapping(value = "/{websiteId}/pages/data")
     @ResponseBody
     public Result<Map<String, String>> getWebsitePages(@PathVariable(value = "websiteId") String websiteId, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
@@ -57,7 +57,6 @@ public class WebsitePageController extends ControllerSupport {
                     }
                     Page<WebsitePage> paginatedResult = websitePageService.getAll(ID.INTERNAL_ID(website.getId()), pagination.getPageNumber(), pagination.getPageSize(), sort, dataTableRequest.getStatusOptions());
                     List<Map<String, String>> dataObjects = new ArrayList<>();
-                    int seq[] = {1};
                     paginatedResult.getContent().forEach(e -> {
                         dataObjects.add(e.toMap());
                     });
@@ -70,7 +69,7 @@ public class WebsitePageController extends ControllerSupport {
         return result;
     }
 
-    @RequestMapping(value = {"/{websiteId}/pages/{pageId}", "{websiteId}/pages/create"})
+    @RequestMapping(value = {"/{websiteId}/pages/{pageId}", "/{websiteId}/pages/create"})
     public ModelAndView pageDetails(@PathVariable(value = "websiteId") String websiteId,
                                     @PathVariable(value = "pageId", required = false) String pageId,
                                     @RequestParam(name = "reload", required = false) boolean reload,
@@ -100,16 +99,19 @@ public class WebsitePageController extends ControllerSupport {
         return new ModelAndView("website/websitePage" + (reload ? "_body" : ""), model);
     }
 
-    @RequestMapping(value = "/pages", method = RequestMethod.POST)
+    @RequestMapping(value = "/{websiteId}/pages", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> createPage(WebsitePage websitePage) {
-        Map<String, Object> model = new HashMap<>();
-        if(isValid(websitePage, model, WebsitePage.CreateGroup.class)) {
-            websitePage.setActive("N");
-            websitePageService.create(websitePage);
-            model.put("success", true);
-        }
-        return model;
+    public Map<String, Object> createPage(@PathVariable(value = "websiteId") String websiteId, WebsitePage websitePage) {
+        return websiteService.get(ID.EXTERNAL_ID(websiteId), false).map(website -> {
+            Map<String, Object> model = new HashMap<>();
+            if(isValid(websitePage, model, WebsitePage.CreateGroup.class)) {
+                websitePage.setActive("Y");
+                websitePage.setWebsiteId(website.getId());
+                websitePageService.create(websitePage);
+                model.put("success", true);
+            }
+            return model;
+        }).orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + websiteId));
     }
 
     @RequestMapping(value = "/pages/{id}", method = RequestMethod.PUT)

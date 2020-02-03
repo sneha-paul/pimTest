@@ -10,9 +10,9 @@
     <c:otherwise>
         <div class="row clearfix">
             <div class="col-lg-12 col-md-12">
-                <form method="post" action="/pim/website/pages" data-method="POST" data-success-message='["Successfully created the page", "Page Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
+                <form method="post" action="/pim/websites/{websiteId}/pages" data-method="POST" data-success-message='["Successfully created the page", "Page Created"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]' >
                     <div class="row">
-                        <div class="col-md-6 col-sm-12">
+                        <div class="col-sm-12">
                             <div class="form-group js-name">
                                 <label>Page Name</label>
                                 <input type="text" name="pageName" class="form-control" />

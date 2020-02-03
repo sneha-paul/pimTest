@@ -64,7 +64,7 @@ $(function(){
             urlParams: urlParams,
             hideStatus:'true',
             columns: [
-                {data: 'pageFriendlyUrl', name: 'pageFriendlyUrl', title: 'Page Url', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + $.getPageAttribute('websiteUrl') + '/' + row.pageUrl + '<small>';}}
+                {data: 'pageFriendlyUrl', name: 'pageFriendlyUrl', title: 'Page Url', render: function ( data, type, row, meta ) {return '<div><small><b>' + $.getPageAttribute('websiteUrl') +  data + '</b></small></div><small>' + $.getPageAttribute('websiteUrl') + row.pageUrl + '<small>';}}
             ],
             buttons: ['DETAILS']
         });

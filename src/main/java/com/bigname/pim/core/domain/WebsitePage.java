@@ -21,21 +21,16 @@ public class WebsitePage extends MongoEntity<WebsitePage> {
 
     private String websiteId;
 
-    @NotEmpty(message = "Page Name cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @NotBlank(message = "Page Name cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pageName;
 
     @Indexed(unique = true)
-    @NotEmpty(message = "Page Url cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @NotBlank(message = "Page Url cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pageUrl;
 
-    @NotEmpty(message = "Friendly Url cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     @NotBlank(message = "Friendly Url cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String friendlyUrl;
 
-    @NotEmpty(message = "Redirect Url cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
-    @NotBlank(message = "Redirect Url cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String redirectURL;
 
     private Map<String, Map<String, Object>> pageAttributes = new LinkedHashMap<>();

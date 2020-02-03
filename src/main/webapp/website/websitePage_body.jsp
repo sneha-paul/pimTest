@@ -17,7 +17,7 @@
                                     <div class="body">
                                         <form method="post" action="/pim/websites/pages/${websitePage.pageId}" data-method="PUT" data-success-message='["Successfully updated the page", "Page Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
-                                                <div class="col-md-6 col-sm-12">
+                                                <div class="col-sm-12">
                                                     <div class="form-group">
                                                         <label for="pageName">Page Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="text" id="pageName" name="pageName" value="${websitePage.pageName}" class="form-control" />
