@@ -30,7 +30,11 @@
                 title: 'Details',
                 icon: 'icon-eye',
                 click: function (row) {
-                    window.location.href = $.getURLWithRequestParams(options.pageUrl.includes('history') === true ? (options.pageUrl + row.timeStamp) : options.pageUrl + row.externalId, options.urlParams || {});
+                    if(options.pageUrl.includes('params')) {
+                        window.location.href = $.getURLWithRequestParams(options.pageUrl + row.paramName, options.urlParams || {});
+                    } else {
+                        window.location.href = $.getURLWithRequestParams(options.pageUrl.includes('history') === true ? (options.pageUrl + row.timeStamp) : options.pageUrl + row.externalId, options.urlParams || {});
+                    }
                 }
             };
         },
@@ -42,7 +46,13 @@
                 title: 'Delete',
                 icon: 'icon-trash',
                 click: function (row) {
-                    window.location.href = $.getURLWithRequestParams(options.pageUrl + row.paramName + '/delete', options.urlParams || {});
+                    //window.location.href = $.getURLWithRequestParams(options.pageUrl + row.paramName + '/delete', options.urlParams || {});
+                    $.deleteInstance(
+                        $.getURL((options.pageUrl + '{paramName}/delete'), {
+                            paramName: row.paramName
+                        }),
+                        options.names[1],
+                        $.reloadDataTable(options.names[0]));
                 }
             };
         },

@@ -1713,6 +1713,18 @@
             }, callback);
         },
 
+        deleteInstance: function(url, entityName, callback) {
+            $.confirmedAJAXRequest({
+                url: url,
+                method: 'PUT',
+                text: 'This will delete the ' + entityName + "!",
+                confirmButtonText: 'Yes, delete it!',
+                confirmButtonColor: '#28a745',
+                successTitle: 'Deleted',
+                successText: 'The ' + entityName + ' has been deleted.'
+            }, callback);
+        },
+
         cloneInstance: function(url, entityName, callback) {
             $.confirmedAJAXRequest({
                 url: url,

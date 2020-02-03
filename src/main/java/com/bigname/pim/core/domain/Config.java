@@ -49,6 +49,22 @@ public class Config extends MongoEntity<Config> {
         this.configName = configName;
     }
 
+    public Map<String, Map<String, Object>> getParams() {
+        return params;
+    }
+
+    public void setParams(Map<String, Map<String, Object>> params) {
+        this.params = params;
+    }
+
+    public Map<String, Map<String, Object>> getCasePreservedParams() {
+        return casePreservedParams;
+    }
+
+    public void setCasePreservedParams(Map<String, Map<String, Object>> casePreservedParams) {
+        this.casePreservedParams = casePreservedParams;
+    }
+
     public Config setParameter(String name, Object value, String... websiteId) {
         String _websiteId = ConversionUtil.getValue(websiteId);
         _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
@@ -72,7 +88,12 @@ public class Config extends MongoEntity<Config> {
     public Map<String, Object> getSiteParameters(String... websiteId) {
         String _websiteId = ConversionUtil.getValue(websiteId);
         _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
-        return new HashMap<>(casePreservedParams.get(_websiteId)); //TODO check : change params to casePreservedParams
+        return new HashMap<>(params.get(_websiteId));
+    }
+    public Map<String, Object> getCasePreservedSiteParameters(String... websiteId) {
+        String _websiteId = ConversionUtil.getValue(websiteId);
+        _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
+        return new HashMap<>(casePreservedParams.get(_websiteId));
     }
 
     @Override
@@ -99,10 +120,10 @@ public class Config extends MongoEntity<Config> {
                     this.setExternalId(config.getExternalId());
                     this.setConfigName(config.getConfigName());
                     mergeBaseProperties(config);
-                    Map<String, Object> parameter = config.getSiteParameters();
-                    parameter.forEach((k,v) -> {
-                        this.setParameter(k, v);
-                    });
+                    Map<String, Object> parameter = config.getCasePreservedSiteParameters();
+                    parameter.forEach((k,v) -> this.setParameter(k, v));
+                    this.setCasePreservedParams(config.getCasePreservedParams());
+                    this.setParams(config.getParams());
                     break;
             }
         }

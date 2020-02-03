@@ -8,10 +8,11 @@ $(function(){
         $.initEntitiesGrid({
             selector: '#paginatedConfigParametersTable',
             names: ['configParameters','configParameter'],
-            pageUrl: '/pim/configs/' + $.getPageAttribute('configId') + '/',
+            pageUrl: '/pim/configs/' + $.getPageAttribute('configId') + '/params/',
             dataUrl: $.getURL('/pim/configs/{configId}/params/data'),
+            hideStatus:'true',
             columns: [
-                { data: 'paramName', name : 'paramName' , title : 'Parameter Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.url + '<small>';}},
+                { data: 'paramName', name : 'paramName' , title : 'Parameter Name'},
                 { data: 'paramValue', name : 'paramValue', title : 'Parameter Value' }
             ],
             buttons: ['DETAILS', 'DELETE']
@@ -21,7 +22,7 @@ $(function(){
 
     $.addModal({
         selector: '.js-add-parameters',
-        url: $.getURL('/pim/configs/{configId}/params'),
+        url: $.getURL('/pim/configs/{configId}/params/create'),
         name:'create-parameters',
         title:'Create Parameters',
         buttons: [

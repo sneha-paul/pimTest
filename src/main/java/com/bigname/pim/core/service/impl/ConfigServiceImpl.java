@@ -12,9 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by sanoop on 12/02/2019.
@@ -36,25 +35,37 @@ public class ConfigServiceImpl extends BaseServiceSupport<Config, ConfigDAO, Con
     public List<Map<String, Object>> getParams(ID<String> configId) {
         List<Map<String, Object>> parameter = new ArrayList<>();
         get(configId, false).ifPresent(config -> {
-            parameter.add(config.getSiteParameters());
+            parameter.add(config.getCasePreservedSiteParameters());
         });
         return parameter;
     }
 
     @Override
     public void deleteConfigParam(String configId, String paramName) {
-        /*get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+        get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
             List<Map<String, Object>> paramList = getParams(ID.EXTERNAL_ID(config.getConfigId()));
             paramList.forEach(param -> {
                 boolean isKey = param.containsKey(paramName);
                 if(isKey) {
-                    Config config1 = config.getParameter(paramName, Config.class);
                     param.remove(paramName);
                 }
             });
-            paramList.forEach(param -> param.forEach((k,v) -> config.setParameter(k,v)));
+            paramList.forEach(param -> {
+                Map<String, Map<String, Object>> casePreserveMap = new HashMap<>();
+                casePreserveMap.put("GLOBAL", param);
+                config.setCasePreservedParams(casePreserveMap);
+
+                Map<String, Map<String, Object>> paramMap = new HashMap<>();
+                Map<String, Object> mapKeyUp = param.entrySet().stream().collect(Collectors.toMap(
+                        entry -> (entry.getKey().toUpperCase()),
+                        entry -> entry.getValue())
+                );
+                paramMap.put("GLOBAL", mapKeyUp);
+                config.setParams(paramMap);
+            });
+
             config.setGroup("DETAILS");
             update(ID.EXTERNAL_ID(configId), config);
-        });*/
+        });
     }
 }

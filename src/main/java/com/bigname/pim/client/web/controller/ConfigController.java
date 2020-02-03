@@ -145,7 +145,7 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
 
-        configService.deleteConfigParam(configId, "google");
+        /*configService.deleteConfigParam(configId, "google");*/
         return result;
     }
 
@@ -165,11 +165,12 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         return model;
     }
 
-    @RequestMapping(value = "/{configId}/{paramName}/delete")
+    @RequestMapping(value = "/{configId}/params/{paramName}/delete", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> deleteParams(@PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName) {
         Map<String, Object> model = new HashMap<>();
         configService.deleteConfigParam(configId, paramName);
+        model.put("success", true);
         return model;
     }
 }
