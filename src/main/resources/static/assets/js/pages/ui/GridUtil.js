@@ -52,7 +52,7 @@
                             paramName: row.paramName
                         }),
                         options.names[1],
-                        $.reloadDataTable(options.names[0]));
+                        $.refreshDataTable.bind(this, options.names[0]));
                 }
             };
         },

@@ -133,7 +133,7 @@ public class ConfigController extends BaseController<Config, ConfigService> {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        List<Map<String, Object>> paramList = configService.getParams(ID.EXTERNAL_ID(configId));
+        List<Map<String, Object>> paramList = configService.getCasePreservedParams(ID.EXTERNAL_ID(configId));
         paramList.forEach(param -> param.forEach((k, v) -> {
             Map<String, String> newMap = new HashMap<>();
             newMap.put("paramName", k);
@@ -144,8 +144,6 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         result.setDataObjects(dataObjects);
         result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
         result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
-
-        /*configService.deleteConfigParam(configId, "google");*/
         return result;
     }
 
@@ -155,7 +153,7 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
         configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            List<Map<String, Object>> paramList = configService.getParams(ID.EXTERNAL_ID(config.getConfigId()));
+            List<Map<String, Object>> paramList = configService.getCasePreservedParams(ID.EXTERNAL_ID(config.getConfigId()));
             paramList.forEach(param -> config.setParameter(String.valueOf(parameters.get("paramName")), parameters.get("paramValue")));
             config.setGroup("DETAILS");
             configService.update(ID.EXTERNAL_ID(configId), config);

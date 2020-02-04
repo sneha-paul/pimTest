@@ -32,7 +32,7 @@ public class ConfigServiceImpl extends BaseServiceSupport<Config, ConfigDAO, Con
     }
 
     @Override
-    public List<Map<String, Object>> getParams(ID<String> configId) {
+    public List<Map<String, Object>> getCasePreservedParams(ID<String> configId) {
         List<Map<String, Object>> parameter = new ArrayList<>();
         get(configId, false).ifPresent(config -> {
             parameter.add(config.getCasePreservedSiteParameters());
@@ -43,7 +43,7 @@ public class ConfigServiceImpl extends BaseServiceSupport<Config, ConfigDAO, Con
     @Override
     public void deleteConfigParam(String configId, String paramName) {
         get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            List<Map<String, Object>> paramList = getParams(ID.EXTERNAL_ID(config.getConfigId()));
+            List<Map<String, Object>> paramList = getCasePreservedParams(ID.EXTERNAL_ID(config.getConfigId()));
             paramList.forEach(param -> {
                 boolean isKey = param.containsKey(paramName);
                 if(isKey) {
