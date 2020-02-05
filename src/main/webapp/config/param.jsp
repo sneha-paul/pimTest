@@ -24,7 +24,7 @@
                         </div>
                     </div>
                     <br>
-                    <input type="hidden" name="group" value="DETAILS"/>
+                    <input type="hidden" name="group" value="PARAMS"/>
                     <img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
                 </form>
             </div>

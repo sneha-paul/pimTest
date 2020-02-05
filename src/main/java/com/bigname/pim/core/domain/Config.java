@@ -120,6 +120,9 @@ public class Config extends MongoEntity<Config> {
                     this.setExternalId(config.getExternalId());
                     this.setConfigName(config.getConfigName());
                     mergeBaseProperties(config);
+                    break;
+                case "PARAMS":
+                    mergeBaseProperties(config);
                     Map<String, Object> parameter = config.getCasePreservedSiteParameters();
                     parameter.forEach((k,v) -> this.setParameter(k, v));
                     this.setCasePreservedParams(config.getCasePreservedParams());

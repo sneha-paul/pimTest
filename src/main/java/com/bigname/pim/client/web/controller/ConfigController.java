@@ -11,6 +11,7 @@ import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
@@ -19,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by sanoop on 12/02/2019.
@@ -89,40 +87,42 @@ public class ConfigController extends BaseController<Config, ConfigService> {
 
     @RequestMapping(value= {"/{configId}/params/{paramName}", "/{configId}/params/create"})
     public ModelAndView paramDetails(@PathVariable(value = "configId") String configId,
-                                         @PathVariable(value = "paramName", required = false) String paramName) {
+                                     @PathVariable(value = "paramName", required = false) String paramName) {
         String[] paramNames = ValidationUtil.isNotEmpty(paramName) ? paramName.split("\\|") : new String[0];
         return configService.get(ID.EXTERNAL_ID(configId), false)
                 .map(config -> {
                     Map<String, Object> model = new HashMap<>();
                     Map<String, String> param = new HashMap<>();
                     String mode;
-                    if(paramNames.length == 2) {
+                    if(paramNames.length > 0) {
                         mode = "DETAILS";
-                        param.put("name", paramNames[1]);
-                        param.put("scope", paramNames[0]);
-                        param.put("value", config.getParameter(paramNames[1], String.class, paramNames[0]));
+                        param.put("configId", configId);
+                        if(paramNames.length == 1) {
+                            param.put("caseName", paramName);
+                            param.put("name", paramName.toUpperCase());
+                            param.put("scope", "GLOBAL");
+                            param.put("value", config.getParameter(paramName.toUpperCase(), String.class));
+                            model.put("breadcrumbs", new Breadcrumbs("Config",
+                            "Config", "/pim/configs/", config.getConfigName(), "/pim/configs/" + config.getConfigId(),
+                                    "Params", "/pim/configs/" + config.getConfigId() + "#params", paramName, ""));
+                        } else {
+                            param.put("caseName", paramNames[1]);
+                            param.put("name", paramNames[1].toUpperCase());
+                            param.put("scope", paramNames[0]);
+                            param.put("value", config.getParameter(paramNames[1].toUpperCase(), String.class, paramNames[0]));
+                        }
                     } else {
                         mode = "CREATE";
                     }
-                    model.put("param", param);
+                    model.put("paramMap", param);
                     model.put("mode", mode);
                     return new ModelAndView("config/param", model);
                 }).orElseThrow(() -> new EntityNotFoundException("Unable to find Config with Id: " + configId));
-
     }
 
     @RequestMapping("/{configId}/params/data")
     @ResponseBody
-    public Result<Map<String, String>> getConfigParams(@PathVariable(value = "configId") String configId, HttpServletRequest request) {
-        /*return getAssociationGridData(request,
-                WebsiteCatalog.class,
-                dataTableRequest -> {
-                    if(isEmpty(dataTableRequest.getSearch())) {
-                        return websiteService.getWebsiteCatalogs(ID.EXTERNAL_ID(id), dataTableRequest.getPageRequest(associationSortPredicate), dataTableRequest.getStatusOptions());
-                    } else {
-                        return websiteService.findAllWebsiteCatalogs(ID.EXTERNAL_ID(id), "catalogName", dataTableRequest.getSearch(), dataTableRequest.getPageRequest(associationSortPredicate), false);
-                    }
-                });*/
+    public Result<Map<String, String>> getConfigParameters(@PathVariable(value = "configId") String configId, HttpServletRequest request) {
         Request dataTableRequest = new Request(request);
         Pagination pagination = dataTableRequest.getPagination();
         Result<Map<String, String>> result = new Result<>();
@@ -133,7 +133,7 @@ public class ConfigController extends BaseController<Config, ConfigService> {
             sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
         }
         List<Map<String, String>> dataObjects = new ArrayList<>();
-        List<Map<String, Object>> paramList = configService.getCasePreservedParams(ID.EXTERNAL_ID(configId));
+        List<Map<String, Object>> paramList = configService.getCasePreservedConfigParams(ID.EXTERNAL_ID(configId));
         paramList.forEach(param -> param.forEach((k, v) -> {
             Map<String, String> newMap = new HashMap<>();
             newMap.put("paramName", k);
@@ -153,9 +153,29 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
         configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            List<Map<String, Object>> paramList = configService.getCasePreservedParams(ID.EXTERNAL_ID(config.getConfigId()));
-            paramList.forEach(param -> config.setParameter(String.valueOf(parameters.get("paramName")), parameters.get("paramValue")));
-            config.setGroup("DETAILS");
+            List<Map<String, Object>> paramList = configService.getCasePreservedConfigParams(ID.EXTERNAL_ID(config.getConfigId()));
+            paramList.forEach(param -> {
+                if(param.containsKey(String.valueOf(parameters.get("paramName")).toLowerCase())) {
+                    param.forEach((k,v) -> {
+                        if(k.toLowerCase().equals(String.valueOf(parameters.get("paramName")).toLowerCase())){
+                            config.setParameter(k, parameters.get("paramValue"));
+                        }
+                    });
+                } else {
+                    config.setParameter(String.valueOf(parameters.get("paramName")), parameters.get("paramValue"));
+                }
+                /*Set<String> set = param.keySet();
+                set.forEach(name -> {
+                    if(name.toLowerCase().equals(String.valueOf(parameters.get("paramName")).toLowerCase())) {
+                        config.setParameter(name, parameters.get("paramValue"));
+                    } else {
+                        config.setParameter(String.valueOf(parameters.get("paramName")), parameters.get("paramValue"));
+                    }
+                });*/
+
+            });
+            //config.setParameter(String.valueOf(parameters.get("paramName")), parameters.get("paramValue"));
+            config.setGroup("PARAMS");
             configService.update(ID.EXTERNAL_ID(configId), config);
             success[0] = true;
         });

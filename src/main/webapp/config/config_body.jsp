@@ -16,7 +16,7 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
-                                        <form method="post" action="/pim/configs/${config.configName}" data-method="PUT" data-success-message='["Successfully updated the config", "Config Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                        <form method="post" action="/pim/configs/${config.configId}" data-method="PUT" data-success-message='["Successfully updated the config", "Config Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
                                                     <div class="form-group">

@@ -32,7 +32,16 @@ public class ConfigServiceImpl extends BaseServiceSupport<Config, ConfigDAO, Con
     }
 
     @Override
-    public List<Map<String, Object>> getCasePreservedParams(ID<String> configId) {
+    public List<Map<String, Object>> getConfigParams(ID<String> configId) {
+        List<Map<String, Object>> parameter = new ArrayList<>();
+        get(configId, false).ifPresent(config -> {
+            parameter.add(config.getSiteParameters());
+        });
+        return parameter;
+    }
+
+    @Override
+    public List<Map<String, Object>> getCasePreservedConfigParams(ID<String> configId) {
         List<Map<String, Object>> parameter = new ArrayList<>();
         get(configId, false).ifPresent(config -> {
             parameter.add(config.getCasePreservedSiteParameters());
@@ -43,7 +52,7 @@ public class ConfigServiceImpl extends BaseServiceSupport<Config, ConfigDAO, Con
     @Override
     public void deleteConfigParam(String configId, String paramName) {
         get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            List<Map<String, Object>> paramList = getCasePreservedParams(ID.EXTERNAL_ID(config.getConfigId()));
+            List<Map<String, Object>> paramList = getCasePreservedConfigParams(ID.EXTERNAL_ID(config.getConfigId()));
             paramList.forEach(param -> {
                 boolean isKey = param.containsKey(paramName);
                 if(isKey) {
@@ -63,8 +72,7 @@ public class ConfigServiceImpl extends BaseServiceSupport<Config, ConfigDAO, Con
                 paramMap.put("GLOBAL", mapKeyUp);
                 config.setParams(paramMap);
             });
-
-            config.setGroup("DETAILS");
+            config.setGroup("PARAMS");
             update(ID.EXTERNAL_ID(configId), config);
         });
     }
