@@ -19,22 +19,26 @@
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
                                     <div class="body">
-                                        <form method="post" action="/pim/configs/${configId}/params" data-method="PUT" data-success-message='["Successfully updated the pricing attribute", "Pricing Attribute Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                        <c:forEach var="entry" items="${paramMap}">
+                                        <c:if test="${entry.key eq 'name'}">
+                                        <form method="post" action="/pim/configs/${configId}/params/${entry.value}" data-method="PUT" data-success-message='["Successfully updated the pricing attribute", "Pricing Attribute Updated"]' data-error-message='["Correct the validation error and try again", "Invalid Data"]'>
+                                            </c:if>
+                                            </c:forEach>
                                             <div class="row">
                                                 <div class="col-md-6 col-sm-12">
-                                                    <div class="form-group">
-                                                        <label for="paramNameCap">Parameter Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <c:forEach var="entry" items="${paramMap}">
-                                                            <c:if test="${entry.key eq 'name'}">
-                                                                <input type="text" id="paramNameCap" name="paramNameCap" value="${entry.value}" class="form-control" />
-                                                            </c:if>
-                                                        </c:forEach>
-                                                    </div>
-                                                    <div class="form-group">
+                                                    <div class="form-group js-name">
                                                         <label for="paramName">Case Preserved Parameter Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <c:forEach var="entry" items="${paramMap}">
                                                             <c:if test="${entry.key eq 'caseName'}">
                                                                 <input type="text" id="paramName" name="paramName" value="${entry.value}" class="form-control" />
+                                                            </c:if>
+                                                        </c:forEach>
+                                                    </div>
+                                                    <div class="form-group js-external-id">
+                                                        <label for="paramNameCap">Parameter Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <c:forEach var="entry" items="${paramMap}">
+                                                            <c:if test="${entry.key eq 'name'}">
+                                                                <input type="text" id="paramNameCap" name="paramNameCap" value="${entry.value}" class="form-control" />
                                                             </c:if>
                                                         </c:forEach>
                                                     </div>

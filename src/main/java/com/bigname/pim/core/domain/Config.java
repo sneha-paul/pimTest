@@ -24,8 +24,8 @@ public class Config extends MongoEntity<Config> {
     @NotEmpty(message = "Config id cannot be empty", groups = {CreateGroup.class, DetailsGroup.class})
     private String configId;
 
-    private Map<String, Map<String, Object>> params = new HashMap<>();
-    private Map<String, Map<String, Object>> casePreservedParams = new HashMap<>();
+    private Map<String, Map<String, String>> params = new HashMap<>();
+    private Map<String, Map<String, String>> casePreservedParams = new HashMap<>();
 
     public Config() {
         super();
@@ -49,23 +49,23 @@ public class Config extends MongoEntity<Config> {
         this.configName = configName;
     }
 
-    public Map<String, Map<String, Object>> getParams() {
+    public Map<String, Map<String, String>> getParams() {
         return params;
     }
 
-    public void setParams(Map<String, Map<String, Object>> params) {
+    public void setParams(Map<String, Map<String, String>> params) {
         this.params = params;
     }
 
-    public Map<String, Map<String, Object>> getCasePreservedParams() {
+    public Map<String, Map<String, String>> getCasePreservedParams() {
         return casePreservedParams;
     }
 
-    public void setCasePreservedParams(Map<String, Map<String, Object>> casePreservedParams) {
+    public void setCasePreservedParams(Map<String, Map<String, String>> casePreservedParams) {
         this.casePreservedParams = casePreservedParams;
     }
 
-    public Config setParameter(String name, Object value, String... websiteId) {
+    public Config setParameter(String name, String value, String... websiteId) {
         String _websiteId = ConversionUtil.getValue(websiteId);
         _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
         if(isNotEmpty(name)) {
@@ -74,7 +74,8 @@ public class Config extends MongoEntity<Config> {
                 casePreservedParams.put(_websiteId, new HashMap<>());
             }
             params.get(_websiteId).put(name.toUpperCase(), value);
-            casePreservedParams.get(_websiteId).put(name, value);
+            String[] caseValue = value.split("\\|");
+            casePreservedParams.get(_websiteId).put(name, caseValue[1]);
         }
         return this;
     }
@@ -85,15 +86,19 @@ public class Config extends MongoEntity<Config> {
         return (T)params.get(_websiteId).get(name);
     }
 
-    public Map<String, Object> getSiteParameters(String... websiteId) {
+    public Map<String, String> getSiteParameters(String... websiteId) {
         String _websiteId = ConversionUtil.getValue(websiteId);
         _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
-        return new HashMap<>(params.get(_websiteId));
+        Map<String, String> paramMap = params.get(_websiteId);
+        return paramMap == null ?  new HashMap<>() :  new HashMap<>(paramMap);
     }
-    public Map<String, Object> getCasePreservedSiteParameters(String... websiteId) {
+
+    public Map<String, String> getCasePreservedSiteParameters(String... websiteId) {
         String _websiteId = ConversionUtil.getValue(websiteId);
         _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
-        return new HashMap<>(casePreservedParams.get(_websiteId));
+        Map<String, String> casePreservedParamMap = casePreservedParams.get(_websiteId);
+        return casePreservedParamMap == null ?  new HashMap<>() :  new HashMap<>(casePreservedParamMap);
+        //return new HashMap<>(casePreservedParams.get(_websiteId));
     }
 
     @Override
@@ -122,11 +127,13 @@ public class Config extends MongoEntity<Config> {
                     mergeBaseProperties(config);
                     break;
                 case "PARAMS":
-                    mergeBaseProperties(config);
-                    Map<String, Object> parameter = config.getCasePreservedSiteParameters();
-                    parameter.forEach((k,v) -> this.setParameter(k, v));
                     this.setCasePreservedParams(config.getCasePreservedParams());
                     this.setParams(config.getParams());
+                    Map<String, String> parameter = config.getSiteParameters();
+                    parameter.forEach((k,v) -> {
+                        String[] value = v.split("\\|");
+                        this.setParameter(value[0], v);
+                    });
                     break;
             }
         }

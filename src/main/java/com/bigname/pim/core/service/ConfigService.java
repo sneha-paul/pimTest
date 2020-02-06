@@ -14,9 +14,11 @@ import java.util.Map;
  * Created by sanoop on 12/02/2019.
  */
 public interface ConfigService extends BaseService<Config , ConfigDAO> {
-    List<Map<String, Object>> getConfigParams(ID<String> configId);
+    List<Map<String, String>> getConfigParams(ID<String> configId);
 
-    List<Map<String, Object>> getCasePreservedConfigParams(ID<String> configId);
+    List<Map<String, String>> getCasePreservedConfigParams(ID<String> configId);
 
     void deleteConfigParam(String configId,String paramName);
+
+    boolean updateParameter(String configId, String paramName, Map<String, String> parameters);
 }
