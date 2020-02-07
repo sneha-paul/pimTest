@@ -2,6 +2,7 @@ package com.bigname.pim.core.domain;
 
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.xcore.domain.MongoEntity;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import javax.validation.constraints.NotEmpty;
@@ -26,6 +27,10 @@ public class Config extends MongoEntity<Config> {
 
     private Map<String, Map<String, String>> params = new HashMap<>();
     private Map<String, Map<String, String>> casePreservedParams = new HashMap<>();
+
+    @Transient
+    private String websiteId;
+
 
     public Config() {
         super();
@@ -63,6 +68,14 @@ public class Config extends MongoEntity<Config> {
 
     public void setCasePreservedParams(Map<String, Map<String, String>> casePreservedParams) {
         this.casePreservedParams = casePreservedParams;
+    }
+
+    public String getWebsiteId() {
+        return websiteId;
+    }
+
+    public void setWebsiteId(String websiteId) {
+        this.websiteId = websiteId;
     }
 
     public Config setParameter(String name, String value, String... websiteId) {
@@ -133,6 +146,15 @@ public class Config extends MongoEntity<Config> {
                     parameter.forEach((k,v) -> {
                         String[] value = v.split("\\|");
                         this.setParameter(value[0], v);
+                    });
+                    break;
+                case "WEB-PARAMS":
+                    this.setCasePreservedParams(config.getCasePreservedParams());
+                    this.setParams(config.getParams());
+                    Map<String, String> webParameter = config.getSiteParameters(config.getWebsiteId());
+                    webParameter.forEach((k,v) -> {
+                        String[] value = v.split("\\|");
+                        this.setParameter(value[0], v, config.getWebsiteId());
                     });
                     break;
             }

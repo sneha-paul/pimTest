@@ -32,6 +32,8 @@
                 click: function (row) {
                     if(options.pageUrl.includes('params')) {
                         window.location.href = $.getURLWithRequestParams(options.pageUrl + row.paramName, options.urlParams || {});
+                    } else if(options.pageUrl.includes('websiteConfig')) {
+                        window.location.href = $.getURLWithRequestParams(options.pageUrl + row.configId + "/param/" + row.paramName, options.urlParams || {});
                     } else {
                         window.location.href = $.getURLWithRequestParams(options.pageUrl.includes('history') === true ? (options.pageUrl + row.timeStamp) : options.pageUrl + row.externalId, options.urlParams || {});
                     }
@@ -47,12 +49,22 @@
                 icon: 'icon-trash',
                 click: function (row) {
                     //window.location.href = $.getURLWithRequestParams(options.pageUrl + row.paramName + '/delete', options.urlParams || {});
-                    $.deleteInstance(
-                        $.getURL((options.pageUrl + '{paramName}/delete'), {
-                            paramName: row.paramName
-                        }),
-                        options.names[1],
-                        $.refreshDataTable.bind(this, options.names[0]));
+                    if(options.pageUrl.includes('websiteConfig')) {
+                        $.deleteInstance(
+                            $.getURL((options.pageUrl + '{configId}/param/{paramName}/delete'), {
+                                paramName: row.paramName,
+                                configId: row.configId
+                            }),
+                            options.names[1],
+                            $.refreshDataTable.bind(this, options.names[0]));
+                    } else {
+                        $.deleteInstance(
+                            $.getURL((options.pageUrl + '{paramName}/delete'), {
+                                paramName: row.paramName
+                            }),
+                            options.names[1],
+                            $.refreshDataTable.bind(this, options.names[0]));
+                    }
                 }
             };
         },

@@ -105,7 +105,7 @@ public class ConfigController extends BaseController<Config, ConfigService> {
                             String[] paramValue = config.getParameter(paramName.toUpperCase(), String.class).split("\\|");
                             param.put("value", paramValue[1]);
                             model.put("breadcrumbs", new Breadcrumbs("Config",
-                            "Config", "/pim/configs/", config.getConfigName(), "/pim/configs/" + config.getConfigId(),
+                                    "Config", "/pim/configs/", config.getConfigName(), "/pim/configs/" + config.getConfigId(),
                                     "Params", "/pim/configs/" + config.getConfigId() + "#params", paramName, ""));
                         } else {
                             param.put("caseName", paramNames[1]);
@@ -149,77 +149,33 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         return result;
     }
 
-    /*@RequestMapping(value = "/{configId}/params", method = RequestMethod.PUT)
-    @ResponseBody
-    public Map<String, Object> createParameter(@PathVariable(value = "configId") String configId, @RequestParam Map<String, String> parameters) {
-        Map<String, Object> model = new HashMap<>();
-        boolean[] success = {false};
-        configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            List<Map<String, String>> paramList = configService.getConfigParams(ID.EXTERNAL_ID(config.getConfigId()));
-            if(paramList.size() > 0) {
-                paramList.forEach(param -> {
-                    Set<String> keySet = param.keySet().stream().filter(s -> s.equals(parameters.get("paramName").toUpperCase())).collect(Collectors.toSet());
-                    if (keySet.isEmpty()) {
-                        Map<String, Map<String, String>> parameterMap = new HashMap<>();
-                        Map<String, String> valueMap = new HashMap<>();
-                        valueMap.put(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-                        parameterMap.put("GLOBAL", valueMap);
-                        config.setParams(parameterMap);
-                        config.setCasePreservedParams(parameterMap);
-                    } else {
-                        keySet.forEach(key -> {
-                            String value = config.getParameter(key, String.class);
-                            String[] keyValue = value.split("\\|");
-                            Map<String, String> caseMap = config.getCasePreservedSiteParameters();
-                            caseMap.keySet().removeIf(k -> k.equals(keyValue[0]));
-                            Map<String, Map<String, String>> caseParameterMap = new HashMap<>();
-                            caseParameterMap.put("GLOBAL", caseMap);
-                            config.setCasePreservedParams(caseParameterMap);
-                            config.setGroup("DELETE");
-                            configService.update(ID.EXTERNAL_ID(configId), config);
-
-                            Map<String, Map<String, String>> parameterMap = new HashMap<>();
-                            Map<String, String> valueMap = new HashMap<>();
-                            valueMap.put(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-                            parameterMap.put("GLOBAL", valueMap);
-                            config.setParams(parameterMap);
-                            config.setCasePreservedParams(parameterMap);
-                        });
-                    }
-                });
-            }
-            config.setGroup("PARAMS");
-            configService.update(ID.EXTERNAL_ID(configId), config);
-            success[0] = true;
-
-        });
-        model.put("success", success[0]);
-        return model;
-    }*/
-
     @RequestMapping(value = "/{configId}/params", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> createParameter(@PathVariable(value = "configId") String configId, @RequestParam Map<String, String> parameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
         configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            Map<String, String> param = config.getSiteParameters();
-            if(param.isEmpty()) {
+            Map<String, Map<String, String>> paramDb = config.getParams();
+            Map<String, String> param = paramDb.get("GLOBAL");
+            if(paramDb.get("GLOBAL") == null) {
                 config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
             } else {
                 Set<String> keySet = param.keySet().stream().filter(k -> k.equals(parameters.get("paramName").toUpperCase())).collect(Collectors.toSet());
-                if(keySet.isEmpty()) {
+                if (keySet.isEmpty()) {
                     config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
                 } else {
-                    Map<String, String> caseParam = config.getCasePreservedSiteParameters();
+                    Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
+                    Map<String, String> caseParam = caseParamDb.get("GLOBAL");
                     keySet.forEach(key -> {
                         String[] value = config.getParameter(key, String.class).split("\\|");
                         caseParam.keySet().removeIf(k -> k.equals(value[0]));
                     });
                     param.put(parameters.get("paramName").toUpperCase(), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-                    caseParam.put(parameters.get("paramName"),  parameters.get("paramValue"));
-                    config.setParams(Map.of("GLOBAL", param));
-                    config.setCasePreservedParams(Map.of("GLOBAL", caseParam));
+                    paramDb.put("GLOBAL", param);
+                    caseParam.put(parameters.get("paramName"), parameters.get("paramValue"));
+                    caseParamDb.put("GLOBAL", caseParam);
+                    config.setParams(paramDb);
+                    config.setCasePreservedParams(caseParamDb);
                 }
             }
             config.setGroup("PARAMS");

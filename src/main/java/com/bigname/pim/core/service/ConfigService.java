@@ -16,7 +16,7 @@ import java.util.Map;
 public interface ConfigService extends BaseService<Config , ConfigDAO> {
     List<Map<String, String>> getConfigParams(ID<String> configId);
 
-    List<Map<String, String>> getCasePreservedConfigParams(ID<String> configId);
+    List<Map<String, String>> getCasePreservedConfigParams(ID<String> configId, String... websiteId);
 
     void deleteConfigParam(String configId,String paramName);
 

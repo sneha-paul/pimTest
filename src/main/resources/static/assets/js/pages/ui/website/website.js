@@ -81,4 +81,34 @@ $(function(){
             {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
         ]
     });
+
+    $('.js-websiteConfigParam-tab').on('shown.bs.tab.websiteConfigParam', function (e) {
+        $.initEntitiesGrid({
+            selector: '#paginatedWebsiteConfigParamTable',
+            names: ['websiteConfigParams', 'websiteConfigParam'],
+            pageUrl: $.getURL('/pim/websites/{websiteId}/websiteConfig/'),
+            dataUrl: $.getURL('/pim/websites/{websiteId}/configParam/data'),
+            urlParams: urlParams,
+            hideStatus:'true',
+            columns: [
+                { data: 'paramName', name : 'paramName' , title : 'Parameter Name'},
+                { data: 'paramValue', name : 'paramValue', title : 'Parameter Value' },
+                { data: 'configId', name : 'configId', title : 'Config Id' }
+            ],
+            buttons: ['DETAILS', 'DELETE']
+        });
+        $(this).removeClass('js-websiteConfigParam-tab').off('shown.bs.tab.websiteConfigParam');
+    });
+
+    $.addModal({
+        selector: '.js-add-websiteParam',
+        url: $.getURL('/pim/websites/{websiteId}/param/create'),
+        name:'add-parameters',
+        title:'Add Parameters',
+        buttons: [
+            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('websiteConfigParams');$.closeModal();});}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
+
 });

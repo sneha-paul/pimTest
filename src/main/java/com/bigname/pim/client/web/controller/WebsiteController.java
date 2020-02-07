@@ -1,8 +1,10 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.pim.core.domain.Config;
 import com.bigname.pim.core.domain.Website;
 import com.bigname.pim.core.domain.WebsiteCatalog;
 import com.bigname.pim.core.domain.WebsitePage;
+import com.bigname.pim.core.service.ConfigService;
 import com.bigname.pim.core.service.WebsitePageService;
 import com.bigname.pim.core.service.WebsiteService;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
@@ -17,6 +19,7 @@ import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.domain.Version;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import com.m7.xtreme.xplatform.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,10 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
@@ -51,12 +51,14 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     private WebsiteService websiteService;
     private UserService userService;
     private RestTemplate restTemplate;
+    private ConfigService configService;
 
-    public WebsiteController(WebsiteService websiteService, UserService userService, RestTemplate restTemplate) {
+    public WebsiteController(WebsiteService websiteService, UserService userService, RestTemplate restTemplate, ConfigService configService) {
         super(websiteService, Website.class, new BreadcrumbsBuilder());
         this.websiteService = websiteService;
         this.userService = userService;
         this.restTemplate = restTemplate;
+        this.configService = configService;
     }
 
 
@@ -298,5 +300,190 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         List<WebsiteCatalog> websiteCatalogList = websiteService.loadWebsiteCatalogsToBOS();
         ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/website/loadWebsiteCatalog", websiteCatalogList, String.class, new HashMap<>());
         return response.getBody();
+    }
+
+    @RequestMapping("/{websiteId}/configParam/data")
+    @ResponseBody
+    public Result<Map<String, String>> getConfigsData(@PathVariable(value = "websiteId") String websiteId, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        Website website = websiteService.get(ID.EXTERNAL_ID(websiteId), false).orElse(null);
+        List<Map<String, String>> paramList = new ArrayList<>();
+        List<String> configIds = new ArrayList<>();
+        configService.getAll(null, false).forEach(config -> {
+            paramList.addAll(configService.getCasePreservedConfigParams(ID.EXTERNAL_ID(config.getConfigId()), website.getId()));
+        });
+        paramList.forEach(param -> param.forEach((k, v) -> {
+            Map<String, String> newMap = new HashMap<>();
+            newMap.put("paramName", k);
+            newMap.put("paramValue", String.valueOf(v));
+            newMap.put("configId", "TEST");
+            dataObjects.add(newMap);
+        }));
+        Page<Map<String, String>> paginatedResult = new PageImpl<>(dataObjects);
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
+    @RequestMapping(value = {"/{websiteId}/websiteConfig/{configId}/param/{paramName}", "/{websiteId}/param/create"})
+    public ModelAndView parameterCreateView(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "configId", required = false) String configId, @PathVariable(value = "paramName", required = false) String paramName) {
+        Map<String, Object> model = new HashMap<>();
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            model.put("website", website);
+            if(configId == null) {
+                List<String> configIds = new ArrayList<>();
+                configService.getAll(null, false).forEach(config -> {
+                    configIds.add(config.getConfigId());
+                });
+                model.put("mode", "CREATE");
+                model.put("configs", configIds);
+
+            } else {
+                configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+                    Map<String, String> param = new HashMap<>();
+                    model.put("configId", configId);
+                    model.put("caseName", paramName);
+                    model.put("name", paramName.toUpperCase());
+                    String[] paramValue = config.getParameter(paramName.toUpperCase(), String.class, website.getId()).split("\\|");
+                    model.put("value", paramValue[1]);
+                    model.put("mode", "DETAILS");
+                    model.put("breadcrumbs", new Breadcrumbs("Websites",
+                            "Websites", "/pim/websites/", website.getWebsiteName(), "/pim/websites/" + website.getWebsiteId(),
+                            "Params", "/pim/websites/" + website.getWebsiteId() + "#websiteConfigParam", paramName, ""));
+                });
+            }
+        });
+        return new ModelAndView("website/websiteParam", model);
+    }
+
+    @RequestMapping(value = "/{websiteId}/params", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> createParameter(@PathVariable(value = "websiteId") String websiteId, @RequestParam Map<String, String> parameters) {
+        Map<String, Object> model = new HashMap<>();
+        boolean[] success = {false};
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            configService.get(ID.EXTERNAL_ID(parameters.get("configId")), false).ifPresent(config -> {
+                /*Map<String, String> param = config.getSiteParameters(website.getId());*/
+                Map<String, Map<String, String>> paramDb = config.getParams();
+                Map<String, String> param = paramDb.get(website.getId().toUpperCase());
+                if(paramDb.get(website.getId().toUpperCase()) == null) {
+                    config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"), website.getId());
+                } else {
+                    Set<String> keySet = param.keySet().stream().filter(k -> k.equals(parameters.get("paramName").toUpperCase())).collect(Collectors.toSet());
+                    if (keySet.isEmpty()) {
+                        config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"), website.getId());
+                    } else {
+                        /*Map<String, String> caseParam = config.getCasePreservedSiteParameters(website.getId());*/
+                        Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
+                        Map<String, String> caseParam = caseParamDb.get(website.getId().toUpperCase());
+                        keySet.forEach(key -> {
+                            String[] value = config.getParameter(key, String.class, website.getId()).split("\\|");
+                            caseParam.keySet().removeIf(k -> k.equals(value[0]));
+                        });
+                        param.put(parameters.get("paramName").toUpperCase(), parameters.get("paramName") + "|" + parameters.get("paramValue"));
+                        caseParam.put(parameters.get("paramName"), parameters.get("paramValue"));
+                        paramDb.put(website.getId().toUpperCase(), param);
+                        caseParamDb.put(website.getId().toUpperCase(), caseParam);
+                    /*config.setParams(Map.of(website.getId().toUpperCase(), param));
+                    config.setCasePreservedParams(Map.of(website.getId().toUpperCase(), caseParam));*/
+                        config.setParams(paramDb);
+                        config.setCasePreservedParams(caseParamDb);
+                    }
+                }
+                config.setGroup("WEB-PARAMS");
+                configService.update(ID.EXTERNAL_ID(config.getConfigId()), config);
+                success[0] = true;
+
+            });
+        });
+        model.put("success", success[0]);
+        return model;
+    }
+
+    @RequestMapping(value = "/{websiteId}/config/{configId}/param/{paramName}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> updateParameter(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName, @RequestParam Map<String, String> parameters) {
+        Map<String, Object> model = new HashMap<>();
+        boolean[] success = {false};
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            configService.get(ID.EXTERNAL_ID(parameters.get("configId")), false).ifPresent(config -> {
+                /*Map<String, String> param = config.getSiteParameters(website.getId());*/
+                Map<String, Map<String, String>> paramDb = config.getParams();
+                Map<String, String> param = paramDb.get(website.getId().toUpperCase());
+                /*Map<String, String> caseParam = config.getCasePreservedSiteParameters(website.getId());*/
+                Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
+                Map<String, String> caseParam = caseParamDb.get(website.getId().toUpperCase());
+                Set<String> keySetParam;
+                if(paramName.equals(parameters.get("paramName"))) {
+                    keySetParam = new HashSet<>();
+                } else {
+                    keySetParam = param.keySet().stream().filter(k -> k.equals(parameters.get("paramName").toUpperCase())).collect(Collectors.toSet());
+                }
+                if(keySetParam.isEmpty()) {
+                    Set<String> keySet = param.keySet().stream().filter(k -> k.equals(paramName.toUpperCase())).collect(Collectors.toSet());
+                    keySet.forEach(key -> {
+                        String[] value = config.getParameter(key, String.class, website.getId()).split("\\|");
+                        caseParam.keySet().removeIf(k -> k.equals(value[0]));
+                    });
+                    param.keySet().removeIf(k -> k.equals(paramName.toUpperCase()));
+                    param.put(parameters.get("paramName").toUpperCase(), parameters.get("paramName") + "|" + parameters.get("paramValue"));
+                    caseParam.put(parameters.get("paramName"), parameters.get("paramValue"));
+                    paramDb.put(website.getId().toUpperCase(), param);
+                    caseParamDb.put(website.getId().toUpperCase(), caseParam);
+                    /*config.setParams(Map.of(website.getId(), param));
+                    config.setCasePreservedParams(Map.of(website.getId(), caseParam));*/
+                    config.setParams(paramDb);
+                    config.setCasePreservedParams(caseParamDb);
+                    config.setGroup("WEB-PARAMS");
+                    config.setWebsiteId(website.getId());
+                    configService.update(ID.EXTERNAL_ID(configId), config);
+                    success[0] = true;
+                }
+            });
+        });
+        model.put("success", success[0]);
+        return model;
+    }
+
+    @RequestMapping(value = "/{websiteId}/websiteConfig/{configId}/param/{paramName}/delete", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> deleteParams(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName) {
+        Map<String, Object> model = new HashMap<>();
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+
+                Map<String, Map<String, String>> paramDb = config.getParams();
+                Map<String, String> param = paramDb.get("GLOBAL");
+                /*Map<String, String> caseParam = config.getCasePreservedSiteParameters();*/
+                Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
+                Map<String, String> caseParam = caseParamDb.get("GLOBAL");
+                Set<String> keySet = param.keySet().stream().filter(k -> k.equals(paramName.toUpperCase())).collect(Collectors.toSet());
+                keySet.forEach(key -> {
+                    String[] value = config.getParameter(key, String.class).split("\\|");
+                    caseParam.keySet().removeIf(k -> k.equals(value[0]));
+                });
+                param.keySet().removeIf(k -> k.equals(paramName.toUpperCase()));config.setParams(Map.of("GLOBAL", param));
+                /*config.setCasePreservedParams(Map.of("GLOBAL", caseParam));*/
+                paramDb.put(website.getId().toUpperCase(), param);
+                caseParamDb.put(website.getId().toUpperCase(), caseParam);
+                config.setParams(paramDb);
+                config.setCasePreservedParams(caseParamDb);
+                config.setGroup("WEB-PARAMS");
+                configService.update(ID.EXTERNAL_ID(configId), config);
+
+            });
+        });
+        model.put("success", true);
+        return model;
     }
 }

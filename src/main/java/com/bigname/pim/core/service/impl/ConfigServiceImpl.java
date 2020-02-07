@@ -41,82 +41,73 @@ public class ConfigServiceImpl extends BaseServiceSupport<Config, ConfigDAO, Con
     }
 
     @Override
-    public List<Map<String, String>> getCasePreservedConfigParams(ID<String> configId) {
+    public List<Map<String, String>> getCasePreservedConfigParams(ID<String> configId, String... websiteId) {
         List<Map<String, String>> parameter = new ArrayList<>();
         get(configId, false).ifPresent(config -> {
-            parameter.add(config.getCasePreservedSiteParameters());
+            parameter.add(config.getCasePreservedSiteParameters(websiteId));
         });
         return parameter;
     }
 
     @Override
     public boolean updateParameter(String configId, String paramName, Map<String, String> parameters) {
+        boolean[] success = {false};
         get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            Map<String, String> param = config.getSiteParameters();
-            Map<String, String> caseParam = config.getCasePreservedSiteParameters();
-            Set<String> keySet = param.keySet().stream().filter(k -> k.equals(paramName.toUpperCase())).collect(Collectors.toSet());
-            keySet.forEach(key -> {
-                String[] value = config.getParameter(key, String.class).split("\\|");
-                caseParam.keySet().removeIf(k -> k.equals(value[0]));
-            });
-            param.keySet().removeIf(k -> k.equals(paramName.toUpperCase()));
-
-            Set<String> keySetParam = param.keySet().stream().filter(k -> k.equals(parameters.get("paramName").toUpperCase())).collect(Collectors.toSet());
-            keySetParam.forEach(key -> {
-                String[] value = config.getParameter(key, String.class).split("\\|");
-                caseParam.keySet().removeIf(k -> k.equals(value[0]));
-            });
-            param.keySet().removeIf(k -> k.equals(parameters.get("paramName").toUpperCase()));
-
-            param.put(parameters.get("paramName").toUpperCase(), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-            caseParam.put(parameters.get("paramName"),  parameters.get("paramValue"));
-            config.setParams(Map.of("GLOBAL", param));
-            config.setCasePreservedParams(Map.of("GLOBAL", caseParam));
-            config.setGroup("PARAMS");
-            update(ID.EXTERNAL_ID(configId), config);
+            /*Map<String, String> param = config.getSiteParameters();*/
+            Map<String, Map<String, String>> paramDb = config.getParams();
+            Map<String, String> param = paramDb.get("GLOBAL");
+            /*Map<String, String> caseParam = config.getCasePreservedSiteParameters();*/
+            Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
+            Map<String, String> caseParam = caseParamDb.get("GLOBAL");
+            Set<String> keySetParam;
+            if(paramName.equals(parameters.get("paramName"))) {
+                keySetParam = new HashSet<>();
+            } else {
+                keySetParam = param.keySet().stream().filter(k -> k.equals(parameters.get("paramName").toUpperCase())).collect(Collectors.toSet());
+            }
+            if(keySetParam.isEmpty()) {
+                Set<String> keySet = param.keySet().stream().filter(k -> k.equals(paramName.toUpperCase())).collect(Collectors.toSet());
+                keySet.forEach(key -> {
+                    String[] value = config.getParameter(key, String.class).split("\\|");
+                    caseParam.keySet().removeIf(k -> k.equals(value[0]));
+                });
+                param.keySet().removeIf(k -> k.equals(paramName.toUpperCase()));
+                param.put(parameters.get("paramName").toUpperCase(), parameters.get("paramName") + "|" + parameters.get("paramValue"));
+                caseParam.put(parameters.get("paramName"), parameters.get("paramValue"));
+                paramDb.put("GLOBAL", param);
+                caseParamDb.put("GLOBAL", caseParam);
+                config.setParams(paramDb);
+                config.setCasePreservedParams(caseParamDb);
+                /*config.setParams(Map.of("GLOBAL", param));
+                config.setCasePreservedParams(Map.of("GLOBAL", caseParam));*/
+                config.setGroup("PARAMS");
+                update(ID.EXTERNAL_ID(configId), config);
+                success[0] = true;
+            }
         });
-        return true;
+        return success[0];
     }
-
-    /*@Override
-    public void deleteConfigParam(String configId, String paramName) {
-        get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            List<Map<String, String>> paramList = getCasePreservedConfigParams(ID.EXTERNAL_ID(config.getConfigId()));
-            paramList.forEach(param -> {
-                if(param.containsKey(paramName)) {
-                    param.remove(paramName);
-                }
-            });
-            paramList.forEach(param -> {
-                Map<String, Map<String, String>> casePreserveMap = new HashMap<>();
-                casePreserveMap.put("GLOBAL", param);
-                config.setCasePreservedParams(casePreserveMap);
-
-                Map<String, Map<String, String>> paramMap = new HashMap<>();
-                Map<String, String> mapKeyUp = param.entrySet().stream().collect(Collectors.toMap(
-                        entry -> (entry.getKey().toUpperCase()),
-                        entry -> entry.getValue())
-                );
-                paramMap.put("GLOBAL", mapKeyUp);
-                config.setParams(paramMap);
-            });
-            config.setGroup("PARAMS");
-            update(ID.EXTERNAL_ID(configId), config);
-        });
-    }*/
 
     @Override
     public void deleteConfigParam(String configId, String paramName) {
         get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            Map<String, String> param = config.getSiteParameters();
-            Map<String, String> caseParam = config.getCasePreservedSiteParameters();
+            /*Map<String, String> param = config.getSiteParameters();*/
+            Map<String, Map<String, String>> paramDb = config.getParams();
+            Map<String, String> param = paramDb.get("GLOBAL");
+            /*Map<String, String> caseParam = config.getCasePreservedSiteParameters();*/
+            Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
+            Map<String, String> caseParam = caseParamDb.get("GLOBAL");
             Set<String> keySet = param.keySet().stream().filter(k -> k.equals(paramName.toUpperCase())).collect(Collectors.toSet());
             keySet.forEach(key -> {
                 String[] value = config.getParameter(key, String.class).split("\\|");
                 caseParam.keySet().removeIf(k -> k.equals(value[0]));
             });
             param.keySet().removeIf(k -> k.equals(paramName.toUpperCase()));config.setParams(Map.of("GLOBAL", param));
-            config.setCasePreservedParams(Map.of("GLOBAL", caseParam));
+            /*config.setCasePreservedParams(Map.of("GLOBAL", caseParam));*/
+            paramDb.put("GLOBAL", param);
+            caseParamDb.put("GLOBAL", caseParam);
+            config.setParams(paramDb);
+            config.setCasePreservedParams(caseParamDb);
             config.setGroup("PARAMS");
             update(ID.EXTERNAL_ID(configId), config);
         });
