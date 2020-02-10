@@ -28,11 +28,11 @@
                                                     </div>
                                                     <div class="form-group js-name">
                                                         <label for="paramName">Case Preserved Parameter Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="paramName" name="paramName" value="${caseName}" class="form-control" />
+                                                        <input type="text" id="paramName" name="paramName" value="${caseName}" class="form-control" readonly/>
                                                     </div>
                                                     <div class="form-group js-external-id">
                                                         <label for="paramNameCap">Parameter Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="text" id="paramNameCap" name="paramNameCap" value="${name}" class="form-control" />
+                                                        <input type="text" id="paramNameCap" name="paramNameCap" value="${name}" class="form-control" readonly/>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="paramValue">Parameter Value</label><code class="highlighter-rouge m-l-10">*</code>

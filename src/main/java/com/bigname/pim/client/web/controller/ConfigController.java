@@ -12,6 +12,7 @@ import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
@@ -155,32 +156,17 @@ public class ConfigController extends BaseController<Config, ConfigService> {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
         configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            Map<String, Map<String, String>> paramDb = config.getParams();
-            Map<String, String> param = paramDb.get("GLOBAL");
-            if(paramDb.get("GLOBAL") == null) {
+            String param = config.getParameter(parameters.get("paramName").toUpperCase(), String.class);
+            if(ValidationUtil.isEmpty(param) && param == null) {
                 config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
+                config.setGroup("PARAMS");
+                configService.update(ID.EXTERNAL_ID(configId), config);
+                success[0] = true;
             } else {
-                Set<String> keySet = param.keySet().stream().filter(k -> k.equals(parameters.get("paramName").toUpperCase())).collect(Collectors.toSet());
-                if (keySet.isEmpty()) {
-                    config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-                } else {
-                    Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
-                    Map<String, String> caseParam = caseParamDb.get("GLOBAL");
-                    keySet.forEach(key -> {
-                        String[] value = config.getParameter(key, String.class).split("\\|");
-                        caseParam.keySet().removeIf(k -> k.equals(value[0]));
-                    });
-                    param.put(parameters.get("paramName").toUpperCase(), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-                    paramDb.put("GLOBAL", param);
-                    caseParam.put(parameters.get("paramName"), parameters.get("paramValue"));
-                    caseParamDb.put("GLOBAL", caseParam);
-                    config.setParams(paramDb);
-                    config.setCasePreservedParams(caseParamDb);
-                }
+                Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                _fieldErrors.put("paramName", Pair.with("Parameter name already exists", parameters.get("paramName")));
+                model.put("fieldErrors", _fieldErrors);
             }
-            config.setGroup("PARAMS");
-            configService.update(ID.EXTERNAL_ID(configId), config);
-            success[0] = true;
         });
         model.put("success", success[0]);
         return model;
@@ -191,7 +177,12 @@ public class ConfigController extends BaseController<Config, ConfigService> {
     public Map<String, Object> updateParameter(@PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName, @RequestParam Map<String, String> parameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        success[0] = configService.updateParameter(configId, paramName, parameters);
+        configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+            config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
+            config.setGroup("PARAMS");
+            configService.update(ID.EXTERNAL_ID(configId), config);
+            success[0] = true;
+        });
         model.put("success", success[0]);
         return model;
     }
@@ -201,7 +192,25 @@ public class ConfigController extends BaseController<Config, ConfigService> {
     @ResponseBody
     public Map<String, Object> deleteParams(@PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName) {
         Map<String, Object> model = new HashMap<>();
-        configService.deleteConfigParam(configId, paramName);
+        configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+            Map<String, Map<String, String>> paramDb = config.getParams();
+            Map<String, String> param = paramDb.get("GLOBAL");
+            Map<String, Map<String, String>> caseParamDb = config.getCasePreservedParams();
+            Map<String, String> caseParam = caseParamDb.get("GLOBAL");
+            Set<String> keySet = param.keySet().stream().filter(k -> k.equals(paramName.toUpperCase())).collect(Collectors.toSet());
+            keySet.forEach(key -> {
+                String[] value = config.getParameter(key, String.class).split("\\|");
+                caseParam.keySet().removeIf(k -> k.equals(value[0]));
+            });
+            param.keySet().removeIf(k -> k.equals(paramName.toUpperCase()));
+            config.setParams(Map.of("GLOBAL", param));
+            paramDb.put("GLOBAL", param);
+            caseParamDb.put("GLOBAL", caseParam);
+            config.setParams(paramDb);
+            config.setCasePreservedParams(caseParamDb);
+            config.setGroup("PARAMS");
+            configService.update(ID.EXTERNAL_ID(configId), config);
+        });
         model.put("success", true);
         return model;
     }

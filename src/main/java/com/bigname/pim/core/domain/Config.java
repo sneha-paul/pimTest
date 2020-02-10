@@ -96,7 +96,8 @@ public class Config extends MongoEntity<Config> {
     public <T> T getParameter(String name, Class<T> type, String... websiteId){
         String _websiteId = ConversionUtil.getValue(websiteId);
         _websiteId = isEmpty(_websiteId) ? "GLOBAL" : _websiteId.toUpperCase();
-        return (T)params.get(_websiteId).get(name);
+        return params.get(_websiteId) == null ? null : (T)params.get(_websiteId).get(name);
+        //return (T)params.get(_websiteId).get(name);
     }
 
     public Map<String, String> getSiteParameters(String... websiteId) {

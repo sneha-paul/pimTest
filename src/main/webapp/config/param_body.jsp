@@ -30,7 +30,7 @@
                                                         <label for="paramName">Case Preserved Parameter Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <c:forEach var="entry" items="${paramMap}">
                                                             <c:if test="${entry.key eq 'caseName'}">
-                                                                <input type="text" id="paramName" name="paramName" value="${entry.value}" class="form-control" />
+                                                                <input type="text" id="paramName" name="paramName" value="${entry.value}" class="form-control" readonly/>
                                                             </c:if>
                                                         </c:forEach>
                                                     </div>
@@ -38,7 +38,7 @@
                                                         <label for="paramNameCap">Parameter Name</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <c:forEach var="entry" items="${paramMap}">
                                                             <c:if test="${entry.key eq 'name'}">
-                                                                <input type="text" id="paramNameCap" name="paramNameCap" value="${entry.value}" class="form-control" />
+                                                                <input type="text" id="paramNameCap" name="paramNameCap" value="${entry.value}" class="form-control" readonly/>
                                                             </c:if>
                                                         </c:forEach>
                                                     </div>
