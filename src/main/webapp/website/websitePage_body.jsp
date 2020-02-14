@@ -3,12 +3,12 @@
     <div class="col-lg-12 col-md-12">
         <div class="card">
             <div class="header">
-                <h2>${websitePage.pageName} <small><code class="highlighter-rouge">${websitePage.pageId}</code></small><small class="pull-right m-t--15"><code style="color:#808080">_id: ${websitePage.id}</code></small></h2>
+                <h2>${websitePage.pageName} <small><code class="highlighter-rouge">${websitePage.pageId}</code></small><small class="pull-right m-t--15"><code style="color:#808080">_website id: ${website.id}</code></small></h2>
             </div>
             <div class="body">
                 <ul class="nav nav-tabs-new2">
                     <li class="nav-item"><a class="nav-link active show" data-toggle="tab" href="#DETAILS">Details</a></li>
-                    <li class="nav-item"><a class="nav-link js-pageAttributes-tab" data-toggle="tab" href="#ATTRIBUTES">Attributes</a></li>
+                    <li class="nav-item"><a class="nav-link js-pageAttributes-tab" data-toggle="tab" href="#pageAttributes">Attributes</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="DETAILS">
@@ -63,7 +63,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane" id="ATTRIBUTES">
+                    <div class="tab-pane" id="pageAttributes">
                         <div class="row clearfix">
                             <div class="col-lg-12 col-md-12">
                                 <div class="card">
@@ -71,12 +71,12 @@
                                         <div class="row p-b-25">
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
-                                                    <button type="button" class="btn btn-success js-add-attribute"><i class="fa fa-plus"></i> <span class="p-l-5">Add Attribute</span></button>
+                                                    <button type="button" class="btn btn-success js-add-pageAttributes"><i class="fa fa-plus"></i> <span class="p-l-5">Add Attribute</span></button>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="paginatedAttributeTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                            <table id="paginatedPageAttributesTable" class="table table-hover dataTable table-custom" style="width: 100%">
                                                 <thead class="thead-dark">
 
                                                 </thead>
@@ -95,7 +95,8 @@
 </div>
 <script>
     $.initPage({
+        'websiteId' : '${website.websiteId}',
         'pageId' : '${websitePage.pageId}'
     });
 </script>
-<script src="/assets/js/pages/ui/website/website.js"></script>
+<script src="/assets/js/pages/ui/website/websitePage.js"></script>

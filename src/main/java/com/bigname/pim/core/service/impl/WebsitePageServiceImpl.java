@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class WebsitePageServiceImpl extends BaseServiceSupport<WebsitePage, WebsitePageDAO, WebsitePageService> implements WebsitePageService {
@@ -45,5 +45,18 @@ public class WebsitePageServiceImpl extends BaseServiceSupport<WebsitePage, Webs
         } else {
             return websiteDAO.findById(websiteId).map(website -> websitePageDAO.findByWebsiteIdAndExternalIdAndActiveIn(website.getId(), pageId.getId(), PlatformUtil.getActiveOptions(activeRequired))).orElse(Optional.empty());
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> getPageAttributes(String websiteId, String pageId) {
+        List<Map<String, Object>> pageAttributes = new ArrayList<>();
+        websiteDAO.findById(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            get(ID.EXTERNAL_ID(pageId), false).ifPresent(websitePage -> {
+                websitePage.getPageAttributes().forEach((k,v) -> {
+                    pageAttributes.add(v);
+                });
+            });
+        });
+        return pageAttributes;
     }
 }

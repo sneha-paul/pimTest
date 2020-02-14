@@ -15,8 +15,10 @@ import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.BaseService;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.ControllerSupport;
+import com.m7.xtreme.xplatform.model.Breadcrumbs;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -90,7 +92,9 @@ public class WebsitePageController extends ControllerSupport {
                     model.put("mode", "DETAILS");
                     model.put("website", website);
                     model.put("websitePage", websitePage.get());
-                    model.put("breadcrumbs", new BreadcrumbsBuilder().init(pageId, WebsitePage.class, request, parameterMap, new BaseService[]{websiteService, websitePageService}).build());
+                    //model.put("breadcrumbs", new BreadcrumbsBuilder().init(pageId, WebsitePage.class, request, parameterMap, new BaseService[]{websiteService, websitePageService}).build());
+                    model.put("breadcrumbs", new Breadcrumbs("Pages", "Websites", "/pim/websites/", website.getWebsiteName(), "/pim/websites/" + website.getWebsiteId(),
+                            "Pages", "/pim/websites/" + website.getWebsiteId() + "#websitePages", websitePage.get().getPageName(), ""));
                 } else {
                     throw new EntityNotFoundException("Unable to find Website with Id: " + pageId);
                 }
@@ -133,4 +137,106 @@ public class WebsitePageController extends ControllerSupport {
     protected <E extends ValidatableEntity> Map<String, Pair<String, Object>> validate(E e, Map<String, Object> context, Class<?>... groups) {
         return websitePageService.validate(e, context, groups);
     }
+
+    @RequestMapping(value = "/{websiteId}/pages/{pageId}/attributes/data")
+    @ResponseBody
+    public Result<Map<String, String>> getWebsitePagesAttributes(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "pageId") String pageId, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        websitePageService.getPageAttributes(websiteId, pageId).forEach(pageAttributes -> {
+            pageAttributes.forEach((k,v) -> {
+                Map<String, String> newMap = new HashMap<>();
+                newMap.put("attributeName", String.valueOf(v));
+                newMap.put("attributeId", k);
+                dataObjects.add(newMap);
+            });
+        });
+        Page<Map<String, String>> paginatedResult = new PageImpl<>(dataObjects);
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+    }
+
+    @RequestMapping(value= {"/{websiteId}/pages/{pageId}/attributes/{pageAttributeId}", "/{websiteId}/pages/{pageId}/attributes/create"})
+    public ModelAndView websitePagesAttributeDetails(@PathVariable(value = "websiteId") String websiteId,
+                                               @PathVariable(value = "pageId") String pageId,
+                                               @PathVariable(value = "pageAttributeId", required = false) String pageAttributeId) {
+        return websiteService.get(ID.EXTERNAL_ID(websiteId), false)
+                .map(website -> {
+                    Map<String, Object> model = new HashMap<>();
+                    WebsitePage websitePage = websitePageService.get(ID.EXTERNAL_ID(pageId), false).orElseThrow(() -> new EntityNotFoundException("Unable to find Page with Id: " + pageId));
+                    model.put("mode", pageAttributeId == null ? "CREATE" : "DETAILS");
+                    if(isNotEmpty(pageAttributeId)) {
+                        websitePage.getPageAttributes().forEach((k,v) -> {
+                            model.put("attributeName", v.get(pageAttributeId));
+                            model.put("attributeId", pageAttributeId);
+                            model.put("website", website);
+                            model.put("websitePage", websitePage);
+                            model.put("breadcrumbs", new Breadcrumbs("Pages", "Websites", "/pim/websites/", website.getWebsiteName(), "/pim/websites/" + website.getWebsiteId(),
+                                    "Pages", "/pim/websites/" + website.getWebsiteId() + "#websitePages", websitePage.getPageName(), "/pim/websites/" + website.getWebsiteId() + "/pages/" + websitePage.getPageId(), "Attributes", "/pim/websites/" + website.getWebsiteId() + "/pages/" + websitePage.getPageId() + "#pageAttributes", v.get(pageAttributeId).toString(), ""));
+                        });
+                    }
+                    return new ModelAndView("website/websitePageAttribute", model);
+                }).orElseThrow(() -> new EntityNotFoundException("Unable to find Website with Id: " + websiteId));
+    }
+
+
+    @RequestMapping(value = "/{websiteId}/pages/{pageId}/attributes", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> createPageAttribute(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "pageId") String pageId, @RequestParam Map<String, String> attribute) {
+        Map<String, Object> model = new HashMap<>();
+        boolean[] success = {false};
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            Optional<WebsitePage> websitePage = websitePageService.get(ID.EXTERNAL_ID(pageId), false);
+            if(websitePage.isPresent()) {
+                Map<String, Map<String, Object>> pageAttributeMap = websitePage.get().getPageAttributes();
+                Object attributeName = pageAttributeMap.get("DEFAULT_GROUP").get(attribute.get("attributeId"));
+                if(isEmpty(attributeName) && attributeName == null) {
+                    pageAttributeMap.get("DEFAULT_GROUP").put(attribute.get("attributeId"), attribute.get("attributeName"));
+                    websitePage.get().setGroup("PAGE-ATTRIBUTES");
+                    websitePage.get().setPageAttributes(pageAttributeMap);
+                    websitePageService.update(ID.EXTERNAL_ID(pageId), websitePage.get());
+                    success[0] = true;
+                } else {
+                    Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                    _fieldErrors.put("attributeId", Pair.with("Attribute Id already exists", attribute.get("attributeId")));
+                    model.put("fieldErrors", _fieldErrors);
+                }
+            }
+        });
+        model.put("success", success[0]);
+        return model;
+    }
+
+    @RequestMapping(value = "/{websiteId}/pages/{pageId}/attributes/{attributeId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> updatePageAttribute(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "pageId") String pageId, @PathVariable(value = "attributeId") String attributeId, @RequestParam Map<String, String> attribute) {
+        Map<String, Object> model = new HashMap<>();
+        boolean[] success = {false};
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            Optional<WebsitePage> websitePage = websitePageService.get(ID.EXTERNAL_ID(pageId), false);
+            if(websitePage.isPresent()) {
+                Map<String, Map<String, Object>> pageAttributeMap = websitePage.get().getPageAttributes();
+                String attributeName = String.valueOf(pageAttributeMap.get("DEFAULT_GROUP").get(attributeId));
+                if(isNotEmpty(attributeName)) {
+                    pageAttributeMap.get("DEFAULT_GROUP").put(attributeId, attribute.get("attributeName"));
+                    websitePage.get().setGroup("PAGE-ATTRIBUTES");
+                    websitePage.get().setPageAttributes(pageAttributeMap);
+                    websitePageService.update(ID.EXTERNAL_ID(pageId), websitePage.get());
+                    success[0] = true;
+                }
+            }
+        });
+        model.put("success", success[0]);
+        return model;
+    }
+
 }

@@ -176,6 +176,18 @@
             });
         },
 
+        websitePageAttributeDetailButton: function(options) {
+            return {
+                name: 'DETAILS',
+                style: 'info',
+                title: 'Details',
+                icon: 'icon-eye',
+                click: function (row) {
+                        window.location.href = $.getURLWithRequestParams(options.pageUrl + row.attributeId, options.urlParams || {});
+                }
+            };
+        },
+
         attributeOptionsButton: function(options) {
           return {
               name: 'ATTRIBUTE_OPTIONS',

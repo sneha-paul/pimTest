@@ -125,6 +125,9 @@ public class WebsitePage extends MongoEntity<WebsitePage> {
                     this.setRedirectURL(websitePage.getRedirectURL());
                     mergeBaseProperties(websitePage);
                     break;
+                case "PAGE-ATTRIBUTES":
+                    this.setPageAttributes(websitePage.getPageAttributes());
+                    break;
             }
         }
         return this;
