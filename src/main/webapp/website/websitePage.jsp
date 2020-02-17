@@ -30,10 +30,6 @@
                                 <input type="friendlyUrl" name="friendlyUrl" class="form-control" />
                             </div>
                             <div class="form-group">
-                                <label>Redirection URL</label>
-                                <input type="redirectURL" name="redirectURL" class="form-control" />
-                            </div>
-                            <div class="form-group">
                                 <label>Website</label>
                                 <input type="wesbiteId" name="websiteId" class="form-control" value="${website.websiteId}" readonly/>
                             </div>

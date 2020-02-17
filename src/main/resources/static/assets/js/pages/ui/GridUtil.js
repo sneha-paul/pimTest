@@ -69,6 +69,21 @@
             };
         },
 
+        websitePageAttributeDeleteButton: function(options) {
+            return {
+                name: 'DELETE',
+                style: 'danger',
+                title: 'Delete',
+                icon: 'icon-trash',
+                click: function (row) {
+                    $.deleteInstance(
+                        $.getURL(options.pageUrl + row.attributeId + '/delete'),
+                        options.names[1],
+                        $.refreshDataTable.bind(this, options.names[0]));
+                },
+            };
+        },
+
         attributeOptionsTabButton: function(options) {
             return {
                 style: 'primary',
@@ -184,6 +199,18 @@
                 icon: 'icon-eye',
                 click: function (row) {
                         window.location.href = $.getURLWithRequestParams(options.pageUrl + row.attributeId, options.urlParams || {});
+                }
+            };
+        },
+
+        websiteRedirectUrlsDetailButton: function(options) {
+            return {
+                name: 'DETAILS',
+                style: 'info',
+                title: 'Details',
+                icon: 'icon-eye',
+                click: function (row) {
+                        window.location.href = $.getURLWithRequestParams(options.pageUrl + row.fromUrl, options.urlParams || {});
                 }
             };
         },

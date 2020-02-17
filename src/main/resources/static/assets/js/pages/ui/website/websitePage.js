@@ -1,15 +1,32 @@
 $(function(){
+    var urlParams = {};
+    if($.getPageAttribute('websiteId') !== '') {
+        urlParams['websiteId'] = '{websiteId}';
+    }
+    if($.getPageAttribute('pageId') !== '') {
+        urlParams['pageId'] = '{pageId}';
+    }
+
     $('.js-pageAttributes-tab').on('shown.bs.tab.pageAttributes', function (e) {
         $.initGrid({
             selector: '#paginatedPageAttributesTable',
             names: ['pageAttributes', 'pageAttribute'],
             dataUrl: $.getURL('/pim/websites/{websiteId}/pages/{pageId}/attributes/data'),
+            urlParams: urlParams,
             columns: [
-                {data: 'attributeName', name: 'attributeName', title: 'Attribute Name'},
-                {data: 'attributeId', name: 'attributeId', title: 'Attribute Id'},
+                {data: 'attributeName', name: 'attributeName', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.attributeId + '<small>';}},
+                {data: 'attributeValue', name: 'attributeValue', title: 'Attribute Value'},
                 {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
             ],
-            buttons: [$.websitePageAttributeDetailButton({pageUrl: $.getURL('/pim/websites/{websiteId}/pages/{pageId}/attributes/')}), $.attributeOptionsTabButton({actionUrl: '/pim/attributeCollections/{collectionId}/attributes/{attributeId}#attributeOptions'})]
+            buttons: [
+                $.websitePageAttributeDetailButton({
+                    pageUrl: $.getURL('/pim/websites/{websiteId}/pages/{pageId}/attributes/')
+                }),
+                $.websitePageAttributeDeleteButton({
+                    names: ['pageAttributes', 'pageAttribute'],
+                    pageUrl: $.getURL('/pim/websites/{websiteId}/pages/{pageId}/attributes/')
+                })
+            ]
         });
         $(this).removeClass('js-pageAttributes-tab').off('shown.bs.tab.pageAttributes');
     });

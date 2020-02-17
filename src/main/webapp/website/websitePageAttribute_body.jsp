@@ -26,6 +26,10 @@
                                                 <label>Attribute Name</label>
                                                 <input type="text" name="attributeName" value="${attributeName}" class="form-control"/>
                                             </div>
+                                            <div class="form-group">
+                                                <label>Attribute Value</label>
+                                                <input type="text" name="attributeValue" value="${attributeValue}" class="form-control"/>
+                                            </div>
                                         </div>
                                     </div>
                                     <br>

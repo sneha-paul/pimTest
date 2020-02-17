@@ -21,6 +21,10 @@
                                 <label>Attribute Id</label>
                                 <input type="text" name="attributeId" class="form-control" />
                             </div>
+                            <div class="form-group">
+                                <label>Attribute Value</label>
+                                <input type="text" name="attributeValue" class="form-control" />
+                            </div>
                         </div>
                     </div>
                     <br>

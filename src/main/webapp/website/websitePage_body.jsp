@@ -36,10 +36,6 @@
                                                         <input type="url" id="friendlyUrl" name="friendlyUrl" class="form-control" value="${websitePage.friendlyUrl}" />
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="redirectURL">Redirect URL</label><code class="highlighter-rouge m-l-10">*</code>
-                                                        <input type="url" id="redirectURL" name="redirectURL" class="form-control" value="${websitePage.redirectURL}" />
-                                                    </div>
-                                                    <div class="form-group">
                                                         <label for="websiteId">Website</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <input type="url" id="websiteId" name="websiteId" class="form-control" value="${website.websiteId}" readonly/>
                                                     </div>
