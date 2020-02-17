@@ -111,4 +111,36 @@ $(function(){
         ]
     });
 
+
+    $('.js-redirects-tab').on('shown.bs.tab.js-redirects-tab', function (e) {
+        $.initGrid({
+            selector: '#paginatedRedirectsTable',
+            names: ['redirects', 'redirect'],
+            dataUrl: $.getURL('/pim/websites/{websiteId}/redirects/data'),
+            urlParams: urlParams,
+            columns: [
+                { data: 'fromUrl', name : 'fromUrl' , title : 'Redirect From Url'},
+                { data: 'toUrl', name : 'toUrl', title : 'Redirect To Url' },
+                {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+            ],
+            buttons: [
+                $.websiteRedirectUrlsDetailButton({
+                    pageUrl: $.getURL('/pim/websites/{websiteId}/redirects/')
+                })
+            ]
+        });
+        $(this).removeClass('js-js-redirects-tab-tab').off('shown.bs.tab.js-redirects-tab');
+    });
+
+    $.addModal({
+        selector: '.js-add-redirects',
+        url: $.getURL('/pim/websites/{websiteId}/redirects/create'),
+        name:'add-redirects',
+        title:'Add Redirects',
+        buttons: [
+            {text: 'SAVE', style: 'primary', close: false, click: function(){$.submitForm($(this).closest('.modal-content').find('form'), function(){$.reloadDataTable('redirects');$.closeModal();});}},
+            {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
+        ]
+    });
+
 });

@@ -11,6 +11,7 @@
                     <li class="nav-item"><a class="nav-link js-catalogs-tab" data-toggle="tab" href="#catalogs">Catalogs</a></li>
                     <li class="nav-item"><a class="nav-link js-websitePages-tab" data-toggle="tab" href="#websitePages">Pages</a></li>
                     <li class="nav-item"><a class="nav-link js-websiteConfigParam-tab" data-toggle="tab" href="#websiteConfigParam">Configs</a></li>
+                    <li class="nav-item"><a class="nav-link js-redirects-tab" data-toggle="tab" href="#redirects">Redirects</a></li>
                     <%--<li class="nav-item"><a class="nav-link js-websiteHistory-tab" data-toggle="tab" href="#websiteHistory">History</a></li>--%>
                 </ul>
                 <div class="tab-content">
@@ -148,6 +149,32 @@
                         </div>
                     </div>
 
+
+                    <div class="tab-pane" id="redirects">
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="card">
+                                    <div class="body">
+                                        <div class="row p-b-25">
+                                            <div class="col-lg-12 col-md-12">
+                                                <div class="pull-right">
+                                                    <button type="button" class="btn btn-success js-add-redirects"><i class="fa fa-plus"></i> <span class="p-l-5">Add Url</span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table id="paginatedRedirectsTable" class="table table-hover dataTable table-custom" style="width: 100%">
+                                                <thead class="thead-dark">
+
+                                                </thead>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

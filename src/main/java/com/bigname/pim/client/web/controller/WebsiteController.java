@@ -433,4 +433,77 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         model.put("success", true);
         return model;
     }
+
+    @RequestMapping(value = "/{websiteId}/redirects/data")
+    @ResponseBody
+    public Result<Map<String, String>> getRedirectUrls(@PathVariable(value = "websiteId") String websiteId, HttpServletRequest request) {
+        Request dataTableRequest = new Request(request);
+        Pagination pagination = dataTableRequest.getPagination();
+        Result<Map<String, String>> result = new Result<>();
+        result.setDraw(dataTableRequest.getDraw());
+        Sort sort = null;
+        if(pagination.hasSorts()) {
+            sort = Sort.by(new Sort.Order(Sort.Direction.valueOf(SortOrder.fromValue(dataTableRequest.getOrder().getSortDir()).name()), dataTableRequest.getOrder().getName()));
+        }
+        List<Map<String, String>> dataObjects = new ArrayList<>();
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            website.getUrlRedirects().forEach((k,v) -> {
+                Map<String, String> newMap = new HashMap<>();
+                newMap.put("fromUrl", k);
+                newMap.put("toUrl", v);
+                dataObjects.add(newMap);
+            });
+        });
+        Page<Map<String, String>> paginatedResult = new PageImpl<>(dataObjects);
+        result.setDataObjects(dataObjects);
+        result.setRecordsTotal(Long.toString(paginatedResult.getTotalElements()));
+        result.setRecordsFiltered(Long.toString(paginatedResult.getTotalElements()));
+        return result;
+
+    }
+
+    @RequestMapping(value = {"/{websiteId}/redirects/{fromUrl}", "/{websiteId}/redirects/create"})
+    public ModelAndView redirectUrlView(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "fromUrl", required = false) String fromUrl) {
+        Map<String, Object> model = new HashMap<>();
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            model.put("website", website);
+            if(fromUrl == null) {
+                model.put("mode", "CREATE");
+
+            } else {
+                model.put("fromUrl", fromUrl);
+                model.put("toUrl", website.getUrlRedirects().get(fromUrl));
+                model.put("mode", "URL");
+                    /*model.put("breadcrumbs", new Breadcrumbs("Websites",
+                            "Websites", "/pim/websites/", website.getWebsiteName(), "/pim/websites/" + website.getWebsiteId(),
+                            "Params", "/pim/websites/" + website.getWebsiteId() + "#websiteConfigParam", paramName, ""));*/
+
+            }
+        });
+        return new ModelAndView("website/redirect", model);
+    }
+
+    @RequestMapping(value = "/{websiteId}/redirects", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> createRedirectUrl(@PathVariable(value = "websiteId") String websiteId, @RequestParam Map<String, String> parameters) {
+        Map<String, Object> model = new HashMap<>();
+        boolean[] success = {false};
+        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+            Map<String, String> urlMap = website.getUrlRedirects();
+            Object url = urlMap.get(parameters.get("fromUrl"));
+            if(url == null && isEmpty(url)) {
+                urlMap.put(parameters.get("fromUrl"), parameters.get("toUrl"));
+                website.setUrlRedirects(urlMap);
+                website.setGroup("URL");
+                websiteService.update(ID.EXTERNAL_ID(website.getWebsiteId()), website);
+                success[0] = true;
+            } else {
+                Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                _fieldErrors.put("fromUrl", Pair.with("Url already exists", parameters.get("fromUrl")));
+                model.put("fieldErrors", _fieldErrors);
+            }
+        });
+        model.put("success", success[0]);
+        return model;
+    }
 }

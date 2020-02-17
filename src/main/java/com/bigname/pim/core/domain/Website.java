@@ -34,6 +34,8 @@ public class Website extends MongoEntity<Website> {
     @NotBlank(message = "Website URL cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String url;
 
+    private Map<String, String> urlRedirects;
+
     @Transient
     @JsonIgnore
     private Page<WebsiteCatalog> catalogs;
@@ -78,6 +80,14 @@ public class Website extends MongoEntity<Website> {
         this.websiteId = getExternalId();
     }
 
+    public Map<String, String> getUrlRedirects() {
+        return urlRedirects;
+    }
+
+    public void setUrlRedirects(Map<String, String> urlRedirects) {
+        this.urlRedirects = urlRedirects;
+    }
+
     @Override
     public Website cloneInstance() {
         Website clone = new Website();
@@ -97,6 +107,9 @@ public class Website extends MongoEntity<Website> {
                     this.setWebsiteName(website.getWebsiteName());
                     this.setUrl(website.getUrl());
                     mergeBaseProperties(website);
+                    break;
+                case "URL":
+                    this.setUrlRedirects(website.getUrlRedirects());
                     break;
             }
         }
