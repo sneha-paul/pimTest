@@ -88,6 +88,8 @@ $(function(){
             names: ['websiteConfigParams', 'websiteConfigParam'],
             pageUrl: $.getURL('/pim/websites/{websiteId}/websiteConfig/'),
             dataUrl: $.getURL('/pim/websites/{websiteId}/configParam/data'),
+            hideActiveFilter: true,
+            hideInactiveFilter: true,
             urlParams: urlParams,
             hideStatus:'true',
             columns: [
@@ -117,11 +119,13 @@ $(function(){
             selector: '#paginatedRedirectsTable',
             names: ['redirects', 'redirect'],
             dataUrl: $.getURL('/pim/websites/{websiteId}/redirects/data'),
+            hideActiveFilter: true,
+            hideInactiveFilter: true,
             urlParams: urlParams,
             columns: [
                 { data: 'fromUrl', name : 'fromUrl' , title : 'Redirect From Url'},
                 { data: 'toUrl', name : 'toUrl', title : 'Redirect To Url' },
-                {data: 'actions', name: 'actions', title: 'Actions', orderable: false}
+                { data: 'actions', name: 'actions', title: 'Actions', orderable: false}
             ],
             buttons: [
                 $.websiteRedirectUrlsDetailButton({
