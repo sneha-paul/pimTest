@@ -1,11 +1,8 @@
 package com.bigname.pim.client.web.controller;
 
-import com.bigname.pim.core.domain.Config;
 import com.bigname.pim.core.domain.Website;
 import com.bigname.pim.core.domain.WebsiteCatalog;
-import com.bigname.pim.core.domain.WebsitePage;
 import com.bigname.pim.core.service.ConfigService;
-import com.bigname.pim.core.service.WebsitePageService;
 import com.bigname.pim.core.service.WebsiteService;
 import com.bigname.pim.core.util.BreadcrumbsBuilder;
 import com.m7.xtreme.common.datatable.model.Pagination;
@@ -463,12 +460,8 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     }
 
     @RequestMapping(value = {"/{websiteId}/redirects/{fromUrl}", "/{websiteId}/redirects/create"})
-    public ModelAndView redirectUrlView(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "fromUrl") String fromUrl, HttpServletRequest request) {
+    public ModelAndView redirectUrlView(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "fromUrl", required = false) String fromUrl, HttpServletRequest request) {
         Map<String, Object> model = new HashMap<>();
-        /*String fullUrl = (String) request.getAttribute(
-                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String[] url = fullUrl.split("redirects/");
-        String fromUrl = url[1];*/
         websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
             model.put("website", website);
             if(fromUrl == null) {
