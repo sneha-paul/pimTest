@@ -34,7 +34,7 @@ public class Website extends MongoEntity<Website> {
     @NotBlank(message = "Website URL cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String url;
 
-    private Map<String, String> urlRedirects;
+    private Map<String, String> urlRedirects = new HashMap<>();
 
     @Transient
     @JsonIgnore
