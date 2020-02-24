@@ -126,9 +126,6 @@ public class WebsitePageController extends ControllerSupport {
         if(isValid(websitePage, model, websitePage.getGroup().length == 1 && websitePage.getGroup()[0].equals("DETAILS") ? WebsitePage.DetailsGroup.class : null)) {
             websitePageService.update(ID.EXTERNAL_ID(id), websitePage);
             model.put("success", true);
-            if(!id.equals(websitePage.getPageId())) {
-                model.put("refreshUrl", "/pim/websites/" + websitePage.getPageId());
-            }
         }
         return model;
     }
@@ -169,8 +166,8 @@ public class WebsitePageController extends ControllerSupport {
 
     @RequestMapping(value= {"/{websiteId}/pages/{pageId}/attributes/{pageAttributeId}", "/{websiteId}/pages/{pageId}/attributes/create"})
     public ModelAndView websitePagesAttributeDetails(@PathVariable(value = "websiteId") String websiteId,
-                                               @PathVariable(value = "pageId") String pageId,
-                                               @PathVariable(value = "pageAttributeId", required = false) String pageAttributeId) {
+                                                     @PathVariable(value = "pageId") String pageId,
+                                                     @PathVariable(value = "pageAttributeId", required = false) String pageAttributeId) {
         return websiteService.get(ID.EXTERNAL_ID(websiteId), false)
                 .map(website -> {
                     Map<String, Object> model = new HashMap<>();
@@ -198,32 +195,34 @@ public class WebsitePageController extends ControllerSupport {
     public Map<String, Object> createPageAttribute(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "pageId") String pageId, @RequestParam Map<String, String> attribute) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
-            Optional<WebsitePage> websitePage = websitePageService.get(ID.EXTERNAL_ID(pageId), false);
-            if(websitePage.isPresent()) {
-                Map<String, Map<String, Object>> pageAttributeMap = websitePage.get().getPageAttributes();
-                if(pageAttributeMap.get("DEFAULT_GROUP") != null) {
-                    Object attributeName = pageAttributeMap.get("DEFAULT_GROUP").get(attribute.get("attributeId").toUpperCase());
-                    if(isEmpty(attributeName) && attributeName == null) {
-                        pageAttributeMap.get("DEFAULT_GROUP").put(attribute.get("attributeId").toUpperCase(), attribute.get("attributeName") + "|" + attribute.get("attributeValue"));
+        if (isNotEmpty(attribute.get("attributeId")) && isNotEmpty(attribute.get("attributeName")) && isNotEmpty(attribute.get("attributeValue"))) {
+            websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+                Optional<WebsitePage> websitePage = websitePageService.get(ID.EXTERNAL_ID(pageId), false);
+                if (websitePage.isPresent()) {
+                    Map<String, Map<String, Object>> pageAttributeMap = websitePage.get().getPageAttributes();
+                    if (pageAttributeMap.get("DEFAULT_GROUP") != null) {
+                        Object attributeName = pageAttributeMap.get("DEFAULT_GROUP").get(attribute.get("attributeId").toUpperCase());
+                        if (isEmpty(attributeName) && attributeName == null) {
+                            pageAttributeMap.get("DEFAULT_GROUP").put(attribute.get("attributeId").toUpperCase(), attribute.get("attributeName") + "|" + attribute.get("attributeValue"));
+                            websitePage.get().setGroup("PAGE-ATTRIBUTES");
+                            websitePage.get().setPageAttributes(pageAttributeMap);
+                            websitePageService.update(ID.EXTERNAL_ID(pageId), websitePage.get());
+                            success[0] = true;
+                        } else {
+                            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                            _fieldErrors.put("attributeId", Pair.with("Attribute Id already exists", attribute.get("attributeId")));
+                            model.put("fieldErrors", _fieldErrors);
+                        }
+                    } else {
+                        pageAttributeMap.put("DEFAULT_GROUP", Map.of(attribute.get("attributeId").toUpperCase(), attribute.get("attributeName") + "|" + attribute.get("attributeValue")));
                         websitePage.get().setGroup("PAGE-ATTRIBUTES");
                         websitePage.get().setPageAttributes(pageAttributeMap);
                         websitePageService.update(ID.EXTERNAL_ID(pageId), websitePage.get());
                         success[0] = true;
-                    } else {
-                        Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
-                        _fieldErrors.put("attributeId", Pair.with("Attribute Id already exists", attribute.get("attributeId")));
-                        model.put("fieldErrors", _fieldErrors);
                     }
-                } else {
-                    pageAttributeMap.put("DEFAULT_GROUP", Map.of(attribute.get("attributeId").toUpperCase(), attribute.get("attributeName") + "|" + attribute.get("attributeValue")));
-                    websitePage.get().setGroup("PAGE-ATTRIBUTES");
-                    websitePage.get().setPageAttributes(pageAttributeMap);
-                    websitePageService.update(ID.EXTERNAL_ID(pageId), websitePage.get());
-                    success[0] = true;
                 }
-            }
-        });
+            });
+        }
         model.put("success", success[0]);
         return model;
     }
@@ -233,20 +232,22 @@ public class WebsitePageController extends ControllerSupport {
     public Map<String, Object> updatePageAttribute(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "pageId") String pageId, @PathVariable(value = "attributeId") String attributeId, @RequestParam Map<String, String> attribute) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
-            Optional<WebsitePage> websitePage = websitePageService.get(ID.EXTERNAL_ID(pageId), false);
-            if(websitePage.isPresent()) {
-                Map<String, Map<String, Object>> pageAttributeMap = websitePage.get().getPageAttributes();
-                String attributeName = String.valueOf(pageAttributeMap.get("DEFAULT_GROUP").get(attributeId));
-                if(isNotEmpty(attributeName)) {
-                    pageAttributeMap.get("DEFAULT_GROUP").put(attributeId, attribute.get("attributeName") + "|" + attribute.get("attributeValue"));
-                    websitePage.get().setGroup("PAGE-ATTRIBUTES");
-                    websitePage.get().setPageAttributes(pageAttributeMap);
-                    websitePageService.update(ID.EXTERNAL_ID(pageId), websitePage.get());
-                    success[0] = true;
+        if (isNotEmpty(attribute.get("attributeId")) && isNotEmpty(attribute.get("attributeName")) && isNotEmpty(attribute.get("attributeValue"))) {
+            websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+                Optional<WebsitePage> websitePage = websitePageService.get(ID.EXTERNAL_ID(pageId), false);
+                if (websitePage.isPresent()) {
+                    Map<String, Map<String, Object>> pageAttributeMap = websitePage.get().getPageAttributes();
+                    String attributeName = String.valueOf(pageAttributeMap.get("DEFAULT_GROUP").get(attributeId));
+                    if (isNotEmpty(attributeName)) {
+                        pageAttributeMap.get("DEFAULT_GROUP").put(attributeId, attribute.get("attributeName") + "|" + attribute.get("attributeValue"));
+                        websitePage.get().setGroup("PAGE-ATTRIBUTES");
+                        websitePage.get().setPageAttributes(pageAttributeMap);
+                        websitePageService.update(ID.EXTERNAL_ID(pageId), websitePage.get());
+                        success[0] = true;
+                    }
                 }
-            }
-        });
+            });
+        }
         model.put("success", success[0]);
         return model;
     }

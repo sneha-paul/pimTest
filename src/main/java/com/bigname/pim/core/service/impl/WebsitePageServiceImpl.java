@@ -24,7 +24,7 @@ public class WebsitePageServiceImpl extends BaseServiceSupport<WebsitePage, Webs
 
     @Autowired
     public WebsitePageServiceImpl(WebsitePageDAO websitePageDAO, Validator validator, WebsiteDAO websiteDAO) {
-        super(websitePageDAO, "websitePage", validator);
+        super(websitePageDAO, "websitePage", "pageId", "Page Id", validator);
         this.websitePageDAO = websitePageDAO;
         this.websiteDAO = websiteDAO;
     }
@@ -43,7 +43,7 @@ public class WebsitePageServiceImpl extends BaseServiceSupport<WebsitePage, Webs
         if(pageId.isInternalId()) {
             return get(pageId, false);
         } else {
-            return websiteDAO.findById(websiteId).map(website -> websitePageDAO.findByWebsiteIdAndExternalIdAndActiveIn(website.getId(), pageId.getId(), PlatformUtil.getActiveOptions(activeRequired))).orElse(Optional.empty());
+            return websiteDAO.findById(websiteId, false).map(website -> websitePageDAO.findByWebsiteIdAndExternalIdAndActiveIn(website.getId(), pageId.getId(), PlatformUtil.getActiveOptions(activeRequired))).orElse(Optional.empty());
         }
     }
 

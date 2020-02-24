@@ -17,6 +17,7 @@ import java.util.Map;
 public class WebsitePage extends MongoEntity<WebsitePage> {
 
     @Transient
+    @NotBlank(message = "Page Id cannot be blank", groups = {CreateGroup.class, DetailsGroup.class})
     private String pageId;
 
     private String websiteId;

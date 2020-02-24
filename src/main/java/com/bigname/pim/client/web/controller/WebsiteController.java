@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
 
 
 /**
@@ -367,21 +368,23 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     public Map<String, Object> createParameter(@PathVariable(value = "websiteId") String websiteId, @RequestParam Map<String, String> parameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
-            configService.get(ID.EXTERNAL_ID(parameters.get("configId")), false).ifPresent(config -> {
-                String param = config.getParameter(parameters.get("paramName").toUpperCase(), String.class, website.getId());
-                if(ValidationUtil.isEmpty(param) && param == null) {
-                    config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"), website.getId());
-                    config.setGroup("WEB-PARAMS");
-                    configService.update(ID.EXTERNAL_ID(config.getConfigId()), config);
-                    success[0] = true;
-                } else {
-                    Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
-                    _fieldErrors.put("paramName", Pair.with("Parameter name already exists", parameters.get("paramName")));
-                    model.put("fieldErrors", _fieldErrors);
-                }
+        if (isNotEmpty(parameters.get("paramName")) && isNotEmpty(parameters.get("paramValue"))) {
+            websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+                configService.get(ID.EXTERNAL_ID(parameters.get("configId")), false).ifPresent(config -> {
+                    String param = config.getParameter(parameters.get("paramName").toUpperCase(), String.class, website.getId());
+                    if(ValidationUtil.isEmpty(param) && param == null) {
+                        config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"), website.getId());
+                        config.setGroup("WEB-PARAMS");
+                        configService.update(ID.EXTERNAL_ID(config.getConfigId()), config);
+                        success[0] = true;
+                    } else {
+                        Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                        _fieldErrors.put("paramName", Pair.with("Parameter name already exists", parameters.get("paramName")));
+                        model.put("fieldErrors", _fieldErrors);
+                    }
+                });
             });
-        });
+        }
         model.put("success", success[0]);
         return model;
     }
@@ -391,14 +394,16 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     public Map<String, Object> updateParameter(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName, @RequestParam Map<String, String> parameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
-            configService.get(ID.EXTERNAL_ID(parameters.get("configId")), false).ifPresent(config -> {
-                config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"), website.getId());
-                config.setGroup("WEB-PARAMS");
-                configService.update(ID.EXTERNAL_ID(configId), config);
-                success[0] = true;
+        if(isNotEmpty(parameters.get("paramValue"))) {
+            websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+                configService.get(ID.EXTERNAL_ID(parameters.get("configId")), false).ifPresent(config -> {
+                    config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"), website.getId());
+                    config.setGroup("WEB-PARAMS");
+                    configService.update(ID.EXTERNAL_ID(configId), config);
+                    success[0] = true;
+                });
             });
-        });
+        }
         model.put("success", success[0]);
         return model;
     }
@@ -485,21 +490,23 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     public Map<String, Object> createRedirectUrl(@PathVariable(value = "websiteId") String websiteId, @RequestParam Map<String, String> urlParameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
-            Map<String, String> urlMap = website.getUrlRedirects();
-            Object url = urlMap.get(urlParameters.get("fromUrl"));
-            if(url == null && isEmpty(url)) {
-                urlMap.put(urlParameters.get("fromUrl"), urlParameters.get("toUrl"));
-                website.setUrlRedirects(urlMap);
-                website.setGroup("URL");
-                websiteService.update(ID.EXTERNAL_ID(website.getWebsiteId()), website);
-                success[0] = true;
-            } else {
-                Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
-                _fieldErrors.put("fromUrl", Pair.with("Url already exists", urlParameters.get("fromUrl")));
-                model.put("fieldErrors", _fieldErrors);
-            }
-        });
+        if (isNotEmpty(urlParameters.get("fromUrl")) && isNotEmpty(urlParameters.get("toUrl"))) {
+            websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+                Map<String, String> urlMap = website.getUrlRedirects();
+                Object url = urlMap.get(urlParameters.get("fromUrl"));
+                if (url == null && isEmpty(url)) {
+                    urlMap.put(urlParameters.get("fromUrl"), urlParameters.get("toUrl"));
+                    website.setUrlRedirects(urlMap);
+                    website.setGroup("URL");
+                    websiteService.update(ID.EXTERNAL_ID(website.getWebsiteId()), website);
+                    success[0] = true;
+                } else {
+                    Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                    _fieldErrors.put("fromUrl", Pair.with("Url already exists", urlParameters.get("fromUrl")));
+                    model.put("fieldErrors", _fieldErrors);
+                }
+            });
+        }
         model.put("success", success[0]);
         return model;
     }
@@ -509,30 +516,32 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     public Map<String, Object> updateRedirectUrl(@PathVariable(value = "websiteId") String websiteId, @PathVariable(value = "fromUrl") String fromUrl, @RequestParam Map<String, String> urlParameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
-            Map<String, String> urlRedirects = website.getUrlRedirects();
-            if(fromUrl.equals(String.valueOf(urlParameters.get("fromUrl")))) {
-                urlRedirects.put(urlParameters.get("fromUrl"), urlParameters.get("toUrl"));
-                website.setUrlRedirects(urlRedirects);
-                website.setGroup("URL");
-                websiteService.update(ID.EXTERNAL_ID(website.getWebsiteId()), website);
-                success[0] = true;
-            } else {
-                Set<String> keySet = urlRedirects.keySet().stream().filter(k -> k.equals(String.valueOf(urlParameters.get("fromUrl")))).collect(Collectors.toSet());
-                if(isEmpty(keySet)) {
-                    urlRedirects.keySet().remove(fromUrl);
+        if (isNotEmpty(urlParameters.get("fromUrl")) && isNotEmpty(urlParameters.get("toUrl"))) {
+            websiteService.get(ID.EXTERNAL_ID(websiteId), false).ifPresent(website -> {
+                Map<String, String> urlRedirects = website.getUrlRedirects();
+                if (fromUrl.equals(String.valueOf(urlParameters.get("fromUrl")))) {
                     urlRedirects.put(urlParameters.get("fromUrl"), urlParameters.get("toUrl"));
                     website.setUrlRedirects(urlRedirects);
                     website.setGroup("URL");
                     websiteService.update(ID.EXTERNAL_ID(website.getWebsiteId()), website);
                     success[0] = true;
                 } else {
-                    Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
-                    _fieldErrors.put("fromUrl", Pair.with("Url already exists", urlParameters.get("fromUrl")));
-                    model.put("fieldErrors", _fieldErrors);
+                    Set<String> keySet = urlRedirects.keySet().stream().filter(k -> k.equals(String.valueOf(urlParameters.get("fromUrl")))).collect(Collectors.toSet());
+                    if (isEmpty(keySet)) {
+                        urlRedirects.keySet().remove(fromUrl);
+                        urlRedirects.put(urlParameters.get("fromUrl"), urlParameters.get("toUrl"));
+                        website.setUrlRedirects(urlRedirects);
+                        website.setGroup("URL");
+                        websiteService.update(ID.EXTERNAL_ID(website.getWebsiteId()), website);
+                        success[0] = true;
+                    } else {
+                        Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                        _fieldErrors.put("fromUrl", Pair.with("Url already exists", urlParameters.get("fromUrl")));
+                        model.put("fieldErrors", _fieldErrors);
+                    }
                 }
-            }
-        });
+            });
+        }
         model.put("success", success[0]);
         return model;
     }

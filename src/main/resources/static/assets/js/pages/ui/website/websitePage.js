@@ -12,6 +12,8 @@ $(function(){
             selector: '#paginatedPageAttributesTable',
             names: ['pageAttributes', 'pageAttribute'],
             dataUrl: $.getURL('/pim/websites/{websiteId}/pages/{pageId}/attributes/data'),
+            hideActiveFilter: true,
+            hideInactiveFilter: true,
             urlParams: urlParams,
             columns: [
                 {data: 'attributeName', name: 'attributeName', title: 'Attribute Name', render: function ( data, type, row, meta ) {return '<h6>' + data + '</h6><small>' + row.attributeId + '<small>';}},
