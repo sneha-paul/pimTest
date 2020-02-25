@@ -384,6 +384,15 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                     }
                 });
             });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(parameters.get("paramName"))) {
+                _fieldErrors.put("paramName", Pair.with("Parameter Name cannot be blank", null));
+            }
+            if(isEmpty(parameters.get("paramValue"))) {
+                _fieldErrors.put("paramValue", Pair.with("Parameter Value cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
         }
         model.put("success", success[0]);
         return model;
@@ -403,6 +412,12 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                     success[0] = true;
                 });
             });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(parameters.get("paramValue"))) {
+                _fieldErrors.put("paramValue", Pair.with("Parameter Value cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
         }
         model.put("success", success[0]);
         return model;
@@ -506,6 +521,15 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                     model.put("fieldErrors", _fieldErrors);
                 }
             });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(urlParameters.get("fromUrl"))) {
+                _fieldErrors.put("fromUrl", Pair.with("Redirect From Url cannot be blank", null));
+            }
+            if(isEmpty(urlParameters.get("toUrl"))) {
+                _fieldErrors.put("toUrl", Pair.with("Redirect To Url cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
         }
         model.put("success", success[0]);
         return model;
@@ -541,6 +565,15 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                     }
                 }
             });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(urlParameters.get("fromUrl"))) {
+                _fieldErrors.put("fromUrl", Pair.with("Redirect From Url cannot be blank", null));
+            }
+            if(isEmpty(urlParameters.get("toUrl"))) {
+                _fieldErrors.put("toUrl", Pair.with("Redirect To Url cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
         }
         model.put("success", success[0]);
         return model;

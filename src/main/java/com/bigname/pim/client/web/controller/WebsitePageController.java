@@ -222,6 +222,18 @@ public class WebsitePageController extends ControllerSupport {
                     }
                 }
             });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(attribute.get("attributeId"))) {
+                _fieldErrors.put("attributeId", Pair.with("Attribute Id cannot be blank", null));
+            }
+            if(isEmpty(attribute.get("attributeName"))) {
+                _fieldErrors.put("attributeName", Pair.with("Attribute Name cannot be blank", null));
+            }
+            if(isEmpty(attribute.get("attributeValue"))) {
+                _fieldErrors.put("attributeValue", Pair.with("Attribute Value cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
         }
         model.put("success", success[0]);
         return model;
@@ -247,6 +259,15 @@ public class WebsitePageController extends ControllerSupport {
                     }
                 }
             });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(attribute.get("attributeName"))) {
+                _fieldErrors.put("attributeName", Pair.with("Attribute Name cannot be blank", null));
+            }
+            if(isEmpty(attribute.get("attributeValue"))) {
+                _fieldErrors.put("attributeValue", Pair.with("Attribute Value cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
         }
         model.put("success", success[0]);
         return model;
