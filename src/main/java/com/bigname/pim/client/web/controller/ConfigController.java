@@ -24,6 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
+import static com.m7.xtreme.common.util.ValidationUtil.isNotEmpty;
+
 /**
  * Created by sanoop on 12/02/2019.
  */
@@ -155,19 +158,30 @@ public class ConfigController extends BaseController<Config, ConfigService> {
     public Map<String, Object> createParameter(@PathVariable(value = "configId") String configId, @RequestParam Map<String, String> parameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            String param = config.getParameter(parameters.get("paramName").toUpperCase(), String.class);
-            if(ValidationUtil.isEmpty(param) && param == null) {
-                config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-                config.setGroup("PARAMS");
-                configService.update(ID.EXTERNAL_ID(configId), config);
-                success[0] = true;
-            } else {
-                Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
-                _fieldErrors.put("paramName", Pair.with("Parameter name already exists", parameters.get("paramName")));
-                model.put("fieldErrors", _fieldErrors);
+        if (isNotEmpty(parameters.get("paramName")) && isNotEmpty(parameters.get("paramValue"))) {
+            configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+                String param = config.getParameter(parameters.get("paramName").toUpperCase(), String.class);
+                if (ValidationUtil.isEmpty(param) && param == null) {
+                    config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
+                    config.setGroup("PARAMS");
+                    configService.update(ID.EXTERNAL_ID(configId), config);
+                    success[0] = true;
+                } else {
+                    Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+                    _fieldErrors.put("paramName", Pair.with("Parameter name already exists", parameters.get("paramName")));
+                    model.put("fieldErrors", _fieldErrors);
+                }
+            });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(parameters.get("paramName"))) {
+                _fieldErrors.put("paramName", Pair.with("Parameter Name cannot be blank", null));
             }
-        });
+            if(isEmpty(parameters.get("paramValue"))) {
+                _fieldErrors.put("paramValue", Pair.with("Parameter Value cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
+        }
         model.put("success", success[0]);
         return model;
     }
@@ -177,12 +191,20 @@ public class ConfigController extends BaseController<Config, ConfigService> {
     public Map<String, Object> updateParameter(@PathVariable(value = "configId") String configId, @PathVariable(value = "paramName") String paramName, @RequestParam Map<String, String> parameters) {
         Map<String, Object> model = new HashMap<>();
         boolean[] success = {false};
-        configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
-            config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
-            config.setGroup("PARAMS");
-            configService.update(ID.EXTERNAL_ID(configId), config);
-            success[0] = true;
-        });
+        if(isNotEmpty(parameters.get("paramValue"))) {
+            configService.get(ID.EXTERNAL_ID(configId), false).ifPresent(config -> {
+                config.setParameter(parameters.get("paramName"), parameters.get("paramName") + "|" + parameters.get("paramValue"));
+                config.setGroup("PARAMS");
+                configService.update(ID.EXTERNAL_ID(configId), config);
+                success[0] = true;
+            });
+        } else {
+            Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
+            if(isEmpty(parameters.get("paramValue"))) {
+                _fieldErrors.put("paramValue", Pair.with("Parameter Value cannot be blank", null));
+            }
+            model.put("fieldErrors", _fieldErrors);
+        }
         model.put("success", success[0]);
         return model;
     }

@@ -517,7 +517,11 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
                     success[0] = true;
                 } else {
                     Map<String, Pair<String, Object>> _fieldErrors = new HashMap<>();
-                    _fieldErrors.put("fromUrl", Pair.with("Url already exists", urlParameters.get("fromUrl")));
+                    if(url.equals(urlParameters.get("toUrl"))) {
+                        _fieldErrors.put("toUrl", Pair.with("To Url already exists", urlParameters.get("toUrl")));
+                    }
+
+                    _fieldErrors.put("fromUrl", Pair.with("From Url already exists", urlParameters.get("fromUrl")));
                     model.put("fieldErrors", _fieldErrors);
                 }
             });
