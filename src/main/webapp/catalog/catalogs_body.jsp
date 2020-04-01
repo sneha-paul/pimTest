@@ -8,6 +8,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
                             <button id="js-create-catalog" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Catalog</span></button>
+                            <button id="js-sync-updatedCatalogs" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Catalogs</span></button>
 <%--                            <button id="js-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>--%>
                         </div>
                     </div>
@@ -58,6 +59,11 @@
                 {text: 'SEARCH', style: 'primary', close: false, click: function(){$.getDataTable('catalogs').search('').draw();$.closeModal();}},
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
+        });
+
+        $('#js-sync-updatedCatalogs').on("click", function () {
+            $.syncUpdatedInstance(
+                $.getURL("/pim/catalogs/syncUpdatedCatalogs"), "catalogs");
         });
 
     });

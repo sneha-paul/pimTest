@@ -33,7 +33,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -168,6 +170,7 @@ public class ProductVariantController extends ControllerSupport {
         productVariantDTO.setLevel(1); //TODO - make this dynamic
         setVariantAttributeValues(productVariantDTO, request);
         if(isValid(productVariantDTO, model, productVariantDTO.getGroup().length == 1 && productVariantDTO.getGroup()[0].equals("DETAILS") ? ProductVariant.DetailsGroup.class : null)) {
+            productVariantDTO.setLastExportedTimeStamp(null);
             productVariantService.update(ID.EXTERNAL_ID(productVariantId), productVariantDTO);
             model.put("success", true);
         }
@@ -239,7 +242,15 @@ public class ProductVariantController extends ControllerSupport {
                 List<String> variantAttributeIds = variantGroup.getVariantAttributes().get(productVariantDTO.getLevel());
                 variantAttributeIds.forEach(attributeId -> {
                     if(attributesMap.containsKey(attributeId)) {
-                        productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
+                        if(Array.getLength(attributesMap.get(attributeId)) == 1 && productFamily.getAllAttributesMap().get(attributeId).getUiType().equals(Attribute.UIType.MULTI_SELECT)) {
+                            productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
+                        } else {
+                            productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
+                        }
+
+                        /*if(productFamily.getAllAttributesMap().get(attributeId).getUiType().equals(Attribute.UIType.MULTI_SELECT)) {
+                            productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
+                        }*/
                     } else {
                         Map<String, Object> valueMap = new LinkedHashMap<>();
                         attributesMap.entrySet().stream()
@@ -618,9 +629,27 @@ public class ProductVariantController extends ControllerSupport {
     public String loadProductVariantsToBOS() {
         List<ProductVariant> productVariantList = productVariantService.loadProductVariantsToBOS();
         Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/product/loadProductVariant1", productVariantList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/product/loadProductVariant", productVariantList, String.class, map);
         return response.getBody();
     }
 
+    @RequestMapping(value ="/syncUpdatedProductVariants", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncUpdatedProductVariants() {
+        Map<String, Object> model = new HashMap<>();
+        List<ProductVariant> productVariants = productVariantService.syncUpdatedRecord();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/syncUpdatedProductVariants", productVariants, String.class, map);
+        if(Objects.equals(response.getBody(), "true")) {
+            productVariants.forEach(productVariant -> {
+                productVariant.setLastExportedTimeStamp(LocalDateTime.now());
+            });
+            productVariantService.update(productVariants);
+            model.put("success", true);
+        } else {
+            model.put("success", false);
+        }
+        return model;
+    }
 
 }

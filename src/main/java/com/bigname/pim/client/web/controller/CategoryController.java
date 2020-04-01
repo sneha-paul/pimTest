@@ -1,10 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.core.data.exportor.CategoryExporter;
-import com.bigname.pim.core.domain.Category;
-import com.bigname.pim.core.domain.CategoryProduct;
-import com.bigname.pim.core.domain.ParentCategoryProduct;
-import com.bigname.pim.core.domain.RelatedCategory;
+import com.bigname.pim.core.domain.*;
 import com.bigname.pim.core.service.CatalogService;
 import com.bigname.pim.core.service.CategoryService;
 import com.bigname.pim.core.service.WebsiteService;
@@ -36,10 +33,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
@@ -97,7 +92,7 @@ public class CategoryController extends BaseController<Category, CategoryService
                     productCategory.setActive(category.getActive());
                     categoryService.updateProductCategory(productCategory);
                 });
-
+        category.setLastExportedTimeStamp(null);
         return update(categoryId, category, "/pim/categories/", category.getGroup().length == 1 && category.getGroup()[0].equals("DETAILS") ? Category.DetailsGroup.class :category.getGroup()[0].equals("SEO") ? Category.SeoGroup.class : null);
     }
 
@@ -434,6 +429,32 @@ public class CategoryController extends BaseController<Category, CategoryService
             success = true;
         }
         model.put("success", success);
+        return model;
+    }
+
+    @RequestMapping(value ="/categoryProductLoad")
+    public void loadProductCategoryToBOS() {
+        List<CategoryProduct> categoryProductList = categoryService.loadCategoryProductToBOS();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/category/loadCategoryProduct", categoryProductList, String.class, map);
+    }
+
+    @RequestMapping(value ="/syncUpdatedCategories", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncUpdatedCategories() {
+        Map<String, Object> model = new HashMap<>();
+        List<Category> categories = categoryService.syncUpdatedRecord();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/syncUpdatedCategories", categories, String.class, map);
+        if(Objects.equals(response.getBody(), "true")) {
+            categories.forEach(category -> {
+                category.setLastExportedTimeStamp(LocalDateTime.now());
+            });
+            categoryService.update(categories);
+            model.put("success", true);
+        } else {
+            model.put("success", false);
+        }
         return model;
     }
 }

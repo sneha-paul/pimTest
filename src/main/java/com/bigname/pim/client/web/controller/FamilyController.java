@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,6 +126,7 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseBody
     public Map<String, Object> update(@PathVariable(value = "id") String familyId, Family family) {
+        family.setLastExportedTimeStamp(null);
         return update(familyId, family, "/pim/families/", family.getGroup().length == 1 && family.getGroup()[0].equals("DETAILS") ? Family.DetailsGroup.class : null);
     }
 
@@ -594,5 +596,24 @@ public class FamilyController extends BaseController<Family, FamilyService> {
         List<Family> familyList = familyService.getAll(null, false);
         Map<String, String> map = new HashMap<String, String>();
         ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/family/loadFamily", familyList, String.class, map);
+    }
+
+    @RequestMapping(value ="/syncUpdatedFamilies", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncUpdatedFamilies() {
+        Map<String, Object> model = new HashMap<>();
+        List<Family> families = familyService.syncUpdatedRecord();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/families/syncUpdatedFamilies", families, String.class, map);
+        if(Objects.equals(response.getBody(), "true")) {
+            families.forEach(family -> {
+                family.setLastExportedTimeStamp(LocalDateTime.now());
+            });
+            familyService.update(families);
+            model.put("success", true);
+        } else {
+            model.put("success", false);
+        }
+        return model;
     }
 }

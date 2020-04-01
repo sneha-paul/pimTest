@@ -33,10 +33,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.m7.xtreme.common.util.ValidationUtil.isEmpty;
@@ -88,6 +86,7 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
             websiteCatalog.setActive(catalog.getActive());
             catalogService.updateWebsiteCatalog(websiteCatalog);
         });
+        catalog.setLastExportedTimeStamp(null);
         return update(catalogId, catalog, "/pim/catalogs/", catalog.getGroup().length == 1 && catalog.getGroup()[0].equals("DETAILS") ? Catalog.DetailsGroup.class : null);
     }
 
@@ -294,7 +293,8 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     public void loadCatalogToBOS() {
         List<Catalog> catalogList = catalogService.getAll(null, false);
         Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/catalog/loadCatalog", catalogList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/catalogs/loadCatalog", catalogList, String.class, map);
+        response.getStatusCode();
     }
 
     @RequestMapping(value ="/rootCategoryLoad")
@@ -303,4 +303,23 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
         Map<String, String> map = new HashMap<String, String>();
         ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/catalog/loadRootCategory", rootCategoryList, String.class, map);
     }
+
+    @RequestMapping(value ="/syncUpdatedCatalogs", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncUpdatedCatalog() {
+        Map<String, Object> model = new HashMap<>();
+        List<Catalog> catalogs = catalogService.syncUpdatedRecord();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/catalogs/syncUpdatedCatalogs", catalogs, String.class, new HashMap<>());
+        if(Objects.equals(response.getBody(), "true")) {
+            catalogs.forEach(catalog -> {
+                catalog.setLastExportedTimeStamp(LocalDateTime.now());
+            });
+            catalogService.update(catalogs);
+            model.put("success", true);
+        } else {
+            model.put("success", null);
+        }
+        return model;
+    }
+
 }

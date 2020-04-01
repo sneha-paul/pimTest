@@ -763,4 +763,9 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
         });
         return true;
     }
+
+    @Override
+    public List<CategoryProduct> loadCategoryProductToBOS() {
+        return categoryProductDAO.findAll();
+    }
 }

@@ -1725,6 +1725,18 @@
             }, callback);
         },
 
+        syncUpdatedInstance: function(url, entityName) {
+            $.confirmedAJAXRequest({
+                url: url,
+                method: 'PUT',
+                text: 'This will sync the updated ' + entityName + "!",
+                confirmButtonText: 'Yes, sync it!',
+                confirmButtonColor: '#28a745',
+                successTitle: 'Synced',
+                successText: 'The ' + entityName + ' has been synced.'
+            }, null);
+        },
+
         cloneInstance: function(url, entityName, callback) {
             $.confirmedAJAXRequest({
                 url: url,

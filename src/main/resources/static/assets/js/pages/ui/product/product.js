@@ -169,6 +169,11 @@ $( document ).ready(function() {
         ]
     });
 
+    $('#js-sync-updatedProductVariants').on("click", function () {
+        $.syncUpdatedInstance(
+            $.getURL("/pim/products/syncUpdatedProductVariants"), "productVariants");
+    });
+
     $('.js-add-categories').on('click', function(){
         //var eventA = function(){};
         var eventB = function(){};

@@ -145,5 +145,7 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
     Page<Map<String, Object>> findAllParentCategoryProducts(ID<String> categoryId, String searchField, String keyword, Pageable pageable, boolean... activeRequired);
 
     boolean syncAllParentCategoryProducts(String categoryId, Pageable pageable);
+
+    List<CategoryProduct> loadCategoryProductToBOS();
 }
 

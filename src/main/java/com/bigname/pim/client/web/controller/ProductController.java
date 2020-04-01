@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,14 +80,13 @@ public class ProductController extends BaseController<Product, ProductService> {
     public Map<String, Object> update(@PathVariable(value = "productId") String productId, Product product, HttpServletRequest request) {
         productService.get(ID.EXTERNAL_ID(productId), true, true, true).ifPresent(product1 -> product.setProductFamily(product1.getProductFamily()));
         product.setAttributeValues(getAttributesMap(request));
-
         Product productDetails = productService.get(ID.EXTERNAL_ID(productId), true, true, true).orElse(null);
         productService.getAllCategoryProductsWithProductId(ID.INTERNAL_ID(productDetails.getId()))
                 .forEach(categoryProduct -> {
                     categoryProduct.setActive(product.getActive());
                     productService.updateCategoryProduct(categoryProduct);
                 });
-
+        product.setLastExportedTimeStamp(null);
         return update(productId, product, "/pim/products/", product.getGroup().length == 1 && product.getGroup()[0].equals("DETAILS") ? Product.DetailsGroup.class : null);
     }
 
@@ -317,6 +317,25 @@ public class ProductController extends BaseController<Product, ProductService> {
         List<ProductCategory> productCategoryList = productService.loadProductCategoryToBOS();
         Map<String, String> map = new HashMap<String, String>();
         ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/product/loadProductCategory", productCategoryList, String.class, map);
+    }
+
+    @RequestMapping(value ="/syncUpdatedProducts", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncUpdatedProducts() {
+        Map<String, Object> model = new HashMap<>();
+        List<Product> products = productService.syncUpdatedRecord();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/syncUpdatedProducts", products, String.class, map);
+        if(Objects.equals(response.getBody(), "true")) {
+            products.forEach(product -> {
+                product.setLastExportedTimeStamp(LocalDateTime.now());
+            });
+            productService.update(products);
+            model.put("success", true);
+        } else {
+            model.put("success", false);
+        }
+        return model;
     }
 
 }

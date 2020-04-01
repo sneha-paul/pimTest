@@ -8,6 +8,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
                             <button id="js-create-product" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Parent Product</span></button>
+                            <button id="js-sync-updatedProducts" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Parent Products</span></button>
 <%--                            <button id="js-advanced-search-product" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>--%>
                         </div>
                     </div>
@@ -76,6 +77,12 @@
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
         });
+
+        $('#js-sync-updatedProducts').on("click", function () {
+            $.syncUpdatedInstance(
+                $.getURL("/pim/products/syncUpdatedProducts"), "products");
+        });
+
         $.addModal({
             selector: '#js-advanced-search-product',
             url: $.getURL('/pim/products/search'),

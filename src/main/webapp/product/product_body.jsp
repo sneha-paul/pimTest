@@ -684,6 +684,7 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="pull-right">
                                             <button id="js-create-variant" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Child Product</span></button>
+                                            <button id="js-sync-updatedProductVariants" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Child Product</span></button>
                                             <button type="button" class="btn btn-sm btn-secondary js-sorting-mode variants selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
                                             <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode variants"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                         </div>

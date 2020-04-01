@@ -59,6 +59,11 @@ $(function(){
         ]
     });
 
+    $('#js-sync-updatedCategories').on("click", function () {
+        $.syncUpdatedInstance(
+            $.getURL("/pim/categories/syncUpdatedCategories"), "categories");
+    });
+
     $.addModal({
         selector: '#js-advanced-search',
         url: $.getURL('/pim/categories/search'),
