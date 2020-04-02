@@ -1,5 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
+import com.bigname.pim.core.domain.Catalog;
+import com.bigname.pim.core.domain.RootCategory;
 import com.bigname.pim.core.domain.Website;
 import com.bigname.pim.core.domain.WebsiteCatalog;
 import com.bigname.pim.core.service.ConfigService;
@@ -598,11 +600,48 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
         if(Objects.equals(response.getBody(), "true")) {
             websites.forEach(website -> {
                 website.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(website.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(website.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
             });
             websiteService.update(websites);
             model.put("success", true);
         } else {
             model.put("success", false);
+        }
+        return model;
+    }
+
+    @RequestMapping(value ="/{websiteId}/syncWebsiteCatalog", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncWebsiteCatalog(@PathVariable(value = "websiteId") String websiteId) {
+        Map<String, Object> model = new HashMap<>();
+        Website website = websiteService.get(ID.EXTERNAL_ID(websiteId), false).orElse(null);
+        List<WebsiteCatalog> websiteCatalogList = websiteService.getAllWebsiteCatalogs(website.getId());
+        List<WebsiteCatalog> finalWebsiteCatalog = new ArrayList<>();
+        websiteCatalogList.forEach(websiteCatalog -> {
+            if(ValidationUtil.isEmpty(websiteCatalog.getLastExportedTimeStamp())) {
+                finalWebsiteCatalog.add(websiteCatalog);
+            }
+        });
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/websites/syncWebsiteCatalogs", finalWebsiteCatalog, String.class, new HashMap<>());
+        if(Objects.equals(response.getBody(), "true")) {
+            finalWebsiteCatalog.forEach(websiteCatalog -> {
+                websiteCatalog.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(websiteCatalog.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(websiteCatalog.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
+            });
+            websiteService.syncWebsiteCatalog(finalWebsiteCatalog);
+            model.put("success", true);
+        } else {
+            model.put("success", null);
         }
         return model;
     }

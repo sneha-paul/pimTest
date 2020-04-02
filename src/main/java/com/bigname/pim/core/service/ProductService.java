@@ -131,5 +131,9 @@ public interface ProductService extends BaseService<Product, ProductDAO> {
 
     Product create(Product product, ID.Type type);
 
+    List<ProductCategory> getAllProductCategories(String productInternalId);
+
     List<ProductCategory> loadProductCategoryToBOS();
+
+    List<ProductCategory> syncProductCategory(List<ProductCategory> finalProductCategory);
 }

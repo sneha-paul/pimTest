@@ -147,5 +147,9 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
     boolean syncAllParentCategoryProducts(String categoryId, Pageable pageable);
 
     List<CategoryProduct> loadCategoryProductToBOS();
+
+    List<RelatedCategory> syncSubCategories(List<RelatedCategory> finalSubCategories);
+
+    List<CategoryProduct> syncCategoryProducts(List<CategoryProduct> finalCategoryProducts);
 }
 

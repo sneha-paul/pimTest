@@ -10,15 +10,18 @@ import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.domain.Version;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
+import com.m7.xtreme.xplatform.service.SyncStatusService;
 import com.m7.xtreme.xplatform.service.UserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -51,12 +54,14 @@ public class CategoryController extends BaseController<Category, CategoryService
     private CategoryService categoryService;
     private UserService userService;
     private RestTemplate restTemplate;
+    private SyncStatusService syncStatusService;
 
-    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, JobInstanceService jobInstanceService, CatalogService catalogService, WebsiteService websiteService, UserService userService, RestTemplate restTemplate){
+    public CategoryController(CategoryService categoryService, @Lazy CategoryExporter categoryExporter, JobInstanceService jobInstanceService, CatalogService catalogService, WebsiteService websiteService, UserService userService, RestTemplate restTemplate, SyncStatusService syncStatusService){
         super(categoryService, Category.class, new BreadcrumbsBuilder(), categoryExporter, jobInstanceService, websiteService, catalogService);
         this.categoryService = categoryService;
         this.userService = userService;
         this.restTemplate = restTemplate;
+        this.syncStatusService = syncStatusService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -414,7 +419,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     public void loadCategoryToBOS() {
         List<Category> categoryList = categoryService.getAll(null, false);
         Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/category/loadCategory", categoryList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/loadCategory", categoryList, String.class, map);
     }
 
     @RequestMapping(value ="/relatedCategoryLoad")
@@ -449,11 +454,79 @@ public class CategoryController extends BaseController<Category, CategoryService
         if(Objects.equals(response.getBody(), "true")) {
             categories.forEach(category -> {
                 category.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(category.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(category.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
             });
             categoryService.update(categories);
             model.put("success", true);
         } else {
             model.put("success", false);
+        }
+        return model;
+    }
+
+    @RequestMapping(value ="/{id}/syncSubCategories", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncSubCategories(@PathVariable(value = "id") String id) {
+        Map<String, Object> model = new HashMap<>();
+        Category category = categoryService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+        List<RelatedCategory> subCategoriesList = categoryService.getAllRelatedCategoriesWithSubCategoryId(ID.INTERNAL_ID(category.getId()));
+        List<RelatedCategory> finalSubCategories = new ArrayList<>();
+        subCategoriesList.forEach(subCategory -> {
+            if(ValidationUtil.isEmpty(subCategory.getLastExportedTimeStamp())) {
+                finalSubCategories.add(subCategory);
+            }
+        });
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/syncSubCategories", finalSubCategories, String.class, new HashMap<>());
+        if(Objects.equals(response.getBody(), "true")) {
+            finalSubCategories.forEach(subCategory -> {
+                subCategory.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(subCategory.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(subCategory.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
+            });
+            categoryService.syncSubCategories(finalSubCategories);
+            model.put("success", true);
+        } else {
+            model.put("success", null);
+        }
+        return model;
+    }
+
+    @RequestMapping(value ="/{id}/syncCategoryProducts", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncCategoryProducts(@PathVariable(value = "id") String id) {
+        Map<String, Object> model = new HashMap<>();
+        Category category = categoryService.get(ID.EXTERNAL_ID(id), false).orElse(null);
+        List<CategoryProduct> categoryProductList = categoryService.getAllCategoryProducts(ID.INTERNAL_ID(category.getId()));
+        List<CategoryProduct> finalCategoryProducts = new ArrayList<>();
+        categoryProductList.forEach(categoryProduct -> {
+            if(ValidationUtil.isEmpty(categoryProduct.getLastExportedTimeStamp())) {
+                finalCategoryProducts.add(categoryProduct);
+            }
+        });
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/syncCategoryProducts", finalCategoryProducts, String.class, new HashMap<>());
+        if(Objects.equals(response.getBody(), "true")) {
+            finalCategoryProducts.forEach(categoryProduct -> {
+                categoryProduct.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(categoryProduct.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(categoryProduct.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
+            });
+            categoryService.syncCategoryProducts(finalCategoryProducts);
+            model.put("success", true);
+        } else {
+            model.put("success", null);
         }
         return model;
     }

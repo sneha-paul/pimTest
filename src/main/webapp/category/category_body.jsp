@@ -132,6 +132,7 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="pull-right">
                                             <button type="button" class="btn btn-success js-add-subCategory"><i class="fa fa-plus"></i> <span class="p-l-5">Add SubCategories</span></button>
+                                            <button id="js-sync-subCategories" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync SubCategories</span></button>
                                             <button type="button" class="btn btn-sm btn-secondary js-sorting-mode subCategories selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
                                             <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode subCategories"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                         </div>
@@ -167,6 +168,7 @@
                                     <div class="col-lg-12 col-md-12">
                                         <div class="pull-right">
                                             <button type="button" class="btn btn-success js-add-products"><i class="fa fa-plus"></i> <span class="p-l-5">Add Parent Product</span></button>
+                                            <button id="js-sync-categoryProducts" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Parent Product</span></button>
                                             <button type="button" class="btn btn-sm btn-secondary js-sorting-mode products selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
                                             <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode products"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                         </div>

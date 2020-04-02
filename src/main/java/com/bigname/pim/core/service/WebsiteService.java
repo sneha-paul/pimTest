@@ -55,4 +55,6 @@ public interface WebsiteService extends BaseService<Website, WebsiteDAO> {
     List<WebsiteCatalog> getAllWebsiteCatalogs(String websiteInternalId);
 
     List<WebsiteCatalog> loadWebsiteCatalogsToBOS();
+
+    List<WebsiteCatalog> syncWebsiteCatalog(List<WebsiteCatalog> finalWebsiteCatalog);
 }

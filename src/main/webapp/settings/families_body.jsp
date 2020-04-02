@@ -5,8 +5,9 @@
                 <div class="row p-b-25">
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
-                                <button id="js-create-family" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Product Type</span></button>
-<%--                            <button id="js-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>--%>
+                            <button id="js-create-family" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Product Type</span></button>
+                            <button id="js-sync-updatedFamilies" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Product Type</span></button>
+                            <%--                            <button id="js-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>--%>
                         </div>
                     </div>
                 </div>
@@ -43,6 +44,11 @@
                 {text: 'SEARCH', style: 'primary', close: false, click: function(){$.getDataTable('families').search('').draw();$.closeModal();}},
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
+        });
+
+        $('#js-sync-updatedFamilies').on("click", function () {
+            $.syncUpdatedInstance(
+                $.getURL("/pim/families/syncUpdatedFamilies"), "families");
         });
 
     });

@@ -64,6 +64,7 @@
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
                                                     <button type="button" class="btn btn-success js-add-catalog"><i class="fa fa-plus"></i> <span class="p-l-5">Add Catalog</span></button>
+                                                    <button id="js-sync-websiteCatalogs" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Catalog</span></button>
                                                 </div>
                                             </div>
                                         </div>

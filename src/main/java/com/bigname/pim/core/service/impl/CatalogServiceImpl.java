@@ -90,6 +90,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                         .map(rootCategory -> rootCategoryDAO.findFirstByCatalogIdAndRootCategoryId(catalog.getId(), rootCategory.getId())
                                 .map(rootCategory1 -> {
                                     rootCategory1.setActive(active.state());
+                                    rootCategory1.setLastExportedTimeStamp(null);
                                     rootCategoryDAO.save(rootCategory1);
                                     return true;
                                 })
@@ -333,5 +334,10 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     @Override
     public List<RootCategory> loadRootCategoryToBOS() {
         return rootCategoryDAO.findAll();
+    }
+
+    @Override
+    public List<RootCategory> syncRootCategories(List<RootCategory> rootCategories) {
+        return rootCategoryDAO.saveAll(rootCategories);
     }
 }

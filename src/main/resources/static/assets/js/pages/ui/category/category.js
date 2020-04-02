@@ -181,6 +181,16 @@ $(function(){
         eModal.ajax(options);
     });
 
+    $('#js-sync-subCategories').on("click", function () {
+        $.syncUpdatedInstance(
+            $.getURL("/pim/categories/{categoryId}/syncSubCategories"), "subCategories");
+    });
+
+    $('#js-sync-categoryProducts').on("click", function () {
+        $.syncUpdatedInstance(
+            $.getURL("/pim/categories/{categoryId}/syncCategoryProducts"), "products");
+    });
+
     $('.js-categoryHistory-tab').on('shown.bs.tab.categoryHistory', function (e) {
         $.initGrid({
             selector: '#paginatedCategoryHistoryTable',

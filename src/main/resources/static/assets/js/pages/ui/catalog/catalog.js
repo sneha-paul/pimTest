@@ -101,6 +101,11 @@ $(function(){
         eModal.ajax(options);
     });
 
+    $('#js-sync-rootCategories').on("click", function () {
+        $.syncUpdatedInstance(
+            $.getURL("/pim/catalogs/{catalogId}/syncRootCategories"), "rootCategories");
+    });
+
     $('.js-catalogHistory-tab').on('shown.bs.tab.catalogHistory', function (e) {
         $.initGrid({
             selector: '#paginatedCatalogHistoryTable',

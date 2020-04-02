@@ -10,13 +10,16 @@ import com.bigname.pim.core.util.ProductUtil;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
+import com.m7.xtreme.xplatform.service.SyncStatusService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
@@ -49,8 +52,9 @@ public class ProductController extends BaseController<Product, ProductService> {
     private FamilyService productFamilyService;
     private ChannelService channelService;
     private RestTemplate restTemplate;
+    private SyncStatusService syncStatusService;
 
-    public ProductController(ProductService productService, @Lazy ProductExporter productExporter, JobInstanceService jobInstanceService, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService, RestTemplate restTemplate){
+    public ProductController(ProductService productService, @Lazy ProductExporter productExporter, JobInstanceService jobInstanceService, ProductVariantService productVariantService, FamilyService productFamilyService, ChannelService channelService, CategoryService categoryService, CatalogService catalogService, WebsiteService websiteService, VirtualFileService assetService, RestTemplate restTemplate, SyncStatusService syncStatusService){
         super(productService, Product.class, new BreadcrumbsBuilder(), productExporter, jobInstanceService, websiteService, categoryService, catalogService, productVariantService, productFamilyService, productService);
         this.productService = productService;
         this.productVariantService = productVariantService;
@@ -58,6 +62,7 @@ public class ProductController extends BaseController<Product, ProductService> {
         this.channelService = channelService;
         this.assetService = assetService;
         this.restTemplate = restTemplate;
+        this.syncStatusService = syncStatusService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -282,7 +287,7 @@ public class ProductController extends BaseController<Product, ProductService> {
 
     @RequestMapping(value = "/{productId}/products/active/{active}", method = RequestMethod.PUT)
     @ResponseBody
-    public Map<String, Object> toggleCatalogs(@PathVariable(value = "productId") String productId,
+    public Map<String, Object> toggleProducts(@PathVariable(value = "productId") String productId,
                                               @PathVariable(value = "active") String active) {
         Map<String, Object> model = new HashMap<>();
         model.put("success", productService.toggleProduct(ID.EXTERNAL_ID(productId), Toggle.get(active)));
@@ -329,11 +334,48 @@ public class ProductController extends BaseController<Product, ProductService> {
         if(Objects.equals(response.getBody(), "true")) {
             products.forEach(product -> {
                 product.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(product.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(product.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
             });
             productService.update(products);
             model.put("success", true);
         } else {
             model.put("success", false);
+        }
+        return model;
+    }
+
+    @RequestMapping(value ="/{productId}/syncProductCategories", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncProductCategories(@PathVariable(value = "productId") String productId) {
+        Map<String, Object> model = new HashMap<>();
+        Product product = productService.get(ID.EXTERNAL_ID(productId), false).orElse(null);
+        List<ProductCategory> productCategoryList = productService.getAllProductCategories(product.getId());
+        List<ProductCategory> finalProductCategory = new ArrayList<>();
+        productCategoryList.forEach(productCategory -> {
+            if(ValidationUtil.isEmpty(productCategory.getLastExportedTimeStamp())) {
+                finalProductCategory.add(productCategory);
+            }
+        });
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/syncProductCategories", finalProductCategory, String.class, new HashMap<>());
+        if(Objects.equals(response.getBody(), "true")) {
+            finalProductCategory.forEach(productCategory -> {
+                productCategory.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(productCategory.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(productCategory.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
+            });
+            productService.syncProductCategory(finalProductCategory);
+            model.put("success", true);
+        } else {
+            model.put("success", null);
         }
         return model;
     }

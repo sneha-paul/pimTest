@@ -39,6 +39,11 @@ $(function(){
         eModal.ajax(options);
     });
 
+    $('#js-sync-websiteCatalogs').on("click", function () {
+        $.syncUpdatedInstance(
+            $.getURL("/pim/websites/{websiteId}/syncWebsiteCatalog"), "websiteCatalogs");
+    });
+
     $('.js-websiteHistory-tab').on('shown.bs.tab.websiteHistory', function (e) {
         $.initGrid({
             selector: '#paginatedWebsiteHistoryTable',

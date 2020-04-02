@@ -147,6 +147,11 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         }
     }
 
+    @Override
+    public List<ProductCategory> getAllProductCategories(String productInternalId) {
+        return productCategoryDAO.findByProductId(productInternalId);
+    }
+
     /**
      * Overriding the base service method to inject the productFamily instance
      * @param productId
@@ -425,6 +430,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
                         .map(category -> productCategoryDAO.findFirstByProductIdAndCategoryId(product.getId(), category.getId())
                                 .map(productCategory -> {
                                     productCategory.setActive(active.state());
+                                    productCategory.setLastExportedTimeStamp(null);
                                     productCategoryDAO.save(productCategory);
                                     return true;
                                 })
@@ -631,5 +637,10 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     @Override
     public List<ProductCategory> loadProductCategoryToBOS() {
         return productCategoryDAO.findAll();
+    }
+
+    @Override
+    public List<ProductCategory> syncProductCategory(List<ProductCategory> finalProductCategory) {
+        return productCategoryDAO.saveAll(finalProductCategory);
     }
 }

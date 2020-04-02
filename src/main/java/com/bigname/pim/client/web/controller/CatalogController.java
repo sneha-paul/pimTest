@@ -1,6 +1,7 @@
 package com.bigname.pim.client.web.controller;
 
 import com.bigname.pim.core.domain.Catalog;
+import com.bigname.pim.core.domain.Category;
 import com.bigname.pim.core.domain.RootCategory;
 import com.bigname.pim.core.domain.WebsiteCatalog;
 import com.bigname.pim.core.service.CatalogService;
@@ -11,15 +12,18 @@ import com.m7.xtreme.common.datatable.model.Pagination;
 import com.m7.xtreme.common.datatable.model.Request;
 import com.m7.xtreme.common.datatable.model.Result;
 import com.m7.xtreme.common.datatable.model.SortOrder;
+import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.domain.Version;
 import com.m7.xtreme.xplatform.service.JobInstanceService;
+import com.m7.xtreme.xplatform.service.SyncStatusService;
 import com.m7.xtreme.xplatform.service.UserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -54,13 +58,15 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     private WebsiteService websiteService;
     private UserService userService;
     private RestTemplate restTemplate;
+    private SyncStatusService syncStatusService;
 
-    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService, JobInstanceService jobInstanceService, UserService userService, RestTemplate restTemplate) {
+    public CatalogController(CatalogService catalogService, @Lazy CatalogExporter catalogExporter, WebsiteService websiteService, JobInstanceService jobInstanceService, UserService userService, RestTemplate restTemplate, SyncStatusService syncStatusService) {
         super(catalogService, Catalog.class, new BreadcrumbsBuilder(), catalogExporter, jobInstanceService, websiteService);
         this.catalogService = catalogService;
         this.websiteService = websiteService;
         this.userService = userService;
         this.restTemplate = restTemplate;
+        this.syncStatusService = syncStatusService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -313,8 +319,45 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
         if(Objects.equals(response.getBody(), "true")) {
             catalogs.forEach(catalog -> {
                 catalog.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(catalog.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(catalog.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
             });
             catalogService.update(catalogs);
+            model.put("success", true);
+        } else {
+            model.put("success", null);
+        }
+        return model;
+    }
+
+    @RequestMapping(value ="/{catalogId}/syncRootCategories", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncRootCategories(@PathVariable(value = "catalogId") String catalogId) {
+        Map<String, Object> model = new HashMap<>();
+        Catalog catalog = catalogService.get(ID.EXTERNAL_ID(catalogId), false).orElse(null);
+        List<RootCategory> rootCategoryList = catalogService.getAllRootCategories(catalog.getId());
+        List<RootCategory> finalRootCategory = new ArrayList<>();
+        rootCategoryList.forEach(rootCategory -> {
+            if(ValidationUtil.isEmpty(rootCategory.getLastExportedTimeStamp())) {
+                finalRootCategory.add(rootCategory);
+            }
+        });
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/catalogs/syncRootCategories", finalRootCategory, String.class, new HashMap<>());
+        if(Objects.equals(response.getBody(), "true")) {
+            finalRootCategory.forEach(rootCategory -> {
+                rootCategory.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(rootCategory.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(catalog.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
+            });
+            catalogService.syncRootCategories(finalRootCategory);
             model.put("success", true);
         } else {
             model.put("success", null);

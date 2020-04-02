@@ -157,4 +157,9 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     public List<WebsiteCatalog> loadWebsiteCatalogsToBOS() {
         return websiteCatalogDAO.findAll();
     }
+
+    @Override
+    public List<WebsiteCatalog> syncWebsiteCatalog(List<WebsiteCatalog> finalWebsiteCatalog) {
+        return websiteCatalogDAO.saveAll(finalWebsiteCatalog);
+    }
 }

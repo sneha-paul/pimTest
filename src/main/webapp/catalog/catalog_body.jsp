@@ -101,6 +101,7 @@
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
                                                     <button type="button" class="btn btn-sm btn-success js-add-category"><i class="fa fa-plus"></i> <span class="p-l-5">Add Categories</span></button>
+                                                    <button id="js-sync-rootCategories" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Categories</span></button>
                                                     <button type="button" class="btn btn-sm btn-secondary js-sorting-mode selected"  title="Sorting Mode"><i class="fa fa-sort-alpha-asc"></i></button>
                                                     <button type="button" class="btn btn-sm btn-outline-secondary js-reordering-mode"  title="Reordering Mode"><i class="fa fa-list-ol"></i></button>
                                                 </div>

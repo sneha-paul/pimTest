@@ -435,6 +435,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                         .map(subCategory -> relatedCategoryDAO.findFirstByCategoryIdAndSubCategoryId(category.getId(), subCategory.getId())
                                 .map(relatedCategory -> {
                                     relatedCategory.setActive(active.state());
+                                    relatedCategory.setLastExportedTimeStamp(null);
                                     relatedCategoryDAO.save(relatedCategory);
                                     return true;
                                 })
@@ -450,6 +451,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                         .map(product -> categoryProductDAO.findFirstByCategoryIdAndProductId(category.getId(), product.getId())
                                 .map(categoryProduct -> {
                                     categoryProduct.setActive(active.state());
+                                    categoryProduct.setLastExportedTimeStamp(null);
                                     categoryProductDAO.save(categoryProduct);
                                     return true;
                                 })
@@ -768,5 +770,15 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     @Override
     public List<CategoryProduct> loadCategoryProductToBOS() {
         return categoryProductDAO.findAll();
+    }
+
+    @Override
+    public List<RelatedCategory> syncSubCategories(List<RelatedCategory> finalSubCategories) {
+        return relatedCategoryDAO.saveAll(finalSubCategories);
+    }
+
+    @Override
+    public List<CategoryProduct> syncCategoryProducts(List<CategoryProduct> finalCategoryProducts) {
+        return categoryProductDAO.saveAll(finalCategoryProducts);
     }
 }
