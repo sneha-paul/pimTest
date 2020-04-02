@@ -110,6 +110,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
 
         if(_variant.isPresent()) {
             ProductVariant variant = _variant.get();
+            variant.setLastExportedTimeStamp(null);
             variant.setActive(active.state());
             productVariantDAO.save(variant);
             return true;

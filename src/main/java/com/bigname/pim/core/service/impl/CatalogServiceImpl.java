@@ -293,6 +293,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                 .map(catalog -> {
 
                     catalog.setGroup("DETAILS");
+                    catalog.setLastExportedTimeStamp(null);
                     catalog.setActive(toggle.state());
                     catalogDAO.save(catalog);
 

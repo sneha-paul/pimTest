@@ -577,6 +577,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         return get(productId, false)
                 .map(product -> {
                     product.setGroup("DETAILS");
+                    product.setLastExportedTimeStamp(null);
                     product.setActive(toggle.state());
                     productDAO.save(product);
 

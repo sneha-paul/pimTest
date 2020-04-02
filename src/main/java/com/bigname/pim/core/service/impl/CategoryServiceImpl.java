@@ -540,6 +540,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                 .map(category -> {
 
                     category.setGroup("DETAILS");
+                    category.setLastExportedTimeStamp(null);
                     category.setActive(toggle.state());
                     categoryDAO.save(category);
 

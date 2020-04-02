@@ -15,9 +15,11 @@ import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.web.controller.BaseController;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
 import com.m7.xtreme.xplatform.domain.User;
 import com.m7.xtreme.xplatform.domain.Version;
 import com.m7.xtreme.xplatform.model.Breadcrumbs;
+import com.m7.xtreme.xplatform.service.SyncStatusService;
 import com.m7.xtreme.xplatform.service.UserService;
 import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,13 +55,15 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     private UserService userService;
     private RestTemplate restTemplate;
     private ConfigService configService;
+    private SyncStatusService syncStatusService;
 
-    public WebsiteController(WebsiteService websiteService, UserService userService, RestTemplate restTemplate, ConfigService configService) {
+    public WebsiteController(WebsiteService websiteService, UserService userService, RestTemplate restTemplate, ConfigService configService, SyncStatusService syncStatusService) {
         super(websiteService, Website.class, new BreadcrumbsBuilder());
         this.websiteService = websiteService;
         this.userService = userService;
         this.restTemplate = restTemplate;
         this.configService = configService;
+        this.syncStatusService = syncStatusService;
     }
 
 
@@ -580,6 +585,25 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
             model.put("fieldErrors", _fieldErrors);
         }
         model.put("success", success[0]);
+        return model;
+    }
+
+    @RequestMapping(value ="/syncUpdatedWebsites", method = RequestMethod.PUT)
+    @ResponseBody
+    public Map<String, Object> syncUpdatedWebsites() {
+        Map<String, Object> model = new HashMap<>();
+        List<Website> websites = websiteService.syncUpdatedRecord();
+        Map<String, String> map = new HashMap<String, String>();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/websites/syncUpdatedWebsites", websites, String.class, map);
+        if(Objects.equals(response.getBody(), "true")) {
+            websites.forEach(website -> {
+                website.setLastExportedTimeStamp(LocalDateTime.now());
+            });
+            websiteService.update(websites);
+            model.put("success", true);
+        } else {
+            model.put("success", false);
+        }
         return model;
     }
 }

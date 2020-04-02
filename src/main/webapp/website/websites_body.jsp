@@ -8,6 +8,7 @@
                     <div class="col-lg-12 col-md-12">
                         <div class="pull-right">
                             <button id="js-create-website" type="button" class="btn btn-success"><i class="fa fa-plus"></i> <span class="p-l-5">Create Website</span></button>
+                            <button id="js-sync-updatedWebsites" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Websites</span></button>
                             <button id="js-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Advanced Search</span></button>
                             <button id="ui-advanced-search" type="button" class="btn btn-primary"><i class="fa fa-gears"></i> <span class="p-l-5">Search</span></button>
                         </div>
@@ -84,6 +85,11 @@
                 {text: 'SEARCH', style: 'primary', close: false, click: function(){$.getDataTable('websites').search('').draw();$.closeModal();}},
                 {text: 'CLOSE', style: 'danger', close: true, click: function(){}}
             ]
+        });
+
+        $('#js-sync-updatedWebsites').on("click", function () {
+            $.syncUpdatedInstance(
+                $.getURL("/pim/websites/syncUpdatedWebsites"), "websites");
         });
 
         $('button#ui-advanced-search').click(function(){
