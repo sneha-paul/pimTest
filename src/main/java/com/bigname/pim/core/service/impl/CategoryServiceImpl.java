@@ -580,6 +580,12 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
     }
 
     @Override
+    public List<RelatedCategory> getAllRelatedCategoriesWithCategoryId(ID<String> categoryId) {
+        ID<String> internalId = getInternalId(categoryId);
+        return isNotEmpty(internalId) ? relatedCategoryDAO.findByCategoryId(internalId.getId()) : new ArrayList<>();
+    }
+
+    @Override
     public List<ProductCategory> getAllProductCategoriesWithCategoryId(ID<String> categoryId) {
         ID<String> internalId = getInternalId(categoryId);
         return isNotEmpty(internalId) ? productCategoryDAO.findByCategoryId(internalId.getId()) : new ArrayList<>();

@@ -314,7 +314,7 @@ public class ProductController extends BaseController<Product, ProductService> {
     public void loadProductToBOS() {
         List<Product> productList = productService.getAll(null, false);
         Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/product/loadProduct", productList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/loadProduct", productList, String.class, map);
     }
 
     @RequestMapping(value ="/productCategoryLoad")

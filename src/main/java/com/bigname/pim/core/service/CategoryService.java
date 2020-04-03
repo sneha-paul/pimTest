@@ -122,6 +122,8 @@ public interface CategoryService extends BaseService<Category, CategoryDAO> {
 
     List<RelatedCategory> getAllRelatedCategoriesWithSubCategoryId(ID<String> categoryId);
 
+    List<RelatedCategory> getAllRelatedCategoriesWithCategoryId(ID<String> categoryId);
+
     List<ProductCategory> getAllProductCategoriesWithCategoryId(ID<String> categoryId);
 
     void updateRootCategory(RootCategory rootCategory);

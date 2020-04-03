@@ -474,7 +474,7 @@ public class CategoryController extends BaseController<Category, CategoryService
     public Map<String, Object> syncSubCategories(@PathVariable(value = "id") String id) {
         Map<String, Object> model = new HashMap<>();
         Category category = categoryService.get(ID.EXTERNAL_ID(id), false).orElse(null);
-        List<RelatedCategory> subCategoriesList = categoryService.getAllRelatedCategoriesWithSubCategoryId(ID.INTERNAL_ID(category.getId()));
+        List<RelatedCategory> subCategoriesList = categoryService.getAllRelatedCategoriesWithCategoryId(ID.INTERNAL_ID(category.getId()));
         List<RelatedCategory> finalSubCategories = new ArrayList<>();
         subCategoriesList.forEach(subCategory -> {
             if(ValidationUtil.isEmpty(subCategory.getLastExportedTimeStamp())) {
