@@ -20,6 +20,8 @@ import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
 import com.m7.xtreme.xcore.web.controller.ControllerSupport;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
+import com.m7.xtreme.xplatform.service.SyncStatusService;
 import org.apache.commons.collections4.MapUtils;
 import org.javatuples.Pair;
 import org.springframework.core.io.Resource;
@@ -68,6 +70,8 @@ public class ProductVariantController extends ControllerSupport {
 
     private RestTemplate restTemplate;
 
+    private SyncStatusService syncStatusService;
+
     public ProductVariantController( ProductVariantService productVariantService,
                                      ProductService productService,
                                      ChannelService channelService,
@@ -76,7 +80,8 @@ public class ProductVariantController extends ControllerSupport {
                                      CatalogService catalogService,
                                      WebsiteService websiteService,
                                      VirtualFileService assetService,
-                                     RestTemplate restTemplate){
+                                     RestTemplate restTemplate,
+                                     SyncStatusService syncStatusService){
         this.productVariantService = productVariantService;
         this.productService = productService;
         this.channelService = channelService;
@@ -86,6 +91,7 @@ public class ProductVariantController extends ControllerSupport {
         this.categoryService = categoryService;
         this.assetService = assetService;
         this.restTemplate = restTemplate;
+        this.syncStatusService = syncStatusService;
     }
 
     @RequestMapping("/{productId}/channels/{channelId}/variants/available/list")
@@ -646,6 +652,12 @@ public class ProductVariantController extends ControllerSupport {
         if(Objects.equals(response.getBody(), "true")) {
             productVariants.forEach(productVariant -> {
                 productVariant.setLastExportedTimeStamp(LocalDateTime.now());
+                List<SyncStatus> syncStatusList = syncStatusService.getPendingSynStatus(productVariant.getId(), "pending");
+                syncStatusList.forEach(syncStatus -> {
+                    syncStatus.setStatus("updated");
+                    syncStatus.setExportedTimeStamp(productVariant.getLastExportedTimeStamp());
+                });
+                syncStatusService.update(syncStatusList);
             });
             productVariantService.update(productVariants);
             model.put("success", true);
