@@ -723,6 +723,7 @@
                                             <div class="col-lg-12 col-md-12">
                                                 <div class="pull-right">
                                                     <button type="button" class="btn btn-success js-add-categories"><i class="fa fa-plus"></i> <span class="p-l-5">Add Categories</span></button>
+                                                    <button id="js-sync-productCategories" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> <span class="p-l-5">Sync Categories</span></button>
                                                 </div>
                                             </div>
                                         </div>

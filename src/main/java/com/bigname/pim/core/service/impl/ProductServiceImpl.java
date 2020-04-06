@@ -8,6 +8,7 @@ import com.bigname.pim.core.persistence.dao.mongo.ProductVariantDAO;
 import com.bigname.pim.core.service.*;
 import com.bigname.pim.core.util.PIMConstants;
 import com.bigname.pim.core.util.ProductUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
@@ -19,6 +20,8 @@ import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.SyncStatusDAO;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -26,6 +29,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,10 +47,11 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
     private FamilyService familyService;
     private ProductDAO productDAO;
     private ProductVariantDAO productVariantDAO;
+    private SyncStatusDAO syncStatusDAO;
 
 
     @Autowired
-    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, VirtualFileService assetService, ProductCategoryDAO productCategoryDAO, CategoryProductDAO categoryProductDAO, ProductVariantDAO productVariantDAO, @Lazy CategoryService categoryService) {
+    public ProductServiceImpl(ProductDAO productDAO, Validator validator, ProductVariantService productVariantService, FamilyService productFamilyService, VirtualFileService assetService, ProductCategoryDAO productCategoryDAO, CategoryProductDAO categoryProductDAO, ProductVariantDAO productVariantDAO, @Lazy CategoryService categoryService, SyncStatusDAO syncStatusDAO) {
         super(productDAO, "product", validator);
         this.productDAO = productDAO;
         this.productVariantService = productVariantService;
@@ -56,6 +61,7 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
         this.categoryProductDAO = categoryProductDAO;
         this.categoryService = categoryService;
         this.productVariantDAO = productVariantDAO;
+        this.syncStatusDAO = syncStatusDAO;
     }
 
     @Override
@@ -414,10 +420,33 @@ public class ProductServiceImpl extends BaseServiceSupport<Product, ProductDAO, 
             Optional<Category> category = categoryService.get(categoryId, false);
             if(category.isPresent()) {
                 Optional<CategoryProduct> top1 = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top1.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
+                CategoryProduct savedCategoryProduct = categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top1.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
+                SyncStatus syncStatus = new SyncStatus();
+                syncStatus.setEntity("categoryProduct");
+                syncStatus.setTimeStamp(LocalDateTime.now());
+                syncStatus.setExportedTimeStamp(null);
+                syncStatus.setStatus("pending");
+                syncStatus.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                syncStatus.setEntityId(savedCategoryProduct.getId());
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> dataMap = objectMapper.convertValue(savedCategoryProduct, Map.class);
+                syncStatus.setData(dataMap);
+                syncStatusDAO.save(syncStatus);
 
                 Optional<ProductCategory> top2 = productCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return productCategoryDAO.save(new ProductCategory(product.get().getId(), category.get().getId(), top2.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+                ProductCategory savedProductCategory = productCategoryDAO.save(new ProductCategory(product.get().getId(), category.get().getId(), top2.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+                SyncStatus syncStatus1 = new SyncStatus();
+                syncStatus1.setEntity("productCategory");
+                syncStatus1.setTimeStamp(LocalDateTime.now());
+                syncStatus1.setExportedTimeStamp(null);
+                syncStatus1.setStatus("pending");
+                syncStatus1.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                syncStatus1.setEntityId(savedProductCategory.getId());
+                ObjectMapper objectMapper1 = new ObjectMapper();
+                Map<String, Object> dataMap1 = objectMapper1.convertValue(savedProductCategory, Map.class);
+                syncStatus1.setData(dataMap1);
+                syncStatusDAO.save(syncStatus1);
+                return savedProductCategory;
             }
         }
         return null;

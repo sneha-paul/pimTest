@@ -60,6 +60,7 @@ $( document ).ready(function() {
             parentAttributeIds.forEach(function(value1){
                 let parentEl = $('[data-attr-id="' + value1 + '"]')[0];
                 $(parentEl).on('change', function(){
+                    console.log("value1..." + value1);
                     $.updateDependentAttributes($('[data-parent-attr-id="' + value1 + '"]'), $(this).find('option:selected'), $(this).val());
                 });
             });
@@ -67,11 +68,15 @@ $( document ).ready(function() {
         updateDependentAttributes: function(dependentAttributes, parentOptionEls, parentOptionValues) {
             $(dependentAttributes).each(function(i, dependentAttribute){
                 const dependentAttributeContainer = $(dependentAttribute).closest('.ig-container');
+                const parentId = $(dependentAttribute).attr('data-parent-attr-id');
                 const uiType = $(dependentAttributeContainer).hasClass('dropdown') ? 'DROPDOWN' : $(dependentAttributeContainer).hasClass('accordion') ? 'ACCORDION' : 'UNKNOWN';
                 let dependentChildAttributes = $(dependentAttributeContainer).find('.js-dependent-child');
                 if(dependentChildAttributes.length < parentOptionValues.length) {
                     for(let i = 0; i < parentOptionValues.length; i ++) {
                         if($(dependentAttributeContainer).find('[data-parent-option="' + parentOptionValues[i] +'"]').length === 0) {
+                            if(uiType === 'DROPDOWN' && $(dependentAttributeContainer).closest('.form-group').siblings().find('#' + parentId).attr('multiple') != 'multiple') {
+                                $(dependentAttributeContainer).find('.js-dependent-child').remove();
+                            }
                             let newDependentChildAttribute = $(dependentAttributeContainer).find('.js-template').clone();
                             let attrId = $(newDependentChildAttribute).data('attr-id');
                             $(newDependentChildAttribute).removeClass('js-template').addClass('js-dependent-child').find('.js-parentOptionName').text($(parentOptionEls[i]).text());

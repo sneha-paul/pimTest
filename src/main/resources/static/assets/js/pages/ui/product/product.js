@@ -193,6 +193,13 @@ $( document ).ready(function() {
         };
         eModal.ajax(options);
     });
+
+    $('#js-sync-productCategories').on("click", function () {
+        $.syncUpdatedInstance(
+            $.getURL("/pim/products/{productId}/syncProductCategories"), "categories");
+    });
+
+
     $.addModal({
         selector: '#js-add-asset',
         url: $.getURL('/pim/assetCollections/browser'),

@@ -4,13 +4,17 @@ import com.bigname.pim.core.domain.*;
 import com.bigname.pim.core.persistence.dao.mongo.*;
 import com.bigname.pim.core.service.CatalogService;
 import com.bigname.pim.core.service.CategoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.PlatformUtil;
+import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.Archive;
 import com.m7.xtreme.xcore.util.ID;
 import com.m7.xtreme.xcore.util.Toggle;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.SyncStatusDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,9 +40,10 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
     private RelatedCategoryDAO relatedCategoryDAO;
     private CategoryService categoryService;
     private CategoryDAO categoryDAO;
+    private SyncStatusDAO syncStatusDAO;
 
     @Autowired
-    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService, CategoryDAO categoryDAO) {
+    public CatalogServiceImpl(CatalogDAO catalogDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, RootCategoryDAO rootCategoryDAO, RelatedCategoryDAO relatedCategoryDAO, CategoryService categoryService, CategoryDAO categoryDAO, SyncStatusDAO syncStatusDAO) {
         super(catalogDAO, "catalog", validator);
         this.catalogDAO = catalogDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
@@ -45,6 +51,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
         this.relatedCategoryDAO = relatedCategoryDAO;
         this.categoryService = categoryService;
         this.categoryDAO = categoryDAO;
+        this.syncStatusDAO = syncStatusDAO;
     }
 
     @Override
@@ -276,7 +283,19 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
             Optional<Category> rootCategory = categoryService.get(rootCategoryId, false);
             if(rootCategory.isPresent()) {
                 Optional<RootCategory> top = rootCategoryDAO.findTopByCatalogIdAndSequenceNumOrderBySubSequenceNumDesc(catalog.get().getId(), 0);
-                return rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
+                RootCategory savedRootCategory = rootCategoryDAO.save(new RootCategory(catalog.get().getId(), rootCategory.get().getId(), top.map(rootCategory1 -> rootCategory1.getSubSequenceNum() + 1).orElse(0)));
+                SyncStatus syncStatus = new SyncStatus();
+                syncStatus.setEntity("rootCategory");
+                syncStatus.setTimeStamp(LocalDateTime.now());
+                syncStatus.setExportedTimeStamp(null);
+                syncStatus.setStatus("pending");
+                syncStatus.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                syncStatus.setEntityId(savedRootCategory.getId());
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> dataMap = objectMapper.convertValue(savedRootCategory, Map.class);
+                syncStatus.setData(dataMap);
+                syncStatusDAO.save(syncStatus);
+                return savedRootCategory;
             }
         }
         return null;

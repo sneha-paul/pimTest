@@ -242,7 +242,10 @@ public class ProductVariantController extends ControllerSupport {
                 List<String> variantAttributeIds = variantGroup.getVariantAttributes().get(productVariantDTO.getLevel());
                 variantAttributeIds.forEach(attributeId -> {
                     if(attributesMap.containsKey(attributeId)) {
-                        if(Array.getLength(attributesMap.get(attributeId)) == 1 && productFamily.getAllAttributesMap().get(attributeId).getUiType().equals(Attribute.UIType.MULTI_SELECT)) {
+                        productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
+                        if(productFamily.getAllAttributesMap().get(attributeId).getUiType().equals(Attribute.UIType.MULTI_SELECT)) {
+                            productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
+                        } else if(attributesMap.get(attributeId) instanceof String[]) {
                             productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
                         } else {
                             productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));

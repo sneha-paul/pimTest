@@ -16,11 +16,15 @@
                                 <input type="text" disabled="disabled" value="${attribute.name}" class="form-control"/>
                             </div>
                             <div class="form-group">
+                                <label>Attribute Option Name</label><code class="highlighter-rouge m-l-10">*</code>
+                                <input type="text" name="value" value="${attributeOption.value}" class="form-control" required="true"/>
+                            </div>
+                            <div class="form-group">
                                 <label>Attribute Option ID</label>
                                 <input type="text" disabled="disabled" value="${attributeOption.id}" class="form-control"/>
                             </div>
                             <c:if test="${not empty attribute.parentAttributeId}">
-                                <%--<div class="form-group">
+                                <div class="form-group">
                                     <label>Parent Option</label><code class="highlighter-rouge m-l-10">*</code>
                                     <select class="form-control" name="parentOptionFullId" required="true">
                                         <option value="">Select One</option>
@@ -34,12 +38,8 @@
                                                <c:if test="${attributeOption.independent eq 'Y'}">checked="checked"</c:if>>
                                         <span>Independent Option</span>
                                     </label>
-                                </div>--%>
+                                </div>
                             </c:if>
-                            <div class="form-group">
-                                <label>Attribute Option Name</label><code class="highlighter-rouge m-l-10">*</code>
-                                <input type="text" name="value" value="${attributeOption.value}" class="form-control" required="true"/>
-                            </div>
                         </div>
                     </div>
                     <br>
@@ -64,7 +64,7 @@
                                 <input type="text" name="id" class="form-control"/>
                             </div>
                             <c:if test="${not empty attribute.parentAttributeId}">
-                                <%--<div class="form-group">
+                                <div class="form-group">
                                     <label>Parent Option</label><code class="highlighter-rouge m-l-10">*</code>
                                     <select class="form-control" name="parentOptionFullId" required="true">
                                         <option value="">Select One</option>
@@ -77,10 +77,8 @@
                                         <input type="checkbox" name="independent" value="Y">
                                         <span>Independent Option</span>
                                     </label>
-                                </div>--%>
-
+                                </div>
                             </c:if>
-
                         </div>
                     </div>
                     <br>

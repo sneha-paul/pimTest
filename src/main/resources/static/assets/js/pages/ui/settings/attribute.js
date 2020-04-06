@@ -6,7 +6,7 @@ $(function(){
             names: ['attributeOptions', 'attributeOption'],
             dataUrl: $.getURL('/pim/attributeCollections/{collectionId}/attributes/{attributeFullId}/options/data'),
             columns: [
-                // { data: 'parent', name : 'parent' , title : parentAttributeName, visible: '' !== parentAttributeName},
+                { data: 'parent', name : 'parent' , title : parentAttributeName, visible: '' !== parentAttributeName},
                 { data: 'value', name : 'value' , title : 'Value'},
                 { data: 'id', name : 'id', title : 'ID' },
                 { data: 'actions', name : 'actions', title : 'Actions', orderable: false }

@@ -7,10 +7,15 @@ import com.bigname.pim.core.persistence.dao.mongo.WebsiteCatalogDAO;
 import com.bigname.pim.core.persistence.dao.mongo.WebsiteDAO;
 import com.bigname.pim.core.service.CatalogService;
 import com.bigname.pim.core.service.WebsiteService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ValidationUtil;
+import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.service.impl.BaseServiceSupport;
 import com.m7.xtreme.xcore.util.Criteria;
 import com.m7.xtreme.xcore.util.ID;
+import com.m7.xtreme.xplatform.domain.SyncStatus;
+import com.m7.xtreme.xplatform.persistence.dao.primary.mongo.SyncStatusDAO;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,14 +37,16 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
     private WebsiteDAO websiteDAO;
     private WebsiteCatalogDAO websiteCatalogDAO;
     private CatalogService catalogService;
+    private SyncStatusDAO syncStatusDAO;
 
 
     @Autowired
-    public WebsiteServiceImpl(WebsiteDAO websiteDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, CatalogService catalogService) {
+    public WebsiteServiceImpl(WebsiteDAO websiteDAO, Validator validator, WebsiteCatalogDAO websiteCatalogDAO, CatalogService catalogService, SyncStatusDAO syncStatusDAO) {
         super(websiteDAO, "website", validator);
         this.websiteDAO = websiteDAO;
         this.websiteCatalogDAO = websiteCatalogDAO;
         this.catalogService = catalogService;
+        this.syncStatusDAO = syncStatusDAO;
     }
 
     @Override
@@ -107,7 +115,19 @@ public class WebsiteServiceImpl extends BaseServiceSupport<Website, WebsiteDAO, 
             Optional<Catalog> catalog = catalogService.get(catalogId, false);
             if(catalog.isPresent()) {
                 Optional<WebsiteCatalog> top = websiteCatalogDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                return websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
+                WebsiteCatalog websiteCatalog = websiteCatalogDAO.save(new WebsiteCatalog(website.get().getId(), catalog.get().getId(), top.isPresent() ? top.get().getSubSequenceNum() + 1 : 0));
+                SyncStatus syncStatus = new SyncStatus();
+                syncStatus.setEntity("websiteCatalog");
+                syncStatus.setTimeStamp(LocalDateTime.now());
+                syncStatus.setExportedTimeStamp(null);
+                syncStatus.setStatus("pending");
+                syncStatus.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                syncStatus.setEntityId(websiteCatalog.getId());
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> dataMap = objectMapper.convertValue(websiteCatalog, Map.class);
+                syncStatus.setData(dataMap);
+                syncStatusDAO.save(syncStatus);
+                return websiteCatalog;
             }
         }
         return null;
