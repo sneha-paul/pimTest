@@ -36,7 +36,7 @@ public class FamilyAttribute extends ValidatableEntity {
     private String collectionId;
     private String attributeId;
     private String parentAttributeId; //Full Id of the parent family attribute, if any
-    @Transient
+    @Transient @JsonIgnore
     private FamilyAttribute parentAttribute;
 
     private Map<String, Scope> scope = new HashMap<>();
