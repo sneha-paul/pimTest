@@ -638,7 +638,7 @@ public class ProductVariantController extends ControllerSupport {
     public String loadProductVariantsToBOS() {
         List<ProductVariant> productVariantList = productVariantService.loadProductVariantsToBOS();
         Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/product/loadProductVariant", productVariantList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/loadProductVariant", productVariantList, String.class, map);
         return response.getBody();
     }
 
