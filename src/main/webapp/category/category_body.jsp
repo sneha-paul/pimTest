@@ -255,6 +255,9 @@
         </div>
     </div>
 </div>
+<img src="/assets/img/tiny.png" onload="$.initPage({categoryId : '${product.productId}', hash : '${param.hash}'});$.initAHAH();"/>
+
+<script src="/assets/js/pages/ui/category/category.js"></script>
 <script>
     $.initPage({
         'categoryId' : '${category.categoryId}',
@@ -264,8 +267,7 @@
         'catalogId' : '${param.catalogId}'
     });
 </script>
-<img src="/assets/img/tiny.png" onload="$.initAHAH(this)"/>
-<script src="/assets/js/pages/ui/category/category.js"></script>
+
 
 
 
