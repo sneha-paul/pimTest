@@ -26,6 +26,10 @@
                                                         <input type="text" id="entity" name="entity" class="form-control" value="${syncStatus.entity}" readonly/>
                                                     </div>
                                                     <div class="form-group">
+                                                        <label for="entityId">Entity Id</label><code class="highlighter-rouge m-l-10">*</code>
+                                                        <input type="text" id="entityId" name="entityId" class="form-control" value="${syncStatus.entityId}" readonly/>
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label for="message">Status</label><code class="highlighter-rouge m-l-10">*</code>
                                                         <textarea type="text" id="message" name="message" class="form-control" disabled>${syncStatus.status}</textarea>
                                                     </div>

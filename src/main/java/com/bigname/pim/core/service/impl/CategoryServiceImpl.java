@@ -545,9 +545,21 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             Optional<Product> product = productService.get(productId, false);
             if(product.isPresent()) {
                 Optional<ProductCategory> top1 = productCategoryDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                productCategoryDAO.save(new ProductCategory(product.get().getId(), getInternalId(categoryId).getId().toString(), top1.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+                ProductCategory savedProductCategory = productCategoryDAO.save(new ProductCategory(product.get().getId(), getInternalId(categoryId).getId().toString(), top1.map(productCategory -> productCategory.getSubSequenceNum() + 1).orElse(0)));
+                SyncStatus syncStatus1 = new SyncStatus();
+                syncStatus1.setEntity("productCategory");
+                syncStatus1.setTimeStamp(LocalDateTime.now());
+                syncStatus1.setExportedTimeStamp(null);
+                syncStatus1.setStatus("pending");
+                syncStatus1.setUser(getCurrentUser().map(Entity::getId).orElse(""));
+                syncStatus1.setEntityId(savedProductCategory.getId());
+                ObjectMapper objectMapper1 = new ObjectMapper();
+                Map<String, Object> dataMap1 = objectMapper1.convertValue(savedProductCategory, Map.class);
+                syncStatus1.setData(dataMap1);
+                syncStatusDAO.save(syncStatus1);
+
                 Optional<CategoryProduct> top2 = categoryProductDAO.findTopBySequenceNumOrderBySubSequenceNumDesc(0);
-                CategoryProduct savedCategoryProduct = categoryProductDAO.save(new CategoryProduct(getInternalId(categoryId).getId().toString(), product.get().getId(), top2.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
+                CategoryProduct savedCategoryProduct = categoryProductDAO.save(new CategoryProduct(category.get().getId(), product.get().getId(), top2.map(categoryProduct -> categoryProduct.getSubSequenceNum() + 1).orElse(0)));
                 SyncStatus syncStatus = new SyncStatus();
                 syncStatus.setEntity("categoryProduct");
                 syncStatus.setTimeStamp(LocalDateTime.now());
