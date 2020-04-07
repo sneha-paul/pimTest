@@ -307,13 +307,16 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                     if(direction == DOWN) {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum());
+                        source.setLastExportedTimeStamp(null);
                         modifiedSubCategories.add(source);
                         destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        destination.setLastExportedTimeStamp(null);
                         modifiedSubCategories.add(destination);
                         modifiedSubCategories.addAll(rearrangeOtherSubCategories(category.getId(), source, destination, direction));
                     } else {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        source.setLastExportedTimeStamp(null);
                         modifiedSubCategories.add(source);
                         modifiedSubCategories.addAll(rearrangeOtherSubCategories(category.getId(), source, destination, direction));
                     }
@@ -332,6 +335,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             }
             if(subCategory.getSubSequenceNum() == subSequenceNum) {
                 subCategory.setSubSequenceNum(++subSequenceNum);
+                subCategory.setLastExportedTimeStamp(null);
                 adjustedSubCategories.add(subCategory);
             } else {
                 break;
@@ -379,13 +383,16 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
                     if(direction == DOWN) {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum());
+                        source.setLastExportedTimeStamp(null);
                         modifiedcategoryProducts.add(source);
                         destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        destination.setLastExportedTimeStamp(null);
                         modifiedcategoryProducts.add(destination);
                         modifiedcategoryProducts.addAll(rearrangeOtherCategoryProducts(category.getId(), source, destination, direction));
                     } else {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        source.setLastExportedTimeStamp(null);
                         modifiedcategoryProducts.add(source);
                         modifiedcategoryProducts.addAll(rearrangeOtherCategoryProducts(category.getId(), source, destination, direction));
                     }
@@ -404,6 +411,7 @@ public class CategoryServiceImpl extends BaseServiceSupport<Category, CategoryDA
             }
             if(categoryProduct.getSubSequenceNum() == subSequenceNum) {
                 categoryProduct.setSubSequenceNum(++subSequenceNum);
+                categoryProduct.setLastExportedTimeStamp(null);
                 adjustedCategoryProducts.add(categoryProduct);
             } else {
                 break;

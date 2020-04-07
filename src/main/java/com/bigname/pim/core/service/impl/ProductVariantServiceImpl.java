@@ -463,13 +463,16 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
                     if(direction == DOWN) {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum());
+                        source.setLastExportedTimeStamp(null);
                         modifiedProductVariants.add(source);
                         destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        destination.setLastExportedTimeStamp(null);
                         modifiedProductVariants.add(destination);
                         modifiedProductVariants.addAll(rearrangeOtherProductVariants(product.getId(), source, destination, direction));
                     } else {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        source.setLastExportedTimeStamp(null);
                         modifiedProductVariants.add(source);
                         modifiedProductVariants.addAll(rearrangeOtherProductVariants(product.getId(), source, destination, direction));
                     }
@@ -488,6 +491,7 @@ public class ProductVariantServiceImpl extends BaseServiceSupport<ProductVariant
             }
             if(productVariant.getSubSequenceNum() == subSequenceNum) {
                 productVariant.setSubSequenceNum(++subSequenceNum);
+                productVariant.setLastExportedTimeStamp(null);
                 adjustedProductVariants.add(productVariant);
             } else {
                 break;

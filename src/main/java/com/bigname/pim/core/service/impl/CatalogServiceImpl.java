@@ -236,13 +236,16 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
                     if(direction == DOWN) {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum());
+                        source.setLastExportedTimeStamp(null);
                         modifiedRootCategories.add(source);
                         destination.setSubSequenceNum(source.getSubSequenceNum() + 1);
+                        destination.setLastExportedTimeStamp(null);
                         modifiedRootCategories.add(destination);
                         modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId.getId(), source, destination, direction));
                     } else {
                         source.setSequenceNum(destination.getSequenceNum());
                         source.setSubSequenceNum(destination.getSubSequenceNum() + 1);
+                        source.setLastExportedTimeStamp(null);
                         modifiedRootCategories.add(source);
                         modifiedRootCategories.addAll(rearrangeOtherRootCategories(catalogId.getId(), source, destination, direction));
                     }
@@ -261,6 +264,7 @@ public class CatalogServiceImpl extends BaseServiceSupport<Catalog, CatalogDAO, 
             }
             if(rootCategory.getSubSequenceNum() == subSequenceNum) {
                 rootCategory.setSubSequenceNum(++subSequenceNum);
+                rootCategory.setLastExportedTimeStamp(null);
                 adjustedRootCategories.add(rootCategory);
             } else {
                 break;
