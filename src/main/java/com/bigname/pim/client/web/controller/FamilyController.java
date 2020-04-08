@@ -603,8 +603,21 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     public Map<String, Object> syncUpdatedFamilies() {
         Map<String, Object> model = new HashMap<>();
         List<Family> families = familyService.syncUpdatedRecord();
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/families/syncUpdatedFamilies", families, String.class, map);
+        families.forEach(family -> {
+            family.getAttributes().forEach((k,v) -> {
+                v.getChildGroups().get("DEFAULT_GROUP").getChildGroups().get("DEFAULT_GROUP").getAttributes().forEach((k1,v1) ->{
+                    if(isNotEmpty(v1.getParentAttributeId())) {
+                        v1.setParentAttribute(family.getAttribute(v1.getParentAttributeId()).orElse(null));
+                    }
+                });
+            });
+            family.getAllAttributes().forEach(attr -> {
+                if(isNotEmpty(attr.getParentAttributeId())) {
+                    attr.setParentAttribute(family.getAttribute(attr.getParentAttributeId()).orElse(null));
+                }
+            });
+        });
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/families/syncUpdatedFamilies", families, String.class, new HashMap<>());
         if(Objects.equals(response.getBody(), "true")) {
             families.forEach(family -> {
                 family.setLastExportedTimeStamp(LocalDateTime.now());

@@ -250,16 +250,14 @@ public class ProductVariantController extends ControllerSupport {
                     if(attributesMap.containsKey(attributeId)) {
                         productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
                         if(productFamily.getAllAttributesMap().get(attributeId).getUiType().equals(Attribute.UIType.MULTI_SELECT)) {
-                            productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
+                            List<Object> attributeList = Arrays.asList(attributesMap.get(attributeId));
+                            attributeList.forEach(attr -> productVariantDTO.getVariantAttributes().put(attributeId, attr));
                         } else if(attributesMap.get(attributeId) instanceof String[]) {
-                            productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
+                            List<Object> attributeList = Arrays.asList(attributesMap.get(attributeId));
+                            attributeList.forEach(attr -> productVariantDTO.getVariantAttributes().put(attributeId, attr));
                         } else {
                             productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
                         }
-
-                        /*if(productFamily.getAllAttributesMap().get(attributeId).getUiType().equals(Attribute.UIType.MULTI_SELECT)) {
-                            productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
-                        }*/
                     } else {
                         Map<String, Object> valueMap = new LinkedHashMap<>();
                         attributesMap.entrySet().stream()
