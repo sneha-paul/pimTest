@@ -223,7 +223,7 @@ public class Product extends MongoEntity<Product> {
 
         Map<String, Object> scopedFamilyAttributes = getScopedFamilyAttributes().get(channelId);
 
-        attributeValues.forEach((attributeId, attributeValue) -> {
+        /*attributeValues.forEach((attributeId, attributeValue) -> {
             if(familyAttributesMap.containsKey(attributeId)) {
                 FamilyAttribute familyAttribute = familyAttributesMap.get(attributeId);
                 if(familyAttribute.getUiType() == Attribute.UIType.MULTI_SELECT) {
@@ -234,11 +234,28 @@ public class Product extends MongoEntity<Product> {
                 scopedFamilyAttributes.put(attributeId, attributeValue);
 //                if(booleanValue(familyAttribute.getScopable())) {
 
-                /*} else {
+                *//*} else {
                     scopedFamilyAttributes.remove(attributeId);
                     familyAttributes.put(attributeId, attributeValue);
-                }*/
+                }*//*
             }
+        });*/
+
+        familyAttributesMap.forEach((attributeId, attributeValue) -> {
+            if(attributeValues.containsKey(attributeId)) {
+                if(attributeValue.getUiType() == Attribute.UIType.MULTI_SELECT) {
+                    if(attributeValues.get(attributeId) instanceof String) {
+                        scopedFamilyAttributes.put(attributeId, new String[]{(String)attributeValues.get(attributeId)});
+                    } else {
+                        scopedFamilyAttributes.put(attributeId, attributeValues.get(attributeId));
+                    }
+                } else {
+                    scopedFamilyAttributes.put(attributeId, attributeValues.get(attributeId));
+                }
+            } else {
+                scopedFamilyAttributes.put(attributeId, null);
+            }
+
         });
     }
 
