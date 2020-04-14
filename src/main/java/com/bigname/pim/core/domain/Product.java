@@ -252,9 +252,9 @@ public class Product extends MongoEntity<Product> {
                 } else {
                     scopedFamilyAttributes.put(attributeId, attributeValues.get(attributeId));
                 }
-            } else {
+            } /*else {
                 scopedFamilyAttributes.put(attributeId, null);
-            }
+            }*/
 
         });
     }

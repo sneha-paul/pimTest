@@ -273,9 +273,9 @@ public class ProductVariantController extends ControllerSupport {
                                 .forEach(e -> valueMap.put(e.getKey().substring(e.getKey().lastIndexOf(".") + 1), e.getValue()));
                         if(!valueMap.isEmpty()) {
                             productVariantDTO.getVariantAttributes().put(attributeId, valueMap);
-                        } else {
+                        } /*else {
                             productVariantDTO.getVariantAttributes().put(attributeId, null);
-                        }
+                        }*/
                     }
                 });
             }
