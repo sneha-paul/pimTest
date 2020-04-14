@@ -223,15 +223,19 @@
                                                     <div class="card inner group overflowhidden">
                                                         <div class="body">
                                                             <fieldset>
-                                                                <c:if test="${attributeGroup.defaultGroup ne 'Y'}"><legend>${attributeGroup.label}</legend></c:if>
                                                                 <div class="panel panel-default">
                                                                     <div class="panel-body">
                                                                         <div class="row">
                                                                             <div class="col-md-6 col-sm-12">
+                                                                                <c:set var="count" value="0"/>
                                                                                 <c:forEach items="${attributeGroup.attributes}" var="attributeEntry">
                                                                                     <c:set var="attribute" value="${attributeEntry.value}"/>
                                                                                     <c:set var="attributeType" value="${attribute.getType(product.channelId)}"/>
                                                                                     <c:if test="${attributeType eq 'COMMON'}">
+                                                                                        <c:if test="${count eq 0}">
+                                                                                            <c:if test="${attributeGroup.defaultGroup ne 'Y'}"><legend>${attributeGroup.label}</legend></c:if>
+                                                                                            <c:set var="count" value="1"/>
+                                                                                        </c:if>
                                                                                         <div class="form-group">
                                                                                         <c:if test="${attribute.uiType ne 'YES_NO' and attributeGroup.label ne attribute.label}">
                                                                                             <label for="${attribute.id}">${attribute.label}</label><code class="highlighter-rouge m-l-10"><c:if test="${attributeType eq 'COMMON' and attribute.isRequired(product.channelId)}">*</c:if></code>
