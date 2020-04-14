@@ -12,6 +12,7 @@ import com.m7.xtreme.common.datatable.model.SortOrder;
 import com.m7.xtreme.common.util.CollectionsUtil;
 import com.m7.xtreme.common.util.ConversionUtil;
 import com.m7.xtreme.common.util.StringUtil;
+import com.m7.xtreme.common.util.ValidationUtil;
 import com.m7.xtreme.xcore.domain.Entity;
 import com.m7.xtreme.xcore.domain.ValidatableEntity;
 import com.m7.xtreme.xcore.exception.EntityNotFoundException;
@@ -251,7 +252,14 @@ public class ProductVariantController extends ControllerSupport {
                         productVariantDTO.getVariantAttributes().put(attributeId, attributesMap.get(attributeId));
                         if(productFamily.getAllAttributesMap().get(attributeId).getUiType().equals(Attribute.UIType.MULTI_SELECT)) {
                             List<Object> attributeList = Arrays.asList(attributesMap.get(attributeId));
-                            attributeList.forEach(attr -> productVariantDTO.getVariantAttributes().put(attributeId, attr));
+                            if(attributesMap.get(attributeId) instanceof String) {
+                                productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
+                            }
+                            else if(((String[]) attributeList.get(0)).length > 1) {
+                                attributeList.forEach(attr -> productVariantDTO.getVariantAttributes().put(attributeId, attr));
+                            } else {
+                                productVariantDTO.getVariantAttributes().put(attributeId, Arrays.asList(attributesMap.get(attributeId)));
+                            }
                         } else if(attributesMap.get(attributeId) instanceof String[]) {
                             List<Object> attributeList = Arrays.asList(attributesMap.get(attributeId));
                             attributeList.forEach(attr -> productVariantDTO.getVariantAttributes().put(attributeId, attr));
