@@ -865,9 +865,7 @@ input.datepicker ~ .js-locked, input.datepicker ~ .js-level-locked, input.datepi
     right: 50px;
 
 }
-.fancy-radio input[type="radio"]+span{
-    position: absolute;
-}
+
 
 @media screen and (max-width: 3000px){
     #main-content{
