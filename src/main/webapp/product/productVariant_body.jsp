@@ -165,7 +165,7 @@
                                                                                                 </c:when>
                                                                                                 <c:when test="${attribute.uiType eq 'YES_NO'}">
                                                                                                     <br/>
-                                                                                                    <label class="fancy-checkbox${disabledClass}">
+                                                                                                    <label class="fancy-checkbox ${disabled} ${disabledClass}">
                                                                                                         <input type="checkbox" class="js-checkbox" name="${attribute.id}" value="Y" <c:if test="${attributeValue eq 'Y'}">checked="checked"</c:if>>
                                                                                                         <span>${attribute.label}</span>
                                                                                                     </label>
