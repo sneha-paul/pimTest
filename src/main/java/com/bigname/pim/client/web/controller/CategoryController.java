@@ -416,10 +416,17 @@ public class CategoryController extends BaseController<Category, CategoryService
     }
 
     @RequestMapping(value ="/categoryLoad")
-    public void loadCategoryToBOS() {
+    @ResponseBody
+    public Map<String, Object> loadCategoryToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
         List<Category> categoryList = categoryService.getAll(null, false);
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/loadCategory", categoryList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/loadCategory", categoryList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/relatedCategoryLoad")
@@ -428,8 +435,7 @@ public class CategoryController extends BaseController<Category, CategoryService
         Map<String, Object> model = new HashMap<>();
         boolean success = false;
         List<RelatedCategory> relatedCategoryList = categoryService.getAll();
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/category/loadRelatedCategory", relatedCategoryList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/loadRelatedCategory", relatedCategoryList, String.class, new HashMap<>());
         if (response != null && response.getStatusCode() == HttpStatus.OK) {
             success = true;
         }
@@ -438,10 +444,17 @@ public class CategoryController extends BaseController<Category, CategoryService
     }
 
     @RequestMapping(value ="/categoryProductLoad")
-    public void loadProductCategoryToBOS() {
+    @ResponseBody
+    public Map<String, Object> loadProductCategoryToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
         List<CategoryProduct> categoryProductList = categoryService.loadCategoryProductToBOS();
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/category/loadCategoryProduct", categoryProductList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/categories/loadCategoryProduct", categoryProductList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/syncUpdatedCategories", method = RequestMethod.PUT)

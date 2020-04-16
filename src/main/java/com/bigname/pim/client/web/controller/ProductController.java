@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -311,17 +312,31 @@ public class ProductController extends BaseController<Product, ProductService> {
         return model;
     }
     @RequestMapping(value ="/productLoad")
-    public void loadProductToBOS() {
+    @ResponseBody
+    public Map<String, Object> loadProductToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
         List<Product> productList = productService.getAll(null, false);
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/loadProduct", productList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/loadProduct", productList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/productCategoryLoad")
-    public void loadProductCategoryToBOS() {
+    @ResponseBody
+    public Map<String, Object> loadProductCategoryToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
         List<ProductCategory> productCategoryList = productService.loadProductCategoryToBOS();
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/product/loadProductCategory", productCategoryList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/loadProductCategory", productCategoryList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/syncUpdatedProducts", method = RequestMethod.PUT)

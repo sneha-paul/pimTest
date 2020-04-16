@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -295,6 +296,7 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     }
 
     @RequestMapping(value ="/websiteLoad")
+    @ResponseBody
     public String loadCatalogToBOS() {
         boolean status;
         List<Website> websiteList = websiteService.getAll(null, false);
@@ -303,10 +305,17 @@ public class WebsiteController extends BaseController<Website, WebsiteService> {
     }
 
     @RequestMapping(value ="/websiteCatalogLoad")
-    public String loadWebsiteCatalogsToBOS() {
+    @ResponseBody
+    public Map<String, Object> loadWebsiteCatalogsToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
         List<WebsiteCatalog> websiteCatalogList = websiteService.loadWebsiteCatalogsToBOS();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/website/loadWebsiteCatalog", websiteCatalogList, String.class, new HashMap<>());
-        return response.getBody();
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin//websites/loadWebsiteCatalog", websiteCatalogList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping("/{websiteId}/configParam/data")

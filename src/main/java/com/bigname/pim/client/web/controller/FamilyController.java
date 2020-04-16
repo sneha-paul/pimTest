@@ -22,6 +22,7 @@ import com.m7.xtreme.xcore.web.controller.BaseController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -592,10 +593,31 @@ public class FamilyController extends BaseController<Family, FamilyService> {
     }
 
     @RequestMapping(value ="/familyLoad")
-    public void loadFamilyToBOS() {
-        List<Family> familyList = familyService.getAll(null, false);
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/family/loadFamily", familyList, String.class, map);
+    @ResponseBody
+    public Map<String, Object> loadFamilyToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        List<Family> familyList = familyService.getAll(null, true);
+        familyList.forEach(family -> {
+            family.getAttributes().forEach((k,v) -> {
+                v.getChildGroups().get("DEFAULT_GROUP").getChildGroups().get("DEFAULT_GROUP").getAttributes().forEach((k1,v1) ->{
+                    if(isNotEmpty(v1.getParentAttributeId())) {
+                        v1.setParentAttribute(family.getAttribute(v1.getParentAttributeId()).orElse(null));
+                    }
+                });
+            });
+            family.getAllAttributes().forEach(attr -> {
+                if(isNotEmpty(attr.getParentAttributeId())) {
+                    attr.setParentAttribute(family.getAttribute(attr.getParentAttributeId()).orElse(null));
+                }
+            });
+        });
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/families/loadFamily", familyList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/syncUpdatedFamilies", method = RequestMethod.PUT)

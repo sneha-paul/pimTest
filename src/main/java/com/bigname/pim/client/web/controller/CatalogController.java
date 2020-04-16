@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -296,18 +297,31 @@ public class CatalogController extends BaseController<Catalog, CatalogService> {
     }
 
     @RequestMapping(value ="/catalogLoad")
-    public void loadCatalogToBOS() {
-        List<Catalog> catalogList = catalogService.getAll(null, false);
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/catalogs/loadCatalog", catalogList, String.class, map);
-        response.getStatusCode();
+    @ResponseBody
+    public Map<String, Object> loadCatalogToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
+        List<Catalog> catalogList = catalogService.getAll(null, true);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/catalogs/loadCatalog", catalogList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/rootCategoryLoad")
-    public void loadRootCategoryToBOS() {
+    @ResponseBody
+    public Map<String, Object> loadRootCategoryToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
         List<RootCategory> rootCategoryList = catalogService.loadRootCategoryToBOS();
-        Map<String, String> map = new HashMap<String, String>();
-        ResponseEntity<String> response =  restTemplate.postForEntity("http://envelopes.localhost:8084/catalog/loadRootCategory", rootCategoryList, String.class, map);
+        ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/catalogs/loadRootCategory", rootCategoryList, String.class, new HashMap<>());
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/syncUpdatedCatalogs", method = RequestMethod.PUT)

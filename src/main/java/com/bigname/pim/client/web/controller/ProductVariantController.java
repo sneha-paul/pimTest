@@ -29,6 +29,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -643,11 +644,18 @@ public class ProductVariantController extends ControllerSupport {
     }
 
     @RequestMapping(value ="/productVariantsLoad")
-    public String loadProductVariantsToBOS() {
+    @ResponseBody
+    public Map<String, Object> loadProductVariantsToBOS() {
+        Map<String, Object> model = new HashMap<>();
+        boolean success = false;
         List<ProductVariant> productVariantList = productVariantService.loadProductVariantsToBOS();
         Map<String, String> map = new HashMap<String, String>();
         ResponseEntity<String> response =  restTemplate.postForEntity("http://localhost:8084/admin/products/loadProductVariant", productVariantList, String.class, map);
-        return response.getBody();
+        if (response != null && response.getStatusCode() == HttpStatus.OK) {
+            success = true;
+        }
+        model.put("success", success);
+        return model;
     }
 
     @RequestMapping(value ="/syncUpdatedProductVariants", method = RequestMethod.PUT)
