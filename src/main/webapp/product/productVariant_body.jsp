@@ -141,8 +141,8 @@
                                                                                                     <br/>
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
-                                                                                                        <label class="fancy-checkbox">
-                                                                                                            <input type="checkbox" class="js-checkbox${disabledClass}" ${disabled} name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                        <label class="fancy-checkbox ${disabledClass} ${disabled}">
+                                                                                                            <input type="checkbox" class="js-checkbox"  name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -316,8 +316,8 @@
                                                                                                     <br/>
                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
-                                                                                                        <label class="fancy-radio">
-                                                                                                            <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                        <label class="fancy-radio" ${disabled}>
+                                                                                                            <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                             <span><i></i>${attributeOption.value}</span>
                                                                                                         </label>
                                                                                                         <c:if test="${not s1.end}">
@@ -633,8 +633,8 @@
                                                                                                                     <br/>
                                                                                                                     <c:forEach items="${attribute.options}" var="attributeOptionEntry" varStatus="s1">
                                                                                                                         <c:set var="attributeOption" value="${attributeOptionEntry.value}"/>
-                                                                                                                        <label class="fancy-radio">
-                                                                                                                            <input type="radio" name="${attribute.id}" ${disabled} value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
+                                                                                                                        <label class="fancy-radio" ${disabled}>
+                                                                                                                            <input type="radio" name="${attribute.id}" value="${attributeOption.id}" <c:if test="${attributeValue eq attributeOption.id}">checked="checked"</c:if>>
                                                                                                                             <span><i></i>${attributeOption.value}</span>
                                                                                                                         </label>
                                                                                                                         <c:if test="${not s1.end}">
