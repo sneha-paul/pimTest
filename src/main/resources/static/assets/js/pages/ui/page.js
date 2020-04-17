@@ -1405,6 +1405,25 @@
                     }));
                 }
             });
+            $('.fancy-radio[disabled="disabled"]').each(function(){
+                let msg = '';
+                if ($(this).hasClass('js-parent-level')) {
+                    msg = 'This property can only be modified at the product level';
+                    $(this).after($('<div class="js-level-locked icon-arrow-up" title="' + msg + '"></div>').on('click', function () {
+                        toastr.info(msg, 'Readonly Property');
+                    }));
+                } else if ($(this).hasClass('js-variant-axis')) {
+                    msg = 'This is the variant axis and is not editable';
+                    $(this).after($('<div class="js-axis-locked icon-target" title="' + msg + '"></div>').on('click', function () {
+                        toastr.info(msg, 'Readonly Property');
+                    }));
+                } else {
+                    msg = 'This property is not editable';
+                    $(this).after($('<div class="js-locked icon-lock" title="' + msg + '"></div>').on('click', function () {
+                        toastr.info(msg, 'Readonly Property');
+                    }));
+                }
+            });
             $('.fancy-checkbox.js-disabled').each(function(){
                 let msg = '';
                 if($(this).hasClass('js-parent-level')) {

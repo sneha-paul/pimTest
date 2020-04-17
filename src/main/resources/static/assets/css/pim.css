@@ -300,7 +300,12 @@ a:focus {outline:0;}
     border-color: #efd8d8;
     background-color: #fbf5f5;
 }
-
+label.fancy-radio[disabled="disabled"] input[type="radio"]+span i {
+    opacity: .4;
+}
+label.fancy-radio[disabled="disabled"] {
+    pointer-events: none;
+}
 .fancy-checkbox input[type="checkbox"]+span:before {
     background-color: #ffffff;
 }
